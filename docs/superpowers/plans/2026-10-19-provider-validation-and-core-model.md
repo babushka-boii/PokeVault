@@ -94,7 +94,7 @@ Run `python -m unittest discover -s tests/research/providers -p 'test_manifest.p
 
 Expected: all Task 1 tests pass.
 
-Run `python -m unittest discover -s tests -p 'test_*.py' -v`.
+Run `python -m unittest discover -s tests -t . -p 'test_*.py' -v`.
 
 Expected: all discovered tests pass offline.
 
@@ -152,7 +152,7 @@ Run `python -m unittest discover -s tests/research/providers -p 'test_tcgdex.py'
 
 Expected: all Task 2 tests pass.
 
-Run `python -m unittest discover -s tests -p 'test_*.py' -v`.
+Run `python -m unittest discover -s tests -t . -p 'test_*.py' -v`.
 
 Expected: all discovered tests pass offline.
 
@@ -204,7 +204,7 @@ Run `python -m unittest discover -s tests/research/providers -p 'test_pokeapi.py
 
 Expected: all Task 3 tests pass.
 
-Run `python -m unittest discover -s tests -p 'test_*.py' -v`.
+Run `python -m unittest discover -s tests -t . -p 'test_*.py' -v`.
 
 Expected: all discovered tests pass offline.
 
@@ -270,7 +270,7 @@ Run `python -m unittest discover -s tests/research/providers -p 'test_fixtures.p
 
 Expected: all Task 4 tests pass.
 
-Run `python -m unittest discover -s tests -p 'test_*.py' -v`.
+Run `python -m unittest discover -s tests -t . -p 'test_*.py' -v`.
 
 Expected: all discovered tests pass offline.
 
@@ -338,7 +338,7 @@ Run `python -m unittest discover -s tests/research/providers -p 'test_cli.py' -v
 
 Expected: all Task 5 tests pass.
 
-Run `python -m unittest discover -s tests -p 'test_*.py' -v`.
+Run `python -m unittest discover -s tests -t . -p 'test_*.py' -v`.
 
 Expected: all tests pass offline and no test opens a network connection.
 
@@ -368,7 +368,7 @@ Run `git commit -m "feat: orchestrate provider validation report"`.
 
 - [ ] **Step 1: Verify offline before live access**
 
-Run `python -m unittest discover -s tests -p 'test_*.py' -v`.
+Run `python -m unittest discover -s tests -t . -p 'test_*.py' -v`.
 
 Expected: all tests pass without network access.
 
@@ -398,7 +398,7 @@ Record completed iteration-2 behavior, AI assistance, evidence date, key finding
 
 - [ ] **Step 7: Run final verification**
 
-Run `python -m unittest discover -s tests -p 'test_*.py' -v`.
+Run `python -m unittest discover -s tests -t . -p 'test_*.py' -v`.
 
 Expected: all tests pass offline.
 

@@ -1,0 +1,100 @@
+{
+  "cases": [
+    {
+      "name": "tcgdex-furret-en",
+      "provider": "tcgdex",
+      "resource_kind": "card",
+      "language": "en",
+      "url": "https://api.tcgdex.net/v2/en/cards/swsh3-136",
+      "expected": {"id": "swsh3-136", "category": "Pokemon", "dexId": [162]}
+    },
+    {
+      "name": "tcgdex-pikachu-zekrom-en",
+      "provider": "tcgdex",
+      "resource_kind": "card",
+      "language": "en",
+      "url": "https://api.tcgdex.net/v2/en/cards/sm9-33",
+      "expected": {"id": "sm9-33", "category": "Pokemon", "dexId": [25, 644]}
+    },
+    {
+      "name": "tcgdex-professor-oak-en",
+      "provider": "tcgdex",
+      "resource_kind": "card",
+      "language": "en",
+      "url": "https://api.tcgdex.net/v2/en/cards/base1-88",
+      "expected": {"id": "base1-88", "category": "Trainer", "dexId": []}
+    },
+    {
+      "name": "tcgdex-grass-energy-en",
+      "provider": "tcgdex",
+      "resource_kind": "card",
+      "language": "en",
+      "url": "https://api.tcgdex.net/v2/en/cards/base1-99",
+      "expected": {"id": "base1-99", "category": "Energy", "dexId": []}
+    },
+    {
+      "name": "tcgdex-furret-es",
+      "provider": "tcgdex",
+      "resource_kind": "card",
+      "language": "es",
+      "url": "https://api.tcgdex.net/v2/es/cards/swsh3-136",
+      "expected": {"id": "swsh3-136", "category": "Pokémon", "dexId": [162]}
+    },
+    {
+      "name": "tcgdex-darkness-ablaze-set-en",
+      "provider": "tcgdex",
+      "resource_kind": "set",
+      "language": "en",
+      "url": "https://api.tcgdex.net/v2/en/sets/swsh3",
+      "expected": {"id": "swsh3", "cardCount": {"official": 189, "total": 201}}
+    },
+    {
+      "name": "pokeapi-species-furret",
+      "provider": "pokeapi",
+      "resource_kind": "species",
+      "language": null,
+      "url": "https://pokeapi.co/api/v2/pokemon-species/162/",
+      "expected": {"id": 162, "name": "furret", "generation": "generation-ii"}
+    },
+    {
+      "name": "pokeapi-species-pikachu",
+      "provider": "pokeapi",
+      "resource_kind": "species",
+      "language": null,
+      "url": "https://pokeapi.co/api/v2/pokemon-species/25/",
+      "expected": {"id": 25, "name": "pikachu", "generation": "generation-i"}
+    },
+    {
+      "name": "pokeapi-species-zekrom",
+      "provider": "pokeapi",
+      "resource_kind": "species",
+      "language": null,
+      "url": "https://pokeapi.co/api/v2/pokemon-species/644/",
+      "expected": {"id": 644, "name": "zekrom", "generation": "generation-v"}
+    },
+    {
+      "name": "pokeapi-pokemon-furret",
+      "provider": "pokeapi",
+      "resource_kind": "pokemon",
+      "language": null,
+      "url": "https://pokeapi.co/api/v2/pokemon/162/",
+      "expected": {"id": 162, "name": "furret", "types": ["normal"]}
+    },
+    {
+      "name": "pokeapi-pokemon-pikachu",
+      "provider": "pokeapi",
+      "resource_kind": "pokemon",
+      "language": null,
+      "url": "https://pokeapi.co/api/v2/pokemon/25/",
+      "expected": {"id": 25, "name": "pikachu", "types": ["electric"]}
+    },
+    {
+      "name": "pokeapi-pokemon-zekrom",
+      "provider": "pokeapi",
+      "resource_kind": "pokemon",
+      "language": null,
+      "url": "https://pokeapi.co/api/v2/pokemon/644/",
+      "expected": {"id": 644, "name": "zekrom", "types": ["dragon", "electric"]}
+    }
+  ]
+}
