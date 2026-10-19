@@ -65,3 +65,18 @@ class SetRecord:
     name: str
     official_count: int
     total_count: int
+
+
+@dataclass(frozen=True)
+class SpeciesRecord:
+    national_dex_number: int
+    slug: str
+    names: tuple[tuple[str, str], ...]
+    generation: str
+
+
+@dataclass(frozen=True)
+class PokemonRecord:
+    national_dex_number: int
+    types: tuple[str, ...]
+    default_sprite_url: str | None

@@ -1,0 +1,10 @@
+{
+  "id": 162,
+  "name": "furret",
+  "generation": {"name": "generation-ii", "url": "https://pokeapi.co/api/v2/generation/2/"},
+  "names": [
+    {"language": {"name": "en"}, "name": "Furret"},
+    {"language": {"name": "es"}, "name": "Furret"},
+    {"language": {"name": "fr"}, "name": "Fouinar"}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": 162,
+  "name": "furret",
+  "sprites": {"front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/162.png"},
+  "types": [
+    {"slot": 1, "type": {"name": "normal"}}
+  ]
+}
