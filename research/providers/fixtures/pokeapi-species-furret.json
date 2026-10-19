@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "case": "pokeapi-species-furret",
+    "provider": "pokeapi",
+    "retrieved_at": "2026-10-19T23:22:58.608006Z",
+    "sha256": "6ea8fbdac01c6d88477240a30144ae42299ddd015ff92a74230074c919782cee",
+    "source_url": "https://pokeapi.co/api/v2/pokemon-species/162/"
+  },
+  "payload": {
+    "generation": {
+      "name": "generation-ii",
+      "url": "https://pokeapi.co/api/v2/generation/2/"
+    },
+    "id": 162,
+    "name": "furret",
+    "names": [
+      {
+        "language": {
+          "name": "es",
+          "url": "https://pokeapi.co/api/v2/language/7/"
+        },
+        "name": "Furret"
+      },
+      {
+        "language": {
+          "name": "en",
+          "url": "https://pokeapi.co/api/v2/language/9/"
+        },
+        "name": "Furret"
+      }
+    ]
+  }
+}

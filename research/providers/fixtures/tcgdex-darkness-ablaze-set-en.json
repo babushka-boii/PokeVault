@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "case": "tcgdex-darkness-ablaze-set-en",
+    "provider": "tcgdex",
+    "retrieved_at": "2026-10-19T23:22:58.315836Z",
+    "sha256": "5f1d2e990c09e0e3f1b715ec0074963c67285355fd24914d5227f03e0d1083d5",
+    "source_url": "https://api.tcgdex.net/v2/en/sets/swsh3"
+  },
+  "payload": {
+    "cardCount": {
+      "firstEd": 0,
+      "holo": 69,
+      "normal": 138,
+      "official": 189,
+      "reverse": 157,
+      "total": 201
+    },
+    "id": "swsh3",
+    "name": "Darkness Ablaze"
+  }
+}

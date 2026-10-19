@@ -53,3 +53,25 @@ No corresponde atribuir al estudiante reflexiones personales que todavía no ha 
 - Evaluar datos oficiales, precios y términos de uso.
 - Diseñar el modelo relacional y definir cómo se guardan copias físicas, variantes, multiespecie y cartas Trainer/Energy.
 - Seleccionar conjunto de prueba para el escaneo.
+
+## Iteración 2 — Evidencia de proveedores y modelo lógico
+
+**Fecha del registro:** 19/10/2026
+**Tipo de entrega:** investigación técnica reproducible y diseño de datos; todavía no hay frontend, backend, base de datos ni autenticación.
+
+### Trabajo realizado y evidencia
+
+- Se definió un manifest fijo de 12 casos: cinco cartas y un set en TCGdex; tres especies y tres recursos Pokémon en PokéAPI.
+- Se implementó validación HTTPS acotada, normalización EN/ES, variantes y precios sin mezclar monedas ni convertir valores `null` en cero.
+- Se comprobaron relaciones con cero, una y múltiples especies, además de los conteos `swsh3` (189 oficiales, 201 totales).
+- Se generaron fixtures mínimos con procedencia y SHA-256, y un reporte reproducible sin red. Su digest se mantuvo idéntico al regenerarlo offline.
+- Se ejecutaron 43 pruebas automatizadas offline al cerrar la implementación.
+- Se diseñó el ERD lógico para catálogo, localización, copias físicas, usuarios, cajas y membresías con integridad por usuario.
+
+### Participación de IA y ajustes
+
+Codex ayudó a revisar el repositorio, redactar el diseño y plan, implementar pruebas/código y documentar resultados. Durante el refresh real se detectaron y corrigieron con pruebas tres diferencias: idioma requerido por TCGdex, ausencia legítima de `dexId` en Trainer/Energy y enlaces nominales anidados de PokéAPI. También se redujeron los fixtures de respuestas completas a una proyección mínima.
+
+### Límites y siguiente paso
+
+La muestra demuestra viabilidad técnica, no cobertura total ni permiso de redistribución de imágenes. Precios, términos, licencias y vigencia deben revisarse antes de producción. El próximo incremento es crear un scaffold ejecutable de frontend/API/base de datos y autenticación, sin adelantar todavía esas implementaciones.

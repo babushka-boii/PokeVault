@@ -1,0 +1,175 @@
+{
+  "metadata": {
+    "case": "tcgdex-professor-oak-en",
+    "provider": "tcgdex",
+    "retrieved_at": "2026-10-19T23:22:55.519816Z",
+    "sha256": "40322c9705d25dae8c09ebbe6589c26592905ff3f19234cd75a76f3de9894ee3",
+    "source_url": "https://api.tcgdex.net/v2/en/cards/base1-88"
+  },
+  "payload": {
+    "category": "Trainer",
+    "id": "base1-88",
+    "image": "https://assets.tcgdex.net/en/base/base1/88",
+    "localId": "88",
+    "name": "Professor Oak",
+    "pricing": {
+      "cardmarket": {
+        "avg": 1.46,
+        "avg-holo": null,
+        "avg1": 0.53,
+        "avg1-holo": 1,
+        "avg30": 1.83,
+        "avg30-holo": 2.5,
+        "avg7": 0.97,
+        "avg7-holo": 2.5,
+        "idProduct": 273783,
+        "low": 0.02,
+        "low-holo": null,
+        "trend": 0.97,
+        "trend-holo": 1,
+        "unit": "EUR",
+        "updated": "2026-10-18T22:54:32.745Z"
+      },
+      "tcgplayer": {
+        "normal": {
+          "directLowPrice": 0.63,
+          "highPrice": 17.99,
+          "lowPrice": 0.18,
+          "marketPrice": 2.68,
+          "midPrice": 1,
+          "productId": 42431
+        },
+        "unit": "USD",
+        "updated": "2026-10-14T22:54:33.803Z"
+      }
+    },
+    "set": {
+      "cardCount": {
+        "official": 102,
+        "total": 102
+      },
+      "id": "base1",
+      "logo": "https://assets.tcgdex.net/en/base/base1/logo",
+      "name": "Base Set"
+    },
+    "variants": {
+      "firstEdition": true,
+      "holo": false,
+      "normal": true,
+      "reverse": false,
+      "wPromo": false
+    },
+    "variants_detailed": [
+      {
+        "pricing": {
+          "cardmarket": {
+            "avg": 1.46,
+            "avg-holo": null,
+            "avg1": 0.53,
+            "avg1-holo": 1,
+            "avg30": 1.83,
+            "avg30-holo": 2.5,
+            "avg7": 0.97,
+            "avg7-holo": 2.5,
+            "idProduct": 273783,
+            "low": 0.02,
+            "low-holo": null,
+            "trend": 0.97,
+            "trend-holo": 1,
+            "unit": "EUR",
+            "updated": "2026-10-18T22:54:32.745Z"
+          },
+          "tcgplayer": {
+            "normal": {
+              "directLowPrice": 0.63,
+              "highPrice": 17.99,
+              "lowPrice": 0.18,
+              "marketPrice": 2.68,
+              "midPrice": 1,
+              "productId": 42431
+            },
+            "unit": "USD",
+            "updated": "2026-10-14T22:54:33.803Z"
+          }
+        },
+        "size": "standard",
+        "subtype": "unlimited",
+        "thirdParty": {
+          "cardmarket": 273783,
+          "tcgplayer": 42431
+        },
+        "type": "normal",
+        "variantId": "3a83wf50tz7q114spsx7dw6v5"
+      },
+      {
+        "pricing": {
+          "cardmarket": {
+            "avg": 8.95,
+            "avg-holo": null,
+            "avg1": 877.5,
+            "avg1-holo": null,
+            "avg30": 53.57,
+            "avg30-holo": null,
+            "avg7": 226.98,
+            "avg7-holo": null,
+            "idProduct": 660118,
+            "low": 1.99,
+            "low-holo": null,
+            "trend": 108.78,
+            "trend-holo": 0,
+            "unit": "EUR",
+            "updated": "2026-10-18T22:54:32.745Z"
+          },
+          "tcgplayer": null
+        },
+        "size": "standard",
+        "stamp": [
+          "1st-edition"
+        ],
+        "subtype": "shadowless",
+        "thirdParty": {
+          "cardmarket": 660118,
+          "tcgplayer": 107085
+        },
+        "type": "normal",
+        "variantId": "gx8bq2hefwadd3utcibq3oc56sjf4jqdz709e"
+      },
+      {
+        "pricing": {
+          "cardmarket": {
+            "avg": 8.95,
+            "avg-holo": null,
+            "avg1": 877.5,
+            "avg1-holo": null,
+            "avg30": 53.57,
+            "avg30-holo": null,
+            "avg7": 226.98,
+            "avg7-holo": null,
+            "idProduct": 660118,
+            "low": 1.99,
+            "low-holo": null,
+            "trend": 108.78,
+            "trend-holo": 0,
+            "unit": "EUR",
+            "updated": "2026-10-18T22:54:32.745Z"
+          },
+          "tcgplayer": null
+        },
+        "size": "standard",
+        "subtype": "shadowless",
+        "thirdParty": {
+          "cardmarket": 660118,
+          "tcgplayer": 107085
+        },
+        "type": "normal",
+        "variantId": "2tszcx1bpt4e79y5us0p570b9n"
+      },
+      {
+        "size": "standard",
+        "subtype": "1999-2000-copyright",
+        "type": "normal",
+        "variantId": "qi4g3e7tzbkcyhfflvx7zmvunxwjcq3pvp"
+      }
+    ]
+  }
+}

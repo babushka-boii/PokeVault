@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "case": "pokeapi-species-pikachu",
+    "provider": "pokeapi",
+    "retrieved_at": "2026-10-19T23:22:58.991459Z",
+    "sha256": "2510209f8f4623ba2e63b8f2837c3f32da363f3f2a697b12ecbd5992fa923be4",
+    "source_url": "https://pokeapi.co/api/v2/pokemon-species/25/"
+  },
+  "payload": {
+    "generation": {
+      "name": "generation-i",
+      "url": "https://pokeapi.co/api/v2/generation/1/"
+    },
+    "id": 25,
+    "name": "pikachu",
+    "names": [
+      {
+        "language": {
+          "name": "es",
+          "url": "https://pokeapi.co/api/v2/language/7/"
+        },
+        "name": "Pikachu"
+      },
+      {
+        "language": {
+          "name": "en",
+          "url": "https://pokeapi.co/api/v2/language/9/"
+        },
+        "name": "Pikachu"
+      }
+    ]
+  }
+}

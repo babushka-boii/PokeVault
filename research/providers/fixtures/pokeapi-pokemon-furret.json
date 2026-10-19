@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "case": "pokeapi-pokemon-furret",
+    "provider": "pokeapi",
+    "retrieved_at": "2026-10-19T23:22:59.693999Z",
+    "sha256": "656edd27bb2711b9c1523e77b06a42b7caf7c7230ce5f806bb3250fee8baeeac",
+    "source_url": "https://pokeapi.co/api/v2/pokemon/162/"
+  },
+  "payload": {
+    "id": 162,
+    "name": "furret",
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/162.png"
+    },
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "normal",
+          "url": "https://pokeapi.co/api/v2/type/1/"
+        }
+      }
+    ]
+  }
+}

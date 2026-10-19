@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "case": "pokeapi-pokemon-zekrom",
+    "provider": "pokeapi",
+    "retrieved_at": "2026-10-19T23:23:00.584490Z",
+    "sha256": "3c2e6712044c8716a78faaf6296ba3b6300fc7b9c5f490dc7ae7cecbb9c82334",
+    "source_url": "https://pokeapi.co/api/v2/pokemon/644/"
+  },
+  "payload": {
+    "id": 644,
+    "name": "zekrom",
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/644.png"
+    },
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "dragon",
+          "url": "https://pokeapi.co/api/v2/type/16/"
+        }
+      },
+      {
+        "slot": 2,
+        "type": {
+          "name": "electric",
+          "url": "https://pokeapi.co/api/v2/type/13/"
+        }
+      }
+    ]
+  }
+}

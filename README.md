@@ -4,7 +4,7 @@
 
 PokéVault is an academic Pokémon Trading Card Game (TCG) collection manager inspired by the classic Pokédex and Pokémon PC storage system. The product aims to make collecting, organizing, discovering, and tracking cards feel like an adventure rather than a spreadsheet.
 
-> **Project status:** Planning and initial software design (week of October 5–11, 2026). No functional application has been implemented yet.
+> **Project status:** Iteration 2 complete: provider feasibility evidence, offline validation tooling, and a logical data model. Frontend, backend, database, and authentication are not implemented yet.
 
 ## Project context
 
@@ -41,11 +41,11 @@ Artwork and sound use must be reviewed before assets are included or distributed
 | Backend | Python, FastAPI, SQLAlchemy, Alembic |
 | Database | PostgreSQL |
 | Sign-in | Google OpenID Connect (SSO) |
-| Pokémon reference data | PokéAPI (candidate) |
-| Pokémon TCG cards | TCGdex (candidate) |
+| Pokémon reference data | PokéAPI (sample integration validated) |
+| Pokémon TCG cards | TCGdex (sample integration validated) |
 | Recognition | OCR + OpenCV + card matching (to be validated) |
 
-Data-provider coverage, pricing availability, and asset licenses are **pending technical validation**.
+Fixed samples from both providers were validated on 2026-10-19. Complete catalog coverage, production price suitability, and asset licenses remain unresolved.
 
 ## Documentation
 
@@ -53,11 +53,14 @@ Data-provider coverage, pricing availability, and asset licenses are **pending t
 - [UX/UI design](docs/UX_UI.md)
 - [Preliminary architecture](docs/ARCHITECTURE.md)
 - [Development roadmap](docs/ROADMAP.md)
+- [Logical data model](docs/DATA_MODEL.md)
+- [Provider validation and reproducibility](research/providers/README.md)
+- [Generated provider evidence report](research/providers/REPORT.md)
 - [Weekly prompt and learning log](Bitacora.md)
 - [Authorship and AI assistance](Autoria.md)
 
 ## Current delivery
 
-**Week 1 (October 5–11, 2026):** project definition, UX direction, preliminary architecture, incremental roadmap, authorship disclosure, and documentation setup. **No production code or tests are claimed.**
+**Iteration 2 (validated October 19, 2026):** a bounded Python validator checks 12 TCGdex/PokéAPI cases, stores hash-verified minimal fixtures, cross-checks National Dex links, and regenerates a deterministic offline report. The current automated suite covers this research tooling only; no application UI or API is claimed.
 
 Future commits will implement and validate capabilities incrementally. Course requirements and rubric remain the source of truth.

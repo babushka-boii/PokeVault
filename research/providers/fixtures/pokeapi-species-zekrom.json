@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "case": "pokeapi-species-zekrom",
+    "provider": "pokeapi",
+    "retrieved_at": "2026-10-19T23:22:59.213051Z",
+    "sha256": "3c1b33b91d1036c04e0965d418f345df9d88f6f9b98a8cff7d7a48e98d7290d3",
+    "source_url": "https://pokeapi.co/api/v2/pokemon-species/644/"
+  },
+  "payload": {
+    "generation": {
+      "name": "generation-v",
+      "url": "https://pokeapi.co/api/v2/generation/5/"
+    },
+    "id": 644,
+    "name": "zekrom",
+    "names": [
+      {
+        "language": {
+          "name": "es",
+          "url": "https://pokeapi.co/api/v2/language/7/"
+        },
+        "name": "Zekrom"
+      },
+      {
+        "language": {
+          "name": "en",
+          "url": "https://pokeapi.co/api/v2/language/9/"
+        },
+        "name": "Zekrom"
+      }
+    ]
+  }
+}

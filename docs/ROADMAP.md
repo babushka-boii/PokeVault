@@ -26,6 +26,18 @@
 | 7 | Prices, wishlist, trades and transaction history | Provenance-aware estimates, missing-card cost coverage and trade filters | Missing or stale provider prices |
 | 8+ | Portfolio, deck builder and polish | Deck ownership gaps, selected animations/sounds, test and demo rehearsal | Time and feature creep |
 
+## Delivery 2 — Provider feasibility and logical model
+
+**Completed and evidenced:** 2026-10-19.
+
+- [x] Validate five TCGdex cards, one TCGdex set, three PokéAPI species and three PokéAPI Pokémon resources.
+- [x] Preserve category, zero/one/multiple species relations, variants, currencies, timestamps and null price metrics.
+- [x] Store minimal SHA-256-verified fixtures and generate an offline deterministic report.
+- [x] Define catalog provenance, localized names, owned copies, boxes and same-user membership integrity.
+- [ ] Review provider terms and Pokémon asset licenses; validate broader catalog and price coverage.
+
+**Next:** iteration 3 project scaffold. Stack choices remain proposals until the runnable frontend/API/database and authentication slice is implemented and verified.
+
 **Rule:** requirements first, then cohesive vertical slices. Optional features only after working mandatory flows.
 
 ## Weekly workflow
@@ -58,4 +70,4 @@
 
 - Trainer avatar shortlist (10–15 approved selections from the student).
 - Pixel-perfect box wireframe measurements and legal/reusable audiovisual assets.
-- Price feed validation; scanner OCR benchmark sample; deployment target.
+- Production price-feed suitability and licensing; scanner OCR benchmark sample; deployment target.

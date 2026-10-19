@@ -1,0 +1,173 @@
+{
+  "metadata": {
+    "case": "tcgdex-furret-es",
+    "provider": "tcgdex",
+    "retrieved_at": "2026-10-19T23:22:56.620287Z",
+    "sha256": "8b5e01cced293d2dccd8474eabc60a3ae95f172ca6d0b9f2fa8eddb2785a313d",
+    "source_url": "https://api.tcgdex.net/v2/es/cards/swsh3-136"
+  },
+  "payload": {
+    "category": "Pokémon",
+    "dexId": [
+      162
+    ],
+    "id": "swsh3-136",
+    "image": "https://assets.tcgdex.net/es/swsh/swsh3/136",
+    "localId": "136",
+    "name": "Furret",
+    "pricing": {
+      "cardmarket": {
+        "avg": 0.07,
+        "avg-holo": 0.28,
+        "avg1": 0.1,
+        "avg1-holo": 0.12,
+        "avg30": 0.06,
+        "avg30-holo": 0.26,
+        "avg7": 0.05,
+        "avg7-holo": 0.19,
+        "idProduct": 483559,
+        "low": 0.02,
+        "low-holo": 0.08,
+        "trend": 0.05,
+        "trend-holo": 0.24,
+        "unit": "EUR",
+        "updated": "2026-10-18T22:54:32.745Z"
+      },
+      "tcgplayer": {
+        "normal": {
+          "directLowPrice": null,
+          "highPrice": 25.27,
+          "lowPrice": 0.02,
+          "marketPrice": 0.27,
+          "midPrice": 0.25,
+          "productId": 219333
+        },
+        "reverse-holofoil": {
+          "directLowPrice": 0.37,
+          "highPrice": 19.8,
+          "lowPrice": 0.17,
+          "marketPrice": 0.44,
+          "midPrice": 0.43,
+          "productId": 219333
+        },
+        "unit": "USD",
+        "updated": "2026-10-14T22:55:05.165Z"
+      }
+    },
+    "set": {
+      "cardCount": {
+        "official": 189,
+        "total": 201
+      },
+      "id": "swsh3",
+      "logo": "https://assets.tcgdex.net/es/swsh/swsh3/logo",
+      "name": "Oscuridad Incandescente",
+      "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol"
+    },
+    "variants": {
+      "firstEdition": false,
+      "holo": false,
+      "normal": true,
+      "reverse": true,
+      "wPromo": false
+    },
+    "variants_detailed": [
+      {
+        "pricing": {
+          "cardmarket": {
+            "avg": 0.07,
+            "avg-holo": 0.28,
+            "avg1": 0.1,
+            "avg1-holo": 0.12,
+            "avg30": 0.06,
+            "avg30-holo": 0.26,
+            "avg7": 0.05,
+            "avg7-holo": 0.19,
+            "idProduct": 483559,
+            "low": 0.02,
+            "low-holo": 0.08,
+            "trend": 0.05,
+            "trend-holo": 0.24,
+            "unit": "EUR",
+            "updated": "2026-10-18T22:54:32.745Z"
+          },
+          "tcgplayer": {
+            "normal": {
+              "directLowPrice": null,
+              "highPrice": 25.27,
+              "lowPrice": 0.02,
+              "marketPrice": 0.27,
+              "midPrice": 0.25,
+              "productId": 219333
+            },
+            "reverse-holofoil": {
+              "directLowPrice": 0.37,
+              "highPrice": 19.8,
+              "lowPrice": 0.17,
+              "marketPrice": 0.44,
+              "midPrice": 0.43,
+              "productId": 219333
+            },
+            "unit": "USD",
+            "updated": "2026-10-14T22:55:05.165Z"
+          }
+        },
+        "size": "estándar",
+        "thirdParty": {
+          "cardmarket": 483559,
+          "tcgplayer": 219333
+        },
+        "type": "básico",
+        "variantId": "endfynwn4n10gzq"
+      },
+      {
+        "pricing": {
+          "cardmarket": {
+            "avg": 0.07,
+            "avg-holo": 0.28,
+            "avg1": 0.1,
+            "avg1-holo": 0.12,
+            "avg30": 0.06,
+            "avg30-holo": 0.26,
+            "avg7": 0.05,
+            "avg7-holo": 0.19,
+            "idProduct": 483559,
+            "low": 0.02,
+            "low-holo": 0.08,
+            "trend": 0.05,
+            "trend-holo": 0.24,
+            "unit": "EUR",
+            "updated": "2026-10-18T22:54:32.745Z"
+          },
+          "tcgplayer": {
+            "normal": {
+              "directLowPrice": null,
+              "highPrice": 25.27,
+              "lowPrice": 0.02,
+              "marketPrice": 0.27,
+              "midPrice": 0.25,
+              "productId": 219333
+            },
+            "reverse-holofoil": {
+              "directLowPrice": 0.37,
+              "highPrice": 19.8,
+              "lowPrice": 0.17,
+              "marketPrice": 0.44,
+              "midPrice": 0.43,
+              "productId": 219333
+            },
+            "unit": "USD",
+            "updated": "2026-10-14T22:55:05.165Z"
+          }
+        },
+        "size": "estándar",
+        "thirdParty": {
+          "cardmarket": 483559,
+          "tcgplayer": 219333
+        },
+        "type": "reversa",
+        "variantId": "cm4kqul3x1bwlz1f"
+      }
+    ]
+  }
+}

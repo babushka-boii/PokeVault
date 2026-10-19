@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "case": "pokeapi-pokemon-pikachu",
+    "provider": "pokeapi",
+    "retrieved_at": "2026-10-19T23:23:00.147001Z",
+    "sha256": "9c2109c3f03b0e7b3b6bce85986bea079253f815fc631bbc6889686e6c81fce0",
+    "source_url": "https://pokeapi.co/api/v2/pokemon/25/"
+  },
+  "payload": {
+    "id": 25,
+    "name": "pikachu",
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
+    },
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "electric",
+          "url": "https://pokeapi.co/api/v2/type/13/"
+        }
+      }
+    ]
+  }
+}

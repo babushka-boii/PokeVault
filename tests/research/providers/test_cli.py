@@ -5,10 +5,42 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from research.providers.provider_validation.cli import run
+from research.providers.provider_validation.cli import REPORT_PATH, project_payload, run, validate_payload
+from research.providers.provider_validation.models import ValidationCase
 
 
 class CliTests(unittest.TestCase):
+    def test_default_report_path_matches_documented_interface(self):
+        self.assertEqual("REPORT.md", REPORT_PATH.name)
+
+    def test_tcgdex_dispatch_passes_manifest_language(self):
+        payload = json.loads((Path(__file__).with_name("samples") / "tcgdex_furret_en.json").read_text())
+        case = ValidationCase("furret", "tcgdex", "card", "en", "https://example.test", {})
+        self.assertEqual("swsh3-136", validate_payload(case, payload).external_id)
+
+    def test_absent_tcgdex_dex_id_satisfies_explicit_zero_links(self):
+        payload = {"id": "base1-88", "localId": "88", "name": "Professor Oak", "category": "Trainer", "set": {"id": "base1"}, "variants": {}}
+        case = ValidationCase("trainer", "tcgdex", "card", "en", "https://example.test", {"dexId": []})
+        self.assertEqual((), validate_payload(case, payload).dex_ids)
+
+    def test_pokeapi_manifest_compares_named_links_semantically(self):
+        samples = Path(__file__).with_name("samples")
+        species_payload = json.loads((samples / "pokeapi_species_furret.json").read_text())
+        species_case = ValidationCase("furret", "pokeapi", "species", None, "https://example.test", {"generation": "generation-ii"})
+        self.assertEqual("generation-ii", validate_payload(species_case, species_payload).generation)
+
+        pokemon_payload = json.loads((samples / "pokeapi_pokemon_furret.json").read_text())
+        pokemon_case = ValidationCase("furret", "pokeapi", "pokemon", None, "https://example.test", {"types": ["normal"]})
+        self.assertEqual(("normal",), validate_payload(pokemon_case, pokemon_payload).types)
+
+    def test_fixture_projection_drops_unrelated_catalog_data(self):
+        payload = json.loads((Path(__file__).with_name("samples") / "pokeapi_pokemon_furret.json").read_text())
+        payload["moves"] = [{"move": {"name": "tackle"}}] * 100
+        case = ValidationCase("furret", "pokeapi", "pokemon", None, "https://example.test", {})
+        projected = project_payload(case, payload)
+        self.assertEqual({"id", "name", "types", "sprites"}, set(projected))
+        self.assertNotIn("moves", projected)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
