@@ -1,0 +1,43 @@
+{
+  "category": "Pokemon",
+  "id": "swsh3-136",
+  "image": "https://assets.tcgdex.net/en/swsh/swsh3/136",
+  "localId": "136",
+  "name": "Furret",
+  "set": {"id": "swsh3"},
+  "variants": {"firstEdition": false, "holo": false, "normal": true, "reverse": true},
+  "variants_detailed": [
+    {
+      "type": "normal",
+      "size": "standard",
+      "variantId": "normal-id",
+      "pricing": {
+        "cardmarket": {
+          "updated": "2026-10-18T22:54:32.706Z",
+          "unit": "EUR",
+          "avg": 0.07,
+          "low": null
+        },
+        "tcgplayer": {
+          "unit": "USD",
+          "updated": "2026-10-14T22:55:05.165Z",
+          "normal": {"marketPrice": 0.27, "directLowPrice": null}
+        }
+      }
+    },
+    {
+      "type": "reverse",
+      "subtype": "reverse-holofoil",
+      "stamp": ["sample-stamp"],
+      "variantId": "reverse-id"
+    }
+  ],
+  "dexId": [162],
+  "pricing": {
+    "cardmarket": {
+      "updated": "2026-10-18T22:54:32.706Z",
+      "unit": "EUR",
+      "trend": 0.05
+    }
+  }
+}

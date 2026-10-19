@@ -1,0 +1,9 @@
+{
+  "category": "Pokemon",
+  "id": "sm9-33",
+  "localId": "33",
+  "name": "Pikachu & Zekrom GX",
+  "set": {"id": "sm9"},
+  "variants": {"normal": true},
+  "dexId": [25, 644]
+}
