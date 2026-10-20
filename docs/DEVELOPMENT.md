@@ -22,6 +22,20 @@ Copy `frontend/.env.example` to `frontend/.env` only when the API does not use i
 
 ## PostgreSQL and migrations
 
+For a first-time Arch Linux setup, install and initialize the native service:
+
+- `sudo pacman -S postgresql`
+- `sudo -iu postgres initdb --locale=C.UTF-8 --encoding=UTF8 -D /var/lib/postgres/data`
+- `sudo systemctl enable --now postgresql`
+
+Create a dedicated login and separate development/test databases. The first command prompts for the password that must match the two local URLs in `backend/.env`:
+
+- `sudo -iu postgres createuser --pwprompt pokevault`
+- `sudo -iu postgres createdb --owner=pokevault pokevault`
+- `sudo -iu postgres createdb --owner=pokevault pokevault_test`
+
+Do not repeat initialization or role/database creation on an already configured PostgreSQL cluster.
+
 Start the native service:
 
 - `sudo systemctl start postgresql`

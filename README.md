@@ -4,7 +4,7 @@
 
 PokéVault is an academic Pokémon Trading Card Game (TCG) collection manager inspired by the classic Pokédex and Pokémon PC storage system. The product aims to make collecting, organizing, discovering, and tracking cards feel like an adventure rather than a spreadsheet.
 
-> **Project status:** Iteration 2 complete: provider feasibility evidence, offline validation tooling, and a logical data model. Frontend, backend, database, and authentication are not implemented yet.
+> **Project status:** Iteration 3 complete: runnable React frontend, FastAPI health API, native PostgreSQL migration baseline, ES/EN shell, and reproducible quality gate. Authentication and domain features remain pending.
 
 ## Project context
 
@@ -32,18 +32,17 @@ PokéVault is an academic Pokémon Trading Card Game (TCG) collection manager in
 
 Artwork and sound use must be reviewed before assets are included or distributed. PokéVault is a fan-made academic concept, not affiliated with or endorsed by The Pokémon Company, Nintendo, or Game Freak.
 
-## Proposed technology (not implemented)
+## Technology status
 
-| Layer | Proposed stack |
+| Layer | Current status |
 | --- | --- |
-| Web frontend | React, TypeScript, Vite, Tailwind CSS |
-| UI and data fetching | shadcn/ui, React Router, TanStack Query |
-| Backend | Python, FastAPI, SQLAlchemy, Alembic |
-| Database | PostgreSQL |
-| Sign-in | Google OpenID Connect (SSO) |
-| Pokémon reference data | PokéAPI (sample integration validated) |
-| Pokémon TCG cards | TCGdex (sample integration validated) |
-| Recognition | OCR + OpenCV + card matching (to be validated) |
+| Web frontend | React, TypeScript, Vite and React Router implemented |
+| Backend | FastAPI, Pydantic Settings, SQLAlchemy and Alembic implemented |
+| Database | Native PostgreSQL integration and revision `0001` implemented |
+| Sign-in | Google OpenID Connect (SSO) pending |
+| Pokémon reference data | PokéAPI sample feasibility validated; runtime catalog pending |
+| Pokémon TCG cards | TCGdex sample feasibility validated; runtime catalog pending |
+| Recognition | OCR, image processing and card matching pending |
 
 Fixed samples from both providers were validated on 2026-10-19. Complete catalog coverage, production price suitability, and asset licenses remain unresolved.
 
@@ -56,11 +55,22 @@ Fixed samples from both providers were validated on 2026-10-19. Complete catalog
 - [Logical data model](docs/DATA_MODEL.md)
 - [Provider validation and reproducibility](research/providers/README.md)
 - [Generated provider evidence report](research/providers/REPORT.md)
+- [Local development and verification](docs/DEVELOPMENT.md)
 - [Weekly prompt and learning log](Bitacora.md)
 - [Authorship and AI assistance](Autoria.md)
 
-## Current delivery
+## Run the verified scaffold
 
-**Iteration 2 (validated October 19, 2026):** a bounded Python validator checks 12 TCGdex/PokéAPI cases, stores hash-verified minimal fixtures, cross-checks National Dex links, and regenerates a deterministic offline report. The current automated suite covers this research tooling only; no application UI or API is claimed.
+After configuring `backend/.env` from its example and installing the documented dependencies:
 
-Future commits will implement and validate capabilities incrementally. Course requirements and rubric remain the source of truth.
+- Apply migration `0001` with `cd backend`, then `.venv/bin/alembic upgrade head`.
+- Start FastAPI with `.venv/bin/uvicorn app.main:create_app --factory --reload` from `backend`.
+- Start Vite with `npm run dev --prefix frontend` from the repository root.
+- Open `http://localhost:5173`; the API health contract is at `http://localhost:8000/api/v1/health`.
+- Run all offline checks with `bash scripts/check.sh`.
+
+The frontend currently provides responsive `/`, `/boxes`, `/pokedex`, and `/profile` routes plus persisted Spanish/English switching. Only the Home health flow is connected to the API; the remaining routes are honest placeholders.
+
+**Iteration 3 evidence (validated October 19, 2026):** 43 provider tests, 9 backend tests including PostgreSQL, and 13 frontend tests passed alongside Ruff, ESLint, TypeScript checking, a Vite production build, migration upgrade/rollback verification, and healthy/degraded browser checks.
+
+No authentication, user inventory, functional boxes, live Pokédex/catalog, prices, scanner, or Pokémon artwork/audio is included yet. Course requirements and rubric remain the source of truth.

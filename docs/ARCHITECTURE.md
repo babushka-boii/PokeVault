@@ -1,6 +1,6 @@
-# PokéVault — Preliminary architecture (v0.1)
+# PokéVault — Incremental architecture (v0.2)
 
-**Status:** Proposed, not implemented. Technical decisions will be validated incrementally.
+**Status:** The Iteration 3 scaffold is implemented and verified. Domain modules below remain planned unless explicitly marked as current.
 
 ## 1. System overview
 
@@ -10,6 +10,8 @@ Browser (React / TypeScript / Vite)
           | HTTPS, JSON REST API
           v
 FastAPI (Python)
+  |-- Health API (implemented)
+  |-- Configuration and database session boundary (implemented)
   |-- Auth and profiles (Google OpenID Connect)
   |-- Reference catalog (species, card printings, sets)
   |-- Inventory and box membership
@@ -25,20 +27,24 @@ FastAPI (Python)
 
 Prefer a **modular monolith** over microservices for a single-developer academic project. Deploying frontend and API separately remains possible without adding distributed architecture complexity.
 
-## 2. Proposed stack
+## 2. Stack status
 
-- **Frontend:** React + TypeScript + Vite, Tailwind CSS, shadcn/ui, React Router, TanStack Query, Recharts for charts.
-- **Backend:** Python + FastAPI + Pydantic + SQLAlchemy + Alembic.
-- **Database:** PostgreSQL for referential integrity, transactional inventory changes and collection queries.
+- **Frontend implemented:** React + TypeScript + Vite + React Router, with original CSS and typed ES/EN dictionaries.
+- **Frontend pending:** domain data fetching, component libraries and charts; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
+- **Backend implemented:** Python + FastAPI + Pydantic Settings + SQLAlchemy + Alembic.
+- **Database implemented:** native PostgreSQL connection, health probe and reversible technical migration `0001`; domain tables are pending.
 - **Auth:** Google OAuth 2.0 / OpenID Connect for SSO. Prefer a secure HTTP-only server-side session strategy; final mechanism to be defined and reviewed.
 - **Language:** checked-in ES/EN translation dictionaries; no automatic translation service.
 - **Scanning:** restricted image upload, preprocessing (OpenCV candidate), OCR engine to be selected, extract number/name/set, rank catalog matches, manual confirmation.
 
-## 3. Proposed backend modules
+## 3. Current and proposed backend modules
 
 ```text
 backend/
   app/
+    api/          # current health route
+    core/         # current configuration
+    db/           # current health/session/model baseline
     auth/
     users/
     pokemon/
@@ -57,7 +63,7 @@ backend/
   migrations/
 ```
 
-Module boundaries are conceptual; they will be introduced as functional code arrives.
+Only `api`, `core`, and `db` exist today. All domain directories shown after them are conceptual boundaries for later vertical slices.
 
 ## 4. Domain model directions (NOT a final ERD)
 
@@ -86,7 +92,15 @@ Module boundaries are conceptual; they will be introduced as functional code arr
 - Plan for fallback when providers are unavailable or price fields are absent; never display fabricated quotes or historical change.
 - Prices: track currency **per snapshot**. Any CLP conversion requires timestamped FX data and explicit estimate labeling; defaulting to currency conversion without provenance is not acceptable.
 
-## 6. Proposed API surface (illustrative, unimplemented)
+## 6. API surface
+
+Implemented and versioned:
+
+```text
+GET    /api/v1/health
+```
+
+It returns HTTP 200 with healthy API/database states or sanitized HTTP 503 while PostgreSQL is unavailable. Planned domain endpoints remain illustrative and unimplemented:
 
 ```text
 GET    /api/v1/pokemon
@@ -126,3 +140,4 @@ APIs need response schemas, pagination, auth scopes, mutations and error contrac
 4. Provider ID normalization, variants, and ambiguous OCR matches.
 5. Actual sound/artwork licensing and whether assets can be bundled or must be user supplied / public-domain alternatives.
 6. Price sources and historical series viability; never claim live estimates without proven integration.
+7. Google OpenID Connect session design and deployment configuration.

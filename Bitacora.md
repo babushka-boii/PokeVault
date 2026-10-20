@@ -75,3 +75,29 @@ Codex ayudó a revisar el repositorio, redactar el diseño y plan, implementar p
 ### Límites y siguiente paso
 
 La muestra demuestra viabilidad técnica, no cobertura total ni permiso de redistribución de imágenes. Precios, términos, licencias y vigencia deben revisarse antes de producción. El próximo incremento es crear un scaffold ejecutable de frontend/API/base de datos y autenticación, sin adelantar todavía esas implementaciones.
+
+## Iteración 3 — Scaffold ejecutable
+
+**Fecha del registro:** 19/10/2026
+**Tipo de entrega:** frontend, API, PostgreSQL y verificación local; autenticación y funciones de dominio pendientes.
+
+### Trabajo realizado y evidencia
+
+- Se implementó un backend FastAPI configurable, sin conexión a base de datos durante la importación o construcción de la aplicación.
+- `GET /api/v1/health` distingue API y PostgreSQL: HTTP 200 saludable y HTTP 503 sanitizado cuando la base no responde.
+- Se agregó SQLAlchemy, una tabla técnica `app_metadata` y la migración reversible `0001`; no se crearon tablas de usuarios, catálogo o inventario.
+- Se implementó un shell React/TypeScript/Vite responsive con rutas `/`, `/boxes`, `/pokedex` y `/profile`, además de diccionarios ES/EN persistidos localmente.
+- La portada consume el endpoint de salud, valida su respuesta y ofrece reintento tanto ante red inaccesible como ante PostgreSQL degradado.
+- La verificación final ejecutó 43 pruebas de proveedores, 9 del backend —incluida integración PostgreSQL— y 13 del frontend. También pasaron Ruff, ESLint, TypeScript, el build de Vite y la revisión de espacios.
+- Se comprobó manualmente la migración, la respuesta saludable, el HTTP 503 degradado y la interfaz a ancho de escritorio y 390 px sin desbordamiento horizontal.
+
+### Participación de IA y ajustes
+
+Codex asistió en el diseño técnico, plan incremental, pruebas primero, implementación, diagnóstico y documentación. Durante la verificación se corrigieron dos problemas con evidencia: una regla Ruff incompatible con el patrón declarativo `Depends` de FastAPI se delimitó explícitamente, y la prueba real degradada reveló que faltaba el botón de reintento para HTTP 503; se agregó una prueba que falló antes de implementar la corrección.
+
+### Decisiones y límites
+
+- Se eligió PostgreSQL nativo en Arch Linux, sin Docker, y archivos `.env` locales ignorados por Git.
+- Se mantuvieron dependencias mínimas; no se instalaron Tailwind, shadcn/ui, TanStack Query ni bibliotecas de autenticación antes de necesitarlas.
+- Google SSO, catálogo en ejecución, cajas funcionales, inventario, precios, scanner y assets Pokémon siguen pendientes.
+- No se inventan reflexiones personales del estudiante; debe revisar y comprender el código antes de la evaluación.

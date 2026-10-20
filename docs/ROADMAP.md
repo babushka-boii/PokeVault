@@ -19,7 +19,7 @@
 | Iteration | Focus | Demonstrable result | Main risks |
 | --- | --- | --- | --- |
 | 2 | Data-provider feasibility and relational model | Verified sample cards/sets/species/price availability; first ERD; schema decisions | External coverage, card variants, license terms |
-| 3 | Project scaffold, database and authentication | Runnable frontend/API/database, Google sign-in, ES/EN switch | OAuth configuration, migrations, developer setup |
+| 3 | Project scaffold and database | Runnable frontend/API/database, health flow and ES/EN switch | Migrations, developer setup |
 | 4 | Catalog, Pokédex and classic PC Boxes | Browse species and cards, navigate sprite boxes on desktop/mobile | Reliable sprites, responsive fidelity |
 | 5 | Inventory and set completion | Add/edit copies, manual/smart boxes, check owned/missing by set | Copy-level bookkeeping, set checklist quality |
 | 6 | Scanner end-to-end | Upload image, OCR match suggestion, correction and inventory registration | Recognition accuracy and demo test images |
@@ -36,7 +36,19 @@
 - [x] Define catalog provenance, localized names, owned copies, boxes and same-user membership integrity.
 - [ ] Review provider terms and Pokémon asset licenses; validate broader catalog and price coverage.
 
-**Next:** iteration 3 project scaffold. Stack choices remain proposals until the runnable frontend/API/database and authentication slice is implemented and verified.
+## Delivery 3 — Executable project scaffold
+
+**Completed and evidenced:** 2026-10-19.
+
+- [x] Implement React/TypeScript/Vite routes for Home, Boxes, Pokédex and Profile with responsive navigation.
+- [x] Implement persisted Spanish/English switching with safe Spanish fallback.
+- [x] Implement FastAPI `GET /api/v1/health` with separate API/PostgreSQL states and sanitized HTTP 503 behavior.
+- [x] Add native PostgreSQL wiring and reversible Alembic revision `0001` for technical metadata only.
+- [x] Verify healthy and degraded flows manually at desktop and 390 px widths.
+- [x] Add one offline gate covering 43 provider, 9 backend and 13 frontend tests plus lint, types and build.
+- [ ] Implement Google SSO, domain schema, catalog synchronization and functional collection views.
+
+**Next:** iteration 4 will connect a bounded catalog/Pokédex slice and begin the classic PC Boxes experience. Authentication remains a separate pending slice and must not be represented by fake state.
 
 **Rule:** requirements first, then cohesive vertical slices. Optional features only after working mandatory flows.
 
@@ -71,3 +83,4 @@
 - Trainer avatar shortlist (10–15 approved selections from the student).
 - Pixel-perfect box wireframe measurements and legal/reusable audiovisual assets.
 - Production price-feed suitability and licensing; scanner OCR benchmark sample; deployment target.
+- Google OpenID Connect design, credentials and secure session strategy.

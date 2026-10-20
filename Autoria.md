@@ -1,7 +1,7 @@
 # Declaración de autoría — PokéVault
 
 **Proyecto:** TICS316, Diseño de Software (individual)  
-**Última actualización:** 2026-10-19
+**Última actualización:** 2026-10-19 (Iteración 3)
 
 Este archivo declara qué partes son de concepción del estudiante, cuáles han recibido apoyo de herramientas de IA y qué materiales externos se prevé consultar.
 
@@ -58,3 +58,29 @@ El código y los documentos de esta iteración son material co-construido con IA
 - TCGdex (`api.tcgdex.net`) y PokéAPI (`pokeapi.co`), consultados el 19/10/2026 para los 12 casos versionados.
 - Solo se guardan JSON mínimos y URLs; no se descargaron imágenes o sprites.
 - La accesibilidad técnica no concede derechos sobre marcas, ilustraciones, sprites u otros assets de Pokémon. Licencias, términos y uso de precios siguen pendientes de revisión.
+
+## Iteración 3 — 19/10/2026
+
+### Aportes y decisiones del estudiante
+
+- Aprobación del stack React/TypeScript/Vite, FastAPI/SQLAlchemy/Alembic y PostgreSQL nativo.
+- Elección de ejecución incremental en una rama/worktree aislada, con revisión y pruebas antes de cada commit.
+- Configuración local de PostgreSQL y credenciales privadas fuera del repositorio.
+- Aprobación de mantener Google SSO y funciones de dominio fuera de este incremento.
+
+### Uso de IA (Codex)
+
+- Diseño y planificación asistida del scaffold ejecutable.
+- Implementación asistida de configuración, API de salud, integración PostgreSQL, migración, frontend localizado, pruebas y gate de calidad.
+- Diagnóstico basado en pruebas de compatibilidad FastAPI/Ruff y del reintento faltante en estado degradado.
+- Pruebas manuales asistidas del flujo saludable/degradado y del diseño responsive.
+- Redacción asistida de la guía de desarrollo y actualización de documentos del proyecto.
+
+El código y la documentación son material co-construido con IA. El estudiante debe revisarlos, ejecutarlos y poder explicar sus decisiones. No se atribuyen como implementados Google SSO, catálogo, inventario, cajas funcionales, precios, reconocimiento de imágenes ni despliegue.
+
+### Dependencias y recursos externos
+
+- Dependencias de aplicación y desarrollo declaradas en `backend/requirements*.txt` y `frontend/package-lock.json`; sus metadatos de licencia se auditan a nivel de paquete, sin extender esa revisión a futuras fuentes de datos o assets.
+- PostgreSQL se usa como servicio local; no se añadieron imágenes de base de datos ni credenciales al repositorio.
+- No se incorporaron sprites, ilustraciones, fuentes, sonidos ni otros binarios protegidos de Pokémon.
+- Los fixtures mínimos de TCGdex y PokéAPI permanecen como evidencia de la iteración anterior; su presencia no equivale a autorización para redistribuir imágenes o marcas.
