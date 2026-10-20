@@ -28,6 +28,12 @@ button, a { font: inherit; }
 .panel { background: #fffaf0; border: 3px solid #173f70; border-radius: 1rem; box-shadow: 6px 6px 0 #d4b76f; padding: clamp(1.25rem, 4vw, 2.5rem); }
 .panel h1 { margin-top: 0; }
 .eyebrow { color: #8b2831; font-size: .75rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.system-status { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin-top: 1.5rem; }
+.system-status div { background: #edf4fb; border: 2px solid #173f70; border-radius: .7rem; padding: 1rem; }
+.system-status dt { font-size: .75rem; font-weight: 900; text-transform: uppercase; }
+.system-status dd { margin: .35rem 0 0; }
+.system-status--degraded { background: #fff0e8; border: 2px solid #a63a2d; border-radius: .7rem; display: block; padding: 1rem; }
+.system-status button { cursor: pointer; }
 
 @media (max-width: 520px) {
   .topbar { align-items: stretch; flex-direction: column; gap: .75rem; }

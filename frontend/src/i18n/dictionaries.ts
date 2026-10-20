@@ -23,6 +23,15 @@ export const spanish = {
     title: "Perfil",
     description: "Las preferencias y la autenticación se implementarán más adelante.",
   },
+  status: {
+    title: "Estado de servicios",
+    loading: "Comprobando conexiones…",
+    apiHealthy: "API disponible",
+    databaseHealthy: "PostgreSQL disponible",
+    databaseUnavailable: "PostgreSQL no disponible",
+    unreachable: "No se pudo contactar con la API de PokéVault.",
+    retry: "Reintentar",
+  },
 } as const;
 
 type WidenStrings<Value> = Value extends string
@@ -55,6 +64,15 @@ export const english: Dictionary = {
   profile: {
     title: "Profile",
     description: "Preferences and authentication will be implemented later.",
+  },
+  status: {
+    title: "Service status",
+    loading: "Checking connections…",
+    apiHealthy: "API available",
+    databaseHealthy: "PostgreSQL available",
+    databaseUnavailable: "PostgreSQL unavailable",
+    unreachable: "PokéVault API could not be reached.",
+    retry: "Retry",
   },
 };
 
