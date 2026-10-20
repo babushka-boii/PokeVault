@@ -1,0 +1,35 @@
+:root {
+  color: #17233c;
+  background: #f5edd8;
+  font-family: Inter, ui-rounded, system-ui, sans-serif;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, a { font: inherit; }
+
+.app-shell { min-height: 100vh; }
+.topbar {
+  align-items: center;
+  background: #c7353f;
+  border-bottom: 4px solid #79242c;
+  color: #fff8df;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem clamp(1rem, 4vw, 3rem);
+}
+.brand { color: inherit; font-size: 1.5rem; font-weight: 900; text-decoration: none; }
+.locale-button { background: #fff8df; border: 2px solid #17233c; border-radius: 999px; color: #17233c; cursor: pointer; padding: .45rem .8rem; }
+.navigation { background: #173f70; display: flex; gap: .4rem; overflow-x: auto; padding: .65rem clamp(1rem, 4vw, 3rem); }
+.navigation a { border-radius: .45rem; color: #eef6ff; padding: .55rem .8rem; text-decoration: none; white-space: nowrap; }
+.navigation a.active { background: #f3c744; color: #17233c; font-weight: 800; }
+.content { margin: 0 auto; max-width: 72rem; padding: clamp(1.25rem, 4vw, 3rem); }
+.panel { background: #fffaf0; border: 3px solid #173f70; border-radius: 1rem; box-shadow: 6px 6px 0 #d4b76f; padding: clamp(1.25rem, 4vw, 2.5rem); }
+.panel h1 { margin-top: 0; }
+.eyebrow { color: #8b2831; font-size: .75rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+
+@media (max-width: 520px) {
+  .topbar { align-items: stretch; flex-direction: column; gap: .75rem; }
+  .locale-button { align-self: flex-start; }
+}
