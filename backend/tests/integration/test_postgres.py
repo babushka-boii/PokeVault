@@ -21,6 +21,10 @@ def integration_url() -> str:
         pytest.skip(
             "POKEVAULT_TEST_DATABASE_URL is required for PostgreSQL integration tests"
         )
+    if value == os.getenv("DATABASE_URL"):
+        pytest.fail(
+            "POKEVAULT_TEST_DATABASE_URL must differ from the development DATABASE_URL"
+        )
     return value
 
 

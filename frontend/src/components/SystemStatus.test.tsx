@@ -86,16 +86,22 @@ describe("SystemStatus", () => {
   });
 
   test("renders the API separately when PostgreSQL is degraded", async () => {
-    renderStatus(
-      vi.fn().mockResolvedValue({
+    const load = vi
+      .fn()
+      .mockResolvedValueOnce({
         ...healthy,
         status: "degraded",
         database: "unavailable",
-      }),
-    );
+      })
+      .mockResolvedValueOnce(healthy);
+    const user = userEvent.setup();
+    renderStatus(load);
 
     expect(await screen.findByText("API disponible")).toBeInTheDocument();
     expect(screen.getByText("PostgreSQL no disponible")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Reintentar" }));
+    expect(await screen.findByText("PostgreSQL disponible")).toBeInTheDocument();
+    expect(load).toHaveBeenCalledTimes(2);
   });
 
   test("aborts the active request when unmounted", async () => {

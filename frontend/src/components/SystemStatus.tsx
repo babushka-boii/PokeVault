@@ -51,19 +51,26 @@ export function SystemStatus({
   }
 
   return (
-    <dl className="system-status" aria-label={dictionary.status.title}>
-      <div>
-        <dt>API</dt>
-        <dd>{dictionary.status.apiHealthy}</dd>
-      </div>
-      <div>
-        <dt>PostgreSQL</dt>
-        <dd>
-          {state.health.database === "healthy"
-            ? dictionary.status.databaseHealthy
-            : dictionary.status.databaseUnavailable}
-        </dd>
-      </div>
-    </dl>
+    <>
+      <dl className="system-status" aria-label={dictionary.status.title}>
+        <div>
+          <dt>API</dt>
+          <dd>{dictionary.status.apiHealthy}</dd>
+        </div>
+        <div>
+          <dt>PostgreSQL</dt>
+          <dd>
+            {state.health.database === "healthy"
+              ? dictionary.status.databaseHealthy
+              : dictionary.status.databaseUnavailable}
+          </dd>
+        </div>
+      </dl>
+      {state.health.database === "unavailable" && (
+        <button className="status-retry" type="button" onClick={retry}>
+          {dictionary.status.retry}
+        </button>
+      )}
+    </>
   );
 }

@@ -34,6 +34,7 @@ button, a { font: inherit; }
 .system-status dd { margin: .35rem 0 0; }
 .system-status--degraded { background: #fff0e8; border: 2px solid #a63a2d; border-radius: .7rem; display: block; padding: 1rem; }
 .system-status button { cursor: pointer; }
+.status-retry { cursor: pointer; margin-top: .75rem; }
 
 @media (max-width: 520px) {
   .topbar { align-items: stretch; flex-direction: column; gap: .75rem; }
