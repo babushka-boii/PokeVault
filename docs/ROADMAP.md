@@ -48,7 +48,7 @@
 - [x] Add one offline gate covering 43 provider, 9 backend and 13 frontend tests plus lint, types and build.
 - [ ] Implement Google SSO, domain schema, catalog synchronization and functional collection views.
 
-**Next:** the initial Iteration 4 Pokédex slice is implemented below; classic PC Boxes remain pending. Authentication remains a separate pending slice and must not be represented by fake state.
+**Next:** the initial Iteration 4 Pokédex slice is implemented below; the PC catalog preview is now implemented below, while owned-card boxes remain pending. Authentication remains a separate pending slice and must not be represented by fake state.
 
 **Rule:** requirements first, then cohesive vertical slices. Optional features only after working mandatory flows.
 
@@ -98,3 +98,40 @@
 
 This delivery is a public reference catalog, without authentication or inventory simulation.
 See `Bitacora.md` for validation evidence and limitations.
+
+## Iteration 4 continuation — Classic PC catalog preview
+
+**Implementation date:** 2026-10-22.
+
+- [x] Implement 6×5 sprite slots, selection/details and keyboard navigation.
+- [x] Extend the existing provider with bounded pagination while preserving the Pokédex defaults.
+- [x] Add 35 catalog groups for species 1–1025, including a partial final box.
+- [x] Add three original CSS wallpapers and responsive grid-first mobile layout.
+- [x] Add reusable synthesized retro effects, persistent mute/volume and graceful audio failure.
+- [x] Test pagination, selection, navigation boundaries, stale responses, localization and audio.
+- [ ] Manually inspect desktop/390 px and listen to audio on real hardware (no connected browser in this session).
+- [ ] Implement owned-card/manual/smart boxes, customization persistence and actual TCG interactions later.
+
+## PC search refinement — 2026-10-22
+
+- [x] Add compact header search with debounced name/partial/number suggestions.
+- [x] Cache the bounded full species name index server-side; limit browser results to eight.
+- [x] Locate the original box/slot, preserving the 30-slot layout and same-box cache.
+- [x] Cover Scraggy → Box 19 / space 19, keyboard focus, errors, stale responses and localization.
+- [x] Reuse original cursor/confirmation/transition/back sounds without overlapping playback.
+- [ ] Manually review dropdown layout and sound at desktop and 390 px widths.
+- [ ] Add localized aliases only when a reliable data source is integrated; canonical names remain the fallback.
+
+## Definitive PC refinement — 2026-10-22
+
+- [x] Verify Gen V menu icon paths, full coverage ranges, Pikachu APNG frames and later menu fallback families.
+- [x] Replace grid battle sprites with menu-only sources and neutral terminal fallback.
+- [x] Add persisted Static/Animated preference, live reduced-motion handling and stable image nodes.
+- [x] Add selected-only cached localized details with units, normal/hidden abilities and real descriptions.
+- [x] Remove the TCG placeholder; share original rectangular SVG/CSS badges across Cajas/Pokédex.
+- [x] Add default Classic wallpaper and a continuous lighter 6×5 storage surface.
+- [x] Preserve search placement/focus, navigation, audio, ES/EN and API compatibility with regression tests.
+- [x] Record source/rights evidence without bundling Pokémon images or recordings.
+- [ ] Manually inspect desktop/390 px, actual APNG playback and sound (no browser connected).
+- [ ] Add sourced trivia/etymology only after a traceable provider is established.
+- [ ] Implement owned/manual/smart boxes and TCG browsing in separate increments.

@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { TypeBadge } from "./TypeBadge";
 import { useLocale } from "../i18n/LocaleProvider";
 import type { Pokemon } from "../services/pokemon";
 
@@ -31,9 +32,7 @@ export function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
       <h2>{name}</h2>
       <ul className="pokemon-types" aria-label={dictionary.pokedex.types}>
         {pokemon.types.map((type) => (
-          <li key={type} className={`pokemon-type pokemon-type--${type}`}>
-            {dictionary.pokemonTypes[type]}
-          </li>
+          <li key={type}><TypeBadge type={type} /></li>
         ))}
       </ul>
     </li>

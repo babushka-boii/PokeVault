@@ -1,0 +1,611 @@
+{
+  "verified_on": "2026-10-22",
+  "repository": "https://github.com/PokeAPI/sprites",
+  "method": "GitHub Contents/Git Trees via connected GitHub; numeric base filenames within 1..1025; full trees are not truncated; decoded sample PNG chunks only. No image bytes included.",
+  "coverage": {
+    "sprites/pokemon/versions/generation-v/icons": {
+      "tree_sha": "af7d4f9f10e05ab97e6ba19cab97ea0b6e8da09e",
+      "tree_url": "https://api.github.com/repos/PokeAPI/sprites/git/trees/af7d4f9f10e05ab97e6ba19cab97ea0b6e8da09e",
+      "truncated": false,
+      "directory_entry_count": 748,
+      "base_species_count": 649,
+      "base_species_ranges": "1-649",
+      "missing_base_species_ranges": "650-1025"
+    },
+    "sprites/pokemon/versions/generation-v/icons/animated": {
+      "tree_sha": "4f64c906424489c6a292e55fcc180b3e067f1ff6",
+      "tree_url": "https://api.github.com/repos/PokeAPI/sprites/git/trees/4f64c906424489c6a292e55fcc180b3e067f1ff6",
+      "truncated": false,
+      "directory_entry_count": 746,
+      "base_species_count": 649,
+      "base_species_ranges": "1-649",
+      "missing_base_species_ranges": "650-1025"
+    },
+    "sprites/pokemon/versions/generation-vii/icons": {
+      "tree_sha": "7b12732e98e465460f27173a9e0ea985522bfcf8",
+      "tree_url": "https://api.github.com/repos/PokeAPI/sprites/git/trees/7b12732e98e465460f27173a9e0ea985522bfcf8",
+      "truncated": false,
+      "directory_entry_count": 1109,
+      "base_species_count": 809,
+      "base_species_ranges": "1-809",
+      "missing_base_species_ranges": "810-1025"
+    },
+    "sprites/pokemon/versions/generation-viii/sword-shield/icons": {
+      "tree_sha": "af3d6b5896fde4214d6c9a5c813ce02ffece78a8",
+      "tree_url": "https://api.github.com/repos/PokeAPI/sprites/git/trees/af3d6b5896fde4214d6c9a5c813ce02ffece78a8",
+      "truncated": false,
+      "directory_entry_count": 879,
+      "base_species_count": 664,
+      "base_species_ranges": "1-12,25-45,50-55,58-68,72-73,77-83,90-95,98-99,102-151,163-164,169-178,182-186,194-197,199,202,206,208,211-215,220-227,230,233,236-260,263-264,270-275,278-282,290-295,298,302-306,309-310,315,318-321,324,328-330,333-334,337-350,355-356,359-365,369,371-385,403-407,415-416,420-423,425-428,434-440,442-454,458-468,470-471,473-475,477-488,494,506-510,517-521,524-539,543-579,582-584,587-593,595-601,605-647,649,659-663,674-675,677-719,721-730,736-738,742-773,776-778,780-898",
+      "missing_base_species_ranges": "13-24,46-49,56-57,69-71,74-76,84-89,96-97,100-101,152-162,165-168,179-181,187-193,198,200-201,203-205,207,209-210,216-219,228-229,231-232,234-235,261-262,265-269,276-277,283-289,296-297,299-301,307-308,311-314,316-317,322-323,325-327,331-332,335-336,351-354,357-358,366-368,370,386-402,408-414,417-419,424,429-433,441,455-457,469,472,476,489-493,495-505,511-516,522-523,540-542,580-581,585-586,594,602-604,648,650-658,664-673,676,720,731-735,739-741,774-775,779,899-1025"
+    },
+    "sprites/pokemon/versions/generation-ix/scarlet-violet/icons": {
+      "tree_sha": "940cd19d4575a4dc6ecde4962b4c5bd065264c48",
+      "tree_url": "https://api.github.com/repos/PokeAPI/sprites/git/trees/940cd19d4575a4dc6ecde4962b4c5bd065264c48",
+      "truncated": false,
+      "directory_entry_count": 1019,
+      "base_species_count": 733,
+      "base_species_ranges": "1-9,23-28,35-40,43-45,48-62,69-76,79-82,84-94,96-97,100-103,106-107,109-113,116-117,123,125-126,128-137,143-164,167-168,170-174,179-200,203-207,209-212,214-221,225,227-237,239-240,242-250,252-262,270-275,278-289,296-299,302,307-308,311-314,316-317,322-326,328-336,339-342,349-350,353-358,361-362,370-398,401-405,408-411,415-419,422-426,429-430,433-438,440,442-450,453-454,456-457,459-462,464,466-467,469-493,495-503,522-523,529-530,532-534,540-542,546-553,559-560,570-581,585-586,590-591,594-596,602-604,607-615,619-620,622-625,627-630,633-648,650-658,661-673,677-678,686-687,690-693,700-709,712-715,719-745,747-754,757-758,761-766,769-770,774-775,778-779,782-784,789-792,800-801,810-823,833-834,837-849,854-861,863,868-879,884-1025",
+      "missing_base_species_ranges": "10-22,29-34,41-42,46-47,63-68,77-78,83,95,98-99,104-105,108,114-115,118-122,124,127,138-142,165-166,169,175-178,201-202,208,213,222-224,226,238,241,251,263-269,276-277,290-295,300-301,303-306,309-310,315,318-321,327,337-338,343-348,351-352,359-360,363-369,399-400,406-407,412-414,420-421,427-428,431-432,439,441,451-452,455,458,463,465,468,494,504-521,524-528,531,535-539,543-545,554-558,561-569,582-584,587-589,592-593,597-601,605-606,616-618,621,626,631-632,649,659-660,674-676,679-685,688-689,694-699,710-711,716-718,746,755-756,759-760,767-768,771-773,776-777,780-781,785-788,793-799,802-809,824-832,835-836,850-853,862,864-867,880-883"
+    }
+  },
+  "sample_headers": {
+    "sprites/pokemon/versions/generation-v/icons/25.png": {
+      "sha": "2b44ee4ed0c962ed775c37d4adea6f0cfdb4f69f",
+      "size_bytes": 242,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        32,
+        32
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "duration_ms": [],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "PLTE",
+          "bytes": 21
+        },
+        {
+          "type": "tRNS",
+          "bytes": 1
+        },
+        {
+          "type": "IDAT",
+          "bytes": 139
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-v/icons/25.png"
+    },
+    "sprites/pokemon/versions/generation-v/icons/animated/25.png": {
+      "sha": "52e6709b4c3c96b9d6c5c990a7a14ed3e697bdc8",
+      "size_bytes": 604,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "APNG",
+      "size": [
+        32,
+        32
+      ],
+      "n_frames": 2,
+      "plays": 0,
+      "duration_ms": [
+        170.0,
+        170.0
+      ],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "acTL",
+          "bytes": 8,
+          "frames": 2,
+          "plays": 0
+        },
+        {
+          "type": "fcTL",
+          "bytes": 26,
+          "sequence": 0,
+          "width": 32,
+          "height": 32,
+          "x": 0,
+          "y": 0,
+          "delay_num": 170,
+          "delay_den": 1000,
+          "dispose": 1,
+          "blend": 1
+        },
+        {
+          "type": "IDAT",
+          "bytes": 220
+        },
+        {
+          "type": "fcTL",
+          "bytes": 26,
+          "sequence": 1,
+          "width": 32,
+          "height": 32,
+          "x": 0,
+          "y": 0,
+          "delay_num": 170,
+          "delay_den": 1000,
+          "dispose": 1,
+          "blend": 1
+        },
+        {
+          "type": "fdAT",
+          "bytes": 219
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-v/icons/animated/25.png"
+    },
+    "sprites/pokemon/versions/generation-vii/icons/25.png": {
+      "sha": "e45e433039370d43eb820f7702f6ddc4d1e4e493",
+      "size_bytes": 264,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        40,
+        30
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "duration_ms": [],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "PLTE",
+          "bytes": 33
+        },
+        {
+          "type": "tRNS",
+          "bytes": 1
+        },
+        {
+          "type": "IDAT",
+          "bytes": 149
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-vii/icons/25.png"
+    },
+    "sprites/pokemon/versions/generation-viii/sword-shield/icons/25.png": {
+      "sha": "367b15407b5acc0637480c8a4ef4d7d868ed550a",
+      "size_bytes": 402,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        68,
+        68
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "duration_ms": [],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "PLTE",
+          "bytes": 111
+        },
+        {
+          "type": "tRNS",
+          "bytes": 2
+        },
+        {
+          "type": "IDAT",
+          "bytes": 208
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-viii/sword-shield/icons/25.png"
+    },
+    "sprites/types/generation-viii/sword-shield/10.png": {
+      "sha": "ad5d21f74e76ccdaae06cee6a883b99a49bf18eb",
+      "size_bytes": 2266,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        200,
+        44
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "duration_ms": [],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "IDAT",
+          "bytes": 2209
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/types/generation-viii/sword-shield/10.png"
+    },
+    "sprites/types/generation-viii/sword-shield/small/10.png": {
+      "sha": "6c485fa37c45986fddfefffdcc060788e4a6d145",
+      "size_bytes": 3706,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        60,
+        60
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "duration_ms": [],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "IDAT",
+          "bytes": 3649
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/types/generation-viii/sword-shield/small/10.png"
+    },
+    "sprites/pokemon/versions/generation-ix/scarlet-violet/icons/1025.png": {
+      "sha": "8466ff20936365e48bfcf43c38b8dcc1b2e25686",
+      "size_bytes": 15305,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        159,
+        107
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "IDAT",
+          "bytes": 15248
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-ix/scarlet-violet/icons/1025.png"
+    },
+    "sprites/pokemon/versions/generation-vii/icons/650.png": {
+      "sha": "9fbc7ed2598d3d7ac494f7a5f2d63d27e57cc7ff",
+      "size_bytes": 294,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        40,
+        30
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "PLTE",
+        "tRNS",
+        "IDAT",
+        "IEND"
+      ],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "PLTE",
+          "bytes": 39
+        },
+        {
+          "type": "tRNS",
+          "bytes": 1
+        },
+        {
+          "type": "IDAT",
+          "bytes": 173
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-vii/icons/650.png"
+    },
+    "sprites/pokemon/versions/generation-vii/icons/809.png": {
+      "sha": "ea7be5866c59e9e4c5f145ffc7f7440cfeb3a16f",
+      "size_bytes": 960,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        52,
+        52
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "sRGB",
+        "gAMA",
+        "pHYs",
+        "tEXt",
+        "IDAT",
+        "IEND"
+      ],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "sRGB",
+          "bytes": 1
+        },
+        {
+          "type": "gAMA",
+          "bytes": 4
+        },
+        {
+          "type": "pHYs",
+          "bytes": 9
+        },
+        {
+          "type": "tEXt",
+          "bytes": 24
+        },
+        {
+          "type": "IDAT",
+          "bytes": 817
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-vii/icons/809.png"
+    },
+    "sprites/pokemon/versions/generation-viii/sword-shield/icons/810.png": {
+      "sha": "146f3d0fc5a90293b80cbb957bd20c506a46d3e3",
+      "size_bytes": 955,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        68,
+        68
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "sRGB",
+        "gAMA",
+        "pHYs",
+        "IDAT",
+        "IEND"
+      ],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "sRGB",
+          "bytes": 1
+        },
+        {
+          "type": "gAMA",
+          "bytes": 4
+        },
+        {
+          "type": "pHYs",
+          "bytes": 9
+        },
+        {
+          "type": "IDAT",
+          "bytes": 848
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-viii/sword-shield/icons/810.png"
+    },
+    "sprites/pokemon/versions/generation-viii/sword-shield/icons/898.png": {
+      "sha": "0a96f2b444e79ae240882f7d84b6d1851a2a1647",
+      "size_bytes": 1034,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        68,
+        68
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "sRGB",
+        "gAMA",
+        "PLTE",
+        "tRNS",
+        "pHYs",
+        "IDAT",
+        "IEND"
+      ],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "sRGB",
+          "bytes": 1
+        },
+        {
+          "type": "gAMA",
+          "bytes": 4
+        },
+        {
+          "type": "PLTE",
+          "bytes": 252
+        },
+        {
+          "type": "tRNS",
+          "bytes": 84
+        },
+        {
+          "type": "pHYs",
+          "bytes": 9
+        },
+        {
+          "type": "IDAT",
+          "bytes": 567
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-viii/sword-shield/icons/898.png"
+    },
+    "sprites/pokemon/versions/generation-ix/scarlet-violet/icons/899.png": {
+      "sha": "dacc8322f44c039de2792eab58aeb9a0f612f88b",
+      "size_bytes": 20556,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        105,
+        202
+      ],
+      "n_frames": 1,
+      "plays": null,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "chunks": [
+        {
+          "type": "IHDR",
+          "bytes": 13
+        },
+        {
+          "type": "IDAT",
+          "bytes": 20499
+        },
+        {
+          "type": "IEND",
+          "bytes": 0
+        }
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/pokemon/versions/generation-ix/scarlet-violet/icons/899.png"
+    },
+    "sprites/types/generation-viii/sword-shield/13.png": {
+      "sha": "759d52df679a7cf1983fa68202dcd685a89d2bce",
+      "size_bytes": 2903,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        200,
+        44
+      ],
+      "n_frames": 1,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/types/generation-viii/sword-shield/13.png"
+    },
+    "sprites/types/generation-viii/sword-shield/small/13.png": {
+      "sha": "4ecc2aff528301bc0f2ed19633f7f797c7108a8d",
+      "size_bytes": 3227,
+      "signature_hex": "89504e470d0a1a0a",
+      "format": "PNG",
+      "size": [
+        60,
+        60
+      ],
+      "n_frames": 1,
+      "animated_chunks_present": false,
+      "all_crc_valid": true,
+      "complete_png": true,
+      "chunk_types": [
+        "IHDR",
+        "IDAT",
+        "IEND"
+      ],
+      "display_url": "https://github.com/PokeAPI/sprites/blob/master/sprites/types/generation-viii/sword-shield/small/13.png"
+    }
+  },
+  "documentation": {
+    "readme": "https://github.com/PokeAPI/sprites/blob/master/README.md",
+    "readme_sha": "ae2e6e138985e05e38f44564320f4791ae8c844d",
+    "license": "https://github.com/PokeAPI/sprites/blob/master/LICENCE.txt",
+    "license_sha": "f08318829a5c65e870b79ddd7e03b7f51416f3d9"
+  }
+}

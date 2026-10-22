@@ -105,4 +105,90 @@ cream/red/blue shell, ES/EN switch and navigation are preserved, with visible
 keyboard focus. Loading and empty states use status announcements; failures use
 an alert plus a native retry button. Entries are informational and have no
 inactive buttons or links to unfinished species detail pages. Filters, species
-selection, TCG detail flows and the PC Boxes design above remain future work.
+selection, TCG detail flows remain future work; the PC catalog preview is described below.
+
+## Iteration 4 PC Storage catalog preview
+
+Implemented: a framed two-panel PC terminal with selected Pokémon details on the
+left and a compact 6×5 sprite grid on the right. Mobile below 700 px puts the grid
+first. Four original CSS wallpapers (Classic by default, Forest, Ocean, Night sky), directional box
+buttons and a high-contrast selection cursor preserve the game-inspired identity
+without copying proprietary screens. Empty slots remain visible. Entries use remote
+PokéAPI sprites with an image-failure fallback; there are no bundled Pokémon assets.
+
+Boxes are prominently labeled as a catalog preview, without owned cards. Each of
+35 boxes covers up to 30 consecutive species within 1–1025. Selection starts at the
+first entry on each box change. Arrow keys move focus and selection, Home/End reach
+the first/last populated slots, and Enter/Space select. The grid uses one Tab stop,
+with native buttons and ARIA grid/row/cell semantics. Prev/next controls stop at the
+boundaries. Loading/error/empty states and retry are localized. Subtle grid/detail
+animations and selection transitions are disabled under reduced motion.
+
+Audio is opt-in, initially muted, with 15% volume. Sound/volume controls persist
+locally without authentication. Original Web Audio sweeps provide cursor, box-change
+and wallpaper-confirmation feedback; no autoplay, recordings or musical sequences.
+Audio failure leaves the rest of the interface usable. The former TCG placeholder has been removed; the selected panel now shows real
+Pokémon facts as described in the refinement below, without owned-card quantities.
+
+Manual desktop/390 px inspection and real listening remain required; this session
+had no connected browser. See DEVELOPMENT.md for the exact checklist. Automated
+coverage does not certify visual fidelity or subjective audio comfort.
+
+## PC search refinement
+
+A compact magnifying-glass button sits at the right end of the storage header,
+separate from previous/next. It opens an original framed search panel with ES/EN
+labels, a clear button and up to eight name/number suggestions. Arrow keys choose
+suggestions, Enter locates the match and Escape closes the panel and restores the
+trigger's focus. Results use combobox/listbox active-descendant semantics and a
+visible cursor, with automatic scrolling for keyboard selection.
+
+Selecting Scraggy (#559) closes the panel, navigates to Box 19 and selects space
+19 (zero-based 18), updates details and moves focus to its sprite button. It never
+renders a filtered storage grid or creates another box. Opening uses the cursor
+sound; locating uses one confirmation or box-transition effect depending on whether
+the box changes, avoiding simultaneous effects. Escape reuses the back effect.
+All sounds respect existing preferences. Name matching uses canonical PokéAPI
+names as the reliable fallback, without invented translations. Manual responsive
+and audio inspection remain pending as noted above.
+
+## Definitive PC visual/data refinement — 2026-10-22
+
+The storage grid now uses **menu icons only**: Generation V static or real APNG
+for #001–#649, followed by verified later menu-icon families for newer species.
+Battle/front sprites remain restricted to the large selected portrait and existing
+Pokédex cards, never as grid fallbacks. Native Gen V icons are 32×32; grid images
+occupy up to 64×64 CSS pixels on desktop and 48×48 on mobile, preserving proportions
+with contain/pixelated rendering. A failed APNG tries a still Gen V icon, then a
+later menu icon, then a neutral placeholder. Later-generation menu icons remain
+static even when Animated is selected. See `research/sprites/VERIFICATION.md`.
+
+The localized Sprites: Static/Animated radio controls default to Static and persist
+at `pokevault.spriteMode`. Reduced motion always selects still resources while
+retaining the saved preference; replacing APNG with PNG actually stops animation.
+Changing mode does not change selection, request another box, play audio or replace
+unchanged image nodes during subsequent selections. No artificial bounce is used.
+
+Classic is the default original wallpaper: soft pale green/cream with broad low-noise
+geometric bands. Slots are transparent over one continuous background, with a warm
+brown/cream selection cursor. Forest, Ocean and Night sky remain available. The
+large portrait is preserved above compact facts, with controlled keyboard-accessible
+scrolling on desktop; mobile places the grid first and expands facts below it.
+
+The selected panel shows real height/weight, separate normal/hidden abilities and
+one localized provider description. Content loads only for the selected species,
+with its own loading/error/retry state; header identity/types remain visible while
+loading. ES decimal commas and EN decimal points use Intl.NumberFormat. A missing
+hidden ability or description is explicit; English fallback descriptions carry a
+visible note and correct language metadata. No etymology or speculative trivia is
+shown. The old TCG placeholder is gone.
+
+Cajas and Pokédex share original rectangular TypeBadge SVG/CSS banners for all 18
+types: colored angled symbol segment, dark high-contrast label segment and uppercase
+localized text. These are not the copyrighted fixed-English badge PNGs. No old
+rounded type-pill markup remains in either view.
+
+Automated checks and provider queries verify behavior/data, not appearance. No
+connected browser was available for desktop/390 px screenshots, APNG playback or
+sound listening. The manual checklist in DEVELOPMENT.md remains required before
+claiming those aspects are visually/auditively approved.

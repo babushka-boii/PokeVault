@@ -99,3 +99,55 @@ El código y la documentación son material co-construido con IA. El estudiante 
 - No se atribuyen al estudiante reflexiones personales ni revisión del código que
   todavía no ha realizado. Debe revisar y comprender este material asistido por IA.
 - No se implementaron autenticación, inventario, cartas TCG ni cambios de Cajas.
+
+## Iteración 4 — Continuación PC Storage (22/10/2026)
+
+- El estudiante definió el alcance, las referencias Emerald/Black & White, la
+  disposición clásica, accesibilidad y requisitos de audio, y autorizó continuar
+  en la rama existente sin commits automáticos.
+- Codex asistió en análisis, diseño acotado, pruebas, paginación, componentes,
+  hooks, CSS, síntesis Web Audio y documentación. El código requiere revisión y
+  comprensión del estudiante; no se atribuyen experiencias personales ni escucha real.
+- Los fondos y efectos se generan con CSS y osciladores/envelopes originales.
+  No se copiaron interfaces píxel por píxel, grabaciones, melodías, sprites o
+  recursos de Nintendo al repositorio. Las imágenes siguen siendo URLs remotas de
+  PokéAPI, sujetas a revisión de condiciones y derechos ya pendiente.
+- La verificación automatizada usa respuestas HTTP y audio simulados. La revisión
+  visual/auditiva manual quedó pendiente por ausencia de navegador conectado.
+- No se incorporaron dependencias nuevas, autenticación, inventario ni migraciones.
+
+## Iteración 4 — Búsqueda de Pokémon en cajas (22/10/2026)
+
+- El estudiante definió que buscar debe localizar la caja y posición originales,
+  con Scraggy (#559) como ejemplo de aceptación, y conservar el flujo clásico.
+- Codex asistió en diseño, pruebas, índice/cache backend, combobox frontend,
+  integración de selección/foco/audio, diagnóstico y documentación.
+- Se consultó el índice real `https://pokeapi.co/api/v2/pokemon-species/?limit=1025`
+  para verificar nombre/número. Las pruebas usan HTTP simulado; no se copiaron
+  sprites ni sonidos. El índice solo aporta nombres canónicos, sin traducciones
+  o alias inventados. Continúan pendientes las revisiones de derechos ya registradas.
+- No hubo dependencias nuevas, migraciones, cambios de propiedad, commits ni push.
+  El estudiante debe revisar y entender este código asistido por IA; no se atribuye
+  como realizada una revisión visual/auditiva manual.
+
+## Iteración 4 — Refinamiento definitivo del PC (22/10/2026)
+
+- El estudiante definió las prioridades visuales/funcionales y aportó tres imágenes
+  como referencia de estilo. Se inspeccionaron, sin copiarlas como assets al repo.
+- Codex y agentes auxiliares asistieron en investigación de fuentes, diseño,
+  implementación, pruebas y revisión de iconos, backend de detalles y documentación.
+  CSS/SVG de fondos e insignias son originales asistidos por IA, no capturas ni
+  símbolos copiados de juegos. El estudiante debe revisar y comprender el resultado.
+- Fuente de datos: `https://pokeapi.co/docs/v2/` y recursos Pokémon/Species/Ability
+  de PokéAPI. Se verificaron Bulbasaur ES/EN y Scraggy ES mediante el endpoint real.
+- Fuente de iconos/referencia de tipos: `https://github.com/PokeAPI/sprites`.
+  Inventario, SHAs, dimensiones, APNG y derechos se registran en
+  `research/sprites/VERIFICATION.md` y `verification.json`, solo con metadatos.
+  El aviso upstream atribuye las imágenes a The Pokémon Company; CC0 del repositorio
+  no se interpreta como liberación de todos los derechos de terceros. Se cargan
+  iconos remotos por URL; no se empaquetan binarios de imágenes o sonidos.
+- No se inventan descripciones, etimologías, propiedad de cartas ni permisos de
+  assets. Nombres/habilidades usan localización del proveedor y fallback explícito.
+- La revisión visual/auditiva manual continúa pendiente por falta de navegador;
+  las pruebas automatizadas y las consultas reales no equivalen a esa aprobación.
+- No hubo commits, push, merge, cambio de rama, migraciones o dependencias nuevas.

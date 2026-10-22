@@ -151,3 +151,119 @@ La Pokédex se limita a 1–20: sin filtros, paginación, detalles TCG ni invent
 Los sprites se cargan desde URLs del proveedor y pueden fallar o estar ausentes.
 La caché es por proceso y no persistente. La revisión de licencias/condiciones de
 assets y la comprobación visual quedan pendientes, junto a las siguientes funciones.
+
+## Iteración 4 — Continuación: PC Storage como vista previa del catálogo
+
+**Fecha:** 22/10/2026.
+
+El estudiante solicitó una experiencia de cajas clásicas, con dos paneles, 30
+espacios, navegación, fondos originales y audio retro; explicitó que no existe
+inventario ni autenticación. Codex revisó documentación/código/Git, explicó el
+diseño antes de editar y asistió en pruebas, implementación y documentación sobre
+la rama existente. Se preservó el directorio `.superpowers/` previamente sin seguimiento.
+No se hicieron commits, push, merge ni migraciones.
+
+Se añadieron paginación acotada al endpoint existente (defaults y esquema anterior
+conservados), cachés limitadas, hook de carga/cancelación, componentes de cuadrícula,
+detalles, sprites y ajustes, tres fondos CSS y un módulo Web Audio original. Las
+cajas cubren 1–1025 en grupos de 30 y muestran explícitamente una vista previa del
+catálogo; no se inventaron cartas propias. Sonido inicialmente desactivado, volumen
+15%, preferencias locales y manejo de audio ausente/restringido. Las acciones de
+selección, navegación y aplicación de fondo tienen efectos distintos; no hay
+controles de cancelar o confirmación de inventario ficticios.
+
+Las pruebas nuevas fallaron inicialmente por el placeholder y por ignorarse la
+paginación. Tras implementar, el gate completo pasó: 43 pruebas de proveedores,
+17 backend (incluida PostgreSQL), 28 frontend, Ruff, ESLint, TypeScript, build y
+revisión de espacios. Los mocks HTTP/audio cubren errores, última página parcial,
+límites, selección, teclado, idioma, preferencias, throttling, cierre de recursos,
+resume rechazado y respuestas tardías.
+
+No había navegador conectado al intentar revisión visual. Quedan pendientes la
+inspección manual a 390 px/escritorio y escuchar los efectos reales; se registró
+un checklist reproducible en DEVELOPMENT.md. No se atribuyen al estudiante revisión
+ni reflexiones que no realizó. Cajas de inventario, reglas, cartas TCG, fondos
+persistidos y ampliación futura del rango de especies permanecen fuera del alcance.
+
+## Iteración 4 — Refinamiento: búsqueda dentro de las cajas
+
+**Fecha:** 22/10/2026.
+
+El estudiante pidió localizar Pokémon por nombre completo/parcial o número dentro
+de su caja original, preservando todos sus compañeros. Codex asistió en diseño,
+pruebas previas, implementación y registros. Se añadió un índice de nombres
+PokéAPI acotado a 1025 especies, cacheado una hora en el servidor, con ocho resultados
+máximos, validación, timeout y errores sanitizados. El navegador no descarga el
+catálogo completo. No se añadieron dependencias ni migraciones.
+
+La lupa abre un panel compacto ES/EN con debounce de 300 ms, cancelación, sugerencias,
+limpieza, teclado, Escape y estados de carga/vacío/error/reintento. Elegir un
+resultado calcula caja/espacio, carga la cuadrícula habitual y enfoca la selección.
+Buscar de nuevo en la misma caja no solicita otra página. Se reutilizan efectos de
+audio existentes con un único efecto de llegada para evitar solapamiento.
+
+Las pruebas iniciales fallaron por ausencia de ruta y controles. Durante la
+implementación se corrigió un reemplazo de texto demasiado amplio que había
+alterado una expresión JSX; las comprobaciones posteriores pasaron. El gate final
+`bash scripts/check.sh` pasó: 43 pruebas de proveedores, 21 backend, 37 frontend,
+Ruff, ESLint, TypeScript, build y revisión de espacios. Las pruebas cubren exacto,
+parcial, mayúsculas, número, errores, debounce, respuestas tardías, caja/espacio y
+foco. Scraggy (#559) llega a Caja 19, espacio 19, con sus otros 29 Pokémon visibles.
+Una consulta real al índice confirmó los resultados de `Scraggy`, `scragg` y `#559`.
+
+Se mantiene el fallback de nombres canónicos; no se inventaron alias españoles.
+La revisión visual y auditiva sigue pendiente sin navegador conectado. El estudiante
+debe revisar y comprender el código; no se atribuyen reflexiones ni validaciones
+personales no realizadas. No se hicieron commits ni push y se conservaron los
+cambios anteriores del trabajo de Cajas.
+
+## Iteración 4 — Refinamiento definitivo de iconos, detalles e interfaz PC
+
+**Fecha:** 22/10/2026.
+
+### Solicitud y trabajo
+
+El estudiante rechazó los sprites de combate dentro de la cuadrícula y las cápsulas
+redondeadas de tipos. Aportó referencias visuales de Pikachu y del banner Eléctrico,
+y pidió iconos de menú Gen V estáticos/APNG, detalles reales, badges inspirados en
+Sword/Shield y un fondo clásico claro, conservando búsqueda/audio/teclado.
+
+Codex revisó Git/documentación/código antes de editar, explicó el enfoque y dividió
+la investigación de assets y el backend de detalles entre agentes auxiliares, con
+revisión independiente del backend. Se preservaron los cambios sin commit y no se
+modificó `.superpowers/`, rama, migraciones, dependencias ni funcionalidades ajenas.
+
+Se verificaron árboles y archivos del repositorio PokeAPI/sprites. Gen V cubre
+1–649; Pikachu animado es APNG de 32×32 con dos frames de 170 ms. Se verificaron rangos
+posteriores de iconos de menú hasta 1025 y sus PNG estáticos de muestra. El banner
+Eléctrico #13 mide 200×44; no se copió porque la licencia del repositorio no elimina
+los derechos de las imágenes. La evidencia de procedencia/SHAs/formatos quedó en
+`research/sprites/`, sin binarios de Pokémon.
+
+La cuadrícula usa iconos de menú con fallback a estáticos/menu posterior/placeholder,
+modo persistido y reducción de movimiento. El panel carga solo el Pokémon elegido,
+con medidas convertidas, habilidades normales/ocultas y descripción localizada.
+Se eliminó el placeholder TCG y se compartió un TypeBadge original para 18 tipos.
+Se añadió Clásico como fondo predeterminado, iconos más legibles y espacios
+transparentes sobre una superficie continua, sin animación CSS artificial del sprite.
+
+### Evidencia y límites
+
+Las pruebas nuevas fallaron antes de implementar por la ausencia de componentes,
+ruta y datos. Se ejecutó el gate completo: 43 pruebas de proveedores, 48 backend
+(incluida PostgreSQL), 80 frontend, Ruff, ESLint, TypeScript, build y espacios.
+El comando reproducible es `bash scripts/check.sh`.
+
+Una consulta real mediante FastAPI confirmó Bulbasaur ES/EN: 0.7 m, 6.9 kg,
+Espesura/Overgrow y Clorofila/Chlorophyll, con descripciones genuinas normalizadas.
+También confirmó Scraggy ES: 0.6 m, 11.8 kg, dos habilidades normales y una oculta.
+Las pruebas de búsqueda conservan Caja 19/espacio 19 y el resto de la cuadrícula;
+se añadieron regresiones de familia de sprite, modo, nodos APNG estables,
+fallback, movimiento reducido, localización, datos tardíos y medidas.
+
+No había navegador conectado tras consultar la herramienta y su diagnóstico.
+No se afirma revisión visual a 390 px, reproducción APNG en navegador ni escucha
+real. La inspección binaria confirma frames, no reproducción visual. Se dejó un
+checklist preciso en DEVELOPMENT.md. Trivia/etimología sin fuente, inventario,
+cartas y cajas persistentes siguen diferidos. El estudiante debe revisar y poder
+explicar el código; no se inventan reflexiones o aprobaciones personales.

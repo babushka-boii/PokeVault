@@ -110,3 +110,27 @@ def test_cache_expires_and_concurrent_requests_share_refresh():
         assert len(requests) == 40
 
     asyncio.run(run())
+
+
+def test_pagination_and_final_partial_page():
+    from app.pokemon.provider import PokemonProvider
+
+    def handle(request):
+        number = int(request.url.path.rstrip("/").split("/")[-1])
+        return httpx.Response(200, json=payload(number))
+
+    app = create_app(settings())
+    app.state.pokemon_provider = PokemonProvider(transport=httpx.MockTransport(handle))
+    with TestClient(app) as client:
+        page = client.get("/api/v1/pokemon?offset=30&limit=30")
+        assert page.status_code == 200
+        assert [p["national_dex_number"] for p in page.json()["results"]] == list(
+            range(31, 61)
+        )
+        assert (
+            len(client.get("/api/v1/pokemon?offset=1020&limit=30").json()["results"])
+            == 5
+        )
+        for query in ["limit=31", "limit=0", "offset=-1", "offset=1025"]:
+            assert client.get("/api/v1/pokemon?" + query).status_code == 422
+        assert len(client.get("/api/v1/pokemon").json()["results"]) == 20

@@ -1,11 +1,14 @@
 import asyncio
+from collections import OrderedDict
 from collections.abc import Callable
 from time import monotonic
 
 import httpx2 as httpx
 from pydantic import ValidationError
 
-from app.pokemon.schemas import Pokemon, PokemonList
+from app.pokemon.details import PokemonDetailsService
+from app.pokemon.schemas import NATIONAL_DEX_TOTAL, Pokemon, PokemonList
+from app.pokemon.search import SpeciesIndex
 
 
 class PokemonUnavailable(Exception):
@@ -21,16 +24,22 @@ class PokemonProvider:
         transport: httpx.AsyncBaseTransport | None = None,
         clock: Callable[[], float] = monotonic,
     ) -> None:
+        self.search_index = SpeciesIndex(transport)
+        self.details = PokemonDetailsService(transport=transport, clock=clock)
         self._transport = transport
         self._clock = clock
-        self._cache: PokemonList | None = None
-        self._expires = 0.0
+        self._cache: OrderedDict[tuple[int, int], tuple[float, PokemonList]] = (
+            OrderedDict()
+        )
         self._lock = asyncio.Lock()
 
-    async def list_pokemon(self) -> PokemonList:
+    async def list_pokemon(self, offset: int = 0, limit: int = 20) -> PokemonList:
         async with self._lock:
-            if self._cache is not None and self._clock() < self._expires:
-                return self._cache.model_copy(deep=True)
+            key = (offset, limit)
+            cached = self._cache.get(key)
+            if cached is not None and self._clock() < cached[0]:
+                self._cache.move_to_end(key)
+                return cached[1].model_copy(deep=True)
             try:
                 # A total deadline also bounds slow responses that keep sending bytes.
                 async with (
@@ -46,13 +55,17 @@ class PokemonProvider:
                     async with asyncio.TaskGroup() as group:
                         tasks = [
                             group.create_task(self._fetch(client, semaphore, number))
-                            for number in range(1, 21)
+                            for number in range(
+                                offset + 1, min(offset + limit, NATIONAL_DEX_TOTAL) + 1
+                            )
                         ]
                     catalog = PokemonList(results=[task.result() for task in tasks])
             except (ExceptionGroup, httpx.HTTPError, TimeoutError) as error:
                 raise PokemonUnavailable from error
-            self._cache = catalog
-            self._expires = self._clock() + 300
+            self._cache[key] = (self._clock() + 300, catalog)
+            self._cache.move_to_end(key)
+            while len(self._cache) > 16:
+                self._cache.popitem(last=False)
             return catalog.model_copy(deep=True)
 
     @staticmethod

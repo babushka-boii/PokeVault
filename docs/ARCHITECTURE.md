@@ -11,7 +11,7 @@ Browser (React / TypeScript / Vite)
           v
 FastAPI (Python)
   |-- Health API (implemented)
-  |-- National Pokédex API / PokéAPI adapter (implemented, entries 1–20)
+  |-- National Pokédex API / PokéAPI adapter (implemented, default 1–20; bounded pagination)
   |-- Configuration and database session boundary (implemented)
   |-- Auth and profiles (Google OpenID Connect)
   |-- Reference catalog (species, card printings, sets)
@@ -163,4 +163,83 @@ no sprite binaries are bundled. Species names are canonical PokéAPI names (shar
 by ES/EN for this initial range); UI copy and type names use the local dictionaries.
 The grid uses semantic lists/headings; existing navigation, language switching
 and retry remain keyboard accessible with visible focus. Species detail routes,
-TCG browsing, filters and Boxes behavior are deferred.
+TCG browsing and filters are deferred. Catalog-only Boxes behavior is described below.
+
+## 10. PC Storage preview and synthesized audio
+
+The existing Pokémon adapter now accepts bounded offset/limit parameters. The
+versioned endpoint preserves its no-query response (first 20) and shape. The
+catalog is explicitly bounded to default species IDs 1–1025, with at most 30 per
+request and 16 cached pages per process. There are no database changes.
+
+`useCatalogBox` owns request cancellation, page identity, retry and a small memory
+cache. `BoxesPage` owns page/selection/wallpaper UI state. Focus movement lives in
+`StorageGrid`; `SelectedPokemon`, `PokemonSprite` and `AudioControls` have separate
+presentation responsibilities. Wallpaper presets and CSS remain independent of
+future owned-card box models. No preview state is presented as ownership.
+
+`RetroAudio` synthesizes original oscillator sweeps with gain envelopes, one voice
+at a time and a 75 ms retrigger guard. The hook owns its lifetime, closes its context
+on unmount, and persists validated mute/volume preferences with storage failure
+fallback. Audio defaults off at 15% volume and is initialized only by a user action.
+Unsupported contexts and rejected resume promises become a localized UI status.
+Selection, box switching and wallpaper application use different effects. Back and
+invalid effects exist in the reusable module but are not connected to absent actions.
+No recordings, game assets, new packages, authentication or inventory were added.
+
+## 11. Search locates the original catalog slot
+
+`GET /api/v1/pokemon/search?q=Scraggy&limit=8` returns bounded name/number
+suggestions across the supported 1–1025 range. `pokemon/search.py` owns a single
+validated species-name index fetched from PokéAPI's paginated species list, cached
+for one hour per process and protected by a refresh lock. It does not request
+1025 individual resources. Refreshes have a five-second HTTP timeout and ten-second
+total deadline; incomplete/failed refreshes are not cached, and errors are sanitized.
+Queries are limited to 40 characters and result counts to 1–8. Matching ignores
+case, accents and separators; numbers may include `#`. Exact names rank first,
+then matches follow National Dex order. Only canonical upstream names are available
+in this index: no independent Spanish aliases are fabricated.
+
+`BoxSearch` owns the compact combobox/listbox, 300 ms debounce, abort handling,
+loading/empty/error/retry states and Escape/clear behavior. The browser receives
+only suggestions. `locatePokemon` computes page=floor((number−1)/30) and
+slot=(number−1)%30. Boxes loads the normal page through `useCatalogBox`, selects the
+slot and focuses it after loading, leaving all peers visible. Same-page lookup
+changes selection without another page fetch. A consumed focus request cannot
+steal focus repeatedly. Search does not affect ownership or persistence.
+
+## 12. Menu icons and selected-only details
+
+`services/menuIcons.ts` centralizes menu-only URLs and verified coverage ranges:
+Gen V #001–#649 (static/APNG), Gen VII #650–#809 (static), Sword/Shield #810–#898
+(static), Scarlet/Violet #899–#1025 (static). Runtime failures follow a menu-only
+chain, ending in a neutral placeholder. `MenuIcon` is separate from the large
+`PokemonSprite` portrait so a battle sprite cannot silently enter the grid.
+`useSpriteMode` owns persistence and live reduced-motion subscription. Frames run
+natively in the image decoder, with no per-frame React work. Unchanged icon nodes
+survive selection updates. `TypeBadge` independently owns all original type symbols,
+geometry and localized labels and is shared by Cajas and Pokédex.
+
+`GET /api/v1/pokemon/{number}?language=es|en` is registered after `/search`; the
+existing list/search schemas are unchanged. `PokemonDetailsService` fetches only
+the selected Pokémon/species and its distinct ability resources. Height dm and
+weight hg convert to m/kg by division by ten. Normal/hidden abilities retain
+provider classification. Names choose requested language, then English, then the
+canonical species/ability name. Descriptions choose the first nonempty entry in
+provider order for the requested language, then English, then null. Whitespace,
+newlines and form feeds are normalized. Metadata records the actual language.
+No game-recency claim or invented translation/trivia is inferred.
+
+Details have an LRU cache of 128 number/language entries for 300 seconds; validated
+ability resources have a 256-entry, 3600-second cache. Refresh locks coalesce work,
+upstream concurrency is at most five, each HTTP timeout is five seconds and a
+refresh deadline is 15 seconds. Resource identities and references are checked;
+errors return sanitized 503 and failed details never enter the cache. This does
+not add species/ability requests for every grid slot.
+
+The frontend `pokemonDetails.ts` validates the detail response. `usePokemonDetails`
+maintains at most 32 number/language entries for five minutes, aborts obsolete
+requests and keys displayed state by selection/language/retry. Late requests cannot
+replace a newer selected panel; cached repeated selections avoid duplicate detail
+fetches. `SelectedPokemon` renders facts without owning external HTTP integration.
+No database model, migration, authentication or inventory change is required.

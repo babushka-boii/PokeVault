@@ -49,9 +49,3 @@ button, a { font: inherit; }
 .pokemon-sprite { align-items: center; display: flex; justify-content: center; min-height: 96px; font-size: .8rem; }
 .pokemon-sprite img { image-rendering: pixelated; }
 .pokemon-types { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center; list-style: none; padding: 0; }
-.pokemon-type { background: #fffaf0; border: 1px solid #173f70; border-radius: 999px; font-size: .8rem; padding: .2rem .5rem; }
-.pokemon-type--grass, .pokemon-type--bug { background: #d5ecc4; }
-.pokemon-type--fire { background: #ffd9ba; }
-.pokemon-type--water, .pokemon-type--ice { background: #cce8fa; }
-.pokemon-type--poison { background: #ecd5f3; }
-.pokemon-type--electric { background: #fff0a8; }
