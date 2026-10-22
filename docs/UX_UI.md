@@ -192,3 +192,70 @@ Automated checks and provider queries verify behavior/data, not appearance. No
 connected browser was available for desktop/390 px screenshots, APNG playback or
 sound listening. The manual checklist in DEVELOPMENT.md remains required before
 claiming those aspects are visually/auditively approved.
+
+## Species TCG card exploration (2026-10-22)
+
+Cajas keeps single-click sprite selection and its original details. A dedicated
+“Ver cartas TCG / View TCG cards” link opens `/pokemon/:number/cards`; the same action
+appears on Pokédex entries. This is public catalog browsing, with no owned/collected
+states or invented quantities. Gallery headers retain the selected species number,
+localized name, portrait and type badges; species-header errors do not hide cards.
+
+The gallery deliberately uses readable full-card artwork, unlike PC slots. Native
+links/buttons, responsive grids and forms support keyboard/touch use. Expansion ID
+can be chosen from current-page suggestions or entered explicitly, with Apply/Clear,
+English-name/ID sorting and Previous/Next pagination. Filters/page live in the URL.
+Coverage and per-card language fallback are visible; no unverified result total is
+shown. Loading skeletons respect reduced motion, and missing artwork has a localized
+fallback with preserved card aspect ratio.
+
+`/cards/:id` shows high-resolution art, set/number/rarity, illustrator, HP, TCG types,
+stage/evolution, card attacks/abilities and recorded variants when present. Missing
+fields stay explicit; unnamed provider attacks are not given invented translations.
+Game abilities are never used as TCG card abilities. Actual content has language
+metadata and a fallback note when it differs from the UI language.
+
+A local Back link returns detail → the exact species gallery/filters → original
+Boxes box/selection/wallpaper or Pokédex. Browser history also retains these URLs.
+Returning to Boxes restores the selected slot and focus; sound and sprite modes keep
+existing independent preferences. Return targets are limited to known local routes.
+
+The end-to-end journey and controls are automated-tested. Manual desktop/mobile
+artwork, layout and audio inspection is still pending: no browser was available.
+See DEVELOPMENT.md for the reproducible checklist; no visual verification is claimed.
+
+## TCG experience refinement (2026-10-22)
+
+The gallery now has a compact searchable expansion dialog, showing official names,
+logos, series/year and selected states. Options come from the complete supported
+species index, not only the visible page. Expansions without a usable logo remain
+individually selectable under Other/Otras. Filtering and newest/oldest sorting update
+the URL immediately and reset page 1; chronological ordering occurs before server
+pagination, with unknown dates last. Price sorting remains future work.
+
+Artwork keeps its full proportions and has separate loading and failure states.
+Documented format/quality candidates and verified same-printing language alternatives
+are tried before the missing state. Actual art language is separate from text
+language. A provider with no image metadata is distinguished from download failure;
+detail retry restarts artwork loading without changing the printing.
+
+The detail view uses a larger framed card opposite a clear information hierarchy:
+name/category/ID and expansion, card number/rarity, Pokémon traits, TCG abilities and
+attacks, then illustrator/regulation/languages/variants. Weaknesses, resistances and
+retreat are real provider fields. Mobile places artwork first and keeps reading order
+linear. Separate gallery/origin links preserve prior filters, page and box context.
+
+Mouse movement gently tilts only the artwork and moves a gradient reflection.
+Touch interaction is deliberately armed through Tilt card before dragging; taps,
+scrolling outside interaction and native keyboard links remain usable. Release,
+cancel or Escape resets the card. Reduced motion disables the visual effect live.
+Standard/unknown finishes get subtle glare; explicit foil metadata can intensify
+iridescence, always labeled as simulation rather than proof of a physical variant.
+There is no idle animation across the gallery. The implementation and gradients are
+original; linked TCGdex/Simey references informed hierarchy and interaction goals,
+without copying their layouts, GPL code or textures. The submitted expansion logo
+is a visual reference only, not a bundled asset or hardcoded expansion exception.
+
+Automated pointer/component tests do not prove visual or real-device touch quality.
+No browser was available after connection diagnostics; desktop and 390 px review
+remain pending in the updated DEVELOPMENT.md checklist.

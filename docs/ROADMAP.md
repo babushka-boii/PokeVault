@@ -135,3 +135,30 @@ See `Bitacora.md` for validation evidence and limitations.
 - [ ] Manually inspect desktop/390 px, actual APNG playback and sound (no browser connected).
 - [ ] Add sourced trivia/etymology only after a traceable provider is established.
 - [ ] Implement owned/manual/smart boxes and TCG browsing in separate increments.
+
+## Iteration 4 continuation — Public TCGdex catalog
+
+**Implementation date:** 2026-10-22.
+
+- [x] Verify exact species filtering, CardBrief limitations, pagination, set filtering and image conventions.
+- [x] Add bounded cached FastAPI species-card and card-detail APIs with stable IDs and ES/EN fallback.
+- [x] Preserve multiple species associations and exclude unverified Trainer/Energy links.
+- [x] Add species galleries, official card details, expansion filtering, name/ID sorting and pagination.
+- [x] Add explicit entry links from Cajas/Pokédex and preserve original browsing context on return.
+- [x] Cover provider failures, optional fields, localization, navigation and regressions with mocked tests.
+- [x] Record live provider evidence separately from offline verification and update authorship.
+- [ ] Manually inspect desktop/390 px layout and artwork (no connected browser available).
+- [ ] Define future inventory eligibility for physical versus Pocket records and durable catalog synchronization.
+- [ ] Implement owned cards, authentication, trading, scanning and pricing in later slices.
+
+## TCG visual and functional refinement — 2026-10-22
+
+- [x] Diagnose null localized artwork and the single-attempt image failure path.
+- [x] Add centralized official format/quality/same-printing language candidates and bounded visible loading.
+- [x] Add metadata-only set caching and globally chronological ordering before pagination.
+- [x] Replace raw expansion input with searchable names/logos/series/year and independent Other options.
+- [x] Add reusable mouse/touch tilt, original simulated reflections, cleanup and live reduced motion.
+- [x] Organize card details with full artwork, category, defenses, retreat and regulation metadata.
+- [x] Preserve URL context, existing species associations, localization, PC search/sprites/audio and navigation.
+- [ ] Review actual desktop/390 px artwork, lighting and Chromium touch on a connected browser/device.
+- [ ] Add price sorting only after verified source/timestamp/currency normalization; no decorative price controls.

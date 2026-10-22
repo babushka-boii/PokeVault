@@ -151,3 +151,67 @@ El código y la documentación son material co-construido con IA. El estudiante 
 - La revisión visual/auditiva manual continúa pendiente por falta de navegador;
   las pruebas automatizadas y las consultas reales no equivalen a esa aprobación.
 - No hubo commits, push, merge, cambio de rama, migraciones o dependencias nuevas.
+
+## Iteración 4 — Integración del catálogo TCGdex (22/10/2026)
+
+- El estudiante definió el flujo Cajas/Pokédex → cartas por especie → detalle →
+  regreso al contexto, el alcance público sin inventario y la conservación de la
+  interfaz existente. Tras una interrupción, indicó continuar los archivos presentes
+  sin reiniciar, resetear, hacer commits ni publicar.
+- Codex y agentes auxiliares asistieron en investigación de la API, diseño acotado,
+  adaptador/cachés/validación FastAPI, componentes y cliente TypeScript, navegación,
+  localización, pruebas, diagnóstico, revisión independiente y documentación.
+  El material es co-construido con IA y requiere revisión y comprensión del estudiante.
+- Fuentes oficiales: `https://tcgdex.dev/rest/cards`,
+  `https://tcgdex.dev/rest/filtering-sorting-pagination`,
+  `https://tcgdex.dev/reference/card`, `https://tcgdex.dev/reference/card-brief`
+  y `https://tcgdex.dev/assets`, consultadas el 22/10/2026. Las solicitudes reales a
+  `api.tcgdex.net` y siete verificaciones de la API de aplicación se registran en
+  `research/tcgdex/VERIFICATION.md` y `metadata.json` con límites explícitos.
+- Los datos de cartas, asociaciones multi-especie y traducciones proceden de
+  TCGdex; los detalles de especie siguen procediendo de PokéAPI. Las pruebas usan
+  respuestas deterministas simuladas. No se inventan cartas, ataques, traducciones,
+  totales, propiedad del usuario ni cobertura no comprobada.
+- Las ilustraciones se cargan por URL HTTPS remota de `assets.tcgdex.net`; no se
+  guardaron imágenes ni sonidos de Pokémon en el repositorio. Disponibilidad técnica
+  y documentación del proveedor no equivalen a autorización de todos los derechos
+  de terceros; se conserva la revisión de condiciones ya pendiente.
+- La verificación final ejecutó 43 pruebas de proveedores, 82 backend y 146 frontend,
+  además de Ruff, ESLint, TypeScript y build. Las consultas reales y las pruebas
+  automatizadas no equivalen a revisión visual/auditiva: no había navegador disponible.
+  No se atribuyen al estudiante experiencias, reflexiones ni aprobaciones personales.
+- No hubo commits, push, merge, cambio de rama, migraciones ni dependencias nuevas;
+  se preservaron cambios existentes y no se modificaron directorios de herramientas.
+
+## Iteración 4 — Refinamiento de experiencia TCG (22/10/2026)
+
+- El estudiante definió las prioridades de fiabilidad de imágenes, interacción,
+  cronología, expansiones y detalle, aportó una referencia visual de logo y enlaces
+  de inspiración y autorizó implementar directamente conservando los cambios previos.
+- Codex y agentes auxiliares asistieron en diagnóstico, investigación de contratos,
+  modelos/cachés/ordenación, resolutores de assets, React/TypeScript/CSS, controles
+  táctiles, pruebas previas, revisión independiente y documentación. El resultado
+  requiere revisión y comprensión del estudiante; no se atribuyen reflexiones propias.
+- Se revisaron las referencias oficiales `https://tcgdex.dev/assets`,
+  `https://tcgdex.dev/reference/set`, la referencia de cartas y GraphQL, así como
+  `https://tcgdex.net/database/sv-scarlet-violet/sv03.5-151/199-charizard-ex` para
+  jerarquía de información. `research/tcgdex/refinement.json` conserva metadatos,
+  cabeceras HEAD y consultas reales separadas de las respuestas simuladas en tests.
+- `https://poke-151.simey.me/`, `https://poke-holo.simey.me/` y
+  `https://github.com/simeydotme/pokemon-cards-css` fueron referencias conceptuales.
+  Se identificó GPL-3.0; no se incorporaron código, texturas, assets ni dependencias
+  de ese proyecto. La solución de Pointer Events, gradientes y variables CSS es
+  original asistida por IA; no reproduce sus implementaciones ni el layout TCGdex.
+  La referencia de logo aportada no se copió ni se trató como una excepción codificada.
+- Las imágenes/logos siguen siendo URLs remotas oficiales del proveedor, con
+  fallback limitado a formatos y recursos verificados de la misma impresión.
+  Texto e imagen registran sus idiomas por separado. Los efectos son simulaciones,
+  sin atribuir acabado físico ni propiedad a una carta. No se inventaron precios,
+  fechas, traducciones, assets ni disponibilidad. La revisión de derechos previamente
+  pendiente no se considera resuelta por la accesibilidad técnica del proveedor.
+- El gate final pasó con 43 pruebas de proveedores, 98 backend y 193 frontend,
+  lint, tipos y build. No había navegador disponible; no se atribuye inspección visual,
+  interacción táctil real, escucha o aprobación personal al estudiante. El checklist
+  manual permanece en DEVELOPMENT.md.
+- No se hicieron commits, push, merge, reset, cambios de rama, migraciones ni
+  dependencias nuevas; se conservaron las modificaciones y directorios de herramientas.

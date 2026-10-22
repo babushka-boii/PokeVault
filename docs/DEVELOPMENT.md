@@ -252,3 +252,109 @@ Manual refinement checklist (not executed in this session):
 No connected browser was available for screenshots/playback/listening. PNG/APNG
 format inspection and automated image/error tests establish source selection and
 frame metadata; they do not establish actual browser playback or visual fidelity.
+
+## Public TCG catalog
+
+Two new endpoints reuse FastAPI's existing settings/CORS/application structure:
+
+- `GET /api/v1/pokemon/{number}/cards?language=es&page=1&page_size=12&sort=name&set_id=sm9`
+- `GET /api/v1/cards/{card_id}?language=es`
+
+`number` is 1–1025; `language` is `es` (default) or `en`; page is 1–500; page_size
+is 1–24 (default 12); sort is `name` (English catalog), `id`, `newest` or `oldest`.
+Expansion is optional.
+Identifiers are at most 100 characters, alphanumeric segments separated by single
+hyphens/dots, including `sv03.5-001`; slashes, consecutive separators and whitespace
+are rejected. Invalid parameters use HTTP 422; provider failures use sanitized 503
+`{"detail":"Card catalog is unavailable"}`. Direct details use HTTP 404
+`{"detail":"Card not found"}` only when both supported language resources are absent.
+
+Page shape: `{results: Card[], page, page_size, has_more, coverage:"english_catalog", sets: CardSet[], sets_complete:true}`.
+There is no total-result count. Card records include stable id/name, `dex_ids`,
+`image_url`, `thumbnail_url`, `set:{id,name}`, `local_id`, nullable rarity/illustrator/
+HP/stage/evolve_from, category, actual content language, verified available_languages,
+TCG types, attacks, abilities and variants. Missing metadata is null/[]; a provider
+attack/ability name can be null. Full schemas are in `backend/app/cards/schemas.py`.
+No pricing or inventory fields are exposed. Cards also include verified
+`image_sources:[{base_url,language}]`, nullable `image_language`, weaknesses and
+resistances `[{type,value:string|null}]`, nullable retreat and regulation_mark.
+CardSet adds name_language, logo_url, symbol_url, logo_sources `[{url,language}]`,
+nullable serie `{id,name}` and release_date. Logo URLs already include a format
+suffix; card sources are bases. `sets` contains all expansions in that species'
+bounded index, including those outside the current filter/page.
+
+TCGdex requires exact `dexId=eq:N`, not substring `dexId=N`. The adapter verifies
+complete card associations after bounded CardBrief discovery. Multi-species cards
+appear in either associated species; missing `dexId` is never guessed from names.
+The complete species-only brief index is cached, filtered by stable set ID and
+sorted before pagination; it never loads all global card details. Discovery is
+bounded at 2000 briefs, with an end probe to reject truncation. Shared metadata-only
+GraphQL set data (at most 512) and Spanish set/series lists establish dates, names
+and logos. `newest`/`oldest` sort by official English expansion release dates;
+unknown/invalid dates stay last in either direction. Ties use set ID, numeric local
+number when possible, then card ID. REST nested release-date sorting was not reliable.
+Name/ID ordering is deterministic; no sorting is performed on just the React page.
+The English discovery pool may include Pocket and omits links
+not established by the provider; it is not an exhaustive all-language catalog.
+Spanish missing with 404 falls back by the same stable ID, never by translated name.
+For direct details, Spanish-only data also remains usable when English is absent.
+Other failures are not disguised as missing translations.
+
+Outbound JSON goes to `api.tcgdex.net`; artwork loads remotely from
+`assets.tcgdex.net` using documented `low.webp` (245×337) and `high.webp` (600×825)
+conventions. No image download, new dependency, database table or migration is needed.
+HTTP timeout is five seconds and the full operation deadline is 15 seconds. Cached
+resources/pages live for 300 seconds with explicit LRU bounds; tests mock HTTP.
+See `research/tcgdex/VERIFICATION.md` and `refinement.json` for live request/coverage
+evidence. `verify_refinement.py` reproduces read-only provider/asset probes; this
+network-dependent research script is separate from the mocked automated suite.
+
+`cardImages.ts` tries WebP/PNG/JPG at the preferred quality, then the other quality,
+then artwork from another verified language resource of the same stable printing.
+The displayed artwork language is tracked independently of the card text. Missing
+provider metadata and failed image requests have different messages. Artwork uses
+contain/aspect-ratio, gallery lazy loading, cached-completion detection and a
+20-second visible loading deadline with detail retry. Offscreen lazy images do
+not start that deadline. Set logos use `.png`/`.webp`/`.jpg`, without `/high` or `/low`.
+
+Mouse tilt is CSS/pointer driven, with 4° gallery and 8° detail limits. Mobile users
+activate Tilt card before dragging; the toggle allows ordinary scrolling by default
+and avoids changing touch-action mid-gesture. A drag never activates the card link.
+Release, pointer cancellation, Escape, preference changes and unmount clean up state.
+Reduced motion disables transformations/reflections and loading animation. All foil
+effects are simulations; unknown/mixed finishes receive only restrained reflection.
+No GPL code/textures were copied; see `research/tcgdex/EXPERIENCE_REFERENCES.md`.
+
+Manual browser checklist (not performed in this session):
+
+1. Start both servers, open `/boxes`, select Bulbasaur, and activate View TCG cards.
+   Check that selecting another slot still only updates Pokémon details.
+2. In the gallery, search expansions by name/series/year, inspect names/logos and
+   Other/Otras grouping, select two distinct logo-less expansions, and use Escape,
+   Tab and clear. Select newest/oldest and compare cards across two pages; filtering
+   or sorting resets page 1. No price/owned/total controls should appear.
+3. Open a card; check high-resolution art, all available official metadata, TCG-only
+   attacks/abilities and missing-field states. Back returns to the same filtered page.
+4. Return to Boxes and verify original box, selected slot, wallpaper, focus, sprite
+   mode and audio settings. Repeat with Scraggy (#559), reached through search.
+5. Repeat from `/pokedex`; test ES/EN, known missing translations, direct detail URLs,
+   invalid IDs, API failure/retry and blocked artwork. Verify old network responses
+   cannot overwrite a new language/species/filter selection.
+6. At desktop and 390 px, inspect image proportions, readable captions, touch/focus
+   controls and no overflow. Move a mouse across artwork: restrained tilt/light must
+   follow it, captions stay fixed, and leave returns to rest. Activate Tilt card on
+   mobile, drag over the actual image, release/cancel and verify no accidental link;
+   ordinary taps must still open details and scrolling works with interaction off.
+7. Toggle reduced motion while interacting: movement/reflections must stop and
+   native keyboard navigation remain usable. Confirm existing search/icons/audio.
+8. Inspect older Base Set, Sword & Shield, Scarlet & Violet illustration rares,
+   Spanish art, English fallback, multi-species and missing-artwork cases. Block
+   WebP to verify PNG fallback, then all formats of one language to verify the exact
+   same printing's alternative. Block every candidate: no broken icon/stuck skeleton;
+   inspect the distinct provider-missing state and retry details after unblocking.
+9. Block localized logos to verify English alternatives and all logo formats to
+   verify Other grouping without merging identities. No card quality suffix should
+   occur in a logo request. Check browser back/forward through filters and details.
+
+Automated tests establish response and interaction behavior. A connected browser
+is still required to approve actual visual responsiveness and artwork loading.

@@ -1,0 +1,113 @@
+.tcg-page { min-width: 0; }
+.tcg-page .tcg-sr-only { border: 0; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; white-space: nowrap; width: 1px; }
+.tcg-action { align-items: center; background: #173f70; border: 2px solid #173f70; border-radius: .4rem; color: #fffaf0; display: inline-flex; font-size: .8rem; font-weight: 800; justify-content: center; line-height: 1.4; min-height: 44px; padding: .55rem .7rem; text-decoration: none; }
+.tcg-action:hover { background: #24568c; text-decoration: underline; text-underline-offset: .2rem; }
+.tcg-page h1 { margin-top: 1rem; }
+.tcg-back { color: #173f70; display: inline-block; font-size: .875rem; font-weight: 800; text-underline-offset: .2rem; }
+.tcg-species { align-items: center; border-bottom: 1px solid #c9d3dc; display: flex; gap: 1.25rem; min-height: 8rem; padding: .4rem 0 1rem; }
+.tcg-species h2 { margin: 0; }
+.tcg-species .pokemon-types { justify-content: flex-start; margin-bottom: 0; }
+.tcg-species-portrait { align-items: center; display: flex; flex-shrink: 0; height: 112px; justify-content: center; width: 112px; }
+.tcg-species-portrait img { image-rendering: pixelated; max-height: 112px; max-width: 112px; object-fit: contain; }
+.tcg-coverage { color: #526073; font-size: .8rem; line-height: 1.65; max-width: 65rem; }
+.tcg-filters { align-items: end; border-bottom: 1px solid #c9d3dc; display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.25rem 0 1.75rem; padding-bottom: 1.25rem; }
+.tcg-filters > div { display: grid; flex: 1 1 12rem; gap: .45rem; min-width: 0; }
+.tcg-filters > .tcg-expansion-selector { flex-grow: 2; position: relative; }
+.tcg-filters label, .tcg-filter-label { color: #4d5e71; font-size: .75rem; font-weight: 800; }
+.tcg-filters input, .tcg-filters select { background: #fffdf7; border: 1px solid #8a9db0; border-radius: .45rem; color: inherit; font: inherit; font-size: .875rem; min-height: 2.8rem; min-width: 0; padding: .55rem .65rem; width: 100%; }
+.tcg-page button { background: #173f70; border: 1px solid #173f70; border-radius: .4rem; color: #fffaf0; cursor: pointer; font: inherit; font-size: .875rem; font-weight: 700; min-height: 2.75rem; padding: .5rem .8rem; }
+.tcg-page button:hover { filter: brightness(1.07); }
+.tcg-page :is(button, a, input, select):focus-visible { outline: 3px solid #317ec5; outline-offset: 4px; }
+.tcg-page .tcg-clear-filters { background: transparent; border-color: #b5c1cd; color: #173f70; font-size: .8rem; }
+.tcg-page .tcg-expansion-trigger { align-items: center; background: #fffdf7; border-color: #8a9db0; color: #173f70; display: flex; gap: .65rem; min-height: 2.8rem; text-align: left; width: 100%; }
+.tcg-expansion-trigger > span:not(.tcg-expansion-chevron) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tcg-expansion-trigger .tcg-set-logo { height: 1.7rem; width: 3.4rem; }
+.tcg-expansion-chevron { font-size: 1.1rem; margin-left: auto; }
+.tcg-expansion-popover { background: #fffdf7; border: 1px solid #8a9db0; border-radius: .65rem; box-shadow: 0 12px 35px #173f702b; left: 0; max-width: calc(100vw - 3rem); min-width: min(26rem, 100%); padding: .75rem; position: absolute; top: calc(100% + .5rem); width: max(100%, 26rem); z-index: 20; }
+.tcg-expansion-search { display: flex; gap: .5rem; }
+.tcg-page .tcg-expansion-close { background: transparent; border-color: #ccd4dc; color: #173f70; flex-shrink: 0; font-size: 1.35rem; line-height: 1; padding: .4rem .7rem; }
+.tcg-expansion-options { max-height: min(26rem, 58vh); overflow-y: auto; overscroll-behavior: contain; padding: .5rem .2rem .2rem; }
+.tcg-expansion-options h3 { color: #53677d; font-size: .68rem; letter-spacing: .09em; margin: 1rem .4rem .4rem; text-transform: uppercase; }
+.tcg-page .tcg-expansion-option { align-items: center; background: transparent; border-color: transparent; color: #173f70; display: flex; gap: .8rem; margin-top: .3rem; min-height: 4.5rem; padding: .65rem .5rem; text-align: left; width: 100%; }
+.tcg-page .tcg-expansion-option:hover { background: #edf3f8; }
+.tcg-page .tcg-expansion-option[aria-pressed=true] { background: #e8f1fa; border-color: #5684ad; }
+.tcg-page .tcg-expansion-all { justify-content: space-between; min-height: 2.75rem; }
+.tcg-set-logo { display: block; flex-shrink: 0; height: 3rem; object-fit: contain; width: 5rem; }
+.tcg-set-logo--missing { align-items: center; background: #eef1f4; border-radius: .35rem; color: #6c8095; display: flex; font-size: 1.5rem; justify-content: center; }
+.tcg-expansion-name { display: grid; flex: 1; gap: .35rem; min-width: 0; }
+.tcg-expansion-name strong { font-size: .85rem; line-height: 1.4; overflow-wrap: anywhere; }
+.tcg-expansion-name small { color: #586a7c; font-size: .7rem; line-height: 1.4; }
+.tcg-results { margin-top: 1.5rem; }
+.tcg-grid, .tcg-skeletons { display: grid; gap: 2rem 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr)); list-style: none; margin: 0; padding: 0; }
+.tcg-preview { min-width: 0; }
+.tcg-preview-link { border-radius: .6rem; color: inherit; display: block; height: 100%; text-decoration: none; }
+.tcg-preview h3 { font-size: .95rem; line-height: 1.4; margin: .85rem 0 .35rem; overflow-wrap: anywhere; }
+.tcg-preview > p { color: #526073; font-size: .75rem; line-height: 1.5; margin: .25rem 0; overflow-wrap: anywhere; }
+.tcg-preview > .tcg-preview-number { color: #42536b; font-size: .7rem; }
+.tcg-preview:has(.tcg-preview-link:hover) h3 { text-decoration: underline; text-underline-offset: .2rem; }
+.tcg-artwork { align-items: center; aspect-ratio: 245 / 337; background: #e4eaf0; border-radius: .7rem; display: flex; justify-content: center; overflow: hidden; position: relative; width: 100%; }
+.tcg-artwork img { display: block; height: 100%; object-fit: contain; position: relative; width: 100%; }
+.tcg-artwork-missing { color: #44516a; font-size: .8rem; line-height: 1.6; max-width: 15rem; padding: 1rem; text-align: center; }
+.tcg-artwork--loading { animation: tcg-pulse 1.3s ease-in-out infinite alternate; background: linear-gradient(120deg, #e1e8ee, #f8fafc, #dde6ed); }
+.tcg-language-note { color: #69552c; font-size: .72rem; line-height: 1.6; }
+.tcg-pagination { align-items: center; border-top: 1px solid #c9d3dc; display: flex; flex-wrap: wrap; font-size: .8rem; gap: .75rem; justify-content: space-between; margin-top: 2rem; padding-top: 1.25rem; }
+.tcg-pagination a { border: 1px solid #8a9db0; border-radius: .4rem; color: #173f70; font-weight: 800; padding: .65rem; }
+.tcg-pagination [aria-disabled] { color: #626b77; }
+.tcg-source { color: #58687b; font-size: .7rem; margin: 1.75rem 0 0; }
+.tcg-detail-navigation { align-items: center; display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; justify-content: space-between; }
+.tcg-origin { color: #53677d; font-size: .75rem; text-underline-offset: .2rem; }
+.tcg-detail { align-items: start; display: grid; gap: clamp(1.5rem, 4vw, 3.5rem); grid-template-columns: minmax(14rem, 1fr) minmax(0, 1.15fr); margin-top: 2rem; }
+.tcg-detail-artwork { margin: 0; min-width: 0; position: sticky; top: 1.5rem; }
+.tcg-artwork-stage { background: radial-gradient(ellipse at 50% 38%, #d9e6f0 0, #e9eff3 38%, #f6f4ec 78%); border-radius: 1rem; padding: clamp(.9rem, 2.6vw, 2rem); }
+.tcg-artwork-stage .tcg-artwork { box-shadow: 0 16px 30px #1029402e, 0 2px 5px #10294021; }
+.tcg-detail-artwork figcaption { color: #637181; font-size: .68rem; letter-spacing: .04em; margin: .9rem 0 .5rem; text-align: center; }
+.tcg-simulation-note { color: #637181; font-size: .66rem; line-height: 1.6; margin: .5rem auto 0; max-width: 23rem; text-align: center; }
+.tcg-detail-skeleton { margin-top: 1.5rem; max-width: 24rem; }
+.tcg-detail-content { min-width: 0; }
+.tcg-card-category { color: #496784; font-size: .72rem; font-weight: 800; letter-spacing: .05em; line-height: 1.6; margin: 0; text-transform: uppercase; }
+.tcg-card-header h1 { font-size: clamp(1.65rem, 3.2vw, 2.55rem); line-height: 1.15; margin: .6rem 0; overflow-wrap: anywhere; }
+.tcg-card-id { color: #627084; font-family: ui-monospace, monospace; font-size: .73rem; margin: .75rem 0 1.35rem; }
+.tcg-detail-set { align-items: center; display: flex; gap: .8rem; margin-bottom: 1.25rem; min-width: 0; }
+.tcg-detail-set .tcg-set-logo { height: 3.6rem; width: 6.5rem; }
+.tcg-detail-set p { font-size: 1rem; font-weight: 800; line-height: 1.5; margin: .15rem 0; overflow-wrap: anywhere; }
+.tcg-detail-set small { color: #637181; font-size: .72rem; }
+.tcg-primary-facts { display: flex; flex-wrap: wrap; gap: .8rem 1.5rem; margin: 1.25rem 0; }
+.tcg-primary-facts dt, .tcg-facts dt { color: #586b80; font-size: .7rem; font-weight: 700; }
+.tcg-primary-facts dd, .tcg-facts dd { font-size: .83rem; line-height: 1.6; margin: .25rem 0 0; overflow-wrap: anywhere; }
+.tcg-primary-facts dd { font-weight: 700; }
+.tcg-facts { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: .8rem 0; }
+.tcg-detail-section { border-top: 1px solid #c9d3dc; margin-top: 1.5rem; padding-top: 1.25rem; }
+.tcg-detail-section h2 { color: #173f70; font-size: .95rem; margin: 0 0 1rem; }
+.tcg-hp-types { align-items: center; display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.tcg-hp { color: #173f70; margin: 0; }
+.tcg-hp span { font-size: .7rem; font-weight: 800; }
+.tcg-hp strong { font-size: 1.75rem; font-weight: 800; line-height: 1; }
+.tcg-energy-types { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+.tcg-energy-types li { background: #e4edf6; border-radius: 1rem; color: #173f70; font-size: .75rem; font-weight: 800; padding: .4rem .75rem; }
+.tcg-effects { list-style: none; margin: 0; padding: 0; }
+.tcg-effects li + li { border-top: 1px dashed #c9d3dc; margin-top: 1.2rem; padding-top: 1.2rem; }
+.tcg-effects li { line-height: 1.7; }
+.tcg-effects h3 { font-size: 1rem; line-height: 1.5; margin: 0; }
+.tcg-effects p { font-size: .875rem; margin: .6rem 0 0; }
+.tcg-ability-kind { color: #9b3d49; display: inline-block; font-size: .65rem; font-weight: 800; letter-spacing: .06em; margin-bottom: .4rem; text-transform: uppercase; }
+.tcg-attack-heading { align-items: start; display: flex; gap: 1rem; justify-content: space-between; }
+.tcg-attack-damage { color: #173f70; flex-shrink: 0; font-size: 1.3rem; font-weight: 800; line-height: 1.2; }
+.tcg-effects .tcg-energy-cost { color: #52667c; font-size: .7rem; line-height: 1.5; margin-top: .3rem; }
+.tcg-empty-metadata { color: #637181; font-size: .78rem; line-height: 1.6; }
+.tcg-variants-heading { color: #586b80; font-size: .75rem; margin: 1.25rem 0 .6rem; }
+.tcg-variants { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+.tcg-variants li { background: #edf1f4; border: 1px solid #d6dfe6; border-radius: .3rem; color: #475e73; font-size: .72rem; line-height: 1.5; padding: .35rem .6rem; }
+@keyframes tcg-pulse { to { filter: brightness(.94); } }
+@media (max-width: 720px) {
+  .tcg-detail { grid-template-columns: minmax(0, 1fr); margin-top: 1.4rem; }
+  .tcg-detail-artwork { margin: 0 auto; max-width: 25rem; position: static; width: 100%; }
+  .tcg-artwork-stage { padding: 1rem 1.4rem; }
+  .tcg-card-header h1 { font-size: 1.9rem; }
+  .tcg-filters > .tcg-expansion-selector { flex-basis: 100%; }
+  .tcg-expansion-popover { max-width: 100%; width: 100%; }
+  .tcg-grid, .tcg-skeletons { column-gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tcg-species { gap: .75rem; }
+  .tcg-facts { gap: .9rem; }
+}
+@media (max-width: 390px) { .tcg-detail-navigation { gap: .8rem; } .tcg-back { font-size: .8rem; } .tcg-origin { font-size: .7rem; } .tcg-artwork-stage { padding: .85rem; } }
+@media (prefers-reduced-motion: reduce) { .tcg-artwork--loading { animation: none; } }

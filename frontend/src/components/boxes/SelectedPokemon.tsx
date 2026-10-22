@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useLocale } from "../../i18n/LocaleProvider";
 import type { Pokemon } from "../../services/pokemon";
 import { usePokemonDetails } from "../../hooks/usePokemonDetails";
@@ -5,7 +6,7 @@ import { TypeBadge } from "../TypeBadge";
 import { PokemonSprite } from "./PokemonSprite";
 import { dexNumber, pokemonName } from "./pokemonLabels";
 
-export function SelectedPokemon({ pokemon }: { pokemon?: Pokemon }) {
+export function SelectedPokemon({ pokemon, cardCatalogHref }: { pokemon?: Pokemon; cardCatalogHref?: string }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.pokemonDetails;
   const { state, retry } = usePokemonDetails(pokemon?.national_dex_number, locale);
@@ -22,6 +23,7 @@ export function SelectedPokemon({ pokemon }: { pokemon?: Pokemon }) {
         <ul className="pokemon-types" aria-label={dictionary.pokedex.types}>
           {display.types.map((type) => <li key={type}><TypeBadge type={type} /></li>)}
         </ul>
+        {cardCatalogHref && <Link className="tcg-action" to={cardCatalogHref}>{dictionary.cards.view}</Link>}
       </div>
       <div className="pc-facts" role="region" tabIndex={0} aria-label={text.info} aria-busy={state.kind === "loading"}>
         {state.kind === "loading" && <p role="status">{text.loading}</p>}

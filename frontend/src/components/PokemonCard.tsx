@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { TypeBadge } from "./TypeBadge";
 import { useLocale } from "../i18n/LocaleProvider";
@@ -35,6 +36,9 @@ export function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
           <li key={type}><TypeBadge type={type} /></li>
         ))}
       </ul>
+      <Link className="tcg-action" to={`/pokemon/${pokemon.national_dex_number}/cards?returnTo=%2Fpokedex`}>
+        {dictionary.cards.view}
+      </Link>
     </li>
   );
 }

@@ -1,0 +1,632 @@
+{
+  "verified_at": "2026-10-22T20:08:09.174914+00:00",
+  "scope": "Public TCGdex JSON metadata and real application API calls; no image binaries or pricing archived.",
+  "rest_probes": [
+    {
+      "case": "en-1-1",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=1&pagination%3Apage=1&pagination%3AitemsPerPage=3&sort%3Afield=id&sort%3Aorder=ASC",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "2011bw-11",
+          "name": "Pidove"
+        },
+        {
+          "id": "2011bw-12",
+          "name": "Audino"
+        },
+        {
+          "id": "2011bw-4",
+          "name": "Oshawott"
+        }
+      ]
+    },
+    {
+      "case": "en-1-eq-1",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A1&pagination%3Apage=1&pagination%3AitemsPerPage=3&sort%3Afield=id&sort%3Aorder=ASC",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "2021swsh-1",
+          "name": "Bulbasaur"
+        },
+        {
+          "id": "A1-001",
+          "name": "Bulbasaur"
+        },
+        {
+          "id": "A1-227",
+          "name": "Bulbasaur"
+        }
+      ]
+    },
+    {
+      "case": "en-559-eq-559",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A559&pagination%3Apage=1&pagination%3AitemsPerPage=3&sort%3Afield=id&sort%3Aorder=ASC",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "2012bw-10",
+          "name": "Scraggy"
+        },
+        {
+          "id": "2016xy-7",
+          "name": "Scraggy"
+        },
+        {
+          "id": "B2-106",
+          "name": "Scraggy"
+        }
+      ]
+    },
+    {
+      "case": "en-25-25",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=25&pagination%3Apage=1&pagination%3AitemsPerPage=3&sort%3Afield=id&sort%3Aorder=ASC",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "2014xy-5",
+          "name": "Pikachu"
+        },
+        {
+          "id": "2015xy-1",
+          "name": "Treecko"
+        },
+        {
+          "id": "2015xy-3",
+          "name": "Torchic"
+        }
+      ]
+    },
+    {
+      "case": "en-25-eq-25",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A25&pagination%3Apage=1&pagination%3AitemsPerPage=3&sort%3Afield=id&sort%3Aorder=ASC",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "2014xy-5",
+          "name": "Pikachu"
+        },
+        {
+          "id": "2015xy-6",
+          "name": "Pikachu"
+        },
+        {
+          "id": "2016xy-6",
+          "name": "Pikachu"
+        }
+      ]
+    },
+    {
+      "case": "multi-25",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A25&id=eq%3Asm9-33&pagination%3Apage=1&pagination%3AitemsPerPage=2",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "sm9-33",
+          "name": "Pikachu & Zekrom GX"
+        }
+      ]
+    },
+    {
+      "case": "multi-644",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A644&id=eq%3Asm9-33&pagination%3Apage=1&pagination%3AitemsPerPage=2",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "sm9-33",
+          "name": "Pikachu & Zekrom GX"
+        }
+      ]
+    },
+    {
+      "case": "multi-1",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A1&id=eq%3Asm9-33&pagination%3Apage=1&pagination%3AitemsPerPage=2",
+      "status": 200,
+      "response_excerpt": []
+    },
+    {
+      "case": "nested-set-sm9",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A25&sort%3Afield=name&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=4&set.id=eq%3Asm9",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "sm9-33",
+          "name": "Pikachu & Zekrom GX"
+        },
+        {
+          "id": "sm9-162",
+          "name": "Pikachu & Zekrom GX"
+        },
+        {
+          "id": "sm9-184",
+          "name": "Pikachu & Zekrom GX"
+        }
+      ]
+    },
+    {
+      "case": "sort-name",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A25&sort%3Afield=name&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=4",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "basep-24",
+          "name": "___________'s Pikachu"
+        },
+        {
+          "id": "cel25cc-CC008",
+          "name": "_____'s Pikachu"
+        },
+        {
+          "id": "smp-SM108",
+          "name": "Ash's Pikachu"
+        },
+        {
+          "id": "smp-SM109",
+          "name": "Ash's Pikachu"
+        }
+      ]
+    },
+    {
+      "case": "lookahead-page2",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A1&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=2&pagination%3AitemsPerPage=3",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "A3-210",
+          "name": "Bulbasaur"
+        },
+        {
+          "id": "B1a-001",
+          "name": "Bulbasaur"
+        },
+        {
+          "id": "base1-44",
+          "name": "Bulbasaur"
+        }
+      ]
+    },
+    {
+      "case": "lookahead-next",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A1&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=7&pagination%3AitemsPerPage=1",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "base4-67",
+          "name": "Bulbasaur"
+        }
+      ]
+    },
+    {
+      "case": "lookahead-page3",
+      "source_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A1&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=3&pagination%3AitemsPerPage=3",
+      "status": 200,
+      "response_excerpt": [
+        {
+          "id": "base4-67",
+          "name": "Bulbasaur"
+        },
+        {
+          "id": "bw5-1",
+          "name": "Bulbasaur"
+        },
+        {
+          "id": "det1-1",
+          "name": "Bulbasaur"
+        }
+      ]
+    },
+    {
+      "case": "es-2012bw-10",
+      "source_url": "https://api.tcgdex.net/v2/es/cards/2012bw-10",
+      "status": 404,
+      "response_excerpt": {
+        "resource_present": false
+      }
+    },
+    {
+      "case": "es-2016xy-7",
+      "source_url": "https://api.tcgdex.net/v2/es/cards/2016xy-7",
+      "status": 404,
+      "response_excerpt": {
+        "resource_present": false
+      }
+    },
+    {
+      "case": "es-base1-58",
+      "source_url": "https://api.tcgdex.net/v2/es/cards/base1-58",
+      "status": 404,
+      "response_excerpt": {
+        "resource_present": false
+      }
+    },
+    {
+      "case": "en-base1-44",
+      "source_url": "https://api.tcgdex.net/v2/en/cards/base1-44",
+      "status": 200,
+      "response_excerpt": {
+        "id": "base1-44",
+        "localId": "44",
+        "name": "Bulbasaur",
+        "category": "Pokemon",
+        "dexId": [
+          1
+        ],
+        "image": "https://assets.tcgdex.net/en/base/base1/44",
+        "rarity": "Common",
+        "hp": 40,
+        "types": [
+          "Grass"
+        ],
+        "stage": "Basic",
+        "set": {
+          "id": "base1",
+          "name": "Base Set"
+        },
+        "attack_fields": [
+          [
+            "cost",
+            "damage",
+            "effect",
+            "name"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "en-bw1-68",
+      "source_url": "https://api.tcgdex.net/v2/en/cards/bw1-68",
+      "status": 200,
+      "response_excerpt": {
+        "id": "bw1-68",
+        "localId": "68",
+        "name": "Scraggy",
+        "category": "Pokemon",
+        "dexId": [
+          559
+        ],
+        "image": "https://assets.tcgdex.net/en/bw/bw1/68",
+        "rarity": "Common",
+        "hp": 60,
+        "types": [
+          "Darkness"
+        ],
+        "stage": "Basic",
+        "set": {
+          "id": "bw1",
+          "name": "Black & White"
+        },
+        "attack_fields": [
+          [
+            "cost",
+            "damage",
+            "name"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "es-bw1-68",
+      "source_url": "https://api.tcgdex.net/v2/es/cards/bw1-68",
+      "status": 200,
+      "response_excerpt": {
+        "id": "bw1-68",
+        "localId": "68",
+        "name": "Scraggy",
+        "category": "Pokémon",
+        "dexId": [
+          559
+        ],
+        "image": "https://assets.tcgdex.net/es/bw/bw1/68",
+        "rarity": "Común",
+        "hp": 60,
+        "types": [
+          "Oscura"
+        ],
+        "stage": "Básico",
+        "set": {
+          "id": "bw1",
+          "name": "Negro y Blanco"
+        },
+        "attack_fields": [
+          [
+            "cost",
+            "damage"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "en-sm9-33",
+      "source_url": "https://api.tcgdex.net/v2/en/cards/sm9-33",
+      "status": 200,
+      "response_excerpt": {
+        "id": "sm9-33",
+        "localId": "33",
+        "name": "Pikachu & Zekrom GX",
+        "category": "Pokemon",
+        "dexId": [
+          25,
+          644
+        ],
+        "image": "https://assets.tcgdex.net/en/sm/sm9/33",
+        "rarity": "Ultra Rare",
+        "hp": 240,
+        "types": [
+          "Lightning"
+        ],
+        "set": {
+          "id": "sm9",
+          "name": "Team Up"
+        },
+        "attack_fields": [
+          [
+            "cost",
+            "damage",
+            "effect",
+            "name"
+          ],
+          [
+            "cost",
+            "damage",
+            "effect",
+            "name"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "es-sm9-33",
+      "source_url": "https://api.tcgdex.net/v2/es/cards/sm9-33",
+      "status": 200,
+      "response_excerpt": {
+        "id": "sm9-33",
+        "localId": "33",
+        "name": "Pikachu y Zekrom GX",
+        "category": "Pokémon",
+        "dexId": [
+          25,
+          644
+        ],
+        "image": "https://assets.tcgdex.net/es/sm/sm9/33",
+        "rarity": "Ultra Rara",
+        "hp": 240,
+        "types": [
+          "Rayo"
+        ],
+        "set": {
+          "id": "sm9",
+          "name": "Union de Aliados"
+        },
+        "attack_fields": [
+          [
+            "cost",
+            "damage",
+            "effect",
+            "name"
+          ],
+          [
+            "cost",
+            "damage",
+            "effect",
+            "name"
+          ]
+        ]
+      }
+    }
+  ],
+  "application_api_checks": [
+    {
+      "case": "bulbasaur",
+      "path": "/api/v1/pokemon/1/cards?language=en&page_size=2&sort=id",
+      "status": 200,
+      "results": [
+        {
+          "id": "2021swsh-1",
+          "dex_ids": [
+            1
+          ],
+          "language": "en",
+          "available_languages": [
+            "en"
+          ],
+          "category": "Pokemon"
+        },
+        {
+          "id": "A1-001",
+          "dex_ids": [
+            1
+          ],
+          "language": "en",
+          "available_languages": [
+            "en"
+          ],
+          "category": "Pokemon"
+        }
+      ],
+      "has_more": true
+    },
+    {
+      "case": "scraggy-fallback",
+      "path": "/api/v1/pokemon/559/cards?language=es&page_size=2&sort=id",
+      "status": 200,
+      "results": [
+        {
+          "id": "2012bw-10",
+          "dex_ids": [
+            559
+          ],
+          "language": "en",
+          "available_languages": [
+            "en"
+          ],
+          "category": "Pokemon"
+        },
+        {
+          "id": "2016xy-7",
+          "dex_ids": [
+            559
+          ],
+          "language": "en",
+          "available_languages": [
+            "en"
+          ],
+          "category": "Pokemon"
+        }
+      ],
+      "has_more": true
+    },
+    {
+      "case": "scraggy-spanish",
+      "path": "/api/v1/pokemon/559/cards?language=es&set_id=bw1",
+      "status": 200,
+      "results": [
+        {
+          "id": "bw1-68",
+          "dex_ids": [
+            559
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        }
+      ],
+      "has_more": false
+    },
+    {
+      "case": "pikachu-multi",
+      "path": "/api/v1/pokemon/25/cards?language=es&set_id=sm9",
+      "status": 200,
+      "results": [
+        {
+          "id": "sm9-33",
+          "dex_ids": [
+            25,
+            644
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        },
+        {
+          "id": "sm9-162",
+          "dex_ids": [
+            25,
+            644
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        },
+        {
+          "id": "sm9-184",
+          "dex_ids": [
+            25,
+            644
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        }
+      ],
+      "has_more": false
+    },
+    {
+      "case": "zekrom-multi",
+      "path": "/api/v1/pokemon/644/cards?language=es&set_id=sm9",
+      "status": 200,
+      "results": [
+        {
+          "id": "sm9-33",
+          "dex_ids": [
+            25,
+            644
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        },
+        {
+          "id": "sm9-162",
+          "dex_ids": [
+            25,
+            644
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        },
+        {
+          "id": "sm9-184",
+          "dex_ids": [
+            25,
+            644
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        }
+      ],
+      "has_more": false
+    },
+    {
+      "case": "multi-card-detail",
+      "path": "/api/v1/cards/sm9-33?language=es",
+      "status": 200,
+      "results": [
+        {
+          "id": "sm9-33",
+          "dex_ids": [
+            25,
+            644
+          ],
+          "language": "es",
+          "available_languages": [
+            "en",
+            "es"
+          ],
+          "category": "Pokemon"
+        }
+      ]
+    },
+    {
+      "case": "spanish-404-fallback",
+      "path": "/api/v1/cards/base1-58?language=es",
+      "status": 200,
+      "results": [
+        {
+          "id": "base1-58",
+          "dex_ids": [
+            25
+          ],
+          "language": "en",
+          "available_languages": [
+            "en"
+          ],
+          "category": "Pokemon"
+        }
+      ]
+    }
+  ]
+}

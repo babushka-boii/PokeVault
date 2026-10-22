@@ -267,3 +267,102 @@ real. La inspección binaria confirma frames, no reproducción visual. Se dejó 
 checklist preciso en DEVELOPMENT.md. Trivia/etimología sin fuente, inventario,
 cartas y cajas persistentes siguen diferidos. El estudiante debe revisar y poder
 explicar el código; no se inventan reflexiones o aprobaciones personales.
+
+## Iteración 4 — Catálogo público TCGdex (22/10/2026)
+
+El estudiante solicitó consultar cartas reales por especie desde Cajas y Pokédex,
+abrir su detalle y regresar conservando el contexto. Tras una interrupción por
+límite de uso, pidió continuar los cambios existentes sin reiniciar, resetear,
+hacer commits ni publicar. Codex inspeccionó el estado de Git y retomó esos archivos;
+agentes auxiliares asistieron en proveedor, frontend, navegación y revisión.
+
+Se verificó REST antes de cerrar la estrategia: `dexId=eq:N` establece asociación
+numérica exacta; `dexId=N` también devuelve coincidencias parciales incorrectas.
+CardBrief no contiene `dexId`, por lo que solo se enriquecen los detalles de la
+página solicitada y se comprueban categoría y todas las asociaciones explícitas.
+La paginación conserva el tamaño real de página y sondea el siguiente desplazamiento
+con una consulta de un elemento. Filtros por expansión, orden, límites, cachés LRU,
+timeouts y errores sanitizados quedan aislados en el adaptador FastAPI.
+
+La galería usa imágenes remotas pequeñas y el detalle imágenes de mayor resolución,
+con placeholders y fallback; muestra ataques/habilidades TCG, variantes y metadatos
+opcionales sin sustituirlos por habilidades PokéAPI. Se añadieron controles ES/EN,
+estados de carga/vacío/error/reintento y avisos del idioma realmente disponible.
+Las rutas conservan caja, especie, fondo y filtros mediante parámetros validados;
+las preferencias existentes de sprites/audio se mantienen. Pulsar un slot continúa
+seleccionando: abrir cartas requiere una acción independiente.
+
+Las pruebas detectaron y permitieron corregir el foco consumido antes de confirmar
+una transición de URL, la aceptación de HP cero, daño numérico no finito, ataques
+sin nombre y la recuperación tras un 404 transitorio en detalles descubiertos.
+La revisión independiente también acotó el origen y puerto HTTPS de las imágenes.
+El gate final `bash scripts/check.sh` pasó: 43 pruebas de proveedores, 82 backend
+(incluida PostgreSQL; 34 casos nuevos de cartas), 146 frontend, Ruff, ESLint,
+TypeScript, build de producción y revisión de espacios.
+
+Se archivaron 21 sondeos REST y siete consultas reales mediante la API de aplicación
+en `research/tcgdex/`: Bulbasaur, Scraggy, Pikachu y Zekrom; Pikachu & Zekrom GX
+`sm9-33` pertenece a #25 y #644. Se verificó el fallback ES→EN de cartas sin
+traducción y Scraggy en español con un ataque cuyo nombre falta en origen.
+Estas consultas reales son evidencia separada de las pruebas HTTP simuladas.
+
+El catálogo parte del índice inglés del proveedor, puede incluir Pocket y no afirma
+cobertura completa de todas las lenguas ni asociaciones ausentes. La disponibilidad
+de idioma solo declara recursos comprobados. No se añadieron inventario, precios,
+autenticación, migraciones, dependencias ni binarios de ilustraciones. El navegador
+no estaba disponible: revisión visual/responsive y escucha real siguen pendientes
+con checklist en DEVELOPMENT.md. El estudiante debe revisar y comprender el código;
+no se le atribuyen validaciones personales ni reflexiones que no realizó.
+
+## Iteración 4 — Refinamiento final de experiencia TCG (22/10/2026)
+
+El estudiante solicitó corregir imágenes ausentes, interacción 3D/táctil,
+reflejos simulados, orden cronológico global, expansiones reconocibles y un detalle
+más organizado. Aportó una referencia de logo y páginas de TCGdex/Simey; pidió
+continuar directamente sin rediseñar Cajas, inventar datos o copiar recursos GPL.
+Codex preservó el árbol de trabajo, revisó documentación/código/contratos y presentó
+el enfoque antes de editar. Agentes auxiliares asistieron en proveedor, interacción,
+interfaz y revisión independiente, con responsabilidades de archivos separadas.
+
+El diagnóstico confirmó que los sufijos de calidad/formato eran correctos, pero
+el adaptador descartaba el artwork inglés si el recurso español existía sin imagen.
+La muestra real identificó doce candidatos de ese caso entre las cartas de Pikachu,
+incluyendo `smp-SM157`; otras cartas carecían de imagen en ambos idiomas. El frontend
+también abandonaba la carga tras un solo error. Ahora se verifican ambas identidades,
+se separa el idioma del texto del artwork y se prueban formatos/calidades y alternativas
+oficiales de esa misma impresión. Hay estados distintos de ausencia/fallo, reintento
+en detalle, limpieza por carta y plazo visible de carga sin penalizar imágenes lazy
+fuera de pantalla. No se sustituyó una impresión por otra ni por sprites de combate.
+
+REST no ordenó realmente por `set.releaseDate`. Se verificó una consulta GraphQL de
+solo metadatos con 220 expansiones y listas ES de nombres/logos/series. El servidor
+cachea un índice acotado de hasta 2000 briefs por especie, filtra y ordena por fecha
+oficial antes de paginar; solo enriquece los detalles visibles. Fechas desconocidas
+van al final y los empates son deterministas. Un índice truncado o incompleto falla
+explícitamente. El selector muestra nombres, logos, series/año y Otras sin fusionar
+identidades. Ordenar por precio sigue pendiente de fuentes, monedas y timestamps.
+
+El detalle organiza artwork, identidad/expansión, rasgos y efectos TCG y metadatos.
+El wrapper original usa variables CSS y Pointer Events, sin render por movimiento
+ni bucles continuos. El ratón inclina la carta; en móvil se activa la interacción
+antes de arrastrar. Soltar/cancelar/Escape reinicia; se evita navegar tras arrastre
+y se respeta reducción de movimiento. Se corrigieron mediante regresiones la captura
+implícita táctil de Chromium y el seguimiento del arrastre con movimiento reducido.
+Los reflejos son simulados; variantes mixtas/desconocidas conservan brillo discreto.
+
+La evidencia nueva separa 18 recursos de idioma, 43 HEAD de assets y ocho consultas
+reales normalizadas de las pruebas offline; todos los artwork no nulos muestreados
+respondieron 200, mientras cuatro símbolos de expansión respondieron 404. No se
+afirma una caída general de imágenes que no fue observada. Dos reconsultas reales
+confirmaron además el ajuste de tipos Pydantic sin advertencias de serialización.
+La evidencia y comandos están en `research/tcgdex/`.
+
+El gate `bash scripts/check.sh` pasó: 43 pruebas de proveedores, 98 backend
+(incluida PostgreSQL), 193 frontend, Ruff, ESLint, TypeScript, build y espacios.
+La revisión independiente no halló problemas críticos/importantes pendientes.
+No había navegador disponible tras diagnóstico: apariencia, 390 px, calidad de
+reflejos y tacto real siguen pendientes en el checklist de DEVELOPMENT.md.
+Se actualizaron arquitectura, UX, guía, roadmap y autoría. No hubo dependencias,
+migraciones, assets binarios, cambios a Cajas/Pokédex ajenos al flujo, commits, push,
+merge, reset ni cambio de rama. No se atribuyen al estudiante revisiones personales
+o reflexiones no realizadas; debe revisar y explicar el material asistido por IA.

@@ -22,7 +22,7 @@ FastAPI (Python)
           |
           +---- PostgreSQL (durable application records and reference cache)
           +---- Pokémon reference provider (PokéAPI, initial runtime integration)
-          +---- TCG catalog provider (candidate: TCGdex)
+          +---- TCG catalog provider (TCGdex, runtime public catalog)
           +---- Market-price source (availability to be validated)
 ```
 
@@ -32,7 +32,7 @@ Prefer a **modular monolith** over microservices for a single-developer academic
 
 - **Frontend implemented:** React + TypeScript + Vite + React Router, with original CSS and typed ES/EN dictionaries.
 - **Frontend implemented:** typed backend Pokédex client, responsive species grid, loading/empty/error/retry and missing-sprite states.
-- **Frontend pending:** card/inventory data fetching, component libraries and charts; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
+- **Frontend pending:** inventory data fetching, component libraries and charts; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
 - **Backend implemented:** Python + FastAPI + Pydantic Settings + SQLAlchemy + Alembic.
 - **Database implemented:** native PostgreSQL connection, health probe and reversible technical migration `0001`; domain tables are pending.
 - **Auth:** Google OAuth 2.0 / OpenID Connect for SSO. Prefer a secure HTTP-only server-side session strategy; final mechanism to be defined and reviewed.
@@ -65,7 +65,7 @@ backend/
   migrations/
 ```
 
-`api`, `core`, `db`, and `pokemon` exist today. The `pokemon` module contains response schemas and an isolated PokéAPI adapter. The remaining domain directories are conceptual boundaries for later vertical slices.
+`api`, `core`, `db`, `pokemon`, and `cards` exist today. The `pokemon` module contains response schemas and an isolated PokéAPI adapter. The remaining domain directories are conceptual boundaries for later vertical slices.
 
 ## 4. Domain model directions (NOT a final ERD)
 
@@ -101,14 +101,14 @@ Implemented and versioned:
 ```text
 GET    /api/v1/health
 GET    /api/v1/pokemon
+GET    /api/v1/pokemon/{number}/cards
+GET    /api/v1/cards/{card_id}
 ```
 
 The health endpoint returns HTTP 200 with healthy API/database states or sanitized HTTP 503 while PostgreSQL is unavailable. The Pokédex endpoint returns entries 1–20 independently of PostgreSQL (see `DEVELOPMENT.md` for the contract). Other domain endpoints remain illustrative and unimplemented:
 
 ```text
-GET    /api/v1/pokemon/{nationalDexNumber}/cards
 GET    /api/v1/cards
-GET    /api/v1/cards/{cardId}
 GET    /api/v1/sets
 GET    /api/v1/sets/{setId}
 GET    /api/v1/me/cards
@@ -243,3 +243,93 @@ requests and keys displayed state by selection/language/retry. Late requests can
 replace a newer selected panel; cached repeated selections avoid duplicate detail
 fetches. `SelectedPokemon` renders facts without owning external HTTP integration.
 No database model, migration, authentication or inventory change is required.
+
+## 13. Public TCG card vertical slice
+
+`cards/provider.py` owns TCGdex access/normalization and bounded in-memory caching;
+`cards/schemas.py` defines stable public DTOs; `api/cards.py` owns the versioned
+species-gallery and card-detail routes. Existing Pokémon and health endpoints are
+preserved. No catalog/inventory tables or migrations are added.
+
+Discovery uses `GET /v2/en/cards?dexId=eq:N`: live verification showed that plain
+`dexId=N` performs substring matching and is incorrect for National Dex membership.
+CardBrief has no `dexId`, expansion or rarity, so only the requested page is
+enriched through individual card resources. Every returned association is checked
+against the complete English card's `dexId` and Pokémon category. Multi-species
+cards retain all associations; Trainer/Energy cards never receive species links.
+An inconsistent provider page returns sanitized 503 rather than unverified cards.
+
+The final refinement caches a complete species-only CardBrief index (at most 2000
+entries, two chunks of 1000 with an end probe; 32 cached species). It derives set
+identity from each explicit localId suffix, then filters/sorts before slicing the
+requested page. Only that page receives full card enrichment. Discovery overflow,
+duplicates or missing matching set metadata return 503 rather than partial results.
+No total is displayed. This replaces the earlier per-page discovery strategy to
+support correct chronological ordering across page boundaries.
+
+A metadata-only GraphQL query obtains at most 512 English sets, including official
+releaseDate, logo, symbol and series. Spanish set/series list resources supply
+localized labels and logo alternatives. These shared catalogs have two language
+cache entries and a refresh lock; no global card-detail enrichment occurs. REST
+`sort:field=set.releaseDate` did not reliably sort chronologically in live probes.
+The adapter orders `newest`/`oldest` using official English set release dates,
+unknown dates last in both directions, then stable set/local-number/card-ID ties.
+English name and ID sorting remain supported. Expansion options cover the complete
+species index, independently of the selected expansion and visible page.
+The English discovery pool includes TCG Pocket records and excludes cards absent
+from that language or missing provider species links. Coverage is therefore
+explicitly `english_catalog`, not a claim of every printing in every language.
+
+Requested Spanish data is loaded by stable card ID and checked against English
+identity. Only 404 triggers language fallback; timeouts, malformed data and other
+provider failures remain retryable 503. Direct details can use Spanish-only records
+when English is missing. Both languages missing produces 404. `language` and
+`available_languages` identify actual resources verified for that response, not
+all printing languages. Optional fields are null/empty arrays; an attack may
+legitimately have no name. TCG attacks/abilities stay separate from PokéAPI abilities.
+
+HTTP requests time out after five seconds, with a 15-second operation deadline,
+at most five concurrent upstream calls, coalesced refreshes and 300-second LRU
+caches (256 raw language resources including confirmed 404s, 256 card views, 64
+pages, plus the indexes/catalogs described above). Bad identity/membership data is evicted so corrected upstream data can be
+retried. Only provider-approved HTTPS artwork bases are accepted; URLs become
+`low.webp` thumbnails and `high.webp` details without downloading artwork to the repo.
+
+React adds `services/cards.ts`, a validating client; `useTcgResource`, with abort
+and key-based stale-response guards; gallery/detail routes and separate artwork,
+preview and language-note components. Card JSON is fetched only from FastAPI.
+Boxes slots keep their selection behavior; explicit links open species galleries.
+Validated URL state preserves box/selection/wallpaper, gallery filters/page and safe
+local return destinations through the full journey. Audio/sprite preferences keep
+their existing storage. A target-tagged focus request prevents the old grid from
+consuming search focus during React Router transitions.
+
+## 14. Card artwork and interaction refinement
+
+Both supported card-language resources are identity-checked before their artwork
+bases enter `image_sources`; text language and actual artwork language are separate.
+Null Spanish art can therefore use the verified English art of the same printing.
+`cardImages.ts` centralizes card quality/format candidates: preferred quality WebP,
+PNG/JPG, the other quality, then a verified alternative language. No guessed language
+path or different printing is used. CardArtwork isolates each printing/source session,
+handles cached image completion and errors, and limits visible loading to 20 seconds.
+IntersectionObserver defers that deadline for offscreen lazy gallery artwork.
+Provider absence and exhausted requests have distinct localized messages; detail
+artwork can retry. Set logo candidates use format suffixes, never card quality paths.
+
+`InteractiveCard` is an independently authored CSS/pointer-event wrapper. It writes
+bounded rotation/light custom properties directly to the active DOM node, without
+pointer-driven React renders, continuous loops, textures or an animation dependency.
+Mouse movement tilts artwork; touch must first arm a localized toggle, establishing
+touch-action before the next gesture. Dragging captures the pointer and suppresses
+the compatibility navigation click; release/cancel/Escape reset. Ordinary taps and
+keyboard links remain usable. Live reduced-motion changes disable visual movement.
+Explicit holo metadata can intensify a simulated gradient reflection; mixed/unknown
+finishes keep subtle glare. The effect never establishes ownership or physical foil.
+
+The searchable expansion dialog groups absent/exhausted logos under Other/Otras,
+retains each stable set ID, and supports native keyboard controls/Escape. The detail
+view separates artwork, primary identity/set information, TCG traits/effects and
+additional metadata; mobile places artwork first. URL-based gallery and origin
+links preserve filters/page and Boxes context. Pricing sort remains deferred until
+currency/source/timestamp normalization exists.
