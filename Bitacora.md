@@ -101,3 +101,53 @@ Codex asistió en el diseño técnico, plan incremental, pruebas primero, implem
 - Se mantuvieron dependencias mínimas; no se instalaron Tailwind, shadcn/ui, TanStack Query ni bibliotecas de autenticación antes de necesitarlas.
 - Google SSO, catálogo en ejecución, cajas funcionales, inventario, precios, scanner y assets Pokémon siguen pendientes.
 - No se inventan reflexiones personales del estudiante; debe revisar y comprender el código antes de la evaluación.
+
+## Iteración 4 — Pokédex Nacional funcional inicial
+
+**Fecha del registro:** 22/10/2026
+**Tipo de entrega:** catálogo público de los primeros 20 Pokémon integrado al frontend y FastAPI existentes.
+
+### Trabajo realizado
+
+- Se revisaron especificación, arquitectura, roadmap, UX/UI, modelo de datos,
+  desarrollo, dependencias, rutas y pruebas antes de editar.
+- Se sustituyó el placeholder de Pokédex por una cuadrícula responsive con número
+  nacional, nombre, tipos traducidos y sprite remoto, más estados de carga,
+  vacío, error sanitizado, reintento y alternativa de imagen ausente.
+- Se creó `GET /api/v1/pokemon` y un adaptador PokéAPI separado del routing:
+  cinco solicitudes concurrentes, timeout de cinco segundos por solicitud,
+  deadline total de 15 segundos y caché completa de 300 segundos en memoria.
+- Se mantuvieron PostgreSQL, migraciones, Cajas y rutas existentes. No hay
+  autenticación simulada, inventario ficticio ni imágenes copiadas al repositorio.
+- HTTPX2 pasó de dependencia de desarrollo a ejecución sin instalar paquetes nuevos.
+
+### Evidencia y obstáculos
+
+- Las pruebas nuevas fallaron antes de implementar porque no existían el módulo
+  Pokémon ni los estados de la página; luego pasaron con la implementación.
+- `bash scripts/check.sh` pasó fuera del sandbox: 43 pruebas de proveedores,
+  16 backend (incluida PostgreSQL), 20 frontend, Ruff, ESLint, TypeScript,
+  build de producción y `git diff --check`.
+- Dentro del sandbox, PostgreSQL no fue accesible y TestClient se bloqueó
+  incluso con las pruebas de salud existentes. Se solicitó ejecución fuera
+  del sandbox y las mismas pruebas pasaron; no se alteraron para ocultar el problema.
+- Una consulta real mediante el endpoint FastAPI y PokéAPI devolvió HTTP 200,
+  20 entradas ordenadas, Bulbasaur al inicio y Raticate al final, con URLs HTTPS
+  de sprites. No se descargaron imágenes durante esta comprobación.
+- La revisión visual manual de escritorio/móvil queda pendiente: la herramienta
+  de navegador no encontró ningún navegador conectado. Las pruebas de interfaz
+  cubren localización, teclado/reintento, errores, vacío y cancelación al desmontar;
+  no sustituyen una inspección visual responsive.
+
+### Participación de IA y límites
+
+El prompt del estudiante solicitó esta primera Pokédex funcional con alcance y
+validaciones explícitos. Codex asistió en revisión, diseño, pruebas, implementación,
+diagnóstico, consulta real y documentación. La intervención y fuentes se registran
+también en `Autoria.md`; el estudiante debe revisar y comprender el resultado.
+No se inventan reflexiones personales ni aprobación académica del estudiante.
+
+La Pokédex se limita a 1–20: sin filtros, paginación, detalles TCG ni inventario.
+Los sprites se cargan desde URLs del proveedor y pueden fallar o estar ausentes.
+La caché es por proceso y no persistente. La revisión de licencias/condiciones de
+assets y la comprobación visual quedan pendientes, junto a las siguientes funciones.

@@ -1,6 +1,6 @@
 # PokéVault — Incremental architecture (v0.2)
 
-**Status:** The Iteration 3 scaffold is implemented and verified. Domain modules below remain planned unless explicitly marked as current.
+**Status:** The Iteration 3 scaffold and Iteration 4 initial Pokédex are implemented. Domain modules below remain planned unless explicitly marked as current.
 
 ## 1. System overview
 
@@ -11,6 +11,7 @@ Browser (React / TypeScript / Vite)
           v
 FastAPI (Python)
   |-- Health API (implemented)
+  |-- National Pokédex API / PokéAPI adapter (implemented, entries 1–20)
   |-- Configuration and database session boundary (implemented)
   |-- Auth and profiles (Google OpenID Connect)
   |-- Reference catalog (species, card printings, sets)
@@ -20,7 +21,7 @@ FastAPI (Python)
   |-- Scanner: image processing + OCR + candidate ranking
           |
           +---- PostgreSQL (durable application records and reference cache)
-          +---- Pokémon reference provider (candidate: PokéAPI)
+          +---- Pokémon reference provider (PokéAPI, initial runtime integration)
           +---- TCG catalog provider (candidate: TCGdex)
           +---- Market-price source (availability to be validated)
 ```
@@ -30,7 +31,8 @@ Prefer a **modular monolith** over microservices for a single-developer academic
 ## 2. Stack status
 
 - **Frontend implemented:** React + TypeScript + Vite + React Router, with original CSS and typed ES/EN dictionaries.
-- **Frontend pending:** domain data fetching, component libraries and charts; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
+- **Frontend implemented:** typed backend Pokédex client, responsive species grid, loading/empty/error/retry and missing-sprite states.
+- **Frontend pending:** card/inventory data fetching, component libraries and charts; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
 - **Backend implemented:** Python + FastAPI + Pydantic Settings + SQLAlchemy + Alembic.
 - **Database implemented:** native PostgreSQL connection, health probe and reversible technical migration `0001`; domain tables are pending.
 - **Auth:** Google OAuth 2.0 / OpenID Connect for SSO. Prefer a secure HTTP-only server-side session strategy; final mechanism to be defined and reviewed.
@@ -63,7 +65,7 @@ backend/
   migrations/
 ```
 
-Only `api`, `core`, and `db` exist today. All domain directories shown after them are conceptual boundaries for later vertical slices.
+`api`, `core`, `db`, and `pokemon` exist today. The `pokemon` module contains response schemas and an isolated PokéAPI adapter. The remaining domain directories are conceptual boundaries for later vertical slices.
 
 ## 4. Domain model directions (NOT a final ERD)
 
@@ -98,12 +100,12 @@ Implemented and versioned:
 
 ```text
 GET    /api/v1/health
+GET    /api/v1/pokemon
 ```
 
-It returns HTTP 200 with healthy API/database states or sanitized HTTP 503 while PostgreSQL is unavailable. Planned domain endpoints remain illustrative and unimplemented:
+The health endpoint returns HTTP 200 with healthy API/database states or sanitized HTTP 503 while PostgreSQL is unavailable. The Pokédex endpoint returns entries 1–20 independently of PostgreSQL (see `DEVELOPMENT.md` for the contract). Other domain endpoints remain illustrative and unimplemented:
 
 ```text
-GET    /api/v1/pokemon
 GET    /api/v1/pokemon/{nationalDexNumber}/cards
 GET    /api/v1/cards
 GET    /api/v1/cards/{cardId}
@@ -141,3 +143,24 @@ APIs need response schemas, pagination, auth scopes, mutations and error contrac
 5. Actual sound/artwork licensing and whether assets can be bundled or must be user supplied / public-domain alternatives.
 6. Price sources and historical series viability; never claim live estimates without proven integration.
 7. Google OpenID Connect session design and deployment configuration.
+
+## 9. Iteration 4 runtime catalog boundary
+
+`api/pokemon.py` handles HTTP and a generic HTTP 503 error; `pokemon/provider.py`
+handles upstream requests, validation and normalization; `pokemon/schemas.py`
+defines the public contract. Default Pokémon IDs 1–20 correspond to the first
+20 National Dex entries; this assumption must be revisited before adding forms.
+The provider uses the existing HTTPX2 dependency, promoted from development to
+runtime, with five concurrent requests, five-second request timeouts and a
+15-second total refresh deadline. A lock coalesces concurrent cache refreshes.
+Complete successful catalogs are cached in memory for 300 seconds per app/process;
+failed or partial refreshes are never cached or returned. No stale fallback is
+served after expiry. There is no persistent catalog cache or schema change.
+
+React requests only the internal catalog endpoint. Provider sprite URLs are
+loaded remotely by the browser, with a localized fallback on null/broken images;
+no sprite binaries are bundled. Species names are canonical PokéAPI names (shared
+by ES/EN for this initial range); UI copy and type names use the local dictionaries.
+The grid uses semantic lists/headings; existing navigation, language switching
+and retry remain keyboard accessible with visible focus. Species detail routes,
+TCG browsing, filters and Boxes behavior are deferred.

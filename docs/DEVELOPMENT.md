@@ -80,3 +80,43 @@ Useful focused commands:
 - `npm run build --prefix frontend`
 
 If the PostgreSQL integration test is skipped, confirm that `POKEVAULT_TEST_DATABASE_URL` exists in `backend/.env` and points to a dedicated test database. If the Home view cannot contact the API, confirm both development processes are running and that `VITE_API_BASE_URL` matches the API origin.
+
+## National Pokédex (Iteration 4)
+
+Open `/pokedex` with both development servers running. The frontend requests
+`GET /api/v1/pokemon` on the configured API base URL; it never requests PokéAPI
+JSON directly. Runtime reference fetching needs outbound HTTPS to `pokeapi.co`.
+Remote sprite URLs are loaded by the browser, so image hosting must also be
+reachable. No database migrations or authentication are required for this route.
+
+HTTP 200 response (one entry shown; a successful provider load returns 20):
+
+```json
+{
+  "results": [
+    {
+      "national_dex_number": 1,
+      "name": "bulbasaur",
+      "types": ["grass", "poison"],
+      "sprite_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+    }
+  ]
+}
+```
+
+Numbers are ordered 1–20. `sprite_url` may be null. Types are canonical English
+identifiers and translated in the UI. Names in this range are shared in ES/EN.
+Upstream failures, invalid JSON/schema and timeouts return HTTP 503 with
+`{"detail":"Pokemon catalog is unavailable"}`; upstream exception text is never
+returned. The frontend renders its own translated error and retry action.
+
+The adapter uses five concurrent requests, a five-second per-request timeout,
+a 15-second total refresh deadline and a 300-second successful in-memory cache.
+Each process has its own cache, reset at restart; concurrent callers share a
+refresh. Failed refreshes do not replace the cache, and expired data is not served.
+The initial catalog is deliberately fixed: there are no pagination/filter inputs.
+
+`backend/tests/test_pokemon.py` mocks upstream HTTP transport and exercises the
+real route/adapter. `frontend/src/pages/PokedexPage.test.tsx` mocks backend fetch
+responses and exercises the application route, localization, retry and cleanup.
+All quality-gate tests run offline with respect to external providers.

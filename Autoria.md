@@ -1,7 +1,7 @@
 # Declaración de autoría — PokéVault
 
 **Proyecto:** TICS316, Diseño de Software (individual)  
-**Última actualización:** 2026-10-19 (Iteración 3)
+**Última actualización:** 2026-10-22 (Iteración 4)
 
 Este archivo declara qué partes son de concepción del estudiante, cuáles han recibido apoyo de herramientas de IA y qué materiales externos se prevé consultar.
 
@@ -84,3 +84,18 @@ El código y la documentación son material co-construido con IA. El estudiante 
 - PostgreSQL se usa como servicio local; no se añadieron imágenes de base de datos ni credenciales al repositorio.
 - No se incorporaron sprites, ilustraciones, fuentes, sonidos ni otros binarios protegidos de Pokémon.
 - Los fixtures mínimos de TCGdex y PokéAPI permanecen como evidencia de la iteración anterior; su presencia no equivale a autorización para redistribuir imágenes o marcas.
+
+## Iteración 4 — 22/10/2026
+
+- El estudiante definió el alcance de la Pokédex funcional: primeros 20 Pokémon,
+  integración mediante FastAPI, localización ES/EN, pruebas y conservación de la arquitectura.
+- Codex asistió en la revisión del proyecto, diseño acotado, pruebas previas a la
+  implementación, código backend/frontend, verificación y documentación.
+- Se consultó la documentación oficial de PokéAPI: https://pokeapi.co/docs/v2/.
+  El adaptador usa datos y URLs del proveedor; los sprites se cargan remotamente,
+  sin copiar imágenes al repositorio. El acceso técnico no resuelve los derechos
+  de los assets; su revisión continúa pendiente antes de redistribución o producción.
+- HTTPX2 ya estaba instalado para pruebas; se declaró como dependencia de ejecución.
+- No se atribuyen al estudiante reflexiones personales ni revisión del código que
+  todavía no ha realizado. Debe revisar y comprender este material asistido por IA.
+- No se implementaron autenticación, inventario, cartas TCG ni cambios de Cajas.

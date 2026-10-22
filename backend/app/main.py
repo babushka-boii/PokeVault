@@ -2,8 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.pokemon import router as pokemon_router
 from app.core.config import Settings, get_settings
 from app.db.base import create_session_factory
+from app.pokemon.provider import PokemonProvider
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -19,5 +21,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_methods=["GET"],
         allow_headers=["Accept", "Content-Type"],
     )
+    app.state.pokemon_provider = PokemonProvider()
+    app.include_router(pokemon_router)
     app.include_router(health_router)
     return app

@@ -95,3 +95,14 @@ Top-level routes (provisional):
 - Background wallpaper specifications and copyright-safe source.
 - Detailed wireframes and spacing tokens; exact mini-sprite box capacity and mobile behavior.
 - Sound pack selection and rights review.
+
+## Iteration 4 implementation status
+
+The National Pokédex now shows entries 1–20 in a responsive semantic list/grid:
+National Dex number, species name, localized type labels and a 96 px remote
+sprite. Null or failed images have a localized text fallback. The existing
+cream/red/blue shell, ES/EN switch and navigation are preserved, with visible
+keyboard focus. Loading and empty states use status announcements; failures use
+an alert plus a native retry button. Entries are informational and have no
+inactive buttons or links to unfinished species detail pages. Filters, species
+selection, TCG detail flows and the PC Boxes design above remain future work.

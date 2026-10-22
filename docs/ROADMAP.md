@@ -48,7 +48,7 @@
 - [x] Add one offline gate covering 43 provider, 9 backend and 13 frontend tests plus lint, types and build.
 - [ ] Implement Google SSO, domain schema, catalog synchronization and functional collection views.
 
-**Next:** iteration 4 will connect a bounded catalog/Pokédex slice and begin the classic PC Boxes experience. Authentication remains a separate pending slice and must not be represented by fake state.
+**Next:** the initial Iteration 4 Pokédex slice is implemented below; classic PC Boxes remain pending. Authentication remains a separate pending slice and must not be represented by fake state.
 
 **Rule:** requirements first, then cohesive vertical slices. Optional features only after working mandatory flows.
 
@@ -84,3 +84,17 @@
 - Pixel-perfect box wireframe measurements and legal/reusable audiovisual assets.
 - Production price-feed suitability and licensing; scanner OCR benchmark sample; deployment target.
 - Google OpenID Connect design, credentials and secure session strategy.
+
+## Delivery 4 — Initial functional National Pokédex
+
+**Implementation date:** 2026-10-22.
+
+- [x] Expose `GET /api/v1/pokemon` with entries 1–20 from PokéAPI.
+- [x] Isolate provider requests, validate responses, bound time/concurrency and cache successful catalogs in memory.
+- [x] Replace the Pokédex placeholder with a responsive ES/EN grid showing number, name, types and remote sprite.
+- [x] Cover loading, empty, sanitized error, keyboard retry and missing-sprite states with offline mocked tests.
+- [x] Preserve existing routes, PostgreSQL schema and Boxes page.
+- [ ] Add species-to-TCG browsing, filtering, pagination and classic PC Boxes in later slices.
+
+This delivery is a public reference catalog, without authentication or inventory simulation.
+See `Bitacora.md` for validation evidence and limitations.
