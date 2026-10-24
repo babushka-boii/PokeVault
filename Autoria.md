@@ -1,7 +1,7 @@
 # Declaración de autoría — PokéVault
 
 **Proyecto:** TICS316, Diseño de Software (individual)  
-**Última actualización:** 2026-10-19 (Iteración 3)
+**Última actualización:** 2026-10-22 (Iteración 4)
 
 Este archivo declara qué partes son de concepción del estudiante, cuáles han recibido apoyo de herramientas de IA y qué materiales externos se prevé consultar.
 
@@ -84,3 +84,134 @@ El código y la documentación son material co-construido con IA. El estudiante 
 - PostgreSQL se usa como servicio local; no se añadieron imágenes de base de datos ni credenciales al repositorio.
 - No se incorporaron sprites, ilustraciones, fuentes, sonidos ni otros binarios protegidos de Pokémon.
 - Los fixtures mínimos de TCGdex y PokéAPI permanecen como evidencia de la iteración anterior; su presencia no equivale a autorización para redistribuir imágenes o marcas.
+
+## Iteración 4 — 22/10/2026
+
+- El estudiante definió el alcance de la Pokédex funcional: primeros 20 Pokémon,
+  integración mediante FastAPI, localización ES/EN, pruebas y conservación de la arquitectura.
+- Codex asistió en la revisión del proyecto, diseño acotado, pruebas previas a la
+  implementación, código backend/frontend, verificación y documentación.
+- Se consultó la documentación oficial de PokéAPI: https://pokeapi.co/docs/v2/.
+  El adaptador usa datos y URLs del proveedor; los sprites se cargan remotamente,
+  sin copiar imágenes al repositorio. El acceso técnico no resuelve los derechos
+  de los assets; su revisión continúa pendiente antes de redistribución o producción.
+- HTTPX2 ya estaba instalado para pruebas; se declaró como dependencia de ejecución.
+- No se atribuyen al estudiante reflexiones personales ni revisión del código que
+  todavía no ha realizado. Debe revisar y comprender este material asistido por IA.
+- No se implementaron autenticación, inventario, cartas TCG ni cambios de Cajas.
+
+## Iteración 4 — Continuación PC Storage (22/10/2026)
+
+- El estudiante definió el alcance, las referencias Emerald/Black & White, la
+  disposición clásica, accesibilidad y requisitos de audio, y autorizó continuar
+  en la rama existente sin commits automáticos.
+- Codex asistió en análisis, diseño acotado, pruebas, paginación, componentes,
+  hooks, CSS, síntesis Web Audio y documentación. El código requiere revisión y
+  comprensión del estudiante; no se atribuyen experiencias personales ni escucha real.
+- Los fondos y efectos se generan con CSS y osciladores/envelopes originales.
+  No se copiaron interfaces píxel por píxel, grabaciones, melodías, sprites o
+  recursos de Nintendo al repositorio. Las imágenes siguen siendo URLs remotas de
+  PokéAPI, sujetas a revisión de condiciones y derechos ya pendiente.
+- La verificación automatizada usa respuestas HTTP y audio simulados. La revisión
+  visual/auditiva manual quedó pendiente por ausencia de navegador conectado.
+- No se incorporaron dependencias nuevas, autenticación, inventario ni migraciones.
+
+## Iteración 4 — Búsqueda de Pokémon en cajas (22/10/2026)
+
+- El estudiante definió que buscar debe localizar la caja y posición originales,
+  con Scraggy (#559) como ejemplo de aceptación, y conservar el flujo clásico.
+- Codex asistió en diseño, pruebas, índice/cache backend, combobox frontend,
+  integración de selección/foco/audio, diagnóstico y documentación.
+- Se consultó el índice real `https://pokeapi.co/api/v2/pokemon-species/?limit=1025`
+  para verificar nombre/número. Las pruebas usan HTTP simulado; no se copiaron
+  sprites ni sonidos. El índice solo aporta nombres canónicos, sin traducciones
+  o alias inventados. Continúan pendientes las revisiones de derechos ya registradas.
+- No hubo dependencias nuevas, migraciones, cambios de propiedad, commits ni push.
+  El estudiante debe revisar y entender este código asistido por IA; no se atribuye
+  como realizada una revisión visual/auditiva manual.
+
+## Iteración 4 — Refinamiento definitivo del PC (22/10/2026)
+
+- El estudiante definió las prioridades visuales/funcionales y aportó tres imágenes
+  como referencia de estilo. Se inspeccionaron, sin copiarlas como assets al repo.
+- Codex y agentes auxiliares asistieron en investigación de fuentes, diseño,
+  implementación, pruebas y revisión de iconos, backend de detalles y documentación.
+  CSS/SVG de fondos e insignias son originales asistidos por IA, no capturas ni
+  símbolos copiados de juegos. El estudiante debe revisar y comprender el resultado.
+- Fuente de datos: `https://pokeapi.co/docs/v2/` y recursos Pokémon/Species/Ability
+  de PokéAPI. Se verificaron Bulbasaur ES/EN y Scraggy ES mediante el endpoint real.
+- Fuente de iconos/referencia de tipos: `https://github.com/PokeAPI/sprites`.
+  Inventario, SHAs, dimensiones, APNG y derechos se registran en
+  `research/sprites/VERIFICATION.md` y `verification.json`, solo con metadatos.
+  El aviso upstream atribuye las imágenes a The Pokémon Company; CC0 del repositorio
+  no se interpreta como liberación de todos los derechos de terceros. Se cargan
+  iconos remotos por URL; no se empaquetan binarios de imágenes o sonidos.
+- No se inventan descripciones, etimologías, propiedad de cartas ni permisos de
+  assets. Nombres/habilidades usan localización del proveedor y fallback explícito.
+- La revisión visual/auditiva manual continúa pendiente por falta de navegador;
+  las pruebas automatizadas y las consultas reales no equivalen a esa aprobación.
+- No hubo commits, push, merge, cambio de rama, migraciones o dependencias nuevas.
+
+## Iteración 4 — Integración del catálogo TCGdex (22/10/2026)
+
+- El estudiante definió el flujo Cajas/Pokédex → cartas por especie → detalle →
+  regreso al contexto, el alcance público sin inventario y la conservación de la
+  interfaz existente. Tras una interrupción, indicó continuar los archivos presentes
+  sin reiniciar, resetear, hacer commits ni publicar.
+- Codex y agentes auxiliares asistieron en investigación de la API, diseño acotado,
+  adaptador/cachés/validación FastAPI, componentes y cliente TypeScript, navegación,
+  localización, pruebas, diagnóstico, revisión independiente y documentación.
+  El material es co-construido con IA y requiere revisión y comprensión del estudiante.
+- Fuentes oficiales: `https://tcgdex.dev/rest/cards`,
+  `https://tcgdex.dev/rest/filtering-sorting-pagination`,
+  `https://tcgdex.dev/reference/card`, `https://tcgdex.dev/reference/card-brief`
+  y `https://tcgdex.dev/assets`, consultadas el 22/10/2026. Las solicitudes reales a
+  `api.tcgdex.net` y siete verificaciones de la API de aplicación se registran en
+  `research/tcgdex/VERIFICATION.md` y `metadata.json` con límites explícitos.
+- Los datos de cartas, asociaciones multi-especie y traducciones proceden de
+  TCGdex; los detalles de especie siguen procediendo de PokéAPI. Las pruebas usan
+  respuestas deterministas simuladas. No se inventan cartas, ataques, traducciones,
+  totales, propiedad del usuario ni cobertura no comprobada.
+- Las ilustraciones se cargan por URL HTTPS remota de `assets.tcgdex.net`; no se
+  guardaron imágenes ni sonidos de Pokémon en el repositorio. Disponibilidad técnica
+  y documentación del proveedor no equivalen a autorización de todos los derechos
+  de terceros; se conserva la revisión de condiciones ya pendiente.
+- La verificación final ejecutó 43 pruebas de proveedores, 82 backend y 146 frontend,
+  además de Ruff, ESLint, TypeScript y build. Las consultas reales y las pruebas
+  automatizadas no equivalen a revisión visual/auditiva: no había navegador disponible.
+  No se atribuyen al estudiante experiencias, reflexiones ni aprobaciones personales.
+- No hubo commits, push, merge, cambio de rama, migraciones ni dependencias nuevas;
+  se preservaron cambios existentes y no se modificaron directorios de herramientas.
+
+## Iteración 4 — Refinamiento de experiencia TCG (22/10/2026)
+
+- El estudiante definió las prioridades de fiabilidad de imágenes, interacción,
+  cronología, expansiones y detalle, aportó una referencia visual de logo y enlaces
+  de inspiración y autorizó implementar directamente conservando los cambios previos.
+- Codex y agentes auxiliares asistieron en diagnóstico, investigación de contratos,
+  modelos/cachés/ordenación, resolutores de assets, React/TypeScript/CSS, controles
+  táctiles, pruebas previas, revisión independiente y documentación. El resultado
+  requiere revisión y comprensión del estudiante; no se atribuyen reflexiones propias.
+- Se revisaron las referencias oficiales `https://tcgdex.dev/assets`,
+  `https://tcgdex.dev/reference/set`, la referencia de cartas y GraphQL, así como
+  `https://tcgdex.net/database/sv-scarlet-violet/sv03.5-151/199-charizard-ex` para
+  jerarquía de información. `research/tcgdex/refinement.json` conserva metadatos,
+  cabeceras HEAD y consultas reales separadas de las respuestas simuladas en tests.
+- `https://poke-151.simey.me/`, `https://poke-holo.simey.me/` y
+  `https://github.com/simeydotme/pokemon-cards-css` fueron referencias conceptuales.
+  Se identificó GPL-3.0; no se incorporaron código, texturas, assets ni dependencias
+  de ese proyecto. La solución de Pointer Events, gradientes y variables CSS es
+  original asistida por IA; no reproduce sus implementaciones ni el layout TCGdex.
+  La referencia de logo aportada no se copió ni se trató como una excepción codificada.
+- Las imágenes/logos siguen siendo URLs remotas oficiales del proveedor, con
+  fallback limitado a formatos y recursos verificados de la misma impresión.
+  Texto e imagen registran sus idiomas por separado. Los efectos son simulaciones,
+  sin atribuir acabado físico ni propiedad a una carta. No se inventaron precios,
+  fechas, traducciones, assets ni disponibilidad. La revisión de derechos previamente
+  pendiente no se considera resuelta por la accesibilidad técnica del proveedor.
+- El gate final pasó con 43 pruebas de proveedores, 98 backend y 193 frontend,
+  lint, tipos y build. No había navegador disponible; no se atribuye inspección visual,
+  interacción táctil real, escucha o aprobación personal al estudiante. El checklist
+  manual permanece en DEVELOPMENT.md.
+- No se hicieron commits, push, merge, reset, cambios de rama, migraciones ni
+  dependencias nuevas; se conservaron las modificaciones y directorios de herramientas.

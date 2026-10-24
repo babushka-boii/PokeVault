@@ -1,0 +1,77 @@
+.tcg-interactive-card {
+  position: relative;
+  width: 100%;
+  perspective: 1100px;
+}
+
+.tcg-interactive-surface {
+  position: relative;
+  border-radius: 4.6%;
+  transform: rotateX(var(--card-rotate-x, 0deg)) rotateY(var(--card-rotate-y, 0deg));
+  transform-origin: center;
+  transition: transform 280ms cubic-bezier(.2, .75, .3, 1);
+  isolation: isolate;
+}
+
+.tcg-interactive-surface[data-active="true"] {
+  transition: transform 65ms linear;
+  will-change: transform;
+}
+
+.tcg-card-glare,
+.tcg-card-iridescence {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  aspect-ratio: 245 / 337;
+  border-radius: .7rem;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 220ms ease;
+}
+
+.tcg-card-glare {
+  background: radial-gradient(ellipse at var(--card-light-x, 50%) var(--card-light-y, 50%),
+    rgb(255 255 244 / .6), rgb(255 255 255 / .12) 24%, transparent 65%);
+}
+
+.tcg-card-iridescence {
+  background: linear-gradient(112deg, transparent 12%, rgb(75 219 228 / .55) 28%,
+    rgb(191 138 255 / .42) 42%, rgb(255 178 192 / .5) 53%, rgb(255 226 155 / .4) 66%, transparent 83%);
+  background-size: 240% 240%;
+  background-position: var(--card-light-x, 50%) var(--card-light-y, 50%);
+}
+
+.tcg-interactive-surface[data-active="true"] > .tcg-card-glare { opacity: .2; }
+.tcg-interactive-surface[data-active="true"] > .tcg-card-iridescence { opacity: .22; }
+.tcg-interactive-card--large .tcg-interactive-surface[data-active="true"] > .tcg-card-glare { opacity: .3; }
+.tcg-interactive-card--large .tcg-interactive-surface[data-active="true"] > .tcg-card-iridescence { opacity: .4; }
+
+.tcg-interactive-card > .tcg-card-touch-toggle {
+  display: block;
+  min-height: 44px;
+  margin: .65rem auto 0;
+  padding: .45rem .85rem;
+  border: 1px solid #8a9db0;
+  border-radius: 999px;
+  color: #173f70;
+  background: #fffdf7;
+  font: inherit;
+  font-size: .78rem;
+  cursor: pointer;
+}
+
+.tcg-interactive-card > .tcg-card-touch-toggle[aria-pressed="true"] {
+  border-color: #5684ad;
+  background: #e8f1fa;
+  color: #173f70;
+}
+
+.tcg-interactive-card > .tcg-card-touch-toggle:focus-visible { outline: 3px solid #317ec5; outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tcg-interactive-surface,
+  .tcg-interactive-surface[data-active="true"] { transform: none; transition: none; will-change: auto; }
+  .tcg-card-glare, .tcg-card-iridescence { display: none; transition: none; }
+}

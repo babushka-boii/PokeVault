@@ -43,3 +43,19 @@ erDiagram
 - `BoxMembership` carries `user_id`. Composite foreign keys `(box_id, user_id)` and `(owned_copy_id, user_id)` prevent cross-user membership, and `(box_id, owned_copy_id)` is unique. Deleting a box cascades to memberships only, never to owned copies.
 
 Prices are evidence in this feasibility iteration, not persisted model entities: currency and observation time must be designed before monetary storage. Deferred extensions include price snapshots, transactions and lines, wishlist, decks, scans and candidates, smart-box rules, trade state, and sale state. Physical-copy identity must remain stable when those tables are introduced.
+
+## Runtime TCG catalog boundary (2026-10-22)
+
+The new public catalog adapter does not persist domain rows or change this ERD.
+TCGdex `id` maps to the future CardPrinting provider/external-ID identity; language
+is metadata/localized content, not a different printing ID. `set.id` and `localId`
+remain separate fields. The complete provider `dexId` array maps to the existing
+many-to-many CardSpecies concept, including Pikachu & Zekrom (#25/#644). Missing
+links remain unresolved; Trainer/Energy normalize to no species associations.
+
+Card DTOs expose recorded variants and optional official fields without owned-copy
+quantity, purchase cost or valuation. `available_languages` means resources verified
+in the response, not all physical printing languages. The current English discovery
+pool also includes Pocket entries; a future inventory slice must explicitly define
+physical/digital eligibility rather than treating every public catalog entry as a
+physical owned copy. Durable catalog synchronization remains a separate increment.

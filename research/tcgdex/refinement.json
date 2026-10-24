@@ -1,0 +1,1624 @@
+{
+  "verified_at": "2026-10-22T20:42:21.348347+00:00",
+  "official_references": [
+    "https://tcgdex.dev/assets",
+    "https://tcgdex.dev/reference/set",
+    "https://tcgdex.dev/reference/card",
+    "https://tcgdex.dev/rest/filtering-sorting-pagination"
+  ],
+  "species_briefs": {
+    "english_url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A25&pagination%3Apage=1&pagination%3AitemsPerPage=1000&sort%3Afield=id",
+    "english_count": 209,
+    "spanish_url": "https://api.tcgdex.net/v2/es/cards?dexId=eq%3A25&pagination%3Apage=1&pagination%3AitemsPerPage=1000&sort%3Afield=id",
+    "spanish_count": 119,
+    "spanish_null_english_present_candidates": [
+      "smp-SM157",
+      "smp-SM162",
+      "smp-SM206",
+      "smp-SM76",
+      "smp-SM81",
+      "smp-SM86",
+      "smp-SM98",
+      "swshp-SWSH153",
+      "swshp-SWSH198",
+      "swshp-SWSH234",
+      "swshp-SWSH285",
+      "swshp-SWSH286"
+    ]
+  },
+  "set_metadata": {
+    "url": "https://api.tcgdex.net/v2/graphql",
+    "method": "POST",
+    "query": "{ sets { id name releaseDate logo symbol serie { id name } } }",
+    "count": 220,
+    "sample": [
+      {
+        "id": "base1",
+        "name": "Base Set",
+        "releaseDate": "1999-01-09",
+        "logo": "https://assets.tcgdex.net/en/base/base1/logo",
+        "symbol": null,
+        "serie": {
+          "id": "base",
+          "name": "Base"
+        }
+      },
+      {
+        "id": "sm9",
+        "name": "Team Up",
+        "releaseDate": "2019-01-31",
+        "logo": "https://assets.tcgdex.net/en/sm/sm9/logo",
+        "symbol": "https://assets.tcgdex.net/univ/sm/sm9/symbol",
+        "serie": {
+          "id": "sm",
+          "name": "Sun & Moon"
+        }
+      },
+      {
+        "id": "swsh3",
+        "name": "Darkness Ablaze",
+        "releaseDate": "2020-08-14",
+        "logo": "https://assets.tcgdex.net/en/swsh/swsh3/logo",
+        "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol",
+        "serie": {
+          "id": "swsh",
+          "name": "Sword & Shield"
+        }
+      },
+      {
+        "id": "sv03.5",
+        "name": "151",
+        "releaseDate": "2023-09-22",
+        "logo": "https://assets.tcgdex.net/en/sv/sv03.5/logo",
+        "symbol": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol",
+        "serie": {
+          "id": "sv",
+          "name": "Scarlet & Violet"
+        }
+      },
+      {
+        "id": "A1",
+        "name": "Genetic Apex",
+        "releaseDate": "2024-10-30",
+        "logo": "https://assets.tcgdex.net/en/tcgp/A1/logo",
+        "symbol": "https://assets.tcgdex.net/univ/tcgp/A1/symbol",
+        "serie": {
+          "id": "tcgp",
+          "name": "Pokémon TCG Pocket"
+        }
+      }
+    ]
+  },
+  "nested_sort": [
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A25&pagination%3Apage=1&pagination%3AitemsPerPage=8&sort%3Afield=set.releaseDate&sort%3Aorder=ASC",
+      "order": "ASC",
+      "sample": [
+        {
+          "id": "xyp-XY95",
+          "release_date": "2013-10-12"
+        },
+        {
+          "id": "xyp-XY89",
+          "release_date": "2013-10-12"
+        },
+        {
+          "id": "xyp-XY84",
+          "release_date": "2013-10-12"
+        },
+        {
+          "id": "xyp-XY202",
+          "release_date": "2013-10-12"
+        },
+        {
+          "id": "xyp-XY174",
+          "release_date": "2013-10-12"
+        },
+        {
+          "id": "xyp-XY124",
+          "release_date": "2013-10-12"
+        },
+        {
+          "id": "swsh11tg-TG29",
+          "release_date": "2022-09-09"
+        },
+        {
+          "id": "swsh11tg-TG17",
+          "release_date": "2022-09-09"
+        }
+      ]
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards?dexId=eq%3A25&pagination%3Apage=1&pagination%3AitemsPerPage=8&sort%3Afield=set.releaseDate&sort%3Aorder=DESC",
+      "order": "DESC",
+      "sample": [
+        {
+          "id": "fut2020-1",
+          "release_date": "2020-09-11"
+        },
+        {
+          "id": "basep-1",
+          "release_date": "1999-07-01"
+        },
+        {
+          "id": "tk-hs-r-2",
+          "release_date": "2010-05-01"
+        },
+        {
+          "id": "2024sv-2",
+          "release_date": "2024-12-04"
+        },
+        {
+          "id": "2018sm-4",
+          "release_date": "2018-10-19"
+        },
+        {
+          "id": "basep-4",
+          "release_date": "1999-07-01"
+        },
+        {
+          "id": "ex5.5-5",
+          "release_date": "2004-07-01"
+        },
+        {
+          "id": "2014xy-5",
+          "release_date": "2014-05-23"
+        }
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/base1-58",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "base1-58",
+        "localId": "58",
+        "name": "Pikachu",
+        "category": "Pokemon",
+        "dexId": [
+          25
+        ],
+        "image": "https://assets.tcgdex.net/en/base/base1/58",
+        "set": {
+          "cardCount": {
+            "official": 102,
+            "total": 102
+          },
+          "id": "base1",
+          "logo": "https://assets.tcgdex.net/en/base/base1/logo",
+          "name": "Base Set"
+        },
+        "rarity": "Common",
+        "weaknesses": [
+          {
+            "type": "Fighting",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/base1-58",
+      "status": 404,
+      "language": "es"
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/sv03.5-199",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "sv03.5-199",
+        "localId": "199",
+        "name": "Charizard ex",
+        "category": "Pokemon",
+        "dexId": [
+          6
+        ],
+        "image": "https://assets.tcgdex.net/en/sv/sv03.5/199",
+        "set": {
+          "cardCount": {
+            "official": 165,
+            "total": 207
+          },
+          "id": "sv03.5",
+          "logo": "https://assets.tcgdex.net/en/sv/sv03.5/logo",
+          "name": "151",
+          "symbol": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol"
+        },
+        "rarity": "Special illustration rare",
+        "weaknesses": [
+          {
+            "type": "Water",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 2,
+        "regulationMark": "G"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/sv03.5-199",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "sv03.5-199",
+        "localId": "199",
+        "name": "Charizard ex",
+        "category": "Pokémon",
+        "dexId": [
+          6
+        ],
+        "image": "https://assets.tcgdex.net/es/sv/sv03.5/199",
+        "set": {
+          "cardCount": {
+            "official": 165,
+            "total": 207
+          },
+          "id": "sv03.5",
+          "logo": "https://assets.tcgdex.net/es/sv/sv03.5/logo",
+          "name": "151",
+          "symbol": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol"
+        },
+        "rarity": "Rara Ilustración Especial",
+        "weaknesses": [
+          {
+            "type": "Agua",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 2,
+        "regulationMark": "G"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/swsh3-136",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "swsh3-136",
+        "localId": "136",
+        "name": "Furret",
+        "category": "Pokemon",
+        "dexId": [
+          162
+        ],
+        "image": "https://assets.tcgdex.net/en/swsh/swsh3/136",
+        "set": {
+          "cardCount": {
+            "official": 189,
+            "total": 201
+          },
+          "id": "swsh3",
+          "logo": "https://assets.tcgdex.net/en/swsh/swsh3/logo",
+          "name": "Darkness Ablaze",
+          "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol"
+        },
+        "rarity": "Uncommon",
+        "weaknesses": [
+          {
+            "type": "Fighting",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": "D"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/swsh3-136",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "swsh3-136",
+        "localId": "136",
+        "name": "Furret",
+        "category": "Pokémon",
+        "dexId": [
+          162
+        ],
+        "image": "https://assets.tcgdex.net/es/swsh/swsh3/136",
+        "set": {
+          "cardCount": {
+            "official": 189,
+            "total": 201
+          },
+          "id": "swsh3",
+          "logo": "https://assets.tcgdex.net/es/swsh/swsh3/logo",
+          "name": "Oscuridad Incandescente",
+          "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol"
+        },
+        "rarity": "Uncommon",
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": "D"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/sm9-33",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "sm9-33",
+        "localId": "33",
+        "name": "Pikachu & Zekrom GX",
+        "category": "Pokemon",
+        "dexId": [
+          25,
+          644
+        ],
+        "image": "https://assets.tcgdex.net/en/sm/sm9/33",
+        "set": {
+          "cardCount": {
+            "official": 181,
+            "total": 196
+          },
+          "id": "sm9",
+          "logo": "https://assets.tcgdex.net/en/sm/sm9/logo",
+          "name": "Team Up",
+          "symbol": "https://assets.tcgdex.net/univ/sm/sm9/symbol"
+        },
+        "rarity": "Ultra Rare",
+        "weaknesses": [
+          {
+            "type": "Fighting",
+            "value": "×2"
+          }
+        ],
+        "resistances": [
+          {
+            "type": "Metal",
+            "value": "-20"
+          }
+        ],
+        "retreat": 3,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/sm9-33",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "sm9-33",
+        "localId": "33",
+        "name": "Pikachu y Zekrom GX",
+        "category": "Pokémon",
+        "dexId": [
+          25,
+          644
+        ],
+        "image": "https://assets.tcgdex.net/es/sm/sm9/33",
+        "set": {
+          "cardCount": {
+            "official": 181,
+            "total": 196
+          },
+          "id": "sm9",
+          "name": "Union de Aliados",
+          "symbol": "https://assets.tcgdex.net/univ/sm/sm9/symbol"
+        },
+        "rarity": "Ultra Rara",
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": [
+          {
+            "type": "Metálica",
+            "value": "-20"
+          }
+        ],
+        "retreat": 3,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/swsh12.5gg-GG30",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "swsh12.5gg-GG30",
+        "localId": "GG30",
+        "name": "Pikachu",
+        "category": "Pokemon",
+        "dexId": [
+          25
+        ],
+        "image": null,
+        "set": {
+          "cardCount": {
+            "official": 70,
+            "total": 70
+          },
+          "id": "swsh12.5gg",
+          "name": "Crown Zenith Galarian Gallery"
+        },
+        "rarity": "Rare",
+        "weaknesses": [
+          {
+            "type": "Fighting",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": "F"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/swsh12.5gg-GG30",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "swsh12.5gg-GG30",
+        "localId": "GG30",
+        "name": "Pikachu",
+        "category": "Pokémon",
+        "dexId": [
+          25
+        ],
+        "image": null,
+        "set": {
+          "cardCount": {
+            "official": 70,
+            "total": 70
+          },
+          "id": "swsh12.5gg",
+          "name": "Cenit Supremo Galería de Galar"
+        },
+        "rarity": "Rara",
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": "F"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/2024sv-2",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "2024sv-2",
+        "localId": "2",
+        "name": "Pikachu",
+        "category": "Pokemon",
+        "dexId": [
+          25
+        ],
+        "image": null,
+        "set": {
+          "cardCount": {
+            "official": 15,
+            "total": 15
+          },
+          "id": "2024sv",
+          "name": "McDonald's Collection 2024"
+        },
+        "rarity": "None",
+        "weaknesses": [
+          {
+            "type": "Fighting",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/2024sv-2",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "2024sv-2",
+        "localId": "2",
+        "name": "Pikachu",
+        "category": "Pokémon",
+        "dexId": [
+          25
+        ],
+        "image": null,
+        "set": {
+          "cardCount": {
+            "official": 15,
+            "total": 15
+          },
+          "id": "2024sv",
+          "name": "Colección de McDonald's 2024"
+        },
+        "rarity": "Ninguno",
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/A1-001",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "A1-001",
+        "localId": "001",
+        "name": "Bulbasaur",
+        "category": "Pokemon",
+        "dexId": [
+          1
+        ],
+        "image": "https://assets.tcgdex.net/en/tcgp/A1/001",
+        "set": {
+          "cardCount": {
+            "official": 226,
+            "total": 286
+          },
+          "id": "A1",
+          "logo": "https://assets.tcgdex.net/en/tcgp/A1/logo",
+          "name": "Genetic Apex",
+          "symbol": "https://assets.tcgdex.net/univ/tcgp/A1/symbol"
+        },
+        "rarity": "One Diamond",
+        "weaknesses": [
+          {
+            "type": "Fire",
+            "value": "+20"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/A1-001",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "A1-001",
+        "localId": "001",
+        "name": "Bulbasaur",
+        "category": "Pokémon",
+        "dexId": [
+          1
+        ],
+        "image": "https://assets.tcgdex.net/es/tcgp/A1/001",
+        "set": {
+          "cardCount": {
+            "official": 226,
+            "total": 286
+          },
+          "id": "A1",
+          "name": "Genes Formidables",
+          "symbol": "https://assets.tcgdex.net/univ/tcgp/A1/symbol"
+        },
+        "rarity": "Un Diamante",
+        "weaknesses": [
+          {
+            "type": "Fuego",
+            "value": "+20"
+          }
+        ],
+        "resistances": null,
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/smp-SM157",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "smp-SM157",
+        "localId": "SM157",
+        "name": "Pikachu",
+        "category": "Pokemon",
+        "dexId": [
+          25
+        ],
+        "image": "https://assets.tcgdex.net/en/sm/smp/SM157",
+        "set": {
+          "cardCount": {
+            "official": 248,
+            "total": 248
+          },
+          "id": "smp",
+          "logo": "https://assets.tcgdex.net/en/sm/smp/logo",
+          "name": "SM Black Star Promos",
+          "symbol": "https://assets.tcgdex.net/univ/sm/smp/symbol"
+        },
+        "rarity": "Promo",
+        "weaknesses": [
+          {
+            "type": "Fighting",
+            "value": "×2"
+          }
+        ],
+        "resistances": [
+          {
+            "type": "Metal",
+            "value": "-20"
+          }
+        ],
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/smp-SM157",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "smp-SM157",
+        "localId": "SM157",
+        "name": "Pikachu",
+        "category": "Pokémon",
+        "dexId": [
+          25
+        ],
+        "image": null,
+        "set": {
+          "cardCount": {
+            "official": 248,
+            "total": 248
+          },
+          "id": "smp",
+          "name": "SL Cartas de promoción",
+          "symbol": "https://assets.tcgdex.net/univ/sm/smp/symbol"
+        },
+        "rarity": "Promo",
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": [
+          {
+            "type": "Metálica",
+            "value": "-20"
+          }
+        ],
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/cards/smp-SM162",
+      "status": 200,
+      "language": "en",
+      "card": {
+        "id": "smp-SM162",
+        "localId": "SM162",
+        "name": "Pikachu",
+        "category": "Pokemon",
+        "dexId": [
+          25
+        ],
+        "image": "https://assets.tcgdex.net/en/sm/smp/SM162",
+        "set": {
+          "cardCount": {
+            "official": 248,
+            "total": 248
+          },
+          "id": "smp",
+          "logo": "https://assets.tcgdex.net/en/sm/smp/logo",
+          "name": "SM Black Star Promos",
+          "symbol": "https://assets.tcgdex.net/univ/sm/smp/symbol"
+        },
+        "rarity": "Promo",
+        "weaknesses": [
+          {
+            "type": "Fighting",
+            "value": "×2"
+          }
+        ],
+        "resistances": [
+          {
+            "type": "Metal",
+            "value": "-20"
+          }
+        ],
+        "retreat": 1,
+        "regulationMark": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/cards/smp-SM162",
+      "status": 200,
+      "language": "es",
+      "card": {
+        "id": "smp-SM162",
+        "localId": "SM162",
+        "name": "Pikachu",
+        "category": "Pokémon",
+        "dexId": [
+          25
+        ],
+        "image": null,
+        "set": {
+          "cardCount": {
+            "official": 248,
+            "total": 248
+          },
+          "id": "smp",
+          "name": "SL Cartas de promoción",
+          "symbol": "https://assets.tcgdex.net/univ/sm/smp/symbol"
+        },
+        "rarity": "Promo",
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": [
+          {
+            "type": "Metálica",
+            "value": "-20"
+          }
+        ],
+        "retreat": 1,
+        "regulationMark": null
+      }
+    }
+  ],
+  "asset_head": [
+    {
+      "url": "https://assets.tcgdex.net/en/base/base1/58/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "384873"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/base/base1/58/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "80678"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/base/base1/58/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "16940"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/sm9/33/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "348151"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/sm9/33/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "111902"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/sm9/33/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "24996"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/sm9/logo.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "214896"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/smp/SM157/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "279744"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/smp/SM157/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "51904"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/smp/SM157/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "14300"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/smp/SM162/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "264791"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/smp/SM162/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "55990"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sm/smp/SM162/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "14824"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sv/sv03.5/199/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "261407"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sv/sv03.5/199/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "57376"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sv/sv03.5/199/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "17050"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/sv/sv03.5/logo.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "28301"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/swsh/swsh3/136/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "327364"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/swsh/swsh3/136/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "67756"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/swsh/swsh3/136/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "15778"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/swsh/swsh3/logo.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "40921"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/tcgp/A1/001/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "284691"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/tcgp/A1/001/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "47774"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/tcgp/A1/001/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "15120"
+    },
+    {
+      "url": "https://assets.tcgdex.net/en/tcgp/A1/logo.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "67784"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/sm/sm9/33/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "317217"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/sm/sm9/33/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "98768"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/sm/sm9/33/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "24844"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/sv/sv03.5/199/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "273769"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/sv/sv03.5/199/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "65278"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/sv/sv03.5/199/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "17790"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/sv/sv03.5/logo.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "27129"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/swsh/swsh3/136/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "328367"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/swsh/swsh3/136/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "71730"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/swsh/swsh3/136/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "16304"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/swsh/swsh3/logo.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "47230"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/tcgp/A1/001/high.png",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "278759"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/tcgp/A1/001/high.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "47366"
+    },
+    {
+      "url": "https://assets.tcgdex.net/es/tcgp/A1/001/low.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "content_length": "15086"
+    },
+    {
+      "url": "https://assets.tcgdex.net/univ/sm/sm9/symbol.png",
+      "status": 404
+    },
+    {
+      "url": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol.png",
+      "status": 404
+    },
+    {
+      "url": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol.png",
+      "status": 404
+    },
+    {
+      "url": "https://assets.tcgdex.net/univ/tcgp/A1/symbol.png",
+      "status": 404
+    }
+  ],
+  "findings": [
+    "Card /low.webp and /high.webp suffixes are documented; previous selected-language-only normalization discarded verified alternative-language images.",
+    "All sampled non-null card image variants responded 200; four documented set symbol PNG URLs responded 404, showing asset metadata alone cannot guarantee availability.",
+    "Some exact printings have no image metadata in either supported language; no different-printing replacement is legitimate.",
+    "REST nested set.releaseDate sorting does not provide chronological card order in the sampled query; local complete species-brief ordering uses official set metadata before pagination.",
+    "Metadata-only GraphQL supplies official English set dates without enriching card details; localized REST set and series lists supply Spanish names/assets.",
+    "Only sampled present-day availability is established; neither worldwide catalog completeness nor future availability is claimed."
+  ],
+  "live_application_api": [
+    {
+      "path": "/api/v1/pokemon/25/cards?language=es&sort=newest&page_size=2",
+      "status": 200,
+      "data": {
+        "results": [
+          {
+            "id": "me02.5-055",
+            "dex_ids": [
+              25
+            ],
+            "language": "es",
+            "image_language": "es",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me02.5/055",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me02.5/055",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "me02.5",
+              "name": "Héroes Ascendentes",
+              "logo_url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/me/me02.5/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+                  "language": "es"
+                },
+                {
+                  "url": "https://assets.tcgdex.net/en/me/me02.5/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "es",
+              "serie": {
+                "id": "me",
+                "name": "Megaevolución"
+              },
+              "release_date": "2026-01-30"
+            }
+          },
+          {
+            "id": "me02.5-057",
+            "dex_ids": [
+              25
+            ],
+            "language": "es",
+            "image_language": "es",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me02.5/057",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me02.5/057",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "me02.5",
+              "name": "Héroes Ascendentes",
+              "logo_url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/me/me02.5/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+                  "language": "es"
+                },
+                {
+                  "url": "https://assets.tcgdex.net/en/me/me02.5/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "es",
+              "serie": {
+                "id": "me",
+                "name": "Megaevolución"
+              },
+              "release_date": "2026-01-30"
+            }
+          }
+        ],
+        "matching_set_count": 104,
+        "has_more": true,
+        "sets_complete": true,
+        "coverage": "english_catalog"
+      }
+    },
+    {
+      "path": "/api/v1/pokemon/25/cards?language=es&sort=newest&page_size=2&page=2",
+      "status": 200,
+      "data": {
+        "results": [
+          {
+            "id": "me02.5-276",
+            "dex_ids": [
+              25
+            ],
+            "language": "es",
+            "image_language": "es",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me02.5/276",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me02.5/276",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "me02.5",
+              "name": "Héroes Ascendentes",
+              "logo_url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/me/me02.5/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+                  "language": "es"
+                },
+                {
+                  "url": "https://assets.tcgdex.net/en/me/me02.5/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "es",
+              "serie": {
+                "id": "me",
+                "name": "Megaevolución"
+              },
+              "release_date": "2026-01-30"
+            }
+          },
+          {
+            "id": "me02.5-277",
+            "dex_ids": [
+              25
+            ],
+            "language": "es",
+            "image_language": "es",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me02.5/277",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me02.5/277",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "me02.5",
+              "name": "Héroes Ascendentes",
+              "logo_url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/me/me02.5/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+                  "language": "es"
+                },
+                {
+                  "url": "https://assets.tcgdex.net/en/me/me02.5/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "es",
+              "serie": {
+                "id": "me",
+                "name": "Megaevolución"
+              },
+              "release_date": "2026-01-30"
+            }
+          }
+        ],
+        "matching_set_count": 104,
+        "has_more": true,
+        "sets_complete": true,
+        "coverage": "english_catalog"
+      }
+    },
+    {
+      "path": "/api/v1/pokemon/25/cards?language=en&sort=oldest&page_size=2",
+      "status": 200,
+      "data": {
+        "results": [
+          {
+            "id": "base1-58",
+            "dex_ids": [
+              25
+            ],
+            "language": "en",
+            "image_language": "en",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/en/base/base1/58",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "base1",
+              "name": "Base Set",
+              "logo_url": "https://assets.tcgdex.net/en/base/base1/logo.png",
+              "symbol_url": null,
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/en/base/base1/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "en",
+              "serie": {
+                "id": "base",
+                "name": "Base"
+              },
+              "release_date": "1999-01-09"
+            }
+          },
+          {
+            "id": "base2-60",
+            "dex_ids": [
+              25
+            ],
+            "language": "en",
+            "image_language": "en",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/en/base/base2/60",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "base2",
+              "name": "Jungle",
+              "logo_url": "https://assets.tcgdex.net/en/base/base2/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/base/base2/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/en/base/base2/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "en",
+              "serie": {
+                "id": "base",
+                "name": "Base"
+              },
+              "release_date": "1999-06-16"
+            }
+          }
+        ],
+        "matching_set_count": 104,
+        "has_more": true,
+        "sets_complete": true,
+        "coverage": "english_catalog"
+      }
+    },
+    {
+      "path": "/api/v1/pokemon/1/cards?language=es&sort=newest&page_size=2",
+      "status": 200,
+      "data": {
+        "results": [
+          {
+            "id": "B1a-001",
+            "dex_ids": [
+              1
+            ],
+            "language": "en",
+            "image_language": "en",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/en/tcgp/B1a/001",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "B1a",
+              "name": "Fuego Carmesí",
+              "logo_url": null,
+              "symbol_url": null,
+              "logo_sources": [],
+              "name_language": "es",
+              "serie": {
+                "id": "tcgp",
+                "name": "Juego de Cartas Coleccionables Pokémon Pocket"
+              },
+              "release_date": "2025-12-17"
+            }
+          },
+          {
+            "id": "me01-001",
+            "dex_ids": [
+              1
+            ],
+            "language": "es",
+            "image_language": "es",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me01/001",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me01/001",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "me01",
+              "name": "Megaevolución",
+              "logo_url": "https://assets.tcgdex.net/es/me/me01/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/me/me01/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/es/me/me01/logo.png",
+                  "language": "es"
+                },
+                {
+                  "url": "https://assets.tcgdex.net/en/me/me01/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "es",
+              "serie": {
+                "id": "me",
+                "name": "Megaevolución"
+              },
+              "release_date": "2025-09-26"
+            }
+          }
+        ],
+        "matching_set_count": 28,
+        "has_more": true,
+        "sets_complete": true,
+        "coverage": "english_catalog"
+      }
+    },
+    {
+      "path": "/api/v1/cards/smp-SM157?language=es",
+      "status": 200,
+      "data": {
+        "id": "smp-SM157",
+        "dex_ids": [
+          25
+        ],
+        "language": "es",
+        "image_language": "en",
+        "image_sources": [
+          {
+            "base_url": "https://assets.tcgdex.net/en/sm/smp/SM157",
+            "language": "en"
+          }
+        ],
+        "set": {
+          "id": "smp",
+          "name": "SL Cartas de promoción",
+          "logo_url": "https://assets.tcgdex.net/en/sm/smp/logo.png",
+          "symbol_url": "https://assets.tcgdex.net/univ/sm/smp/symbol.png",
+          "logo_sources": [
+            {
+              "url": "https://assets.tcgdex.net/en/sm/smp/logo.png",
+              "language": "en"
+            }
+          ],
+          "name_language": "es",
+          "serie": {
+            "id": "sm",
+            "name": "Sol y Luna"
+          },
+          "release_date": "2017-02-03"
+        },
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": [
+          {
+            "type": "Metálica",
+            "value": "-20"
+          }
+        ],
+        "retreat": 1,
+        "regulation_mark": null
+      }
+    },
+    {
+      "path": "/api/v1/cards/swsh12.5gg-GG30?language=es",
+      "status": 200,
+      "data": {
+        "id": "swsh12.5gg-GG30",
+        "dex_ids": [
+          25
+        ],
+        "language": "es",
+        "image_language": null,
+        "image_sources": [],
+        "set": {
+          "id": "swsh12.5gg",
+          "name": "Cenit Supremo Galería de Galar",
+          "logo_url": null,
+          "symbol_url": null,
+          "logo_sources": [],
+          "name_language": "es",
+          "serie": {
+            "id": "swsh",
+            "name": "Espada y Escudo"
+          },
+          "release_date": "2023-01-20"
+        },
+        "weaknesses": [
+          {
+            "type": "Lucha",
+            "value": "×2"
+          }
+        ],
+        "resistances": [],
+        "retreat": 1,
+        "regulation_mark": "F"
+      }
+    },
+    {
+      "path": "/api/v1/cards/sv03.5-199?language=es",
+      "status": 200,
+      "data": {
+        "id": "sv03.5-199",
+        "dex_ids": [
+          6
+        ],
+        "language": "es",
+        "image_language": "es",
+        "image_sources": [
+          {
+            "base_url": "https://assets.tcgdex.net/es/sv/sv03.5/199",
+            "language": "es"
+          },
+          {
+            "base_url": "https://assets.tcgdex.net/en/sv/sv03.5/199",
+            "language": "en"
+          }
+        ],
+        "set": {
+          "id": "sv03.5",
+          "name": "151",
+          "logo_url": "https://assets.tcgdex.net/es/sv/sv03.5/logo.png",
+          "symbol_url": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol.png",
+          "logo_sources": [
+            {
+              "url": "https://assets.tcgdex.net/es/sv/sv03.5/logo.png",
+              "language": "es"
+            },
+            {
+              "url": "https://assets.tcgdex.net/en/sv/sv03.5/logo.png",
+              "language": "en"
+            }
+          ],
+          "name_language": "es",
+          "serie": {
+            "id": "sv",
+            "name": "Escarlata y Púrpura"
+          },
+          "release_date": "2023-09-22"
+        },
+        "weaknesses": [
+          {
+            "type": "Agua",
+            "value": "×2"
+          }
+        ],
+        "resistances": [],
+        "retreat": 2,
+        "regulation_mark": "G"
+      }
+    },
+    {
+      "path": "/api/v1/pokemon/644/cards?language=es&set_id=sm9&sort=oldest&page_size=2",
+      "status": 200,
+      "data": {
+        "results": [
+          {
+            "id": "sm9-33",
+            "dex_ids": [
+              25,
+              644
+            ],
+            "language": "es",
+            "image_language": "es",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/sm/sm9/33",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/sm/sm9/33",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "sm9",
+              "name": "Union de Aliados",
+              "logo_url": "https://assets.tcgdex.net/en/sm/sm9/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/sm/sm9/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/en/sm/sm9/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "es",
+              "serie": {
+                "id": "sm",
+                "name": "Sol y Luna"
+              },
+              "release_date": "2019-01-31"
+            }
+          },
+          {
+            "id": "sm9-162",
+            "dex_ids": [
+              25,
+              644
+            ],
+            "language": "es",
+            "image_language": "es",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/sm/sm9/162",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/sm/sm9/162",
+                "language": "en"
+              }
+            ],
+            "set": {
+              "id": "sm9",
+              "name": "Union de Aliados",
+              "logo_url": "https://assets.tcgdex.net/en/sm/sm9/logo.png",
+              "symbol_url": "https://assets.tcgdex.net/univ/sm/sm9/symbol.png",
+              "logo_sources": [
+                {
+                  "url": "https://assets.tcgdex.net/en/sm/sm9/logo.png",
+                  "language": "en"
+                }
+              ],
+              "name_language": "es",
+              "serie": {
+                "id": "sm",
+                "name": "Sol y Luna"
+              },
+              "release_date": "2019-01-31"
+            }
+          }
+        ],
+        "matching_set_count": 20,
+        "has_more": true,
+        "sets_complete": true,
+        "coverage": "english_catalog"
+      }
+    }
+  ],
+  "typed_asset_serialization_recheck": {
+    "warnings_as_errors": true,
+    "status": 200,
+    "paths": [
+      "/api/v1/pokemon/25/cards?language=es&sort=newest&page_size=2",
+      "/api/v1/cards/smp-SM157?language=es"
+    ]
+  }
+}

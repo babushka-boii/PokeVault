@@ -95,3 +95,167 @@ Top-level routes (provisional):
 - Background wallpaper specifications and copyright-safe source.
 - Detailed wireframes and spacing tokens; exact mini-sprite box capacity and mobile behavior.
 - Sound pack selection and rights review.
+
+## Iteration 4 implementation status
+
+The National Pokédex now shows entries 1–20 in a responsive semantic list/grid:
+National Dex number, species name, localized type labels and a 96 px remote
+sprite. Null or failed images have a localized text fallback. The existing
+cream/red/blue shell, ES/EN switch and navigation are preserved, with visible
+keyboard focus. Loading and empty states use status announcements; failures use
+an alert plus a native retry button. Entries are informational and have no
+inactive buttons or links to unfinished species detail pages. Filters, species
+selection, TCG detail flows remain future work; the PC catalog preview is described below.
+
+## Iteration 4 PC Storage catalog preview
+
+Implemented: a framed two-panel PC terminal with selected Pokémon details on the
+left and a compact 6×5 sprite grid on the right. Mobile below 700 px puts the grid
+first. Four original CSS wallpapers (Classic by default, Forest, Ocean, Night sky), directional box
+buttons and a high-contrast selection cursor preserve the game-inspired identity
+without copying proprietary screens. Empty slots remain visible. Entries use remote
+PokéAPI sprites with an image-failure fallback; there are no bundled Pokémon assets.
+
+Boxes are prominently labeled as a catalog preview, without owned cards. Each of
+35 boxes covers up to 30 consecutive species within 1–1025. Selection starts at the
+first entry on each box change. Arrow keys move focus and selection, Home/End reach
+the first/last populated slots, and Enter/Space select. The grid uses one Tab stop,
+with native buttons and ARIA grid/row/cell semantics. Prev/next controls stop at the
+boundaries. Loading/error/empty states and retry are localized. Subtle grid/detail
+animations and selection transitions are disabled under reduced motion.
+
+Audio is opt-in, initially muted, with 15% volume. Sound/volume controls persist
+locally without authentication. Original Web Audio sweeps provide cursor, box-change
+and wallpaper-confirmation feedback; no autoplay, recordings or musical sequences.
+Audio failure leaves the rest of the interface usable. The former TCG placeholder has been removed; the selected panel now shows real
+Pokémon facts as described in the refinement below, without owned-card quantities.
+
+Manual desktop/390 px inspection and real listening remain required; this session
+had no connected browser. See DEVELOPMENT.md for the exact checklist. Automated
+coverage does not certify visual fidelity or subjective audio comfort.
+
+## PC search refinement
+
+A compact magnifying-glass button sits at the right end of the storage header,
+separate from previous/next. It opens an original framed search panel with ES/EN
+labels, a clear button and up to eight name/number suggestions. Arrow keys choose
+suggestions, Enter locates the match and Escape closes the panel and restores the
+trigger's focus. Results use combobox/listbox active-descendant semantics and a
+visible cursor, with automatic scrolling for keyboard selection.
+
+Selecting Scraggy (#559) closes the panel, navigates to Box 19 and selects space
+19 (zero-based 18), updates details and moves focus to its sprite button. It never
+renders a filtered storage grid or creates another box. Opening uses the cursor
+sound; locating uses one confirmation or box-transition effect depending on whether
+the box changes, avoiding simultaneous effects. Escape reuses the back effect.
+All sounds respect existing preferences. Name matching uses canonical PokéAPI
+names as the reliable fallback, without invented translations. Manual responsive
+and audio inspection remain pending as noted above.
+
+## Definitive PC visual/data refinement — 2026-10-22
+
+The storage grid now uses **menu icons only**: Generation V static or real APNG
+for #001–#649, followed by verified later menu-icon families for newer species.
+Battle/front sprites remain restricted to the large selected portrait and existing
+Pokédex cards, never as grid fallbacks. Native Gen V icons are 32×32; grid images
+occupy up to 64×64 CSS pixels on desktop and 48×48 on mobile, preserving proportions
+with contain/pixelated rendering. A failed APNG tries a still Gen V icon, then a
+later menu icon, then a neutral placeholder. Later-generation menu icons remain
+static even when Animated is selected. See `research/sprites/VERIFICATION.md`.
+
+The localized Sprites: Static/Animated radio controls default to Static and persist
+at `pokevault.spriteMode`. Reduced motion always selects still resources while
+retaining the saved preference; replacing APNG with PNG actually stops animation.
+Changing mode does not change selection, request another box, play audio or replace
+unchanged image nodes during subsequent selections. No artificial bounce is used.
+
+Classic is the default original wallpaper: soft pale green/cream with broad low-noise
+geometric bands. Slots are transparent over one continuous background, with a warm
+brown/cream selection cursor. Forest, Ocean and Night sky remain available. The
+large portrait is preserved above compact facts, with controlled keyboard-accessible
+scrolling on desktop; mobile places the grid first and expands facts below it.
+
+The selected panel shows real height/weight, separate normal/hidden abilities and
+one localized provider description. Content loads only for the selected species,
+with its own loading/error/retry state; header identity/types remain visible while
+loading. ES decimal commas and EN decimal points use Intl.NumberFormat. A missing
+hidden ability or description is explicit; English fallback descriptions carry a
+visible note and correct language metadata. No etymology or speculative trivia is
+shown. The old TCG placeholder is gone.
+
+Cajas and Pokédex share original rectangular TypeBadge SVG/CSS banners for all 18
+types: colored angled symbol segment, dark high-contrast label segment and uppercase
+localized text. These are not the copyrighted fixed-English badge PNGs. No old
+rounded type-pill markup remains in either view.
+
+Automated checks and provider queries verify behavior/data, not appearance. No
+connected browser was available for desktop/390 px screenshots, APNG playback or
+sound listening. The manual checklist in DEVELOPMENT.md remains required before
+claiming those aspects are visually/auditively approved.
+
+## Species TCG card exploration (2026-10-22)
+
+Cajas keeps single-click sprite selection and its original details. A dedicated
+“Ver cartas TCG / View TCG cards” link opens `/pokemon/:number/cards`; the same action
+appears on Pokédex entries. This is public catalog browsing, with no owned/collected
+states or invented quantities. Gallery headers retain the selected species number,
+localized name, portrait and type badges; species-header errors do not hide cards.
+
+The gallery deliberately uses readable full-card artwork, unlike PC slots. Native
+links/buttons, responsive grids and forms support keyboard/touch use. Expansion ID
+can be chosen from current-page suggestions or entered explicitly, with Apply/Clear,
+English-name/ID sorting and Previous/Next pagination. Filters/page live in the URL.
+Coverage and per-card language fallback are visible; no unverified result total is
+shown. Loading skeletons respect reduced motion, and missing artwork has a localized
+fallback with preserved card aspect ratio.
+
+`/cards/:id` shows high-resolution art, set/number/rarity, illustrator, HP, TCG types,
+stage/evolution, card attacks/abilities and recorded variants when present. Missing
+fields stay explicit; unnamed provider attacks are not given invented translations.
+Game abilities are never used as TCG card abilities. Actual content has language
+metadata and a fallback note when it differs from the UI language.
+
+A local Back link returns detail → the exact species gallery/filters → original
+Boxes box/selection/wallpaper or Pokédex. Browser history also retains these URLs.
+Returning to Boxes restores the selected slot and focus; sound and sprite modes keep
+existing independent preferences. Return targets are limited to known local routes.
+
+The end-to-end journey and controls are automated-tested. Manual desktop/mobile
+artwork, layout and audio inspection is still pending: no browser was available.
+See DEVELOPMENT.md for the reproducible checklist; no visual verification is claimed.
+
+## TCG experience refinement (2026-10-22)
+
+The gallery now has a compact searchable expansion dialog, showing official names,
+logos, series/year and selected states. Options come from the complete supported
+species index, not only the visible page. Expansions without a usable logo remain
+individually selectable under Other/Otras. Filtering and newest/oldest sorting update
+the URL immediately and reset page 1; chronological ordering occurs before server
+pagination, with unknown dates last. Price sorting remains future work.
+
+Artwork keeps its full proportions and has separate loading and failure states.
+Documented format/quality candidates and verified same-printing language alternatives
+are tried before the missing state. Actual art language is separate from text
+language. A provider with no image metadata is distinguished from download failure;
+detail retry restarts artwork loading without changing the printing.
+
+The detail view uses a larger framed card opposite a clear information hierarchy:
+name/category/ID and expansion, card number/rarity, Pokémon traits, TCG abilities and
+attacks, then illustrator/regulation/languages/variants. Weaknesses, resistances and
+retreat are real provider fields. Mobile places artwork first and keeps reading order
+linear. Separate gallery/origin links preserve prior filters, page and box context.
+
+Mouse movement gently tilts only the artwork and moves a gradient reflection.
+Touch interaction is deliberately armed through Tilt card before dragging; taps,
+scrolling outside interaction and native keyboard links remain usable. Release,
+cancel or Escape resets the card. Reduced motion disables the visual effect live.
+Standard/unknown finishes get subtle glare; explicit foil metadata can intensify
+iridescence, always labeled as simulation rather than proof of a physical variant.
+There is no idle animation across the gallery. The implementation and gradients are
+original; linked TCGdex/Simey references informed hierarchy and interaction goals,
+without copying their layouts, GPL code or textures. The submitted expansion logo
+is a visual reference only, not a bundled asset or hardcoded expansion exception.
+
+Automated pointer/component tests do not prove visual or real-device touch quality.
+No browser was available after connection diagnostics; desktop and 390 px review
+remain pending in the updated DEVELOPMENT.md checklist.
