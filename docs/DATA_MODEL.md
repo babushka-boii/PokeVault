@@ -1,6 +1,8 @@
 # PokéVault logical data model
 
-This iteration defines identities and integrity rules only; it does not implement a database or migration.
+The original model below defines the planned inventory domain. Iteration 5A
+implements only the authentication subset described at the end of this file;
+catalog and inventory entities remain conceptual unless stated otherwise.
 
 ```mermaid
 erDiagram
@@ -59,3 +61,27 @@ in the response, not all physical printing languages. The current English discov
 pool also includes Pocket entries; a future inventory slice must explicitly define
 physical/digital eligibility rather than treating every public catalog entry as a
 physical owned copy. Durable catalog synchronization remains a separate increment.
+
+## Iteration 5A — Persisted authentication subset (2026-10-24)
+
+Alembic revision `0002` follows and preserves `0001`. It adds:
+
+| Table | Persisted fields and integrity |
+| --- | --- |
+| `users` | UUID `id`; unique case-sensitive Google `google_sub`; mutable display name, nullable email/picture URL, verified-email Boolean; timezone-aware created/updated timestamps. Email is not an identity key or unique account constraint. |
+| `user_settings` | One-to-one `user_id` PK/FK; preferred language (ES/EN), optional customized display name, trainer avatar identifier and favorite National Dex ID. No avatar catalog or species table is invented. |
+| `auth_sessions` | Opaque-token SHA-256 digest PK, user FK, created/expiry timestamps. No reusable session secret or Google token is stored. |
+| `oauth_transactions` | State digest PK, browser-binding digest, nonce, PKCE verifier and created/expiry timestamps. These are short-lived server-only authorization transactions, atomically consumed on callback. |
+
+User-dependent rows cascade on user deletion. Application user IDs remain stable
+across repeat logins and email changes. New account/settings/session persistence
+is transactional, with database subject uniqueness handling concurrent sign-ins.
+The migration can be downgraded to `0001`; doing so intentionally removes auth
+records while retaining technical metadata. Do not downgrade a populated user
+database casually. Integration tests exercise reversal only in disposable schemas.
+
+The original ERD's `AppUser` concept maps to implemented `User`/`users`.
+Favorite Pokémon uses a bounded National Dex reference until a persistent species
+catalog exists. Optional preferences are foundations, not settings-editing APIs.
+Future inventory must FK the internal UUID and enforce same-user membership as
+specified above; no owned-copy/collection/wishlist tables are added in 5A.

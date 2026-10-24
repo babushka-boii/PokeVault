@@ -83,7 +83,7 @@
 - Trainer avatar shortlist (10–15 approved selections from the student).
 - Pixel-perfect box wireframe measurements and legal/reusable audiovisual assets.
 - Production price-feed suitability and licensing; scanner OCR benchmark sample; deployment target.
-- Google OpenID Connect design, credentials and secure session strategy.
+- Google production deployment, real credentials and live verification; OIDC/session implementation is recorded in Iteration 5A below.
 
 ## Delivery 4 — Initial functional National Pokédex
 
@@ -162,3 +162,18 @@ See `Bitacora.md` for validation evidence and limitations.
 - [x] Preserve URL context, existing species associations, localization, PC search/sprites/audio and navigation.
 - [ ] Review actual desktop/390 px artwork, lighting and Chromium touch on a connected browser/device.
 - [ ] Add price sorting only after verified source/timestamp/currency normalization; no decorative price controls.
+
+## Iteration 5A — Secure Google authentication and identity (2026-10-24)
+
+- [x] Implement backend Google authorization code flow, S256 PKCE, nonce and signed ID token validation.
+- [x] Persist internal UUID users keyed by unique Google subject and extensible one-to-one settings.
+- [x] Persist short-lived browser-bound single-use login transactions and digest-only expiring sessions.
+- [x] Add credentialed `/auth/me`, Origin/CSRF-protected logout, session rotation and sanitized failures.
+- [x] Add typed React session restoration, ES/EN login, real profile and logout; preserve public catalogs.
+- [x] Document exact Google Cloud setup, localhost cookies and future backend-derived ownership boundaries.
+- [ ] Configure real Google credentials and manually verify consent, callback and browser cookies.
+- [ ] Review real desktop/mobile appearance and production HTTPS/proxy behavior.
+- [ ] Implement owned cards, user boxes, collections and set completion in the next inventory slice.
+
+Automated evidence is recorded in DEVELOPMENT.md and Bitacora.md after the final
+gate. The earlier roadmap entries are historical records, not live completion claims.

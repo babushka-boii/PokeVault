@@ -1,3 +1,4 @@
+import { withUnauthenticatedSession } from "../test/authSession";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
@@ -19,7 +20,7 @@ function gallery() {
       sets, sets_complete: true, page: Number(url.searchParams.get("page")),
     }) : speciesDetails()));
   });
-  vi.stubGlobal("fetch", request);
+  vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   return request;
 }
 
@@ -96,10 +97,10 @@ test("chronological controls request a new complete server order and retain navi
 
 test("detail presents TCG defensive metadata and two independently validated return destinations", async () => {
   const user = userEvent.setup();
-  vi.stubGlobal("fetch", vi.fn().mockImplementation(() => Promise.resolve(jsonResponse({ ...pikachuCard, set: teamUp,
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockImplementation(() => Promise.resolve(jsonResponse({ ...pikachuCard, set: teamUp,
     weaknesses: [{ type: "Fighting", value: "×2" }], resistances: [{ type: "Metal", value: "-30" }], retreat: 3, regulation_mark: "F",
     abilities: [{ name: "TCG Power", type: "Ability", effect: "An official card effect." }],
-  }))));
+  })))));
   const origin = "/boxes?box=19&pokemon=559&wallpaper=ocean";
   const returnTo = `/pokemon/25/cards?sort=newest&page=2&${new URLSearchParams({ returnTo: origin })}`;
   render(<App initialEntries={[`/cards/sm9-33?${new URLSearchParams({ returnTo })}`]} />);
@@ -117,7 +118,7 @@ test("detail presents TCG defensive metadata and two independently validated ret
 });
 
 test("a nested external return destination never creates an external link", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(pikachuCard)));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockResolvedValue(jsonResponse(pikachuCard))));
   const returnTo = `/pokemon/25/cards?${new URLSearchParams({ returnTo: "https://evil.example" })}`;
   render(<App initialEntries={[`/cards/sm9-33?${new URLSearchParams({ returnTo })}`]} />);
   await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" });

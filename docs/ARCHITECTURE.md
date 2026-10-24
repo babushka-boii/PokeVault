@@ -34,8 +34,8 @@ Prefer a **modular monolith** over microservices for a single-developer academic
 - **Frontend implemented:** typed backend Pokédex client, responsive species grid, loading/empty/error/retry and missing-sprite states.
 - **Frontend pending:** inventory data fetching, component libraries and charts; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
 - **Backend implemented:** Python + FastAPI + Pydantic Settings + SQLAlchemy + Alembic.
-- **Database implemented:** native PostgreSQL connection, health probe and reversible technical migration `0001`; domain tables are pending.
-- **Auth:** Google OAuth 2.0 / OpenID Connect for SSO. Prefer a secure HTTP-only server-side session strategy; final mechanism to be defined and reviewed.
+- **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001` and authentication migration `0002`; inventory tables remain pending.
+- **Auth implemented (5A):** backend Google OIDC code flow with S256 PKCE, browser-bound single-use transactions and digest-backed opaque server sessions. Live credentials/manual login remain pending; see `AUTHENTICATION.md`.
 - **Language:** checked-in ES/EN translation dictionaries; no automatic translation service.
 - **Scanning:** restricted image upload, preprocessing (OpenCV candidate), OCR engine to be selected, extract number/name/set, rank catalog matches, manual confirmation.
 
@@ -142,7 +142,7 @@ APIs need response schemas, pagination, auth scopes, mutations and error contrac
 4. Provider ID normalization, variants, and ambiguous OCR matches.
 5. Actual sound/artwork licensing and whether assets can be bundled or must be user supplied / public-domain alternatives.
 6. Price sources and historical series viability; never claim live estimates without proven integration.
-7. Google OpenID Connect session design and deployment configuration.
+7. Production authentication hosting/proxy configuration and live Google credential verification (local session design implemented in 5A).
 
 ## 9. Iteration 4 runtime catalog boundary
 
@@ -333,3 +333,27 @@ view separates artwork, primary identity/set information, TCG traits/effects and
 additional metadata; mobile places artwork first. URL-based gallery and origin
 links preserve filters/page and Boxes context. Pricing sort remains deferred until
 currency/source/timestamp normalization exists.
+
+## Iteration 5A — Implemented authentication boundary (2026-10-24)
+
+The existing catalog/provider architecture is preserved. `app/auth` owns Google
+OAuth/OIDC and session services; `api/auth.py` exposes the four versioned auth
+routes. Authlib/joserfc perform maintained protocol/signature/claims validation.
+The database holds users, settings, authorization transactions and opaque-session
+digests. The browser holds host-only HttpOnly cookies; React holds only public
+profile data and a session-bound CSRF token in memory.
+
+Login uses random state/nonce, S256 PKCE and an independent browser binding.
+Atomic transaction consumption prevents callback replay/concurrent exchange.
+Authentication creates a fresh session and invalidates the previous cookie's
+session. `/me` restores identity, expiration returns 401, and POST logout checks
+Origin plus CSRF before deleting the session. CORS now permits credentialed auth
+requests only from explicit configured origins. Fixed redirect configuration,
+no-store auth responses and sanitized errors protect the boundary.
+
+Public Pokédex, Boxes/search and TCG routes have no authentication dependency.
+Future private routes must use `require_current_user` and constrain records by
+its internal UUID; client-provided account IDs confer no access. Inventory,
+collections, trades and custom boxes are not implemented. See
+[AUTHENTICATION.md](AUTHENTICATION.md) for the API contract, lifecycle, security
+sources, deployment constraints and exact Google Console configuration.

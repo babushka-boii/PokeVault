@@ -358,3 +358,48 @@ Manual browser checklist (not performed in this session):
 
 Automated tests establish response and interaction behavior. A connected browser
 is still required to approve actual visual responsiveness and artwork loading.
+
+## Iteration 5A — Google sign-in setup
+
+The complete reproducible guide is [AUTHENTICATION.md](AUTHENTICATION.md). Install
+updated backend requirements, populate only the ignored backend `.env`, then run
+`alembic upgrade head` from `backend`. New environment variables are
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `FRONTEND_ORIGIN`,
+`AUTH_COOKIE_SECURE`, `AUTH_SESSION_TTL_SECONDS`, and `AUTH_TRANSACTION_TTL_SECONDS`.
+
+Register exactly `http://localhost:8000/api/v1/auth/google/callback` on a Google
+**Web application** client. Keep the frontend at `http://localhost:5173` and backend
+at `http://localhost:8000`. Use `AUTH_COOKIE_SECURE=false` only for local HTTP.
+Start Uvicorn with `--no-access-log` to keep OAuth callback queries out of logs;
+production proxies must redact them as well. Production needs HTTPS and Secure
+cookies, exact trusted origins and a same-site frontend/API arrangement.
+
+No Google credentials are supplied by this iteration. `/login` reports missing
+configuration safely and never produces a fake user. Tests use mocked Google
+transport and locally signed ID tokens; they do not require live credentials.
+PostgreSQL integration tests require the existing distinct dedicated test database;
+auth migration tests create/drop disposable schemas within it, not development data.
+
+Manual acceptance pending credentials: sign in/cancel/retry; refresh `/profile`;
+confirm actual name/email/picture; log out and check old cookie invalidation;
+repeat login and retain internal UUID; inspect desktop/390 px keyboard behavior;
+confirm public Pokédex, Boxes, search, TCG galleries/details remain accessible.
+Do not claim live login or production cookie verification from mocked tests.
+
+### Iteration 5A automated evidence — 2026-10-24
+
+`bash scripts/check.sh` completed with exit 0:
+
+- Provider fixtures/report: **43 tests passed** and offline report regenerated.
+- Backend: **155 passed**, including **6 PostgreSQL integration tests**, no skips.
+  Five new auth integration cases use disposable schemas and exercise migration
+  reversal, identity persistence, uniqueness/FKs, digest sessions/cascades, concurrent
+  callback consumption, returning-user email changes, session rotation and logout.
+- Frontend: **232 passed in 22 files**; 38 focused auth cases plus a login-route case
+  supplement the existing 193 tests.
+- Ruff, ESLint, TypeScript, Vite production build and `git diff --check`: passed.
+- `pip check`: no broken requirements; real `.env` files remain ignored.
+
+The managed sandbox blocks local PostgreSQL connections and stalls FastAPI's
+TestClient. Backend/project checks ran with approved broader execution access;
+tests were not disabled or weakened to bypass that environment restriction.

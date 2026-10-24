@@ -366,3 +366,52 @@ Se actualizaron arquitectura, UX, guía, roadmap y autoría. No hubo dependencia
 migraciones, assets binarios, cambios a Cajas/Pokédex ajenos al flujo, commits, push,
 merge, reset ni cambio de rama. No se atribuyen al estudiante revisiones personales
 o reflexiones no realizadas; debe revisar y explicar el material asistido por IA.
+
+## Semana 3 — Iteración 5A: identidad y autenticación Google
+
+**Fecha:** 24/10/2026. **Rama:** `feat/iteration-5-auth-inventory`.
+
+### Solicitud y decisiones
+
+Se solicitó implementar Google OpenID Connect real, usuarios persistentes y sesiones
+seguras, manteniendo el catálogo público y excluyendo inventario. Se inspeccionaron
+los requisitos, arquitectura, modelos, desarrollo, roadmap, UX, rutas, pruebas y
+migraciones existentes antes de cambiar código. Se conservó la carpeta no versionada
+`.superpowers/` y no se realizaron commits, pushes, merges ni resets.
+
+La implementación asistida por IA usa Authlib/joserfc para protocolo y validación
+criptográfica, autorización con PKCE S256/nonce/state vinculado al navegador,
+transacciones de un solo uso, usuarios UUID por `sub` de Google y sesiones opacas
+con solo digest persistido. Se añadieron `/auth/google/login`, callback, `/auth/me`
+y logout POST con Origin/CSRF. React restaura sesión y muestra el perfil real con
+estados ES/EN. No se añadieron cuentas falsas, inventario ni credenciales.
+
+### Evidencia y límites
+
+Las pruebas nuevas se escribieron antes de implementar: el primer ensayo detectó
+rutas/modelos ausentes y validaciones de configuración faltantes. Se usan tokens RSA
+firmados localmente y respuestas Google simuladas. Las pruebas PostgreSQL trabajan
+en esquemas desechables de la base dedicada y verifican reversibilidad e integridad.
+La conexión y TestClient quedaron restringidos dentro del sandbox; la ejecución con
+permisos aprobados confirmó que PostgreSQL sí estaba disponible, sin cambiar datos
+de desarrollo ni ocultar pruebas con skips.
+
+Los resultados finales de `bash scripts/check.sh` se registran al finalizar la
+validación. Pendientes: credenciales Google reales, consentimiento/callback real,
+verificación manual del navegador en escritorio/móvil y despliegue HTTPS. La guía
+exacta está en `docs/AUTHENTICATION.md`. No se afirma haber probado login real.
+
+### Validación final — 24/10/2026
+
+`bash scripts/check.sh` terminó con **código 0**: **43 pruebas de proveedores**,
+**155 de backend** (incluidas **6 de integración PostgreSQL**, ninguna omitida) y
+**232 de frontend en 22 archivos**. Ruff, ESLint, TypeScript, build de producción y
+verificación de whitespace pasaron. `pip check` no detectó dependencias rotas.
+
+La prueba concurrente contra PostgreSQL confirmó un solo callback exitoso y un
+solo intercambio de identidad; repetir login conservó el UUID al cambiar correo,
+rotó/inutilizó la sesión anterior y logout eliminó la sesión activa. La revisión
+independiente detectó y motivó regresiones para nombre opcional ausente, URL de foto
+malformada, errores de configuración con secretos y consultas OAuth en logs de
+error. Esas correcciones se verificaron antes del gate completo. Las pruebas no
+usan Google real ni modifican datos de desarrollo.

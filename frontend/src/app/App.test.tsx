@@ -1,9 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { withUnauthenticatedSession } from "../test/authSession";
 
 import { App } from "./App";
 
+
+beforeEach(() => {
+  vi.stubGlobal("fetch", withUnauthenticatedSession((url) => Promise.resolve(new Response(JSON.stringify(url.endsWith("/health")
+    ? { status: "healthy", api: "healthy", database: "healthy", version: "test" }
+    : { results: [] })))));
+});
+afterEach(() => vi.unstubAllGlobals());
 
 describe("PokéVault application shell", () => {
   test.each([
@@ -11,6 +19,7 @@ describe("PokéVault application shell", () => {
     ["/boxes", "Cajas"],
     ["/pokedex", "Pokédex"],
     ["/profile", "Perfil"],
+    ["/login", "Tu cuenta de PokéVault"],
   ])("renders direct route %s", (path, heading) => {
     render(<App initialEntries={[path]} />);
 

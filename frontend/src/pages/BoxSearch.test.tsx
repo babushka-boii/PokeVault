@@ -1,3 +1,4 @@
+import { withUnauthenticatedSession } from "../test/authSession";
 import { withPokemonDetails } from "../test/pokemonDetails";
 import { act, render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -15,7 +16,7 @@ function mockCatalog() {
       types: ['dark'], sprite_url: null,
     })) })));
   });
-  vi.stubGlobal('fetch', withPokemonDetails(request));
+  vi.stubGlobal('fetch', withUnauthenticatedSession(withPokemonDetails(request)));
   return request;
 }
 afterEach(() => vi.unstubAllGlobals());

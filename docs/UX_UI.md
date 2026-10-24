@@ -259,3 +259,20 @@ is a visual reference only, not a bundled asset or hardcoded expansion exception
 Automated pointer/component tests do not prove visual or real-device touch quality.
 No browser was available after connection diagnostics; desktop and 390 px review
 remain pending in the updated DEVELOPMENT.md checklist.
+
+## Iteration 5A — Login and real profile (2026-10-24)
+
+`/login` adds a responsive entry point within the existing cream/red/blue shell,
+with Continue with Google, loading/retry and friendly sanitized error messages in
+ES/EN. Public browsing remains available without signing in. `/profile` restores
+the server session and distinguishes loading, signed-out, authenticated and service
+failure states. Authenticated content comes from the backend: actual display name,
+optional email and Google profile picture, explicit sign-in status and logout.
+A failed or missing picture has a neutral fallback; no trainer identity or owned
+cards are fabricated. The curated trainer-avatar catalog remains future work.
+
+The current Google account photo is provider identity metadata, not a newly added
+custom photo-upload feature. Keyboard-native controls, visible focus and status/
+alert announcements fit existing conventions. Language/audio/sprite preferences
+remain independent. Automated component coverage is separate from manual desktop
+and 390 px review; real Google consent and cookie behavior remain pending credentials.

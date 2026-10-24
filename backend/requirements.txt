@@ -5,3 +5,5 @@ pydantic-settings==2.16.0
 sqlalchemy==2.1.5
 uvicorn==0.54.0
 httpx2==2.15.1
+authlib==1.9.1
+joserfc==1.7.1
