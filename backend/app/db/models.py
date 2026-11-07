@@ -1,11 +1,13 @@
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
+    Index,
     String,
     Uuid,
     func,
@@ -95,4 +97,49 @@ class OAuthTransaction(Base):
     )
     expires_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, index=True
+    )
+
+
+class InventoryCopy(Base):
+    """A physical card; duplicate catalog identifiers intentionally stay separate."""
+
+    __tablename__ = "inventory_copies"
+    __table_args__ = (
+        CheckConstraint(
+            "condition IN ('mint','near_mint','excellent','good',"
+            "'played','poor','unknown')",
+            name="ck_inventory_condition",
+        ),
+        CheckConstraint(
+            "language IN ('es','en','ja','fr','de','it',"
+            "'pt','ko','zh','id','th','other')",
+            name="ck_inventory_language",
+        ),
+        CheckConstraint(
+            "variant IN ('normal','holo','reverse','first_edition','other','unknown')",
+            name="ck_inventory_variant",
+        ),
+        CheckConstraint("length(notes) <= 2000", name="ck_inventory_notes"),
+        Index("ix_inventory_owner_created", "user_id", "created_at", "id"),
+        Index("ix_inventory_owner_card", "user_id", "card_id"),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    card_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    condition: Mapped[str] = mapped_column(String(16), nullable=False)
+    language: Mapped[str] = mapped_column(String(8), nullable=False)
+    variant: Mapped[str] = mapped_column(String(16), nullable=False)
+    acquired_on: Mapped[date | None] = mapped_column(Date)
+    notes: Mapped[str] = mapped_column(String(2000), nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
     )

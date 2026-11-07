@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.cards import router as cards_router
 from app.api.health import router as health_router
+from app.api.inventory import router as inventory_router
 from app.api.pokemon import router as pokemon_router
 from app.auth.google import GoogleOIDCClient
 from app.auth.middleware import AuthenticationPrivacyMiddleware
@@ -25,13 +26,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         CORSMiddleware,
         allow_origins=list(active_settings.cors_origins),
         allow_credentials=True,
-        allow_methods=["GET", "POST"],
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
         allow_headers=["Accept", "Content-Type", "X-CSRF-Token"],
     )
     app.add_middleware(AuthenticationPrivacyMiddleware)
     app.state.pokemon_provider = PokemonProvider()
     app.state.card_provider = CardProvider()
     app.include_router(auth_router)
+    app.include_router(inventory_router)
     app.include_router(pokemon_router)
     app.include_router(cards_router)
     app.include_router(health_router)

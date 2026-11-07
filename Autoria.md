@@ -238,3 +238,21 @@ propietarias nuevas. Se conservan los registros y atribuciones anteriores.
 **Límite de evidencia:** pruebas automáticas con proveedor simulado y base PostgreSQL
 de pruebas; no equivalen a login Google real, aprobación visual ni certificación
 formal de seguridad. No hubo commit, push o merge automático.
+
+## Iteración 5B — Inventario personal (07/11/2026)
+
+**Aporte del estudiante:** alcance y autorización de continuación desde su Mac,
+restricciones de seguridad/privacidad, preferencia por revisión local sin commits ni
+push y criterios de aceptación para inventario persistente.
+
+**Aporte asistido por IA (Codex):** inspección del repositorio/entorno macOS, plan,
+modelo SQLAlchemy/migración Alembic, CRUD con aislamiento y CSRF existentes, cliente y
+componentes React, diccionario ES/EN, pruebas de integración y regresión, revisión
+independiente y documentación. No se introdujeron dependencias ni assets nuevos;
+TCGdex sigue aportando datos/artwork remotos mediante el adaptador existente.
+
+**Límites:** identidades Google simuladas únicamente en pruebas, datos PostgreSQL de
+pruebas en esquemas desechables, sin credenciales expuestas/modificadas. La revisión
+y comprensión del código, configuración OAuth y aceptación manual corresponden al
+estudiante. Evidencia automatizada no equivale a login real ni aprobación visual.
+No hubo commit, push o merge automático.

@@ -22,14 +22,14 @@ export function ProfilePage() {
     <h1 id="profile-title">{dictionary.profile.title}</h1>
     <SessionNotice />
     {auth.status === "authenticated" && <>
-      <div className="auth-profile">
+      {!auth.validating && <div className="auth-profile">
         <ProfilePicture key={`${auth.user.id}:${auth.user.picture_url}`} user={auth.user} />
         <div className="auth-identity">
           <h2>{auth.user.display_name.trim() || dictionary.auth.account}</h2>
           {auth.user.email && <p>{auth.user.email}</p>}
           <p className="auth-status">{dictionary.auth.authenticated}</p>
         </div>
-      </div>
+      </div>}
       {auth.error && <p className="auth-error" role="alert">{dictionary.auth.errors[auth.error]}</p>}
       <button className="auth-button auth-button--secondary" type="button" onClick={auth.logout} disabled={auth.loggingOut}>
         {auth.loggingOut ? dictionary.auth.loggingOut : dictionary.auth.logout}

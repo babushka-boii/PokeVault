@@ -5,11 +5,13 @@ export type AuthState = {
   user: null;
   error: AuthErrorCode | null;
   loggingOut: false;
+  validating?: false;
 } | {
   status: "authenticated";
   user: AuthUser;
   error: AuthErrorCode | null;
   loggingOut: boolean;
+  validating?: boolean;
 };
 
 const unauthenticated: AuthState = { status: "unauthenticated", user: null, error: null, loggingOut: false };
@@ -29,6 +31,11 @@ export function createAuthStore() {
 
   function restore() {
     if (!active || state.loggingOut || pending) return;
+    // Until the cookie has been revalidated, no private identity is trusted.
+    // Marking validation unmounts private requests and disables CSRF access.
+    publish(state.status === "authenticated"
+      ? { ...state, validating: true }
+      : { status: "loading", user: null, error: null, loggingOut: false });
     const currentGeneration = generation;
     const controller = new AbortController();
     sessionController = controller;
@@ -69,6 +76,7 @@ export function createAuthStore() {
 
   return {
     getSnapshot: () => state,
+    getCsrfToken: () => state.status === "authenticated" && !state.loggingOut && !state.validating ? session?.csrf_token ?? null : null,
     subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
     activate: () => { active = true; restore(); },
     deactivate: () => {

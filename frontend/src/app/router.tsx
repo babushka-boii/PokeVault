@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import { AppShell } from "../components/AppShell";
+import { CollectionPage } from "../pages/CollectionPage";
 import { BoxesPage } from "../pages/BoxesPage";
 import { LoginPage } from "../pages/LoginPage";
 import { HomePage } from "../pages/HomePage";
@@ -18,6 +19,7 @@ export function AppRoutes() {
         <Route path="boxes" element={<BoxesPage />} />
         <Route path="pokedex" element={<PokedexPage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="collection" element={<CollectionPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="pokemon/:number/cards" element={<PokemonCardsPage />} />
         <Route path="cards/:id" element={<TcgCardPage />} />

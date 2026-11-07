@@ -20,6 +20,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [store]);
 
-  const value = useMemo(() => ({ ...state, retrySession: store.retrySession, logout: store.logout }), [state, store]);
+  const value = useMemo(() => ({ ...state, retrySession: store.retrySession, logout: store.logout, getCsrfToken: store.getCsrfToken }), [state, store]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

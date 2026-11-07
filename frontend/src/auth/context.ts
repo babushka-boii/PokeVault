@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import type { AuthState } from "./store";
 
-type AuthContextValue = AuthState & { retrySession: () => void; logout: () => void };
+type AuthContextValue = AuthState & { retrySession: () => void; logout: () => void; getCsrfToken: () => string | null };
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function useAuth(): AuthContextValue {

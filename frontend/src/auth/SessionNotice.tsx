@@ -4,7 +4,7 @@ import { useAuth } from "./context";
 export function SessionNotice() {
   const auth = useAuth();
   const { dictionary } = useLocale();
-  if (auth.status === "loading") return <p role="status">{dictionary.auth.loading}</p>;
+  if ((auth.status === "loading" || auth.validating)) return <p role="status">{dictionary.auth.loading}</p>;
   if (auth.status !== "error") return null;
   return <div className="auth-notice">
     <p role="alert">{dictionary.auth.errors.session_unavailable}</p>

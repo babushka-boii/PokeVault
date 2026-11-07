@@ -177,3 +177,18 @@ See `Bitacora.md` for validation evidence and limitations.
 
 Automated evidence is recorded in DEVELOPMENT.md and Bitacora.md after the final
 gate. The earlier roadmap entries are historical records, not live completion claims.
+
+
+## Iteration 5B — Persistent personal inventory (2026-11-07)
+
+- [x] One PostgreSQL row per physical copy with condition/language/variant/date/notes.
+- [x] Reversible 0003 migration, authenticated CRUD, CSRF and strict user isolation.
+- [x] Add action in TCG details; personal collection with quantities, artwork,
+  exact-card/condition/language filters, pagination and per-copy edits/deletion.
+- [x] ES/EN states, offline provider fallback, automated persistence/concurrency tests.
+- [ ] Configure local Google OAuth and complete live login/reload/logout/relogin acceptance.
+- [ ] Student reviews changes before deciding on commit/push; none performed by Codex.
+
+Personal boxes, owned/missing set completion, wishlist, trades, prices and scanner
+are subsequent slices, outside 5B. This local implementation does not establish
+compliance with weekly commit dates or a final academic delivery deadline.

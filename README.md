@@ -4,7 +4,7 @@
 
 PokéVault is an academic Pokémon Trading Card Game (TCG) collection manager inspired by the classic Pokédex and Pokémon PC storage system. The product aims to make collecting, organizing, discovering, and tracking cards feel like an adventure rather than a spreadsheet.
 
-> **Project status:** Iteration 3 complete: runnable React frontend, FastAPI health API, native PostgreSQL migration baseline, ES/EN shell, and reproducible quality gate. Authentication and domain features remain pending.
+> **Project status:** Iterations 4, 5A and 5B implemented: public Pokédex/PC catalog/TCG details, Google OIDC sessions and persistent personal inventory. Local Google credentials and manual browser acceptance remain environment-specific; see the development guide.
 
 ## Project context
 
@@ -38,10 +38,10 @@ Artwork and sound use must be reviewed before assets are included or distributed
 | --- | --- |
 | Web frontend | React, TypeScript, Vite and React Router implemented |
 | Backend | FastAPI, Pydantic Settings, SQLAlchemy and Alembic implemented |
-| Database | Native PostgreSQL integration and revision `0001` implemented |
-| Sign-in | Google OpenID Connect (SSO) pending |
-| Pokémon reference data | PokéAPI sample feasibility validated; runtime catalog pending |
-| Pokémon TCG cards | TCGdex sample feasibility validated; runtime catalog pending |
+| Database | Native PostgreSQL integration and revisions `0001`–`0003` implemented |
+| Sign-in | Google OpenID Connect and secure persistent sessions implemented |
+| Pokémon reference data | PokéAPI runtime catalog, search and details implemented |
+| Pokémon TCG cards | TCGdex runtime catalog and personal inventory integration implemented |
 | Recognition | OCR, image processing and card matching pending |
 
 Fixed samples from both providers were validated on 2026-10-19. Complete catalog coverage, production price suitability, and asset licenses remain unresolved.
@@ -59,18 +59,22 @@ Fixed samples from both providers were validated on 2026-10-19. Complete catalog
 - [Weekly prompt and learning log](Bitacora.md)
 - [Authorship and AI assistance](Autoria.md)
 
-## Run the verified scaffold
+## Run locally
 
 After configuring `backend/.env` from its example and installing the documented dependencies:
 
-- Apply migration `0001` with `cd backend`, then `.venv/bin/alembic upgrade head`.
-- Start FastAPI with `.venv/bin/uvicorn app.main:create_app --factory --reload` from `backend`.
+- Apply migrations through `0003` with `cd backend`, then `.venv/bin/alembic upgrade head`.
+- Start FastAPI with `.venv/bin/uvicorn app.main:create_app --factory --reload --no-access-log` from `backend`.
 - Start Vite with `npm run dev --prefix frontend` from the repository root.
 - Open `http://localhost:5173`; the API health contract is at `http://localhost:8000/api/v1/health`.
 - Run all offline checks with `bash scripts/check.sh`.
 
-The frontend currently provides responsive `/`, `/boxes`, `/pokedex`, and `/profile` routes plus persisted Spanish/English switching. Only the Home health flow is connected to the API; the remaining routes are honest placeholders.
+The frontend provides `/`, `/boxes`, `/pokedex`, `/pokemon/:number/cards`,
+`/cards/:id`, `/login`, `/profile` and `/collection`, with persisted ES/EN switching.
+Sign in, open a real TCG card, choose Add to my collection, and manage individual
+copies in My collection. Quantities come from persisted copies; physical language
+and finish are independent of catalog artwork/text. No secrets belong in Git.
 
-**Iteration 3 evidence (validated October 19, 2026):** 43 provider tests, 9 backend tests including PostgreSQL, and 13 frontend tests passed alongside Ruff, ESLint, TypeScript checking, a Vite production build, migration upgrade/rollback verification, and healthy/degraded browser checks.
-
-No authentication, user inventory, functional boxes, live Pokédex/catalog, prices, scanner, or Pokémon artwork/audio is included yet. Course requirements and rubric remain the source of truth.
+See [inventory API and acceptance checks](docs/INVENTORY.md) and
+[macOS setup and validation](docs/DEVELOPMENT.md). Wishlist, personal boxes,
+set completion, prices and scanner remain future work.

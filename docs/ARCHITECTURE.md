@@ -1,6 +1,6 @@
 # PokéVault — Incremental architecture (v0.2)
 
-**Status:** The Iteration 3 scaffold and Iteration 4 initial Pokédex are implemented. Domain modules below remain planned unless explicitly marked as current.
+**Status:** Public catalog, Google authentication (5A) and personal copy inventory (5B) are implemented. Future modules are marked as conceptual.
 
 ## 1. System overview
 
@@ -32,9 +32,9 @@ Prefer a **modular monolith** over microservices for a single-developer academic
 
 - **Frontend implemented:** React + TypeScript + Vite + React Router, with original CSS and typed ES/EN dictionaries.
 - **Frontend implemented:** typed backend Pokédex client, responsive species grid, loading/empty/error/retry and missing-sprite states.
-- **Frontend pending:** inventory data fetching, component libraries and charts; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
+- **Frontend implemented (5B):** typed inventory client, individual-copy forms, quantities, filters and pagination. Component libraries and charts remain pending; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
 - **Backend implemented:** Python + FastAPI + Pydantic Settings + SQLAlchemy + Alembic.
-- **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001` and authentication migration `0002`; inventory tables remain pending.
+- **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001`, authentication migration `0002` and physical-copy migration `0003`.
 - **Auth implemented (5A):** backend Google OIDC code flow with S256 PKCE, browser-bound single-use transactions and digest-backed opaque server sessions. Live credentials/manual login remain pending; see `AUTHENTICATION.md`.
 - **Language:** checked-in ES/EN translation dictionaries; no automatic translation service.
 - **Scanning:** restricted image upload, preprocessing (OpenCV candidate), OCR engine to be selected, extract number/name/set, rank catalog matches, manual confirmation.
@@ -65,7 +65,7 @@ backend/
   migrations/
 ```
 
-`api`, `core`, `db`, `pokemon`, and `cards` exist today. The `pokemon` module contains response schemas and an isolated PokéAPI adapter. The remaining domain directories are conceptual boundaries for later vertical slices.
+`api`, `core`, `db`, `auth`, `pokemon`, `cards` and `inventory` exist today. The `pokemon` module contains response schemas and an isolated PokéAPI adapter. The remaining domain directories are conceptual boundaries for later vertical slices.
 
 ## 4. Domain model directions (NOT a final ERD)
 
@@ -137,7 +137,7 @@ APIs need response schemas, pagination, auth scopes, mutations and error contrac
 ## 8. Architecture decisions still open
 
 1. Hosted database and storage options appropriate to available academic resources.
-2. Per-copy versus batch-based inventory representation; transaction effects on quantity.
+2. Future transaction effects on quantity; 5B settles inventory representation as one row per physical copy.
 3. Modeling automatic rule-based boxes versus manual membership and cross-box views.
 4. Provider ID normalization, variants, and ambiguous OCR matches.
 5. Actual sound/artwork licensing and whether assets can be bundled or must be user supplied / public-domain alternatives.
@@ -357,3 +357,25 @@ its internal UUID; client-provided account IDs confer no access. Inventory,
 collections, trades and custom boxes are not implemented. See
 [AUTHENTICATION.md](AUTHENTICATION.md) for the API contract, lifecycle, security
 sources, deployment constraints and exact Google Console configuration.
+
+## Iteration 5B — Personal inventory
+
+`api/inventory.py` reuses `require_current_user` for reads and `require_csrf` for
+writes. Every lookup includes both copy UUID and session-derived user UUID; forged
+owners/card changes are rejected. Foreign copies and absent copies return the same
+404. CORS permits PUT/DELETE with the existing trusted origins and CSRF header.
+Auth and inventory responses, including failures, carry no-store/no-cache headers.
+
+`inventory/schemas.py` separates physical language/condition/variant from public
+catalog translation. `inventory_copies` references only stable TCGdex IDs and internal
+users, without duplicating public card data. Create verifies catalog identity; saved
+copy CRUD works independently of TCGdex. Transactions roll back and return sanitized
+503s on database errors. PostgreSQL list queries use REPEATABLE READ so quantities,
+total and page rows share a snapshot even during concurrent changes.
+
+React keeps inventory only in mounted private components, never localStorage.
+Session revalidation hides private content, aborts inventory requests and disables
+mutation credentials immediately; resolved logout/account changes clear private
+components. One active editor/confirmation locks other mutations, filters and
+pagination, avoiding lost drafts during list refresh. Catalog hydration is grouped
+by card ID per page and independent of inventory loading. See INVENTORY.md.

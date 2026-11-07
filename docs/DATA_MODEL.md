@@ -1,8 +1,8 @@
 # PokéVault logical data model
 
-The original model below defines the planned inventory domain. Iteration 5A
-implements only the authentication subset described at the end of this file;
-catalog and inventory entities remain conceptual unless stated otherwise.
+The original model below defines the planned inventory domain. Iteration 5A implements authentication and 5B implements physical copies as
+described below. Persistent public catalog tables and personal box entities remain
+conceptual unless stated otherwise.
 
 ```mermaid
 erDiagram
@@ -85,3 +85,31 @@ Favorite Pokémon uses a bounded National Dex reference until a persistent speci
 catalog exists. Optional preferences are foundations, not settings-editing APIs.
 Future inventory must FK the internal UUID and enforce same-user membership as
 specified above; no owned-copy/collection/wishlist tables are added in 5A.
+
+## Implemented inventory subset — Iteration 5B (2026-11-07)
+
+`InventoryCopy` maps to `inventory_copies` (Alembic `0003`, parent `0002`).
+
+| Column | Contract |
+| --- | --- |
+| id | UUID primary key; one immutable identity per physical copy |
+| user_id | Required FK to users.id, ON DELETE CASCADE; derived from session |
+| card_id | Required stable TCGdex identifier, up to 100 characters; validated on create |
+| condition | mint, near_mint, excellent, good, played, poor, unknown |
+| language | es, en, ja, fr, de, it, pt, ko, zh, id, th, other |
+| variant | normal, holo, reverse, first_edition, other, unknown |
+| acquired_on | Nullable calendar date |
+| notes | Required string, at most 2000 characters; empty allowed |
+| created_at / updated_at | Timezone-aware database timestamps; ORM updates updated_at |
+
+Database checks constrain all enumerated attributes and note length. Indexes on
+(user_id, created_at, id) and (user_id, card_id) support private queries. No uniqueness
+constraint on (user_id, card_id): two physical copies must remain distinct. There is
+no quantity column: grouped counts are derived from physical rows under the active
+filters. Notes can describe a finish/language represented as other. Artwork remains
+provider data and is never evidence of a physical copy's language or finish.
+
+No CardPrinting FK exists yet because the runtime catalog is external. Future
+catalog persistence must preserve these stable IDs. Downgrading 0003 removes only
+inventory, leaving auth tables intact; reversal is tested on disposable schemas,
+never on populated development data.

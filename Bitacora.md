@@ -415,3 +415,40 @@ independiente detectó y motivó regresiones para nombre opcional ausente, URL d
 malformada, errores de configuración con secretos y consultas OAuth en logs de
 error. Esas correcciones se verificaron antes del gate completo. Las pruebas no
 usan Google real ni modifican datos de desarrollo.
+
+## Iteración 5B — Inventario persistente desde macOS
+
+**Fecha:** 07/11/2026. **Rama:** `feat/iteration-5-auth-inventory`.
+
+Se inspeccionó el checkout real del Mac: limpio, HEAD 0b7b2d2, referencia local de
+origin alineada, Python 3.14, Node 24 y PostgreSQL 18. Dependencias preinstaladas y
+`pip check` correcto. El sandbox impedía localhost; las pruebas PostgreSQL se ejecutan
+con acceso autorizado, sin omitirlas. No se copiaron supuestos de Arch ni se tocaron
+credenciales. Se detectó configuración Google incompleta: queda pendiente login real.
+
+Plan: `docs/superpowers/plans/2026-11-07-personal-inventory.md`. Se implementaron una
+fila por copia física, migración reversible 0003, CRUD con propietario derivado de
+sesión y CSRF, cantidades/filtros/paginación, formularios React, ES/EN y fallback de
+catálogo. Pruebas HTTP se observaron fallar antes de implementar. PostgreSQL verifica
+integridad, reversibilidad, persistencia y concurrencia en esquemas desechables.
+
+La revisión independiente señaló tres problemas concretos: datos visibles durante
+revalidación, borradores paralelos perdidos al refrescar y cantidades/filas de distintas
+instantáneas. Se reprodujeron con pruebas fallidas y se corrigieron mediante bloqueo
+privado inmediato, edición coordinada e instantánea REPEATABLE READ. Se conservó
+logout durante revalidación y se verifican regresiones de autenticación existentes.
+
+No se añadieron dependencias, wishlist, cajas personales, precios ni scanner. No se
+hicieron commits, push ni merge. El estudiante debe revisar el incremento y completar
+las comprobaciones manuales de INVENTORY.md; no se atribuye una prueba Google real.
+
+
+### Validación automatizada — 07/11/2026
+
+`bash scripts/check.sh` finalizó con código 0: **43 pruebas de proveedores**,
+**179 de backend** (incluidas **9 de PostgreSQL**, sin omisiones) y **240 de
+frontend en 23 archivos**. Ruff, ESLint, TypeScript, build y whitespace pasan.
+Prueba adicional de cambio de cuenta: 8/8 casos de inventario frontend correctos.
+La base local de desarrollo quedó en **0003 (head)** mediante upgrade aditivo.
+Las pruebas demuestran persistencia tras logout/relogin/reinicio de aplicación con
+Google simulado; login Google real y aprobación visual siguen pendientes.
