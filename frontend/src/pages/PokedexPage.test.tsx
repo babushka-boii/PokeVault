@@ -1,3 +1,4 @@
+import { withUnauthenticatedSession } from "../test/authSession";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
@@ -17,7 +18,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 test("loads backend data and translates types without refetching", async () => {
   const request = vi.fn().mockResolvedValue(respond());
-  vi.stubGlobal("fetch", request);
+  vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   const user = userEvent.setup();
   render(<App initialEntries={["/pokedex"]} />);
   expect(screen.getByRole("status")).toHaveTextContent("Cargando Pokémon");
@@ -35,7 +36,7 @@ test("loads backend data and translates types without refetching", async () => {
 });
 
 test("shows sanitized error and supports keyboard retry", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(new Response("secret", { status: 503 })).mockResolvedValueOnce(respond()));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockResolvedValueOnce(new Response("secret", { status: 503 })).mockResolvedValueOnce(respond())));
   const user = userEvent.setup();
   render(<App initialEntries={["/pokedex"]} />);
   expect(await screen.findByRole("alert")).not.toHaveTextContent("secret");
@@ -46,23 +47,23 @@ test("shows sanitized error and supports keyboard retry", async () => {
 });
 
 test("shows an empty state", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(respond([])));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockResolvedValue(respond([]))));
   render(<App initialEntries={["/pokedex"]} />);
   expect(await screen.findByText("No hay Pokémon disponibles.")).toBeVisible();
 });
 
 test.each([null, [{ ...pokemon, types: null }], [{ ...pokemon, sprite_url: "javascript:alert(1)" }]])("handles malformed data safely: %j", async (results) => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(respond(results)));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockResolvedValue(respond(results))));
   render(<App initialEntries={["/pokedex"]} />);
   expect(await screen.findByRole("alert")).toHaveTextContent("No se pudo cargar");
 });
 
 test("aborts the active request on navigation away", () => {
   let signal: AbortSignal | undefined;
-  vi.stubGlobal("fetch", vi.fn((_url, options) => {
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn((_url, options) => {
     signal = options.signal;
-    return new Promise(() => undefined);
-  }));
+    return new Promise<Response>(() => undefined);
+  })));
   const view = render(<App initialEntries={["/pokedex"]} />);
   view.unmount();
   expect(signal?.aborted).toBe(true);

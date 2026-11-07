@@ -259,3 +259,33 @@ is a visual reference only, not a bundled asset or hardcoded expansion exception
 Automated pointer/component tests do not prove visual or real-device touch quality.
 No browser was available after connection diagnostics; desktop and 390 px review
 remain pending in the updated DEVELOPMENT.md checklist.
+
+## Iteration 5A — Login and real profile (2026-10-24)
+
+`/login` adds a responsive entry point within the existing cream/red/blue shell,
+with Continue with Google, loading/retry and friendly sanitized error messages in
+ES/EN. Public browsing remains available without signing in. `/profile` restores
+the server session and distinguishes loading, signed-out, authenticated and service
+failure states. Authenticated content comes from the backend: actual display name,
+optional email and Google profile picture, explicit sign-in status and logout.
+A failed or missing picture has a neutral fallback; no trainer identity or owned
+cards are fabricated. The curated trainer-avatar catalog remains future work.
+
+The current Google account photo is provider identity metadata, not a newly added
+custom photo-upload feature. Keyboard-native controls, visible focus and status/
+alert announcements fit existing conventions. Language/audio/sprite preferences
+remain independent. Automated component coverage is separate from manual desktop
+and 390 px review; real Google consent and cookie behavior remain pending credentials.
+
+## Iteration 5B — My collection
+
+The main navigation adds My collection / Mi colección. Real TCG details offer an
+Add to my collection action after authentication. A shared accessible form captures
+physical condition, language, printing variant, acquisition date and personal notes,
+with translated labels, disabled repeated submission and retained values after errors.
+Saved copies are grouped by catalog ID with artwork, filtered quantities and distinct
+copy rows. Filters/pagination come from the private API. Edit/delete are coordinated
+so refreshing one saved copy cannot silently discard another draft. Delete requires
+confirmation. Catalog failures preserve management by ID, and artwork never implies
+the language or finish of the collector's physical copy. Private UI disappears during
+session validation, logout and account changes. Manual desktop/mobile approval is pending.

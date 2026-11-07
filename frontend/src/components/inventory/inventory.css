@@ -1,0 +1,25 @@
+.inventory-page { max-width: 1050px; margin-inline: auto; }
+.inventory-filters, .inventory-actions { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; margin-block: 1rem; }
+.inventory-filters label { display: grid; gap: .35rem; flex: 1 1 160px; }
+.inventory-page :is(input, select, textarea), .inventory-form :is(input, select, textarea) { font: inherit; width: 100%; min-width: 0; padding: .65rem; border: 2px solid #718877; border-radius: 6px; background: #fafcf1; color: #183e32; }
+.inventory-page button, .inventory-add button, .inventory-form button { font: inherit; min-height: 44px; padding: .6rem .85rem; border: 2px solid #315f4a; border-radius: 6px; background: #e6f0d8; color: #183e32; cursor: pointer; }
+.inventory-page button:disabled, .inventory-form button:disabled { opacity: .55; cursor: default; }
+.inventory-page :focus-visible, .inventory-add :focus-visible { outline: 3px solid #bf700f; outline-offset: 3px; }
+.inventory-group { margin-block: 1.5rem; padding: 1rem; border: 2px solid #71907c; border-radius: 10px; background: #f1f5e8; }
+.inventory-card-summary { display: flex; gap: 1rem; align-items: start; }
+.inventory-card-summary h2 { margin-top: .3rem; overflow-wrap: anywhere; }
+.inventory-art { width: 140px; flex: 0 0 140px; }
+.inventory-copies { padding: 0; list-style: none; }
+.inventory-copy { padding-block: 1rem; border-top: 1px solid #9aae95; }
+.inventory-copy p { overflow-wrap: anywhere; }
+.inventory-notes { white-space: pre-wrap; }
+.inventory-form { margin-block: 1rem; max-width: 560px; }
+.inventory-form fieldset { display: grid; gap: .4rem; padding: 1rem; border: 2px solid #71907c; border-radius: 8px; min-width: 0; }
+.inventory-form legend { font-weight: 700; }
+.inventory-form label:not(:first-of-type) { margin-top: .6rem; }
+.inventory-hint { font-size: .85rem; line-height: 1.5; }
+.inventory-add { margin-block: 1rem; }
+.inventory-confirm button { margin-right: .75rem; }
+@media (max-width: 520px) { .inventory-card-summary { flex-direction: column; } .inventory-art { width: 120px; flex-basis: auto; } }
+
+.inventory-filters { border: 0; padding: 0; min-width: 0; }

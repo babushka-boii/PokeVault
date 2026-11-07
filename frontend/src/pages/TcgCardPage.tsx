@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { AddToCollection } from "../components/inventory/AddToCollection";
 import { CardArtwork } from "../components/cards/CardArtwork";
 import { CardLanguageNote } from "../components/cards/CardLanguageNote";
 import { InteractiveCard } from "../components/cards/InteractiveCard";
@@ -63,6 +64,7 @@ export function TcgCardPage() {
               </dl>
               <CardLanguageNote card={card} />
             </header>
+            <AddToCollection cardId={card.id} />
             {card.category === "Pokemon" && <section className="tcg-detail-section tcg-pokemon-traits" aria-label={text.cardInformation}>
               <div className="tcg-hp-types">
                 {card.hp !== null && <p className="tcg-hp"><span>{text.hp}</span> <strong>{card.hp}</strong></p>}

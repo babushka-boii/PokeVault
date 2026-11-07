@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from alembic import command
 from alembic.config import Config
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 from sqlalchemy import inspect, select
 
 from app.db.base import create_session_factory
@@ -12,16 +12,28 @@ from app.db.health import check_database
 from app.db.models import AppMetadata
 
 BACKEND_ROOT = Path(__file__).parents[2]
-load_dotenv(BACKEND_ROOT / ".env")
+
+
+def _database_environment() -> dict[str, str | None]:
+    # Snapshot only DB configuration before per-test settings isolation. Never
+    # export the developer's OAuth/cookie settings into the process environment.
+    local_values = dotenv_values(BACKEND_ROOT / ".env")
+    return {
+        name: os.environ.get(name, local_values.get(name))
+        for name in ("DATABASE_URL", "POKEVAULT_TEST_DATABASE_URL")
+    }
+
+
+_DATABASE_ENVIRONMENT = _database_environment()
 
 
 def integration_url() -> str:
-    value = os.getenv("POKEVAULT_TEST_DATABASE_URL")
+    value = _DATABASE_ENVIRONMENT["POKEVAULT_TEST_DATABASE_URL"]
     if not value:
         pytest.skip(
             "POKEVAULT_TEST_DATABASE_URL is required for PostgreSQL integration tests"
         )
-    if value == os.getenv("DATABASE_URL"):
+    if value == _DATABASE_ENVIRONMENT["DATABASE_URL"]:
         pytest.fail(
             "POKEVAULT_TEST_DATABASE_URL must differ from the development DATABASE_URL"
         )

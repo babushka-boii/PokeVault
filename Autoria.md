@@ -1,7 +1,7 @@
 # Declaración de autoría — PokéVault
 
 **Proyecto:** TICS316, Diseño de Software (individual)  
-**Última actualización:** 2026-10-22 (Iteración 4)
+**Última actualización:** 2026-10-24 (Iteración 5A)
 
 Este archivo declara qué partes son de concepción del estudiante, cuáles han recibido apoyo de herramientas de IA y qué materiales externos se prevé consultar.
 
@@ -215,3 +215,44 @@ El código y la documentación son material co-construido con IA. El estudiante 
   manual permanece en DEVELOPMENT.md.
 - No se hicieron commits, push, merge, reset, cambios de rama, migraciones ni
   dependencias nuevas; se conservaron las modificaciones y directorios de herramientas.
+
+## Iteración 5A — Autenticación e identidad (24/10/2026)
+
+**Aporte del estudiante:** especificación detallada del alcance, seguridad, criterios
+de aceptación y restricciones; decisión de continuar sobre la rama existente sin
+implementar inventario ni publicar cambios.
+
+**Aporte asistido por IA (Codex):** inspección de arquitectura y pruebas, investigación
+de documentación primaria de Google/OWASP/Authlib, plan técnico, modelos y migración
+SQLAlchemy/Alembic, flujo OIDC/PKCE y sesiones FastAPI, capa tipada React de sesión,
+login/perfil ES/EN, pruebas deterministas y PostgreSQL, revisión de seguridad y
+actualización documental. El estudiante debe revisar y comprender las decisiones,
+configurar sus propias credenciales y completar la validación manual.
+
+**Dependencias/fuentes:** Authlib y joserfc aportan protocolo y criptografía; no se
+implementa firma criptográfica propia ni se copian plantillas de Google. Fuentes
+primarias y configuración exacta están enlazadas en `docs/AUTHENTICATION.md`.
+No se introducen secretos, avatares licenciados, inventario ficticio ni imágenes
+propietarias nuevas. Se conservan los registros y atribuciones anteriores.
+
+**Límite de evidencia:** pruebas automáticas con proveedor simulado y base PostgreSQL
+de pruebas; no equivalen a login Google real, aprobación visual ni certificación
+formal de seguridad. No hubo commit, push o merge automático.
+
+## Iteración 5B — Inventario personal (07/11/2026)
+
+**Aporte del estudiante:** alcance y autorización de continuación desde su Mac,
+restricciones de seguridad/privacidad, preferencia por revisión local sin commits ni
+push y criterios de aceptación para inventario persistente.
+
+**Aporte asistido por IA (Codex):** inspección del repositorio/entorno macOS, plan,
+modelo SQLAlchemy/migración Alembic, CRUD con aislamiento y CSRF existentes, cliente y
+componentes React, diccionario ES/EN, pruebas de integración y regresión, revisión
+independiente y documentación. No se introdujeron dependencias ni assets nuevos;
+TCGdex sigue aportando datos/artwork remotos mediante el adaptador existente.
+
+**Límites:** identidades Google simuladas únicamente en pruebas, datos PostgreSQL de
+pruebas en esquemas desechables, sin credenciales expuestas/modificadas. La revisión
+y comprensión del código, configuración OAuth y aceptación manual corresponden al
+estudiante. Evidencia automatizada no equivale a login real ni aprobación visual.
+No hubo commit, push o merge automático.

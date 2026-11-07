@@ -1,3 +1,4 @@
+import { withUnauthenticatedSession } from "../test/authSession";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
@@ -30,7 +31,7 @@ function mockBackend() {
     }
     return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
   });
-  vi.stubGlobal('fetch', request);
+  vi.stubGlobal('fetch', withUnauthenticatedSession(request));
   return request;
 }
 

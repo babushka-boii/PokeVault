@@ -4,8 +4,8 @@ set -eu
 repository_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$repository_root"
 
-python -m unittest discover -s tests -t .
-python -m research.providers.validate_providers report
+backend/.venv/bin/python -m unittest discover -s tests -t .
+backend/.venv/bin/python -m research.providers.validate_providers report
 
 backend/.venv/bin/python -m pytest backend/tests -v
 backend/.venv/bin/python -m ruff check backend

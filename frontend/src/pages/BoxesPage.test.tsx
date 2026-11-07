@@ -1,3 +1,4 @@
+import { withUnauthenticatedSession } from "../test/authSession";
 import { withPokemonDetails } from "../test/pokemonDetails";
 import { act, fireEvent, render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -10,7 +11,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 test("renders 30 slots, selects with keyboard, switches boxes and translates", async () => {
   const request = vi.fn().mockImplementation((url: string) => Promise.resolve(response(url.includes("offset=30") ? 31 : 1)));
-  vi.stubGlobal("fetch", withPokemonDetails(request));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(withPokemonDetails(request)));
   const user = userEvent.setup();
   render(<App initialEntries={["/boxes"]} />);
   expect(screen.getByRole("status")).toBeVisible();
@@ -32,7 +33,7 @@ test("renders 30 slots, selects with keyboard, switches boxes and translates", a
 });
 
 test("retries failures and shows empty slots", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockRejectedValueOnce(new Error("private")).mockResolvedValueOnce(response(1, 0)));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockRejectedValueOnce(new Error("private")).mockResolvedValueOnce(response(1, 0))));
   const user = userEvent.setup();
   render(<App initialEntries={["/boxes"]} />);
   expect(await screen.findByRole("alert")).not.toHaveTextContent("private");
@@ -43,7 +44,7 @@ test("retries failures and shows empty slots", async () => {
 
 test("persists sound preferences and handles unsupported audio", async () => {
   vi.stubGlobal("AudioContext", undefined);
-  vi.stubGlobal("fetch", withPokemonDetails(vi.fn().mockResolvedValue(response())));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(withPokemonDetails(vi.fn().mockResolvedValue(response()))));
   const user = userEvent.setup();
   render(<App initialEntries={["/boxes"]} />);
   const toggle = screen.getByRole("checkbox", { name: "Sonido" });
@@ -62,8 +63,8 @@ test("persists sound preferences and handles unsupported audio", async () => {
 
 test("late responses cannot replace the current box", async () => {
   let resolveFirst!: (value: Response) => void;
-  vi.stubGlobal("fetch", withPokemonDetails(vi.fn().mockImplementation((url: string) => url.includes("offset=0&")
-    ? new Promise<Response>((resolve) => { resolveFirst = resolve; }) : Promise.resolve(response(31)))));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(withPokemonDetails(vi.fn().mockImplementation((url: string) => url.includes("offset=0&")
+    ? new Promise<Response>((resolve) => { resolveFirst = resolve; }) : Promise.resolve(response(31))))));
   const user = userEvent.setup();
   render(<App initialEntries={["/boxes"]} />);
   await user.click(screen.getByRole("button", { name: "Caja siguiente" }));
@@ -74,10 +75,10 @@ test("late responses cannot replace the current box", async () => {
 });
 
 test("final box has five species and navigation ends there", async () => {
-  vi.stubGlobal("fetch", withPokemonDetails(vi.fn().mockImplementation((url: string) => {
+  vi.stubGlobal("fetch", withUnauthenticatedSession(withPokemonDetails(vi.fn().mockImplementation((url: string) => {
     const offset = Number(new URL(url).searchParams.get("offset"));
     return Promise.resolve(response(offset + 1, Math.min(30, 1025 - offset)));
-  })));
+  }))));
   const user = userEvent.setup();
   render(<App initialEntries={["/boxes"]} />);
   for (let i = 0; i < 34; i++) await user.click(screen.getByRole("button", { name: "Caja siguiente" }));
@@ -89,7 +90,7 @@ test("final box has five species and navigation ends there", async () => {
 
 test("menu icon mode changes without resetting selection, reloading catalog or playing audio", async () => {
   const request = vi.fn().mockResolvedValue(response());
-  vi.stubGlobal("fetch", withPokemonDetails(request));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(withPokemonDetails(request)));
   const audio = vi.fn();
   vi.stubGlobal("AudioContext", audio);
   const user = userEvent.setup();

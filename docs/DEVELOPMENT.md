@@ -358,3 +358,83 @@ Manual browser checklist (not performed in this session):
 
 Automated tests establish response and interaction behavior. A connected browser
 is still required to approve actual visual responsiveness and artwork loading.
+
+## Iteration 5A — Google sign-in setup
+
+The complete reproducible guide is [AUTHENTICATION.md](AUTHENTICATION.md). Install
+updated backend requirements, populate only the ignored backend `.env`, then run
+`alembic upgrade head` from `backend`. New environment variables are
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `FRONTEND_ORIGIN`,
+`AUTH_COOKIE_SECURE`, `AUTH_SESSION_TTL_SECONDS`, and `AUTH_TRANSACTION_TTL_SECONDS`.
+
+Register exactly `http://localhost:8000/api/v1/auth/google/callback` on a Google
+**Web application** client. Keep the frontend at `http://localhost:5173` and backend
+at `http://localhost:8000`. Use `AUTH_COOKIE_SECURE=false` only for local HTTP.
+Start Uvicorn with `--no-access-log` to keep OAuth callback queries out of logs;
+production proxies must redact them as well. Production needs HTTPS and Secure
+cookies, exact trusted origins and a same-site frontend/API arrangement.
+
+No Google credentials are supplied by this iteration. `/login` reports missing
+configuration safely and never produces a fake user. Tests use mocked Google
+transport and locally signed ID tokens; they do not require live credentials.
+PostgreSQL integration tests require the existing distinct dedicated test database;
+auth migration tests create/drop disposable schemas within it, not development data.
+
+Manual acceptance pending credentials: sign in/cancel/retry; refresh `/profile`;
+confirm actual name/email/picture; log out and check old cookie invalidation;
+repeat login and retain internal UUID; inspect desktop/390 px keyboard behavior;
+confirm public Pokédex, Boxes, search, TCG galleries/details remain accessible.
+Do not claim live login or production cookie verification from mocked tests.
+
+### Iteration 5A automated evidence — 2026-10-24
+
+`bash scripts/check.sh` completed with exit 0:
+
+- Provider fixtures/report: **43 tests passed** and offline report regenerated.
+- Backend: **155 passed**, including **6 PostgreSQL integration tests**, no skips.
+  Five new auth integration cases use disposable schemas and exercise migration
+  reversal, identity persistence, uniqueness/FKs, digest sessions/cascades, concurrent
+  callback consumption, returning-user email changes, session rotation and logout.
+- Frontend: **232 passed in 22 files**; 38 focused auth cases plus a login-route case
+  supplement the existing 193 tests.
+- Ruff, ESLint, TypeScript, Vite production build and `git diff --check`: passed.
+- `pip check`: no broken requirements; real `.env` files remain ignored.
+
+The managed sandbox blocks local PostgreSQL connections and stalls FastAPI's
+TestClient. Backend/project checks ran with approved broader execution access;
+tests were not disabled or weakened to bypass that environment restriction.
+
+## macOS continuation and inventory 5B — 2026-11-07
+
+Verified on Darwin arm64: Homebrew Node 24, Python 3.14 in backend/.venv and native
+PostgreSQL 18. Do not use macOS /usr/bin/python3 (3.9) for this project's environment.
+Dependencies were already installed; no dependency versions changed. `pip check`
+passed. No Arch paths or service commands are assumed on macOS.
+
+The quality gate now consistently invokes backend/.venv/bin/python, including the
+standard-library provider checks, so `bash scripts/check.sh` does not need a global
+`python` alias or an activated shell. PostgreSQL tests need local DB access and the
+existing distinct POKEVAULT_TEST_DATABASE_URL. A restricted sandbox can report
+Operation not permitted even while PostgreSQL is running; run authorized checks
+with localhost access, without weakening/skipping tests.
+
+From backend, use `.venv/bin/alembic upgrade head` to apply additive 0003; never run
+a development downgrade merely to test reversal. Inventory integration tests create
+and drop disposable schemas in the dedicated test database. Runtime endpoints and
+manual acceptance are in [INVENTORY.md](INVENTORY.md).
+
+The local configuration check found incomplete Google OAuth settings on this Mac.
+Private environment files were neither printed nor modified. Follow AUTHENTICATION.md
+locally before attempting a real sign-in; simulated test identities are never added
+to the development database.
+
+
+### Validación automatizada — 07/11/2026
+
+`bash scripts/check.sh` finalizó con código 0: **43 pruebas de proveedores**,
+**179 de backend** (incluidas **9 de PostgreSQL**, sin omisiones) y **240 de
+frontend en 23 archivos**. Ruff, ESLint, TypeScript, build y whitespace pasan.
+Prueba adicional de cambio de cuenta: 8/8 casos de inventario frontend correctos.
+La base local de desarrollo quedó en **0003 (head)** mediante upgrade aditivo.
+Las pruebas demuestran persistencia tras logout/relogin/reinicio de aplicación con
+Google simulado; login Google real y aprobación visual siguen pendientes.

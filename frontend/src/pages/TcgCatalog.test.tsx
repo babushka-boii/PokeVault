@@ -1,3 +1,4 @@
+import { withUnauthenticatedSession } from "../test/authSession";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
@@ -11,7 +12,7 @@ function serveGallery(results: unknown[] = [pikachuCard], options: Record<string
   const request = vi.fn((input: string) => Promise.resolve(
     input.includes("/cards?") ? jsonResponse(tcgPage(results, { ...options, page: Number(new URL(input).searchParams.get("page")) })) : jsonResponse(speciesDetails()),
   ));
-  vi.stubGlobal("fetch", request);
+  vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   return request;
 }
 
@@ -32,9 +33,9 @@ test("loads real card-shaped JSON with species context, full card preview, and c
 });
 
 test("keeps gallery available when independent species details fail", async () => {
-  vi.stubGlobal("fetch", vi.fn((input: string) => Promise.resolve(
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn((input: string) => Promise.resolve(
     input.includes("/cards?") ? jsonResponse(tcgPage()) : jsonResponse({ secret: "private" }, 503),
-  )));
+  ))));
   render(<App initialEntries={["/pokemon/25/cards"]} />);
   expect(await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" })).toBeVisible();
   expect(screen.getByRole("alert")).toHaveTextContent("No se pudieron cargar los detalles.");
@@ -65,9 +66,9 @@ test("applies expansion and sort, resets pagination, and preserves the full gall
 
 test("renders empty cards, retryable sanitized failures, and successful retry", async () => {
   let attempt = 0;
-  vi.stubGlobal("fetch", vi.fn((input: string) => Promise.resolve(
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn((input: string) => Promise.resolve(
     input.includes("/cards?") ? ++attempt === 1 ? jsonResponse({ secret: "internal exception" }, 503) : jsonResponse(tcgPage([])) : jsonResponse(speciesDetails()),
-  )));
+  ))));
   const user = userEvent.setup();
   render(<App initialEntries={["/pokemon/25/cards"]} />);
   expect(await screen.findByRole("alert")).toHaveTextContent("No se pudieron cargar las cartas.");
@@ -78,11 +79,11 @@ test("renders empty cards, retryable sanitized failures, and successful retry", 
 
 test("provides missing artwork fallback and fetches new language without stale Spanish results", async () => {
   let finishSpanish: ((response: Response) => void) | undefined;
-  vi.stubGlobal("fetch", vi.fn((input: string) => {
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn((input: string) => {
     if (!input.includes("/cards?")) return Promise.resolve(jsonResponse(speciesDetails(559)));
     if (input.includes("language=es")) return new Promise<Response>((resolve) => { finishSpanish = resolve; });
     return Promise.resolve(jsonResponse(tcgPage([scraggyCard])));
-  }));
+  })));
   const user = userEvent.setup();
   render(<App initialEntries={["/pokemon/559/cards"]} />);
   await user.click(screen.getByRole("button", { name: "English" }));
@@ -94,10 +95,10 @@ test("provides missing artwork fallback and fetches new language without stale S
 });
 
 test("renders detailed card fields from TCG content and full resolution artwork", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ ...pikachuCard,
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockResolvedValue(jsonResponse({ ...pikachuCard,
     abilities: [{ name: "TCG Ability", type: "Ability", effect: "Only the card's own effect." }],
     variants: [{ id: "first", type: "holo", subtype: "reverse", stamps: ["Promo"] }],
-  })));
+  }))));
   render(<App initialEntries={["/cards/sm9-33"]} />);
   expect(await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" })).toBeVisible();
   expect(screen.getByRole("img", { name: "Pikachu & Zekrom-GX" })).toHaveAttribute("src", "https://assets.tcgdex.net/en/sm/sm9/33/high.webp");
@@ -115,7 +116,7 @@ test("renders detailed card fields from TCG content and full resolution artwork"
 });
 
 test.each(["0", "1026", "-1", "abc", "1.5"])("rejects invalid species route %s without fetch", (number) => {
-  const request = vi.fn(); vi.stubGlobal("fetch", request);
+  const request = vi.fn(); vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   render(<App initialEntries={[`/pokemon/${number}/cards`]} />);
   expect(screen.getByRole("alert")).toHaveTextContent("El número de Pokémon no es válido.");
   expect(request).not.toHaveBeenCalled();
@@ -123,7 +124,7 @@ test.each(["0", "1026", "-1", "abc", "1.5"])("rejects invalid species route %s w
 
 test("allows dot identifiers and ignores external return destinations", async () => {
   const request = vi.fn().mockResolvedValue(jsonResponse({ ...bulbasaurCard, id: "sv03.5-001" }));
-  vi.stubGlobal("fetch", request);
+  vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   render(<App initialEntries={["/cards/sv03.5-001?returnTo=https%3A%2F%2Fevil.example"]} />);
   expect(await screen.findByRole("heading", { level: 1, name: "Bulbasaur" })).toBeVisible();
   expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/pokedex");
@@ -131,7 +132,7 @@ test("allows dot identifiers and ignores external return destinations", async ()
 });
 
 test("distinguishes missing card from transient failures", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({}, 404)));
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockResolvedValue(jsonResponse({}, 404))));
   render(<App initialEntries={["/cards/base1-44"]} />);
   expect(await screen.findByRole("alert")).toHaveTextContent("No se encontró esta carta.");
 });
