@@ -11,6 +11,7 @@ import { SelectedPokemon } from "../components/boxes/SelectedPokemon";
 import { StorageGrid } from "../components/boxes/StorageGrid";
 import { wallpapers, type Wallpaper } from "../components/boxes/wallpapers";
 import "../components/boxes/boxes.css";
+import { PersonalBoxesPage } from "./PersonalBoxesPage";
 
 function readBoxLocation(params: URLSearchParams) {
   const box = Number(params.get("box"));
@@ -30,7 +31,7 @@ function boxSearchParams(page: number, selected: number, wallpaper: Wallpaper): 
   });
 }
 
-export function BoxesPage() {
+function CatalogBoxesPage() {
   const { dictionary } = useLocale();
   const text = dictionary.boxes;
   const [params, setParams] = useSearchParams();
@@ -100,4 +101,17 @@ export function BoxesPage() {
         onClick={() => { updateLocation(page, selected, preset); audio.play("confirm"); }}>{text[preset]}</button>)}
     </fieldset><AudioControls {...audio} /></div>
   </section>;
+}
+
+export function BoxesPage() {
+  const { dictionary } = useLocale();
+  const [params, setParams] = useSearchParams();
+  const personal = params.get("mode") === "personal";
+  return <>
+    <div className="pc-mode-switch" role="group" aria-label={dictionary.boxes.title}>
+      <button type="button" aria-pressed={!personal} onClick={() => { const next = new URLSearchParams(params); next.delete("mode"); setParams(next); }}>{dictionary.personalBoxes.catalog}</button>
+      <button type="button" aria-pressed={personal} onClick={() => { const next = new URLSearchParams(params); next.set("mode", "personal"); setParams(next); }}>{dictionary.personalBoxes.personal}</button>
+    </div>
+    {personal ? <PersonalBoxesPage /> : <CatalogBoxesPage />}
+  </>;
 }

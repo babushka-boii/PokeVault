@@ -22,6 +22,15 @@ export const spanish = {
     languages: { es: "Español", en: "Inglés", ja: "Japonés", fr: "Francés", de: "Alemán", it: "Italiano", pt: "Portugués", ko: "Coreano", zh: "Chino", id: "Indonesio", th: "Tailandés", other: "Otro" },
     variants: { unknown: "Sin especificar", normal: "Normal", holo: "Holográfica", reverse: "Holográfica inversa", first_edition: "Primera edición", other: "Otra" },
   },
+  personalBoxes: {
+    title: "Mis cajas", catalog: "Catálogo público", personal: "Mis cajas", description: "Tu PC personal · Copias físicas de tu colección",
+    signIn: "Inicia sesión para organizar tus copias físicas.", manual: "Cajas manuales", owned: "Todas mis copias", unassigned: "Sin asignar", recent: "Adquisiciones recientes", view: "Vista de copias",
+    slots: "30 espacios de copias propias", selected: "Copia seleccionada", position: "Espacio", chooseSlot: "Selecciona un espacio para colocar una copia propia.", copyId: "UUID de copia", printing: "Ver impresión", noSpecies: "Sin asociación oficial de especie",
+    create: "Crear caja", newName: "Nombre de nueva caja", name: "Nombre de caja", manage: "Gestionar caja", save: "Guardar caja", chooseBox: "Elegir caja", earlier: "Mover caja antes", later: "Mover caja después", delete: "Eliminar caja", confirmDelete: "Confirmar eliminación de caja", deleteQuestion: "¿Eliminar esta caja?", retained: "Las copias permanecen en tu colección.", empty: "Aún no tienes cajas. Crea tu primera caja.",
+    move: "Mover copia", destination: "Caja de destino", destinationSlot: "Espacio de destino (1–30)", remove: "Quitar de la caja", removeNote: "Quitar una copia solo libera el espacio; la copia permanece en tu colección.", placeHere: "Colocar copia aquí", picker: "Elegir copia sin asignar", onlyUnassigned: "Solo copias propias que aún no están en una caja.", place: "Colocar", total: "Copias disponibles: {count}", noCopies: "No hay copias en esta vista.",
+    loading: "Cargando tus cajas…", loadError: "No se pudieron cargar tus cajas. Inténtalo de nuevo.", saved: "Cambio guardado.", conflict: "La caja cambió o el espacio está ocupado. Se actualizaron los datos; elige un espacio libre e inténtalo de nuevo.", error: "No se pudo guardar el cambio. Inténtalo de nuevo.", invalid: "Revisa el nombre, el espacio y los datos de la caja.", missing: "La caja o copia ya no está disponible. Se actualizaron los datos.", expired: "Tu sesión caducó o cambió. Vuelve a iniciar sesión.",
+    readonly: "Vista de solo lectura. Organiza las copias desde tus cajas manuales.", group: "Agrupar esta página por generación", groupNote: "Agrupación de esta página; no representa toda la colección.", generation: "Generación", mixedGeneration: "Varias generaciones", unknownGeneration: "Generación no disponible",
+  },
   languageAction: "English",
   home: {
     title: "Estado del sistema",
@@ -267,6 +276,15 @@ export const english: Dictionary = {
     conditions: { unknown: "Unspecified", mint: "Mint", near_mint: "Near mint", excellent: "Excellent", good: "Good", played: "Played", poor: "Poor" },
     languages: { es: "Spanish", en: "English", ja: "Japanese", fr: "French", de: "German", it: "Italian", pt: "Portuguese", ko: "Korean", zh: "Chinese", id: "Indonesian", th: "Thai", other: "Other" },
     variants: { unknown: "Unspecified", normal: "Normal", holo: "Holo", reverse: "Reverse holo", first_edition: "First edition", other: "Other" },
+  },
+  personalBoxes: {
+    title: "My boxes", catalog: "Public catalog", personal: "My boxes", description: "Your personal PC · Physical collection copies",
+    signIn: "Sign in to organize your physical copies.", manual: "Manual boxes", owned: "All my copies", unassigned: "Unassigned", recent: "Recent acquisitions", view: "Copy view",
+    slots: "30 owned copy positions", selected: "Selected copy", position: "Position", chooseSlot: "Select a position to place an owned copy.", copyId: "Copy UUID", printing: "View printing", noSpecies: "No official species association",
+    create: "Create box", newName: "New box name", name: "Box name", manage: "Manage box", save: "Save box", chooseBox: "Choose box", earlier: "Move box earlier", later: "Move box later", delete: "Delete box", confirmDelete: "Confirm box deletion", deleteQuestion: "Delete this box?", retained: "Copies remain in your collection.", empty: "You have no boxes yet. Create your first box.",
+    move: "Move copy", destination: "Destination box", destinationSlot: "Destination position (1–30)", remove: "Remove from box", removeNote: "Removing a copy only frees the position; the copy remains in your collection.", placeHere: "Place copy here", picker: "Choose an unassigned copy", onlyUnassigned: "Only owned copies that are not already in a box.", place: "Place", total: "Available copies: {count}", noCopies: "There are no copies in this view.",
+    loading: "Loading your boxes…", loadError: "Your boxes could not be loaded. Please try again.", saved: "Change saved.", conflict: "The box changed or the position is occupied. Data was refreshed; choose a free position and try again.", error: "The change could not be saved. Try again.", invalid: "Check the box name, position and details.", missing: "The box or copy is no longer available. Data was refreshed.", expired: "Your session expired or changed. Sign in again.",
+    readonly: "Read-only view. Organize copies from your manual boxes.", group: "Group this page by generation", groupNote: "This page is grouped; it does not represent the entire collection.", generation: "Generation", mixedGeneration: "Multiple generations", unknownGeneration: "Generation unavailable",
   },
   languageAction: "Español",
   home: {

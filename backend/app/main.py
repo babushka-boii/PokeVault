@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.auth import router as auth_router
+from app.api.boxes import router as boxes_router
 from app.api.cards import router as cards_router
 from app.api.health import router as health_router
 from app.api.inventory import router as inventory_router
@@ -34,6 +35,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.card_provider = CardProvider()
     app.include_router(auth_router)
     app.include_router(inventory_router)
+    app.include_router(boxes_router)
     app.include_router(pokemon_router)
     app.include_router(cards_router)
     app.include_router(health_router)

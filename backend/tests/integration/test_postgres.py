@@ -1,11 +1,13 @@
 import os
+import uuid
 from pathlib import Path
 
 import pytest
 from alembic import command
 from alembic.config import Config
 from dotenv import dotenv_values
-from sqlalchemy import inspect, select
+from sqlalchemy import create_engine, inspect, select, text
+from sqlalchemy.engine import make_url
 
 from app.db.base import create_session_factory
 from app.db.health import check_database
@@ -42,21 +44,34 @@ def integration_url() -> str:
 
 def test_migration_model_and_health_against_postgres(monkeypatch) -> None:
     database_url = integration_url()
-    monkeypatch.setenv("DATABASE_URL", database_url)
+    schema = f"metadata_test_{uuid.uuid4().hex}"
+    engine = create_engine(database_url)
+    with engine.begin() as connection:
+        connection.execute(text(f'CREATE SCHEMA "{schema}"'))
+    scoped_url = (
+        make_url(database_url)
+        .update_query_dict({"options": f"-csearch_path={schema}"})
+        .render_as_string(hide_password=False)
+    )
+    monkeypatch.setenv("DATABASE_URL", scoped_url)
     configuration = Config(BACKEND_ROOT / "alembic.ini")
     configuration.set_main_option("script_location", str(BACKEND_ROOT / "migrations"))
-    command.upgrade(configuration, "head")
-
-    session_factory = create_session_factory(database_url)
-    with session_factory() as session:
-        assert "app_metadata" in inspect(session.get_bind()).get_table_names()
-        record = AppMetadata(schema_version="0001")
-        session.add(record)
-        session.flush()
-        assert (
-            session.scalar(select(AppMetadata).where(AppMetadata.id == record.id))
-            == record
-        )
-        session.rollback()
-
-    assert check_database(session_factory).status == "healthy"
+    session_factory = create_session_factory(scoped_url)
+    try:
+        command.upgrade(configuration, "head")
+        with session_factory() as session:
+            assert "app_metadata" in inspect(session.get_bind()).get_table_names()
+            record = AppMetadata(schema_version="0001")
+            session.add(record)
+            session.flush()
+            assert (
+                session.scalar(select(AppMetadata).where(AppMetadata.id == record.id))
+                == record
+            )
+            session.rollback()
+        assert check_database(session_factory).status == "healthy"
+    finally:
+        session_factory.kw["bind"].dispose()
+        with engine.begin() as connection:
+            connection.execute(text(f'DROP SCHEMA "{schema}" CASCADE'))
+        engine.dispose()

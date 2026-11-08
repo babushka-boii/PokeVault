@@ -438,3 +438,68 @@ Prueba adicional de cambio de cuenta: 8/8 casos de inventario frontend correctos
 La base local de desarrollo quedó en **0003 (head)** mediante upgrade aditivo.
 Las pruebas demuestran persistencia tras logout/relogin/reinicio de aplicación con
 Google simulado; login Google real y aprobación visual siguen pendientes.
+
+## Iteration 5C — Personal PC boxes (2026-11-07)
+
+Implementation uses the existing macOS Python/Node/PostgreSQL environment and adds
+no dependencies. The corrected `feat/iteration-5c-personal-boxes` baseline matched
+`main` at `ad8279c` with a clean tree before implementation. No commits, pushes,
+merges, resets or rebases were performed by Codex.
+
+From the repository root, apply the additive migration locally with:
+
+```sh
+cd backend
+.venv/bin/alembic upgrade head
+.venv/bin/alembic current
+```
+
+`0004` follows `0003`; it adds box/membership tables and the composite inventory
+owner/identity unique key. It does not remove physical copies or authentication
+records. The local development database was first inspected read-only at `0003`,
+then upgraded additively and verified as **`0004 (head)`**. Never downgrade the
+populated development database to validate reversal. The test suite runs all
+migration upgrade/downgrade checks in fresh disposable schemas of the dedicated
+test database; the older metadata/health test now uses its own disposable schema too.
+
+Fresh final `bash scripts/check.sh` completed with **exit 0**:
+
+| Check | Result |
+| --- | --- |
+| Offline provider fixtures/report | 43 tests passed; deterministic report regenerated |
+| Backend | 247 passed, no failures or skips |
+| PostgreSQL integration subset | 42 passed, included in backend total; 33 new box cases |
+| Frontend | 265 passed in 27 files; 25 new cases including direct-copy navigation |
+| Ruff / ESLint | Passed |
+| TypeScript | Passed |
+| Vite production build | Passed |
+| `git diff --check` | Passed |
+
+New evidence covers composite owner FKs, valid positions, unique copy and slot,
+cascades, full capacity, whole-permutation ordering, competing slot/copy movement,
+box-limit concurrency, consistent count/page snapshots, acquisition-date recency,
+0004 reversal preserving exact 0003 inventory, and application restart/relogin.
+HTTP tests use real application/session/CSRF boundaries with deterministic providers.
+Frontend regressions cover stale read and mutation responses across account changes,
+copy identity, missing metadata/categories, paginated placement, keyboard focus and ES/EN.
+
+The restricted sandbox initially denied localhost database connections. Successful
+PostgreSQL/full-gate runs used approved localhost access; no tests were skipped or
+assertions weakened. Independent code review found no critical/important defect;
+an empty derived-view range was corrected and documentation clarified the explicit
+Place copy here action. The pending-mutation privacy regression also passes.
+
+Limited live native-browser inspection confirmed the original public catalog at
+box 27 with its 30 positions and the new My Boxes entry. Before migration, My Boxes
+showed its translated load-error state as expected. Further live checks were deferred
+while the browser was in use; no post-migration personal-box CRUD, full real OAuth
+cycle, mobile visual, audio or touch acceptance is claimed. Complete [BOXES.md](BOXES.md)
+using the real local session after reviewing the implementation.
+
+Known limits: 100 manual boxes per user; no automatic swaps or drag-only operation;
+concurrent successful moves of the same copy serialize with one final placement;
+box `updated_at` describes metadata/order and is not an optimistic contents version.
+Generation grouping applies to the bounded visible page, uses official species
+associations and explicit mixed/unknown/category fallbacks. Provider failure keeps
+inventory management usable with IDs. Collection-wide generation indexing, custom
+smart rules and set completion remain deferred (set completion belongs to 5D).

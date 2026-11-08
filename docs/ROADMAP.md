@@ -192,3 +192,25 @@ gate. The earlier roadmap entries are historical records, not live completion cl
 Personal boxes, owned/missing set completion, wishlist, trades, prices and scanner
 are subsequent slices, outside 5B. This local implementation does not establish
 compliance with weekly commit dates or a final academic delivery deadline.
+
+## Iteration 5C — Persistent personal PC boxes (2026-11-07)
+
+- [x] Audit the corrected clean 5C branch at `ad8279c`, including authentication,
+  persistent inventory and migration `0003`; no Git history changes by Codex.
+- [x] Implement separate manual boxes/memberships and reversible `0004`, composite
+  same-owner foreign keys, 30-position bounds, unique physical-copy placement and cascades.
+- [x] Add authenticated/CSRF-protected CRUD, ordering, transactional placement/movement/
+  removal, collision rejection and derived owned/unassigned/recent views.
+- [x] Preserve Catalog Boxes and add classic personal PC interactions, copy metadata,
+  direct inventory record navigation, category/multi-species fallbacks and ES/EN.
+- [x] Complete gate: 43 provider, 247 backend (42 PostgreSQL), 265 frontend tests;
+  Ruff, ESLint, TypeScript, production build and whitespace checks pass.
+- [x] Apply additive local `0004` and verify `0004 (head)` without development downgrade.
+- [ ] Complete real-browser personal-box acceptance in BOXES.md; only catalog and
+  pre-migration personal entry/error were inspected live in this session.
+- [ ] Student reviews the implementation and decides on any future Git publication.
+
+Generation grouping covers the bounded visible smart-view page using reliable official
+species associations, with explicit mixed/unknown/category fallbacks. A collection-wide
+generation index, automatic swaps, drag-and-drop and custom rule builder remain deferred.
+Set completion is reserved for 5D; the final global visual redesign remains postponed.

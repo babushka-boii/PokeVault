@@ -7,8 +7,10 @@ from sqlalchemy import (
     Date,
     DateTime,
     ForeignKey,
+    ForeignKeyConstraint,
     Index,
     String,
+    UniqueConstraint,
     Uuid,
     func,
 )
@@ -105,6 +107,7 @@ class InventoryCopy(Base):
 
     __tablename__ = "inventory_copies"
     __table_args__ = (
+        UniqueConstraint("user_id", "id", name="uq_inventory_owner_id"),
         CheckConstraint(
             "condition IN ('mint','near_mint','excellent','good',"
             "'played','poor','unknown')",
@@ -143,3 +146,71 @@ class InventoryCopy(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+class PersonalBox(Base):
+    """A user's manual arrangement; deleting it never deletes inventory copies."""
+
+    __tablename__ = "personal_boxes"
+    __table_args__ = (
+        UniqueConstraint("user_id", "id", name="uq_personal_boxes_owner_id"),
+        UniqueConstraint(
+            "user_id", "display_order", name="uq_personal_boxes_owner_order"
+        ),
+        CheckConstraint(
+            "length(name) BETWEEN 1 AND 80 AND name = trim(name)",
+            name="ck_personal_boxes_name",
+        ),
+        CheckConstraint("display_order >= 0", name="ck_personal_boxes_order"),
+        CheckConstraint(
+            "wallpaper IN ('classic','forest','ocean','night')",
+            name="ck_personal_boxes_wallpaper",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    display_order: Mapped[int] = mapped_column(nullable=False)
+    wallpaper: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="classic", server_default="classic"
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
+class BoxMembership(Base):
+    """One placement of an authentic physical copy, with owner-checked parents."""
+
+    __tablename__ = "box_memberships"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "box_id"],
+            ["personal_boxes.user_id", "personal_boxes.id"],
+            ondelete="CASCADE",
+            name="fk_box_membership_owned_box",
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "copy_id"],
+            ["inventory_copies.user_id", "inventory_copies.id"],
+            ondelete="CASCADE",
+            name="fk_box_membership_owned_copy",
+        ),
+        UniqueConstraint("copy_id", name="uq_box_membership_copy"),
+        CheckConstraint("position BETWEEN 0 AND 29", name="ck_box_membership_position"),
+        Index("ix_box_membership_owner", "user_id"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    box_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    position: Mapped[int] = mapped_column(primary_key=True)
+    copy_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)

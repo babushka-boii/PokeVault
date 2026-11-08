@@ -13,6 +13,8 @@ class AuthenticationPrivacyMiddleware:
             scope["path"].startswith("/api/v1/auth/")
             or scope["path"] == "/api/v1/inventory"
             or scope["path"].startswith("/api/v1/inventory/")
+            or scope["path"] == "/api/v1/boxes"
+            or scope["path"].startswith("/api/v1/boxes/")
         ):
             await self.app(scope, receive, send)
             return

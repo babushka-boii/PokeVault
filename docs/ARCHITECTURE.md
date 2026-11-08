@@ -354,7 +354,8 @@ no-store auth responses and sanitized errors protect the boundary.
 Public Pokédex, Boxes/search and TCG routes have no authentication dependency.
 Future private routes must use `require_current_user` and constrain records by
 its internal UUID; client-provided account IDs confer no access. Inventory,
-collections, trades and custom boxes are not implemented. See
+trades and set completion are not implemented. Personal inventory and boxes are
+described in the subsequent implementation sections. See
 [AUTHENTICATION.md](AUTHENTICATION.md) for the API contract, lifecycle, security
 sources, deployment constraints and exact Google Console configuration.
 
@@ -379,3 +380,27 @@ mutation credentials immediately; resolved logout/account changes clear private
 components. One active editor/confirmation locks other mutations, filters and
 pagination, avoiding lost drafts during list refresh. Catalog hydration is grouped
 by card ID per page and independent of inventory loading. See INVENTORY.md.
+
+## Iteration 5C — Persistent personal PC boxes
+
+`api/boxes.py` and `boxes/schemas.py` expose owner-scoped manual storage and read-only
+inventory views. Ownership comes exclusively from existing session/CSRF dependencies;
+the privacy middleware covers the entire boxes API. Composite database foreign keys
+enforce owner equality independently of application predicates. Owner-row locks
+serialize manual-box mutations; slot collisions fail with sanitized 409s. Reordering
+uses a two-phase unique-order update within one transaction. Existing inventory CRUD
+and public provider routes retain their boundaries.
+
+The frontend Boxes route retains its catalog implementation and adds a guarded
+personal workspace. Personal grid/details reuse menu icons, wallpapers, audio and
+sprite preferences. Slots carry physical copy UUIDs and metadata; public card data
+only enriches representations. Provider failure does not block storage operations.
+Private state is scoped to mounted authenticated components; account revalidation
+aborts obsolete work. Direct `/collection/:copyId` routes reuse the existing copy
+editor and can load without public provider access.
+
+Smart owned/unassigned/recent queries are paginated reads over existing inventory.
+Optional generation grouping is explicitly per visible page using verified official
+species associations, with mixed/unknown/category fallbacks. No persisted smart-rule
+engine or additional inventory representation exists. Migration, API and concurrency
+details are in [BOXES.md](BOXES.md).

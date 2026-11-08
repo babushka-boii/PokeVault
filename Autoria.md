@@ -256,3 +256,32 @@ pruebas en esquemas desechables, sin credenciales expuestas/modificadas. La revi
 y comprensión del código, configuración OAuth y aceptación manual corresponden al
 estudiante. Evidencia automatizada no equivale a login real ni aprobación visual.
 No hubo commit, push o merge automático.
+
+## Iteración 5C — Cajas personales persistentes (07/11/2026)
+
+**Aporte del estudiante:** especificación funcional y de integridad detallada,
+restricciones académicas/de seguridad, aceptación por copia física, decisión de
+posponer rediseño visual y trabajo fuera de alcance; corrección de la rama base y
+autorización explícita para continuar sin commits ni push.
+
+**Aporte asistido por IA (Codex):** auditoría de Git/arquitectura, plan, modelos y
+migración Alembic 0004, APIs autenticadas, transacciones/constraints, integración React
+con experiencia PC existente, localización, ruta de copia individual, vistas derivadas,
+pruebas HTTP/PostgreSQL/frontend, revisión independiente y actualización documental.
+Se usaron agentes en paralelo para backend, frontend, pruebas PostgreSQL y revisión.
+La revisión y comprensión del código por el estudiante siguen siendo necesarias.
+
+**Fuentes y reutilización:** adaptadores existentes de TCGdex/PokéAPI, menu icons,
+wallpapers CSS, efectos de audio originales y dependencias ya instaladas. No se
+añadieron paquetes, servicios, assets propietarios, metadatos de negocio ficticios
+ni una segunda representación de inventario. La accesibilidad de datos remotos no
+resuelve las revisiones de licencias pendientes del proyecto.
+
+**Evidencia y límites:** gate final con 43 pruebas de proveedores, 247 backend
+(42 PostgreSQL) y 265 frontend, lint/tipos/build correctos. Google/proveedores se
+simulan en pruebas deterministas; PostgreSQL usa esquemas desechables. La migración
+local aditiva quedó verificada en 0004 sin downgrade de desarrollo. La inspección
+real de navegador se limitó al catálogo y entrada/error personal anterior al upgrade;
+no equivale a aceptación completa, login Google real o aprobación visual/audio.
+Las credenciales y archivos .env no se modificaron ni imprimieron. No hubo commits,
+push, merge, reset ni rebase por Codex; se conservan las atribuciones e historia anteriores.
