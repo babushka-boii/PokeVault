@@ -25,7 +25,7 @@ async function request(path: string, options: RequestInit): Promise<unknown> {
 }
 const record = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const uuid = (v: unknown): v is string => typeof v === "string" && /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(v);
-function isCopy(v: unknown): v is InventoryCopy {
+export function isInventoryCopy(v: unknown): v is InventoryCopy {
   return record(v) && uuid(v.id) && typeof v.card_id === "string" && isCardId(v.card_id)
     && conditions.some((x) => x === v.condition) && physicalLanguages.some((x) => x === v.language)
     && variants.some((x) => x === v.variant) && typeof v.notes === "string" && v.notes.length <= 2000
@@ -37,7 +37,7 @@ export async function fetchInventory(filters: InventoryFilters, signal: AbortSig
   const params = new URLSearchParams({ offset: String(filters.offset), limit: "24" });
   for (const key of ["card_id", "language", "condition"] as const) if (filters[key]) params.set(key, filters[key]);
   const payload = await request(`?${params}`, { signal, headers: { Accept: "application/json" } });
-  if (!record(payload) || !Array.isArray(payload.results) || !payload.results.every(isCopy)
+  if (!record(payload) || !Array.isArray(payload.results) || !payload.results.every(isInventoryCopy)
     || payload.results.length > 24 || new Set(payload.results.map((r) => r.id)).size !== payload.results.length
     || payload.offset !== filters.offset || payload.limit !== 24 || !Number.isSafeInteger(payload.total) || (payload.total as number) < 0
     || !record(payload.quantities) || !Object.entries(payload.quantities).every(([key, n]) => isCardId(key) && Number.isSafeInteger(n) && (n as number) > 0)) {
@@ -51,9 +51,16 @@ export async function saveCopy(cardId: string, attributes: CopyAttributes, csrf:
     headers: { Accept: "application/json", "Content-Type": "application/json", "X-CSRF-Token": csrf },
     body: JSON.stringify(id ? attributes : { card_id: cardId, ...attributes }),
   });
-  if (!isCopy(payload) || payload.card_id !== cardId || (id && payload.id !== id)) throw new InventoryError(0);
+  if (!isInventoryCopy(payload) || payload.card_id !== cardId || (id && payload.id !== id)) throw new InventoryError(0);
   return payload;
 }
 export async function deleteCopy(id: string, csrf: string, signal: AbortSignal): Promise<void> {
   await request(`/${encodeURIComponent(id)}`, { method: "DELETE", signal, headers: { "X-CSRF-Token": csrf } });
+}
+
+export async function fetchInventoryCopy(id: string, signal: AbortSignal): Promise<InventoryCopy> {
+  if (!uuid(id)) throw new InventoryError(404);
+  const payload = await request(`/${encodeURIComponent(id)}`, { signal, headers: { Accept: "application/json" } });
+  if (!isInventoryCopy(payload) || payload.id !== id) throw new InventoryError(0);
+  return payload;
 }

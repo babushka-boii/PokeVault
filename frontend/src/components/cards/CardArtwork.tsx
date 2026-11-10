@@ -4,7 +4,9 @@ import type { TcgCard } from "../../services/cards";
 import { cardImageCandidates, type ArtworkCandidate } from "../../services/cardImages";
 import "./artwork.css";
 
-export function CardArtwork({ card, large = false }: { card: TcgCard; large?: boolean }) {
+type ArtworkCard = Pick<TcgCard, "id" | "name" | "language" | "image_sources">;
+
+export function CardArtwork({ card, large = false }: { card: ArtworkCard; large?: boolean }) {
   const [retry, setRetry] = useState(0);
   const candidates = cardImageCandidates(card, large);
   return <ArtworkSession key={`${card.id}:${large}:${JSON.stringify(candidates)}:${retry}`}
@@ -12,7 +14,7 @@ export function CardArtwork({ card, large = false }: { card: TcgCard; large?: bo
 }
 
 function ArtworkSession({ card, large, candidates, retry }: {
-  card: TcgCard; large: boolean; candidates: ArtworkCandidate[]; retry: () => void;
+  card: ArtworkCard; large: boolean; candidates: ArtworkCandidate[]; retry: () => void;
 }) {
   const { dictionary } = useLocale();
   const text = dictionary.cards;

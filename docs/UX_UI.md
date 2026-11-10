@@ -1,5 +1,49 @@
 # PokéVault — UX/UI blueprint (v0.1)
 
+## Iteration 5D — Expansion and completion flow (2026-11-09)
+
+The global visual redesign and personal-box scrolling refinement remain deferred.
+The Expansions navigation entry opens `/sets` with global name/ID search, supported
+series selection and chronological sorting before pagination. Official set logos,
+symbols, dates and separate printed/provider counts reuse existing asset fallbacks.
+Signed-in users receive bounded per-page progress badges; guests retain public access.
+
+An expansion page shows its canonical checklist and separate verified/printed counts.
+Numeric owned/missing/total/physical-copy labels accompany an accessible progress
+indicator. Duplicate copies affect quantity rather than completed entries. All/Owned/
+Missing filters and search apply to the complete expansion before paging. Unverified
+coverage shows an explicit warning with no fabricated percentage; unknown rarity or
+category is not invented from briefs. Spanish gaps use labeled English fallback.
+
+Existing card artwork proportions/fallbacks and AddToCollection/CopyForm are reused.
+Stable expansion links and validated return URLs preserve catalog context. Inventory
+writes refresh derived progress; account revalidation/logout immediately remove private
+badges/checklists and abort obsolete requests. ES/EN loading, empty, errors, retry and
+keyboard-native controls follow the existing design. See SET_COMPLETION.md for manual
+desktop/mobile acceptance; automated UI tests do not certify actual visual layout.
+
+## Iteration 5C functional PC storage (2026-11-07)
+
+The final global visual redesign remains deferred. Catalog Boxes retain their public
+species discovery experience. My Boxes adds persistent manual storage using the same
+left detail panel, compact 6×5 sprite surface, name/previous/next navigation, wallpaper,
+menu icons, audio and sprite preferences. Every position, including an empty one,
+supports arrow/Home/End keyboard navigation and native mouse/touch selection.
+
+The selected slot identifies one physical copy by UUID and condition/language/variant/
+date/notes; duplicate printings remain separate occupants. Multi-species cards display
+all official associations; Trainer/Energy use accessible category labels. A paginated
+unassigned picker fills empty positions. Destination box/position forms support moves
+and reorganization without dragging. Collisions show errors; remove keeps inventory;
+box deletion confirms explicitly that inventory survives.
+
+Read-only owned/unassigned/recent views remain separate from editable manual boxes.
+Generation grouping explicitly applies to the visible page with mixed/unknown/category
+fallbacks. ES/EN loading, empty, success, error and retry states are provided. Private
+content disappears during session revalidation/logout/account changes. Exact-copy
+navigation opens `/collection/:copyId`. See [BOXES.md](BOXES.md) for acceptance steps;
+automated UI tests do not establish real-device visual or audio acceptance.
+
 **Status:** Agreed product direction; detailed pixel layouts pending. The submitted classic Pokémon PC Box screenshot is the primary *reference*, not an asset licensed for reuse.
 
 ## 1. Design principles

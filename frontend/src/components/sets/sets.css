@@ -1,0 +1,37 @@
+.sets-page { min-width: 0; }
+.set-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); list-style: none; margin: 1.25rem 0; padding: 0; }
+.set-summary { background: #edf4fb; border: 1px solid #b4c5d5; border-radius: .65rem; min-width: 0; overflow-wrap: anywhere; padding: 1rem; }
+.set-summary h2 { font-size: 1.05rem; }
+.set-summary a { color: #173f70; text-underline-offset: .2rem; }
+.set-summary > p { color: #526073; font-size: .8rem; }
+.set-summary .tcg-set-logo { height: 4rem; width: 7rem; }
+.set-summary-counts, .set-facts { display: grid; gap: .85rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
+.set-summary-counts dt, .set-facts dt { color: #526073; font-size: .75rem; font-weight: 700; }
+.set-summary-counts dd, .set-facts dd { margin: .3rem 0 0; overflow-wrap: anywhere; }
+.set-heading { align-items: center; display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+.set-heading > div { min-width: 0; }
+.set-heading h1 { margin: 0; overflow-wrap: anywhere; }
+.set-heading .tcg-set-logo { height: 5rem; width: 8rem; }
+.set-heading p { align-items: center; display: flex; flex-wrap: wrap; gap: .8rem; }
+.set-symbol { height: 1.8rem; max-width: 2rem; object-fit: contain; }
+.set-progress { background: #edf4fb; border: 1px solid #b4c5d5; border-radius: .65rem; margin: 1rem 0; min-width: 0; padding: 1rem; }
+.set-progress h2 { font-size: 1rem; margin-top: 0; }
+.set-progress-number { font-weight: 800; }
+.set-progress progress { accent-color: #246c50; display: block; height: 1rem; max-width: 100%; width: 100%; }
+.set-progress--compact { background: transparent; border: 0; margin: .75rem 0 0; padding: 0; }
+.set-progress--compact .set-progress-number { font-size: .8rem; }
+.set-progress-unavailable, .set-coverage-note { color: #69552c; font-size: .8rem; line-height: 1.6; }
+.set-checklist .tcg-preview-link { height: auto; }
+.set-checklist code { font-size: .7rem; overflow-wrap: anywhere; }
+.set-ownership { font-size: .8rem; }
+.set-owned { color: #1e6345; font-weight: 800; }
+.set-missing { color: #69552c; }
+.set-checklist .inventory-form { font-size: .8rem; }
+.set-checklist .inventory-add button { max-width: 100%; overflow-wrap: anywhere; }
+.set-checklist .inventory-form :is(input, select, textarea) { min-width: 0; width: 100%; }
+.set-filters > div { flex-basis: 10rem; }
+@media (max-width: 520px) {
+  .set-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .set-checklist:has(.inventory-form) { grid-template-columns: minmax(0, 1fr); }
+  .set-heading .tcg-set-logo { height: 4rem; width: 6rem; }
+}

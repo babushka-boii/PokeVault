@@ -1,8 +1,10 @@
 # PokéVault logical data model
 
-The original model below defines the planned inventory domain. Iteration 5A implements authentication and 5B implements physical copies as
-described below. Persistent public catalog tables and personal box entities remain
-conceptual unless stated otherwise.
+The original model below defines the planned inventory domain. Iterations 5A–5C
+implement authentication, physical copies and personal boxes as described below.
+Persistent public catalog tables remain conceptual unless stated otherwise.
+Iteration 5D derives set completion from existing copies and a verified runtime
+provider checklist; it adds no persisted entities or migration.
 
 ```mermaid
 erDiagram
@@ -42,7 +44,7 @@ erDiagram
 - `CardSpecies` preserves display order and is unique by card/species. Pokémon printings may link to multiple species; Trainer and Energy printings have none. Missing provider links remain unresolved rather than guessed.
 - `AppUser` is identified by a unique external authentication subject. `UserSettings` is one-to-one and may reference a favorite species.
 - `OwnedCardCopy` represents one physical card. `CollectionBox` is a user-owned manual ordering container; species grouping is a query/view concern.
-- `BoxMembership` carries `user_id`. Composite foreign keys `(box_id, user_id)` and `(owned_copy_id, user_id)` prevent cross-user membership, and `(box_id, owned_copy_id)` is unique. Deleting a box cascades to memberships only, never to owned copies.
+- `BoxMembership` carries `user_id`. Composite ownership foreign keys prevent cross-user membership. The implemented 5C schema additionally limits each physical copy to one placement globally and each box position to one copy. Deleting a box cascades to memberships only, never to owned copies.
 
 Prices are evidence in this feasibility iteration, not persisted model entities: currency and observation time must be designed before monetary storage. Deferred extensions include price snapshots, transactions and lines, wishlist, decks, scans and candidates, smart-box rules, trade state, and sale state. Physical-copy identity must remain stable when those tables are introduced.
 
@@ -113,3 +115,41 @@ No CardPrinting FK exists yet because the runtime catalog is external. Future
 catalog persistence must preserve these stable IDs. Downgrading 0003 removes only
 inventory, leaving auth tables intact; reversal is tested on disposable schemas,
 never on populated development data.
+
+## Implemented personal boxes — Iteration 5C (2026-11-07)
+
+Alembic `0004` adds `PersonalBox` / `personal_boxes` and `BoxMembership` /
+`box_memberships`, reusing `InventoryCopy`. Box UUIDs are stable. Names are trimmed
+1–80 characters; wallpapers are constrained to classic/forest/ocean/night. Box
+`display_order` is nonnegative and unique per owner, separate from slot `position`.
+Timezone-aware created/updated timestamps describe the persisted box.
+
+Membership PK `(box_id, position)` and CHECK `position BETWEEN 0 AND 29` give exactly
+30 possible positions without precreating empty rows. UNIQUE `copy_id` prevents any
+physical copy appearing twice. Composite FKs `(user_id,box_id)` and `(user_id,copy_id)`
+reference UNIQUE `(user_id,id)` parent keys and enforce same-owner storage in SQL.
+Both cascade on deletion. Membership-owner index supports private placement queries;
+parent owner/order and owner/identity unique indexes support listing and FK checks.
+
+Copies may remain unassigned. Placement/movement never duplicates or updates an
+inventory record. Box deletion retains all inventory; inventory deletion cleans its
+membership. Downgrade to `0003` removes layouts/memberships and the additional copy
+owner/identity unique key, retaining all original inventory and authentication data.
+Reversal is tested only in disposable schemas. See [BOXES.md](BOXES.md) for contracts,
+transaction behavior and derived views.
+
+## Derived set completion — Iteration 5D (2026-11-09)
+
+The existing `(user_id, card_id)` inventory index supports `GROUP BY card_id` counts
+restricted to a complete, validated set membership list. There is no SetProgress
+table, completion flag, second ownership record or additional migration; head stays
+`0004`. Language/condition/variant/date/notes and manual box memberships are independent
+of distinct printing ownership. Deleting the last physical copy changes progress on
+the next read; duplicates affect quantity only.
+
+English TCGdex embedded set.card IDs establish canonical membership, with a stable
+checklist revision. Official printed count and provider total are separate metadata;
+the denominator is the unique complete checklist, not either count copied blindly.
+Incomplete/empty checklists have explicit unavailable percentages. Spanish fallback
+does not alter identity. See [SET_COMPLETION.md](SET_COMPLETION.md) for the formula,
+coverage limits, aggregation, API and future variant-specific master-set boundary.

@@ -438,3 +438,140 @@ Prueba adicional de cambio de cuenta: 8/8 casos de inventario frontend correctos
 La base local de desarrollo quedó en **0003 (head)** mediante upgrade aditivo.
 Las pruebas demuestran persistencia tras logout/relogin/reinicio de aplicación con
 Google simulado; login Google real y aprobación visual siguen pendientes.
+
+## Iteration 5C — Personal PC boxes (2026-11-07)
+
+Implementation uses the existing macOS Python/Node/PostgreSQL environment and adds
+no dependencies. The corrected `feat/iteration-5c-personal-boxes` baseline matched
+`main` at `ad8279c` with a clean tree before implementation. No commits, pushes,
+merges, resets or rebases were performed by Codex.
+
+From the repository root, apply the additive migration locally with:
+
+```sh
+cd backend
+.venv/bin/alembic upgrade head
+.venv/bin/alembic current
+```
+
+`0004` follows `0003`; it adds box/membership tables and the composite inventory
+owner/identity unique key. It does not remove physical copies or authentication
+records. The local development database was first inspected read-only at `0003`,
+then upgraded additively and verified as **`0004 (head)`**. Never downgrade the
+populated development database to validate reversal. The test suite runs all
+migration upgrade/downgrade checks in fresh disposable schemas of the dedicated
+test database; the older metadata/health test now uses its own disposable schema too.
+
+Fresh final `bash scripts/check.sh` completed with **exit 0**:
+
+| Check | Result |
+| --- | --- |
+| Offline provider fixtures/report | 43 tests passed; deterministic report regenerated |
+| Backend | 247 passed, no failures or skips |
+| PostgreSQL integration subset | 42 passed, included in backend total; 33 new box cases |
+| Frontend | 265 passed in 27 files; 25 new cases including direct-copy navigation |
+| Ruff / ESLint | Passed |
+| TypeScript | Passed |
+| Vite production build | Passed |
+| `git diff --check` | Passed |
+
+New evidence covers composite owner FKs, valid positions, unique copy and slot,
+cascades, full capacity, whole-permutation ordering, competing slot/copy movement,
+box-limit concurrency, consistent count/page snapshots, acquisition-date recency,
+0004 reversal preserving exact 0003 inventory, and application restart/relogin.
+HTTP tests use real application/session/CSRF boundaries with deterministic providers.
+Frontend regressions cover stale read and mutation responses across account changes,
+copy identity, missing metadata/categories, paginated placement, keyboard focus and ES/EN.
+
+The restricted sandbox initially denied localhost database connections. Successful
+PostgreSQL/full-gate runs used approved localhost access; no tests were skipped or
+assertions weakened. Independent code review found no critical/important defect;
+an empty derived-view range was corrected and documentation clarified the explicit
+Place copy here action. The pending-mutation privacy regression also passes.
+
+Limited live native-browser inspection confirmed the original public catalog at
+box 27 with its 30 positions and the new My Boxes entry. Before migration, My Boxes
+showed its translated load-error state as expected. Further live checks were deferred
+while the browser was in use; no post-migration personal-box CRUD, full real OAuth
+cycle, mobile visual, audio or touch acceptance is claimed. Complete [BOXES.md](BOXES.md)
+using the real local session after reviewing the implementation.
+
+Known limits: 100 manual boxes per user; no automatic swaps or drag-only operation;
+concurrent successful moves of the same copy serialize with one final placement;
+box `updated_at` describes metadata/order and is not an optimistic contents version.
+Generation grouping applies to the bounded visible page, uses official species
+associations and explicit mixed/unknown/category fallbacks. Provider failure keeps
+inventory management usable with IDs. Collection-wide generation indexing, custom
+smart rules and set completion remain deferred (set completion belongs to 5D).
+
+## Iteration 5D — Expansion explorer and completion (2026-11-09)
+
+The starting checkout was clean on `feat/iteration-5c-personal-boxes` at `dc233c4`,
+including committed 5A/5B/5C and migration 0004. Local main was its ancestor by one
+commit. A new `feat/iteration-5d-set-completion` branch was created at that complete
+baseline; no merge/rebase/reset/commit/push was performed. No dependencies changed.
+
+Completion uses the existing `(user_id,card_id)` inventory index and a single grouped
+query over full canonical set IDs. No new table/index/migration was necessary. Both
+Alembic code head and read-only development `current` remain **0004 (head)**; 5D
+did not apply a migration or alter populated development records. Tests create/drop
+only disposable PostgreSQL schemas using the existing dedicated test configuration.
+
+Live provider verification, interpretation and reproduction script are in
+`research/tcgdex/set_completion_*`. The corrected ten-request capture found Spanish
+Base Set's empty list despite total 102; swsh3 had 201 unique IDs vs 189 printed, and
+sv03.5 had 207 vs 165. English membership is therefore canonical. Four additional
+asset HEAD probes (two cards/logo 200, symbol 404) verify both available artwork and
+the continuing need for fallbacks. No image binaries or private configuration were
+printed or modified. Those live probes are separate from the deterministic gate.
+
+Full-set progress is independent of pagination/filters, quantities, physical metadata
+and box placement. Existing AddToCollection/CopyForm and exact copy routes remain
+the only inventory editor. New public/private API and cache/coverage details are in
+[SET_COMPLETION.md](SET_COMPLETION.md).
+
+The initial sandbox run could not connect to localhost PostgreSQL; approved runs used
+the real disposable schemas without skipping tests. The first approved baseline run
+already included new return-route red tests: two expected missing-feature failures,
+with existing regressions passing. Compare final results against the committed 5C
+evidence (43 provider, 247 backend/42 PostgreSQL, 265 frontend), not that intermediate
+red development run. Backend/API and frontend feature tests were observed failing
+before implementation; the first PostgreSQL completion case failed404 before APIs.
+
+Independent review and regression fixes cover locale views outliving canonical
+membership/physical classification, duplicate concurrent partial/failed provider
+fetches, canceled refresh cleanup, decimal half-up percentage consistency, competing
+inline drafts, browser-history editor locks and incorrect public rows appearing under
+a pending private ownership filter. In-flight account reads/saves are aborted and late
+responses cannot restore another user's private state. No assertions were weakened.
+
+Fresh final `bash scripts/check.sh` completed with **exit 0**, after the last
+clear-all-filter regression:
+
+| Check | 5C baseline | 5D final |
+| --- | ---: | ---: |
+| Offline provider fixtures/report | 43 passed | 43 passed |
+| Backend total | 247 passed | 355 passed (+108), no skips |
+| PostgreSQL subset (included in backend) | 42 passed | 66 passed (+24) |
+| New set-provider adapter cases (included in backend) | — | 62 passed |
+| Frontend | 265 passed / 27 files | 315 passed / 29 files (+50) |
+| Ruff / ESLint | Passed | Passed |
+| TypeScript | Passed | Passed |
+| Vite production build | Passed | Passed, 95 modules |
+| `git diff --check` | Passed | Passed |
+
+The other new backend cases are 22 HTTP/completion tests and 24 PostgreSQL cases.
+Frontend additions cover 26 initial route-level cases, one clear-all regression,
+18 service cases and five return-route cases. The required 12-copies/8-distinct/100
+example yields 8% in HTTP, PostgreSQL and UI tests. The SQL regression with 1,000
+physical copies verifies one grouped query without loading every physical row.
+Public browsing never queries inventory; batch progress uses one union aggregation.
+Current schema/indexes and migration head stay unchanged at 0004.
+
+No known failing automated check or unresolved blocking review finding remains.
+Manual browser/OAuth checks for 5D were not performed; use SET_COMPLETION.md. Actual
+desktop/mobile appearance, touch and artwork loading remain human acceptance,
+distinct from deterministic component tests and public HTTP probes. Retained limits
+are English physical catalog coverage, conservative new-series exclusions, 2,000
+briefs per expansion, nullable incomplete progress, and no official-numbered subset
+or variant master-set tracking. Provider availability remains an external dependency.

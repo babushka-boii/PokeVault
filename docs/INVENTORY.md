@@ -2,8 +2,8 @@
 
 Each record represents one physical card, owned by the authenticated internal user.
 The same stable TCGdex card ID may appear many times with independent properties.
-The public catalog and classic PC Boxes remain public; Boxes still represent species,
-not personal inventory.
+Catalog Boxes remain public species discovery. Iteration 5C adds separate My Boxes
+for placements of these same physical records; see [BOXES.md](BOXES.md).
 
 ## API contract
 
@@ -75,3 +75,12 @@ Automated tests mock only provider boundaries. PostgreSQL tests exercise migrati
 reversal, foreign keys/checks/cascade, concurrent insertion snapshots and inventory
 survival across real application sessions/restarts with simulated Google identity.
 This evidence does not establish live Google login or visual browser acceptance.
+
+## Iteration 5C integration
+
+`/collection/:copyId` opens an exact physical record and reuses the existing edit/
+delete form, even during provider failure. Personal PC slots link to this route and
+the existing printing details. Moving/removing a placement never changes a copy's
+UUID or attributes. Deleting inventory cascades its optional placement; deleting a
+manual box removes placements while retaining every copy. Counts and smart views
+remain derived from the original `inventory_copies` table.

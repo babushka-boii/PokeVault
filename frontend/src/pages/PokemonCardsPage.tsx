@@ -68,6 +68,7 @@ export function PokemonCardsPage() {
         </>}
       </section>
       <p className="tcg-coverage">{text.coverage}</p>
+      <p><Link to="/sets">{dictionary.sets.title}</Link>{setId && <> · <Link to={`/sets/${encodeURIComponent(setId)}`}>{dictionary.sets.view}</Link></>}</p>
       <div className="tcg-filters">
         <ExpansionSelector key={`${number}:${locale}`} sets={knownSets} selectedId={setId} status={state.kind} onSelect={(id) => updateFilter("set_id", id)} onRetry={retry} />
         <div className="tcg-sort-control"><label htmlFor="tcg-sort">{text.sort}</label>

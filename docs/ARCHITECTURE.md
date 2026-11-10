@@ -1,6 +1,8 @@
 # PokéVault — Incremental architecture (v0.2)
 
-**Status:** Public catalog, Google authentication (5A) and personal copy inventory (5B) are implemented. Future modules are marked as conceptual.
+**Status:** Public catalog, Google authentication (5A), personal copy inventory (5B),
+personal boxes (5C) and expansion/completion exploration (5D) are implemented.
+Future modules are marked as conceptual; live acceptance is separate from automated evidence.
 
 ## 1. System overview
 
@@ -20,7 +22,7 @@ FastAPI (Python)
   |-- Decks and completion analytics
   |-- Scanner: image processing + OCR + candidate ranking
           |
-          +---- PostgreSQL (durable application records and reference cache)
+          +---- PostgreSQL (durable accounts, physical copies and personal boxes)
           +---- Pokémon reference provider (PokéAPI, initial runtime integration)
           +---- TCG catalog provider (TCGdex, runtime public catalog)
           +---- Market-price source (availability to be validated)
@@ -34,7 +36,7 @@ Prefer a **modular monolith** over microservices for a single-developer academic
 - **Frontend implemented:** typed backend Pokédex client, responsive species grid, loading/empty/error/retry and missing-sprite states.
 - **Frontend implemented (5B):** typed inventory client, individual-copy forms, quantities, filters and pagination. Component libraries and charts remain pending; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
 - **Backend implemented:** Python + FastAPI + Pydantic Settings + SQLAlchemy + Alembic.
-- **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001`, authentication migration `0002` and physical-copy migration `0003`.
+- **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001`, authentication `0002`, physical copies `0003` and personal boxes `0004`. Completion adds no schema change.
 - **Auth implemented (5A):** backend Google OIDC code flow with S256 PKCE, browser-bound single-use transactions and digest-backed opaque server sessions. Live credentials/manual login remain pending; see `AUTHENTICATION.md`.
 - **Language:** checked-in ES/EN translation dictionaries; no automatic translation service.
 - **Scanning:** restricted image upload, preprocessing (OpenCV candidate), OCR engine to be selected, extract number/name/set, rank catalog matches, manual confirmation.
@@ -65,7 +67,9 @@ backend/
   migrations/
 ```
 
-`api`, `core`, `db`, `auth`, `pokemon`, `cards` and `inventory` exist today. The `pokemon` module contains response schemas and an isolated PokéAPI adapter. The remaining domain directories are conceptual boundaries for later vertical slices.
+`api`, `core`, `db`, `auth`, `pokemon`, `cards`, `inventory` and `boxes` exist today.
+Expansion catalog/completion schemas and services extend `cards` through `api/sets.py`;
+there is no parallel catalog provider. Other listed directories remain conceptual.
 
 ## 4. Domain model directions (NOT a final ERD)
 
@@ -76,7 +80,7 @@ backend/
 | TcgSet | Official TCG expansion and catalog card checklist. |
 | CardPrinting | Official printing identified by stable provider ID + set + local card number and variant when needed. |
 | CardPokemon | Many-to-many relationship for multiple species per card; Trainer/Energy may have zero species. |
-| OwnedCardCopy or InventoryBatch | User-owned cards and condition/price metadata; granularity requires final decision. |
+| InventoryCopy | Implemented one-row-per-physical-copy identity and collector-supplied condition/language/variant metadata; completion aggregates by stable card ID. |
 | Box / BoxMembership | User-defined grouping without duplicating inventory; smart rule boxes may be computed. |
 | WishlistEntry | Wanted official printing with priority and potential target quantity. |
 | Deck / DeckCard | Deck list and card quantity; format validation separate from storage. |
@@ -354,7 +358,8 @@ no-store auth responses and sanitized errors protect the boundary.
 Public Pokédex, Boxes/search and TCG routes have no authentication dependency.
 Future private routes must use `require_current_user` and constrain records by
 its internal UUID; client-provided account IDs confer no access. Inventory,
-collections, trades and custom boxes are not implemented. See
+trades and set completion are not implemented. Personal inventory and boxes are
+described in the subsequent implementation sections. See
 [AUTHENTICATION.md](AUTHENTICATION.md) for the API contract, lifecycle, security
 sources, deployment constraints and exact Google Console configuration.
 
@@ -379,3 +384,48 @@ mutation credentials immediately; resolved logout/account changes clear private
 components. One active editor/confirmation locks other mutations, filters and
 pagination, avoiding lost drafts during list refresh. Catalog hydration is grouped
 by card ID per page and independent of inventory loading. See INVENTORY.md.
+
+## Iteration 5C — Persistent personal PC boxes
+
+`api/boxes.py` and `boxes/schemas.py` expose owner-scoped manual storage and read-only
+inventory views. Ownership comes exclusively from existing session/CSRF dependencies;
+the privacy middleware covers the entire boxes API. Composite database foreign keys
+enforce owner equality independently of application predicates. Owner-row locks
+serialize manual-box mutations; slot collisions fail with sanitized 409s. Reordering
+uses a two-phase unique-order update within one transaction. Existing inventory CRUD
+and public provider routes retain their boundaries.
+
+The frontend Boxes route retains its catalog implementation and adds a guarded
+personal workspace. Personal grid/details reuse menu icons, wallpapers, audio and
+sprite preferences. Slots carry physical copy UUIDs and metadata; public card data
+only enriches representations. Provider failure does not block storage operations.
+Private state is scoped to mounted authenticated components; account revalidation
+aborts obsolete work. Direct `/collection/:copyId` routes reuse the existing copy
+editor and can load without public provider access.
+
+Smart owned/unassigned/recent queries are paginated reads over existing inventory.
+Optional generation grouping is explicitly per visible page using verified official
+species associations, with mixed/unknown/category fallbacks. No persisted smart-rule
+engine or additional inventory representation exists. Migration, API and concurrency
+details are in [BOXES.md](BOXES.md).
+
+## Iteration 5D — Expansion explorer and derived completion
+
+The existing CardProvider now supplies globally filtered/sorted physical set metadata
+and bounded canonical checklist briefs. English embedded set membership is validated
+against unique IDs and provider total; Spanish overlays matching identities without
+changing the denominator. Pocket and unknown-series exclusions are explicit. Existing
+species/card routes and DTOs retain compatibility. Shared clients, assets, metadata
+catalogs, concurrency and TTL/LRU infrastructure are reused.
+
+`api/sets.py` exposes public set metadata/pages and authenticated whole-set progress.
+`cards/set_completion.py` performs one owner-constrained grouped inventory query and
+applies checklist search/ownership filters before pagination. Full progress totals
+stay separate from matching page totals. The explorer uses a bounded batch of at most
+twelve sets and one union aggregation; no private state enters shared public caches.
+
+React adds `/sets` and `/sets/:setId`, shared artwork and inventory-add workflows,
+validated return destinations and numeric accessible progress. Account-keyed private
+subtrees abort on revalidation/logout/account changes while public metadata remains
+available. Completion has no stored flags or new database schema. Exact contracts,
+cache/coverage decisions and manual checks are in [SET_COMPLETION.md](SET_COMPLETION.md).
