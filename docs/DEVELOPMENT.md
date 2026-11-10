@@ -503,3 +503,75 @@ Generation grouping applies to the bounded visible page, uses official species
 associations and explicit mixed/unknown/category fallbacks. Provider failure keeps
 inventory management usable with IDs. Collection-wide generation indexing, custom
 smart rules and set completion remain deferred (set completion belongs to 5D).
+
+## Iteration 5D — Expansion explorer and completion (2026-11-09)
+
+The starting checkout was clean on `feat/iteration-5c-personal-boxes` at `dc233c4`,
+including committed 5A/5B/5C and migration 0004. Local main was its ancestor by one
+commit. A new `feat/iteration-5d-set-completion` branch was created at that complete
+baseline; no merge/rebase/reset/commit/push was performed. No dependencies changed.
+
+Completion uses the existing `(user_id,card_id)` inventory index and a single grouped
+query over full canonical set IDs. No new table/index/migration was necessary. Both
+Alembic code head and read-only development `current` remain **0004 (head)**; 5D
+did not apply a migration or alter populated development records. Tests create/drop
+only disposable PostgreSQL schemas using the existing dedicated test configuration.
+
+Live provider verification, interpretation and reproduction script are in
+`research/tcgdex/set_completion_*`. The corrected ten-request capture found Spanish
+Base Set's empty list despite total 102; swsh3 had 201 unique IDs vs 189 printed, and
+sv03.5 had 207 vs 165. English membership is therefore canonical. Four additional
+asset HEAD probes (two cards/logo 200, symbol 404) verify both available artwork and
+the continuing need for fallbacks. No image binaries or private configuration were
+printed or modified. Those live probes are separate from the deterministic gate.
+
+Full-set progress is independent of pagination/filters, quantities, physical metadata
+and box placement. Existing AddToCollection/CopyForm and exact copy routes remain
+the only inventory editor. New public/private API and cache/coverage details are in
+[SET_COMPLETION.md](SET_COMPLETION.md).
+
+The initial sandbox run could not connect to localhost PostgreSQL; approved runs used
+the real disposable schemas without skipping tests. The first approved baseline run
+already included new return-route red tests: two expected missing-feature failures,
+with existing regressions passing. Compare final results against the committed 5C
+evidence (43 provider, 247 backend/42 PostgreSQL, 265 frontend), not that intermediate
+red development run. Backend/API and frontend feature tests were observed failing
+before implementation; the first PostgreSQL completion case failed404 before APIs.
+
+Independent review and regression fixes cover locale views outliving canonical
+membership/physical classification, duplicate concurrent partial/failed provider
+fetches, canceled refresh cleanup, decimal half-up percentage consistency, competing
+inline drafts, browser-history editor locks and incorrect public rows appearing under
+a pending private ownership filter. In-flight account reads/saves are aborted and late
+responses cannot restore another user's private state. No assertions were weakened.
+
+Fresh final `bash scripts/check.sh` completed with **exit 0**, after the last
+clear-all-filter regression:
+
+| Check | 5C baseline | 5D final |
+| --- | ---: | ---: |
+| Offline provider fixtures/report | 43 passed | 43 passed |
+| Backend total | 247 passed | 355 passed (+108), no skips |
+| PostgreSQL subset (included in backend) | 42 passed | 66 passed (+24) |
+| New set-provider adapter cases (included in backend) | — | 62 passed |
+| Frontend | 265 passed / 27 files | 315 passed / 29 files (+50) |
+| Ruff / ESLint | Passed | Passed |
+| TypeScript | Passed | Passed |
+| Vite production build | Passed | Passed, 95 modules |
+| `git diff --check` | Passed | Passed |
+
+The other new backend cases are 22 HTTP/completion tests and 24 PostgreSQL cases.
+Frontend additions cover 26 initial route-level cases, one clear-all regression,
+18 service cases and five return-route cases. The required 12-copies/8-distinct/100
+example yields 8% in HTTP, PostgreSQL and UI tests. The SQL regression with 1,000
+physical copies verifies one grouped query without loading every physical row.
+Public browsing never queries inventory; batch progress uses one union aggregation.
+Current schema/indexes and migration head stay unchanged at 0004.
+
+No known failing automated check or unresolved blocking review finding remains.
+Manual browser/OAuth checks for 5D were not performed; use SET_COMPLETION.md. Actual
+desktop/mobile appearance, touch and artwork loading remain human acceptance,
+distinct from deterministic component tests and public HTTP probes. Retained limits
+are English physical catalog coverage, conservative new-series exclusions, 2,000
+briefs per expansion, nullable incomplete progress, and no official-numbered subset
+or variant master-set tracking. Provider availability remains an external dependency.

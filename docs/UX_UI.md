@@ -1,5 +1,27 @@
 # PokéVault — UX/UI blueprint (v0.1)
 
+## Iteration 5D — Expansion and completion flow (2026-11-09)
+
+The global visual redesign and personal-box scrolling refinement remain deferred.
+The Expansions navigation entry opens `/sets` with global name/ID search, supported
+series selection and chronological sorting before pagination. Official set logos,
+symbols, dates and separate printed/provider counts reuse existing asset fallbacks.
+Signed-in users receive bounded per-page progress badges; guests retain public access.
+
+An expansion page shows its canonical checklist and separate verified/printed counts.
+Numeric owned/missing/total/physical-copy labels accompany an accessible progress
+indicator. Duplicate copies affect quantity rather than completed entries. All/Owned/
+Missing filters and search apply to the complete expansion before paging. Unverified
+coverage shows an explicit warning with no fabricated percentage; unknown rarity or
+category is not invented from briefs. Spanish gaps use labeled English fallback.
+
+Existing card artwork proportions/fallbacks and AddToCollection/CopyForm are reused.
+Stable expansion links and validated return URLs preserve catalog context. Inventory
+writes refresh derived progress; account revalidation/logout immediately remove private
+badges/checklists and abort obsolete requests. ES/EN loading, empty, errors, retry and
+keyboard-native controls follow the existing design. See SET_COMPLETION.md for manual
+desktop/mobile acceptance; automated UI tests do not certify actual visual layout.
+
 ## Iteration 5C functional PC storage (2026-11-07)
 
 The final global visual redesign remains deferred. Catalog Boxes retain their public

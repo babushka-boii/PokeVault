@@ -24,6 +24,7 @@ export function TcgCardPage() {
   useEffect(() => { heading.current?.focus(); }, [location.pathname, card?.id]);
   const returnTo = safeReturnTo(searchParams.get("returnTo"));
   const fromGallery = /^\/pokemon\/\d+\/cards(?:\?|$)/.test(returnTo);
+  const fromSet = /^\/sets\/[^/?]+(?:\?|$)/.test(returnTo);
   const nestedReturn = fromGallery ? new URLSearchParams(returnTo.split("?")[1] ?? "").get("returnTo") : null;
   // Validate the nested destination separately; even a valid gallery URL may contain untrusted query values.
   const candidateOrigin = safeReturnTo(nestedReturn);
@@ -32,7 +33,7 @@ export function TcgCardPage() {
 
   return <section className="panel tcg-page tcg-card-page" aria-labelledby="tcg-card-title">
     <nav className="tcg-detail-navigation" aria-label={text.cardInformation}>
-      <Link className="tcg-back" to={returnTo}><span aria-hidden="true">← </span>{fromGallery ? text.backGallery : text.back}</Link>
+      <Link className="tcg-back" to={returnTo}><span aria-hidden="true">← </span>{fromSet ? dictionary.sets.backSet : fromGallery ? text.backGallery : text.back}</Link>
       {fromGallery && <Link className="tcg-origin" to={origin}>{origin.startsWith("/boxes") ? text.backBoxes : text.backPokedex}<span aria-hidden="true"> ↗</span></Link>}
     </nav>
     {!card && <h1 id="tcg-card-title" tabIndex={-1} ref={heading}>{text.detailTitle}</h1>}
@@ -56,6 +57,7 @@ export function TcgCardPage() {
               <p className="tcg-card-id">{card.id}</p>
               <div className="tcg-detail-set"><SetLogo set={card.set} decorative /><div><span className="tcg-filter-label">{text.set}</span>
                 <p lang={card.set.name_language ?? card.language}>{card.set.name}</p>
+                <Link to={`/sets/${encodeURIComponent(card.set.id)}`}>{dictionary.sets.view}</Link>
                 <small>{[card.set.serie?.name, card.set.release_date?.slice(0, 4)].filter(Boolean).join(" · ")}</small>
               </div></div>
               <dl className="tcg-primary-facts"><div><dt>{text.number}</dt><dd>#{card.local_id}</dd></div>

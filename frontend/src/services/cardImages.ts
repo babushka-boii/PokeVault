@@ -13,7 +13,7 @@ export function isOfficialAssetUrl(value: unknown): value is string {
 }
 
 /** Paths come only from verified printing resources; never guess another language or ID. */
-export function cardImageCandidates(card: TcgCard, large = false): ArtworkCandidate[] {
+export function cardImageCandidates<Card extends Pick<TcgCard, "image_sources">>(card: Card, large = false): ArtworkCandidate[] {
   const qualities = large ? ["high", "low"] : ["low", "high"];
   const candidates: ArtworkCandidate[] = [];
   const seen = new Set<string>();

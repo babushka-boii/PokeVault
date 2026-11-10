@@ -77,7 +77,9 @@ export function safeReturnTo(value: string | null | undefined): string {
   if (!value || value.length > 2048 || /[\\#\s]/.test(value) ||
     Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return fallback;
   const path = value.split("?")[0];
-  if (path === "/boxes" || path === "/pokedex") return value;
+  if (path === "/boxes" || path === "/pokedex" || path === "/sets") return value;
+  const expansion = /^\/sets\/([^/]+)$/.exec(path);
+  if (expansion && isSetId(expansion[1])) return value;
   const match = /^\/pokemon\/([^/]+)\/cards$/.exec(path);
   return match && parsePokemonNumber(match[1]) !== undefined ? value : fallback;
 }
@@ -122,7 +124,7 @@ function isDate(value: unknown): boolean {
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
-function isCardSet(value: unknown): value is CardSet {
+export function isCardSet(value: unknown): value is CardSet {
   return isRecord(value) && isText(value.id) && isSetId(value.id) && isText(value.name) &&
     isLanguage(value.name_language) && isImageUrl(value.logo_url) && isImageUrl(value.symbol_url) &&
     Array.isArray(value.logo_sources) && value.logo_sources.length <= 2 &&

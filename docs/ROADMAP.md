@@ -213,4 +213,34 @@ compliance with weekly commit dates or a final academic delivery deadline.
 Generation grouping covers the bounded visible smart-view page using reliable official
 species associations, with explicit mixed/unknown/category fallbacks. A collection-wide
 generation index, automatic swaps, drag-and-drop and custom rule builder remain deferred.
-Set completion is reserved for 5D; the final global visual redesign remains postponed.
+Set completion is implemented in 5D below; the final global visual redesign remains postponed.
+
+## Iteration 5D — Expansion explorer and derived completion (2026-11-09)
+
+- [x] Audit clean completed 5C at `dc233c4`, one commit ahead of local main; create
+  `feat/iteration-5d-set-completion` from that baseline without rewriting history.
+- [x] Verify live EN/ES set contracts, punctuation, printed/provider counts, Pocket
+  separation and representative artwork availability; retain compact dated evidence.
+- [x] Extend shared CardProvider with bounded physical-set discovery, global search/
+  series/date filters, canonical checklists and safe localized overlays.
+- [x] Derive full-set distinct owned/missing/copy totals from existing inventory;
+  no new progress tables, migrations or ownership flags.
+- [x] Add public `/sets` and `/sets/:setId`, account-isolated progress, All/Owned/
+  Missing filters, pagination, shared artwork/forms and context-preserving links.
+- [x] Validate full backend/provider/PostgreSQL/UI regressions; exact final counts
+  are recorded in DEVELOPMENT.md with the 5C comparison.
+- [x] Verify migration remains `0004 (head)` read-only; no 5D development DB writes.
+- [ ] Complete the real-browser acceptance checklist in SET_COMPLETION.md, including
+  mobile, actual Google session transitions and artwork fallback inspection.
+- [ ] Student reviews 5D changes and decides on publication; no Codex commit/push.
+
+5C is recorded in commit `dc233c4` and its local remote branch reference. Its full
+manual acceptance markers remain pending because this does not establish specific
+browser/OAuth checks. Earlier roadmap entries remain historical rather than claims
+that now-implemented authentication/inventory/boxes are still missing.
+
+Coverage is the recognized physical English catalog with explicit exclusions, not
+worldwide/all-language completeness. Partial English checklists never produce a
+percentage; Spanish gaps preserve canonical membership. Official-numbered subsets,
+variant master sets, prices, scanning, trading and the final visual redesign remain
+deferred. The personal-box scroll issue is outside 5D unless it blocks acceptance.

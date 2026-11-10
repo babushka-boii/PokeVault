@@ -7,6 +7,7 @@ from app.api.cards import router as cards_router
 from app.api.health import router as health_router
 from app.api.inventory import router as inventory_router
 from app.api.pokemon import router as pokemon_router
+from app.api.sets import router as sets_router
 from app.auth.google import GoogleOIDCClient
 from app.auth.middleware import AuthenticationPrivacyMiddleware
 from app.cards.provider import CardProvider
@@ -38,5 +39,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(boxes_router)
     app.include_router(pokemon_router)
     app.include_router(cards_router)
+    app.include_router(sets_router)
     app.include_router(health_router)
     return app

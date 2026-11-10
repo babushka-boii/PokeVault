@@ -285,3 +285,33 @@ real de navegador se limitó al catálogo y entrada/error personal anterior al u
 no equivale a aceptación completa, login Google real o aprobación visual/audio.
 Las credenciales y archivos .env no se modificaron ni imprimieron. No hubo commits,
 push, merge, reset ni rebase por Codex; se conservan las atribuciones e historia anteriores.
+
+## Iteración 5D — Expansiones y completitud derivada (09/11/2026)
+
+**Aporte del estudiante:** alcance detallado, reglas de completitud por printing ID,
+separación entre conteo impreso y total, requisitos de seguridad/cobertura/validación,
+límites académicos y decisión de continuar sin publicación ni rediseño visual.
+
+**Aporte asistido por IA (Codex):** auditoría Git/documentación/arquitectura, creación
+de rama 5D desde 5C completo, verificación pública acotada de TCGdex, contratos y extensión
+del adaptador existente, agregación SQL y APIs, páginas React ES/EN, reutilización de
+artwork/formularios, pruebas de proveedor/HTTP/PostgreSQL/interfaz, revisión independiente
+y documentación. Se usaron agentes paralelos para proveedor, frontend, PostgreSQL y
+revisión; Codex principal coordinó e implementó servicios/API/semántica de conteo.
+
+**Fuentes/reutilización:** documentación oficial de TCGdex enlazada en SET_COMPLETION.md
+y evidencias fechadas en research/tcgdex. Se reutilizaron dependencias, infraestructura
+de catálogo, imágenes remotas y componentes existentes; no se copiaron nuevas imágenes
+propietarias ni se inventaron metadatos ni se creó otro inventario. El tracker no supone
+que lengua/condición/acabado sean entradas distintas ni certifica un master-set.
+
+**Límites y responsabilidad:** el estudiante debe revisar y comprender el código,
+verificar datos/fuentes y completar aceptación manual. Pruebas deterministas simulan
+límites Google/TCGdex y usan esquemas PostgreSQL desechables. Las consultas públicas
+limitadas y HEAD no garantizan cobertura mundial, licencias o disponibilidad futura.
+No hubo prueba manual de Google o navegador 5D, migración nueva ni alteración de datos
+poblados, secretos o dependencias. No hubo commit/push/merge/rebase/reset por Codex.
+El gate final pasó con 43 pruebas de fixtures de proveedores, 355 backend (66 de
+PostgreSQL, 62 del nuevo adaptador de sets) y 315 frontend; Ruff, ESLint, TypeScript,
+build y whitespace correctos. Se conservan los registros/atribuciones previos;
+evidencia y comparación con 5C en DEVELOPMENT.md.

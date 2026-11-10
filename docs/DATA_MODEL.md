@@ -3,6 +3,8 @@
 The original model below defines the planned inventory domain. Iterations 5A–5C
 implement authentication, physical copies and personal boxes as described below.
 Persistent public catalog tables remain conceptual unless stated otherwise.
+Iteration 5D derives set completion from existing copies and a verified runtime
+provider checklist; it adds no persisted entities or migration.
 
 ```mermaid
 erDiagram
@@ -135,3 +137,19 @@ membership. Downgrade to `0003` removes layouts/memberships and the additional c
 owner/identity unique key, retaining all original inventory and authentication data.
 Reversal is tested only in disposable schemas. See [BOXES.md](BOXES.md) for contracts,
 transaction behavior and derived views.
+
+## Derived set completion — Iteration 5D (2026-11-09)
+
+The existing `(user_id, card_id)` inventory index supports `GROUP BY card_id` counts
+restricted to a complete, validated set membership list. There is no SetProgress
+table, completion flag, second ownership record or additional migration; head stays
+`0004`. Language/condition/variant/date/notes and manual box memberships are independent
+of distinct printing ownership. Deleting the last physical copy changes progress on
+the next read; duplicates affect quantity only.
+
+English TCGdex embedded set.card IDs establish canonical membership, with a stable
+checklist revision. Official printed count and provider total are separate metadata;
+the denominator is the unique complete checklist, not either count copied blindly.
+Incomplete/empty checklists have explicit unavailable percentages. Spanish fallback
+does not alter identity. See [SET_COMPLETION.md](SET_COMPLETION.md) for the formula,
+coverage limits, aggregation, API and future variant-specific master-set boundary.

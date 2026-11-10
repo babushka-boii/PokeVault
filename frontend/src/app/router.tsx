@@ -10,6 +10,8 @@ import { PokedexPage } from "../pages/PokedexPage";
 import { ProfilePage } from "../pages/ProfilePage";
 import { PokemonCardsPage } from "../pages/PokemonCardsPage";
 import { TcgCardPage } from "../pages/TcgCardPage";
+import { SetsPage } from "../pages/SetsPage";
+import { SetPage } from "../pages/SetPage";
 
 
 export function AppRoutes() {
@@ -25,6 +27,8 @@ export function AppRoutes() {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="pokemon/:number/cards" element={<PokemonCardsPage />} />
         <Route path="cards/:id" element={<TcgCardPage />} />
+        <Route path="sets" element={<SetsPage />} />
+        <Route path="sets/:setId" element={<SetPage />} />
       </Route>
     </Routes>
   );

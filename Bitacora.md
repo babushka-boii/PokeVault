@@ -513,3 +513,64 @@ y bloqueo por propietario simplifican concurrencia sin animaciones complejas. El
 timestamp de caja describe metadatos/orden, no una revisión optimista de su contenido.
 Quedan fuera intercambio automático, reglas inteligentes avanzadas, índice global
 por generación, set completion, precios, escaneo y rediseño global.
+
+## Iteración 5D — Explorador de expansiones y completitud
+
+**Fecha:** 09/11/2026. **Rama:** `feat/iteration-5d-set-completion`.
+
+**Solicitud del estudiante:** implementar expansiones físicas reales y progreso por
+IDs oficiales sobre el inventario persistente; diferenciar conteo impreso y checklist
+completo; evitar porcentajes falsos, duplicación de inventario, migraciones innecesarias
+y rediseño visual. Continuar autónomamente con rigor técnico y sin commits/push.
+
+La auditoría encontró árbol limpio en `dc233c4` (5C), con 5A/5B/5C y 0004 presentes;
+main era ancestro por un commit. Se creó la rama 5D desde esa base sin modificar
+historial. Se revisaron arquitectura/modelos/inventario/cajas/adaptadores/documentación
+e investigación previa. Plan: `docs/superpowers/plans/2026-11-09-set-completion.md`.
+
+La captura pública acotada verificó 221 expansiones EN / 160 ES, 206 físicas reconocidas
+y 15 Pocket (`tcgp`). Base Set ES devolvió lista vacía aun anunciando 102; EN entregó 102.
+Darkness Ablaze entregó 201 IDs frente a 189 impresos y 151 (`sv03.5`), 207 frente a 165.
+Cuatro HEAD adicionales confirmaron dos imágenes y un logo disponibles, y un símbolo 404.
+Se conservaron URLs/fechas/hashes/resúmenes; no se descargaron binarios de artwork.
+El primer intento de captura falló al resumir después de consultar; se repitieron
+las diez consultas para obtener evidencia verificable. Las pruebas normales son offline.
+
+Se extendió CardProvider con checklists canónicos EN y metadatos ES por identidad exacta,
+sin deducir sets por prefijos ni descargar cada detalle. Se implementaron catálogos
+globales filtrados/ordenados antes de paginar, cachés acotadas, límites/timeout y
+coalescencia de peticiones simultáneas. Fallos y cobertura parcial no se convierten en
+porcentajes ni contaminan caches verificadas. No hay un proveedor de catálogo paralelo.
+
+Las APIs personales agregan `inventory_copies` por propietario y `card_id` en una sola
+consulta sobre el checklist completo. Doce copias de ocho IDs en 100 entradas dan 8%
+con 12 copias físicas. Atributos/ubicación no alteran completitud; borrar la última copia
+vuelve a marcar faltante. No se añadieron tablas, índices ni migraciones; `0004 (head)`
+se verificó en modo lectura y no hubo escrituras 5D en los datos poblados de desarrollo.
+
+React agrega `/sets` y `/sets/:setId`, ES/EN, progreso accesible, All/Owned/Missing,
+checklists paginados y entradas desde navegación/catálogos/detalles. Reutiliza artwork
+y AddToCollection/CopyForm, conserva contexto al volver y aborta datos privados al
+revalidar/cambiar cuenta. Las altas y regreso tras borrar copias refrescan progreso.
+No se implementaron categorías/rareza inexistentes en los briefs ni precios ficticios.
+
+El trabajo se dividió en proveedor, interfaz, pruebas PostgreSQL y revisión independiente;
+Codex principal implementó contratos/API/agregación y trazabilidad. Las pruebas HTTP
+nuevas fallaron con 404 antes de implementar; la primera integración PostgreSQL también.
+Se corrigieron con regresiones: versiones EN/ES divergentes por TTL, consultas repetidas
+ante fallos/respuestas parciales simultáneos, redondeo porcentual entre Python/JS,
+pérdida de borradores, bloqueo al usar Atrás y fallback público bajo filtros privados pendientes. No se
+debilitaron seguridad ni pruebas para aprobar el gate.
+
+**Validación final:** `bash scripts/check.sh`, código **0**; **43** pruebas de fixtures
+de proveedores, **355** backend (incluidas **66** PostgreSQL y **62** del nuevo adaptador
+de sets), **315** frontend en **29** archivos. Ruff, ESLint, TypeScript, build de
+producción y whitespace correctos; sin skips. Frente a 5C: +108 backend (24 nuevas
+PostgreSQL) y +50 frontend. La última regresión verifica que Limpiar filtros restaura
+All, búsqueda vacía, orden por número y página 1 en una sola actualización de URL.
+Se verificó nuevamente `0004 (head)` en modo lectura. Evidencia en DEVELOPMENT.md.
+La validación automatizada no equivale a Google real ni aceptación visual/mobile;
+no se realizaron interacciones de navegador 5D. Checklist y límites en SET_COMPLETION.md.
+Se mantiene pendiente el rediseño global, scroll de cajas, variantes master-set,
+precios, escáner, wishlist, intercambio y decks. No hubo commit/push/merge/rebase/reset,
+dependencias nuevas ni credenciales modificadas/reveladas.
