@@ -1,0 +1,3 @@
+# Frozen pre-improvement evaluation reference
+
+These scanner source files preserve the actual Iteration 6 implementation before automatic card framing, regional OCR and HEIC support. They are evaluation references, never imported by the application. `evaluate_private.py --baseline` overlays them into a temporary copy of the current backend package, so the same existing CardProvider and public catalog facts serve both runs. No photographs or credentials are stored here. The previous temporary-only snapshot was lost across an interruption; this source record makes the new baseline reproducible. Source hashes are recorded by the evaluator. The original failed-network measurement remains in `real_photo_baseline.json`.

@@ -1,0 +1,128 @@
+{
+  "date": "2026-11-23",
+  "implementation": "improved",
+  "input_mode": "lossless full-image PNG decode",
+  "platform": "macOS-27.2.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.10",
+  "source_hashes": {
+    "worker.py": "8b57c20b9a06afb4e200ae5015ee246bcd8494d77fcf8629d04db517d42fd468",
+    "hybrid.py": "f44f3e28e3e66d2a7a50c9d9afded2db561e244a97f2fa41b92edc5e346af0cb",
+    "visual_worker.py": "c5b873f83ccdec22350cfa2e4232f803939aecd0a2157ebc0c67b12c9e00e3cd",
+    "__init__.py": "6bab311927e6a007070084d4bed9273f5a19632c36df8f0b735ca1447faf3667",
+    "matching.py": "c9300cd3eab938ef02accc1986a92770aff1c7b6a31599b46651db40b7ca65a6",
+    "ocr.py": "295d0768ad219be8f1aa8187215f6ddc90c47aceb748d50a3f006629bd9bbeb5",
+    "schemas.py": "2fad1ac6e9c555363f5679eeb36281e249c2bd5f8b7577cd6483498d90b69cda",
+    "extraction.py": "bb4581c1ff049c2e343a61208635f19c82b8c8485fd5d8f4b80f3749ba26e743",
+    "geometry.py": "03e095d5006371358824ea865c7de565536d58fb0ffc70c20f3d5401c8774d3e",
+    "images.py": "f756611f6cecd9c582c8f5ce7afc960b2335d4f4ead95ad59c1da828efd77a80",
+    "heif.py": "eeea786d963cd17c49fb484338cdf911fec54ca2ed4fea3ed42494eb545a8e44",
+    "visual.py": "b5d8b0562f962f8c5a6dfd77c7ebbe62b7eb7d58d7edbd77cfc1afc4430a9411",
+    "errors.py": "12ad7b562d68b132f5f90e57e0464139745c0d4f776c455f883bf1f3e7824136",
+    "normalization.py": "9fdcf6cfdef8865d2da060ab015f78b519a57f081ab2f6ffcd049a06021fa278"
+  },
+  "scope": "Two authorized real photos; no independent held-out photo set. No global accuracy claim.",
+  "memory_method": "Approximate 50ms sampled evaluator/descendant RSS including brief ps; not a hard ceiling. CPU sums process self and reaped children.",
+  "metrics": {
+    "name_exact": 2,
+    "number_exact": 2,
+    "total_exact": 2,
+    "top1": 2,
+    "top3": 2
+  },
+  "photos": [
+    {
+      "sample": "photo-1",
+      "original_sha256": "bd14523b2a4940bde384783fe93b4939fc921b07a5b7f2fb01801139ce3ef849",
+      "processed_input_sha256": "65da775c424b6813e54c89d183f2cefe850e2906a357267cf39969e8cd01c42c",
+      "mime": "image/png",
+      "expected_id": "me05-044",
+      "clues": {
+        "name": "Cranidos",
+        "local_number": "044",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": "en"
+      },
+      "ocr_warnings": [
+        "card_rectified"
+      ],
+      "card_detected": true,
+      "name_exact": true,
+      "number_exact": true,
+      "total_exact": true,
+      "top1": true,
+      "top3": true,
+      "candidates": [
+        {
+          "id": "me05-044",
+          "quality": "possible",
+          "evidence": [
+            "number_exact",
+            "name_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "match_warnings": [],
+      "limited": false,
+      "ocr_seconds": 1.8813,
+      "total_seconds": 4.7193,
+      "cpu_seconds": 3.0878,
+      "peak_sampled_tree_rss_mib": 234.66
+    },
+    {
+      "sample": "photo-2",
+      "original_sha256": "f69dd39fa2555a728cf28801c0d99ab3545ae3acb507429a0ab56b088d7b94e6",
+      "processed_input_sha256": "84ae761a08b74aea58454b3344914440d0afd25b762123d534a6551a121f0178",
+      "mime": "image/png",
+      "expected_id": "me05-086",
+      "clues": {
+        "name": "Armarouge",
+        "local_number": "086",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "ocr_warnings": [
+        "card_rectified"
+      ],
+      "card_detected": true,
+      "name_exact": true,
+      "number_exact": true,
+      "total_exact": true,
+      "top1": true,
+      "top3": true,
+      "candidates": [
+        {
+          "id": "me05-086",
+          "quality": "possible",
+          "evidence": [
+            "number_exact",
+            "name_exact",
+            "printed_total"
+          ]
+        },
+        {
+          "id": "me05-012",
+          "quality": "uncertain",
+          "evidence": [
+            "name_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "match_warnings": [
+        "conflicting_clues"
+      ],
+      "limited": false,
+      "ocr_seconds": 1.6127,
+      "total_seconds": 1.619,
+      "cpu_seconds": 1.9405,
+      "peak_sampled_tree_rss_mib": 265.05
+    }
+  ]
+}

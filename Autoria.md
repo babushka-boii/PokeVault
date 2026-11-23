@@ -315,3 +315,109 @@ El gate final pasó con 43 pruebas de fixtures de proveedores, 355 backend (66 d
 PostgreSQL, 62 del nuevo adaptador de sets) y 315 frontend; Ruff, ESLint, TypeScript,
 build y whitespace correctos. Se conservan los registros/atribuciones previos;
 evidencia y comparación con 5C en DEVELOPMENT.md.
+
+
+## Iteración 6 — Escáner OCR (2026-11-10–11)
+
+**Aporte del estudiante:** definición detallada del flujo, prioridades de fiabilidad,
+seguridad y corrección humana; restricciones académicas/técnicas, preparación de la
+rama y autorización para continuar preservando los cambios tras interrupciones.
+La aceptación con cámara, fotografías reales, Google y navegador sigue pendiente;
+no se atribuye al estudiante una validación que no está registrada.
+
+**Aporte asistido por IA (Codex):** auditoría Git/arquitectura, selección e instalación
+asistida de OCR, contratos/API, supervisor de procesos, validación y extracción,
+extensión del CardProvider, ranking explicable, UI ES/EN, reutilización del formulario
+físico e idempotencia de inventario, tests, revisión y documentación. Agentes separados
+trabajaron OCR/evaluación, matching y frontend; otro realizó revisión independiente.
+Codex principal integró APIs, seguridad/reintentos, PostgreSQL y cerró las correcciones
+interrumpidas con pruebas observadas antes/después. La última revisión comprobó los
+tres hallazgos corregidos; no se presenta como otra ejecución de todo el test suite.
+
+**Fuentes y activos:** Tesseract/tessdata oficiales (Apache-2.0), Pillow (HPND), metadatos
+TCGdex con URLs/hashes y componentes existentes. Las 14 imágenes de prueba son diseños
+sintéticos originales de texto/formas, sin artwork de cartas ni fotos privadas.
+Arial/DejaVu se usan desde una instalación local; no se distribuyen archivos de fuente.
+Catálogo de evaluación: 510 identidades físicas EN con aliases ES reales donde existen.
+No se inventaron cartas, traducciones, probabilidades calibradas o resultados OCR.
+
+**Verificación y límites:** gate final 43 fixtures, 508 backend (75 PostgreSQL), 379 frontend;
+Ruff/ESLint/TypeScript/build/whitespace aprobados, sin skips. OCR nativo real: 11/11 top-1
+y top-3 en muestras etiquetadas, 2/2 abstenciones y 1/1 ambigüedad; datos medidos y límites en
+research/scanner y DEVELOPMENT.md. Un pequeño catálogo sintético no estima precisión
+sobre fotografías reales ni búsqueda mundial. Hubo un smoke adicional contra TCGdex
+real, sin interacción de navegador ni escritura de inventario. No hubo cambios de
+credenciales, migración nueva, destrucción de datos, commit, push, merge, rebase o reset.
+El estudiante debe revisar y comprender el código, completar SCANNER.md y decidir
+cuándo publicar. Se conservan todas las atribuciones y entradas históricas anteriores.
+
+
+### Continuación acotada — 2026-11-23
+
+El usuario delimitó un único hito y autorizó exclusivamente evaluación local de dos
+fotografías. Codex recuperó la implementación existente, completó regresiones HEIC y
+HTTP, corrigió un test obsoleto y registró mediciones reales con trazabilidad de hashes.
+La localización y OCR regional evaluados ya estaban implementados antes de esta
+sesión; no se atribuyen como una nueva implementación. Verificación: 66 backend,
+20 frontend de servicio, lint acotado y TypeScript; sin aceptación manual de navegador
+ni ejecución del gate completo. Las fotografías no forman parte del repositorio.
+
+
+### Hito B — 2026-11-23
+
+El usuario delimitó recuperación ante localización incorrecta y prohibió comenzar
+matching visual/UI. Codex implementó únicamente comparación OCR acotada con la imagen
+original, regresiones, traducciones de avisos y registro reproducible de mediciones.
+Se reutilizó el detector y la extracción previos. Las identidades esperadas de las
+dos fotos permanecen exclusivamente en evaluación; no se añadieron excepciones por
+nombre, archivo o ID a producción. No se atribuye aceptación de navegador ni precisión
+general a estas mediciones.
+
+
+### 2026-11-23 — Milestone C
+
+Asistencia de Codex: revisión del ciclo de sesión del escáner, corrección de programación
+cancelable del reconocimiento y retorno de foco, cuatro regresiones de escaneos consecutivos
+y logout, y documentación. Validación ejecutada: 98 pruebas frontend focalizadas, lint
+acotado y TypeScript. No se atribuye validación manual de navegador ni nuevas mediciones OCR.
+
+### Milestone D — final validation (2026-11-23)
+
+Real Zen browser acceptance completed with existing Google OAuth, local FastAPI,
+PostgreSQL, Tesseract 5.5.4 and pillow-heif 1.8.1. Original HEIC Cranidos → me05-044
+and Armarouge → me05-086 ranked first as possible matches. Explicit selection and
+save created exactly two acceptance copies, retained in the development database.
+Both collection detail pages and read-only PostgreSQL queries confirmed persistence;
+migration remains 0004. Spanish/English flow, next-scan reset and focus were observed.
+Race/failure scenarios have automated coverage, not browser fault-injection evidence.
+
+Final bash scripts/check.sh exited 0: 43 unittest cases, 586 backend cases (including
+75 PostgreSQL integration cases), 406 frontend cases across 32 files; zero failures
+or skips. Provider validation, Ruff, ESLint, TypeScript, build and whitespace passed.
+Earlier gate attempts found one copied-patch false positive in existing unintegrated
+visual code and 25 scanner lint violations. Fixed without enabling hybrid recognition
+or weakening tests. Focused runs: 43 backend, 98 frontend and 15 visual tests passed.
+
+Ready for final user acceptance. Mobile camera/touch, narrow-screen and VoiceOver
+remain manual: http://localhost:5173/scanner on the development Mac. No private images
+stored in the repository, secrets changed, database resets, commits or pushes.
+See docs/SCANNER.md for copy identifiers and detailed browser evidence.
+
+### Acceptance regression follow-up — 2026-11-23
+
+Recovered the two absent candidates in the five-photo sample with bounded fallback
+framing, layout-aware Trainer title OCR and language-aware discovery budget ordering.
+All five expected cards now rank first, as do the prior Cranidos/Armarouge HEICs.
+Jamming Tower and Zigzagoon numbers remain unreadable: same-name printings remain
+ambiguous, requiring explicit confirmation. This is not a general accuracy claim.
+Scorbunny retains a partial OCR title and uncertain confidence. See docs/SCANNER.md
+and research/scanner/acceptance_regression_{before,after}.json for measured evidence.
+
+Validation: 100 focused tests; one complete scripts/check.sh run passed with 43
+unittest, 593 backend and 406 frontend tests, zero skips/failures. Ruff, ESLint,
+TypeScript, production build and whitespace passed. Seven general regression cases
+cover bounded localized discovery, incomplete regional names, secret numbering,
+Trainer headers/title regions and interrupted geometric boundaries. No private
+images committed, inventory writes, credentials changes, commits or pushes.
+Remaining: improve outlined footer OCR using independent evidence; do not infer a
+printing solely from first rank. No hybrid recognition or Iteration 7 work.

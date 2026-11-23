@@ -84,3 +84,26 @@ the existing printing details. Moving/removing a placement never changes a copy'
 UUID or attributes. Deleting inventory cascades its optional placement; deleting a
 manual box removes placements while retaining every copy. Counts and smart views
 remain derived from the original `inventory_copies` table.
+
+
+## Iteration 6 — Human-confirmed scanning and retry identity
+
+`/scanner` reuses CopyForm and this API after explicit candidate selection. Recognition
+and matching never insert copies. Create accepts optional UUIDv4 `Idempotency-Key`:
+owner + key determines one physical UUID; repeated matching payload returns that
+record with 201, conflicting payload returns 409. Concurrent retries use the existing primary
+key/savepoint, including across processes. Unkeyed requests retain previous semantics.
+
+CopyForm holds one key/original payload across uncertain explicit retries, locks
+attributes until the outcome is known, and prevents simultaneous submits. A new form
+creates a fresh intentional-copy key. No key/private draft is persisted in browser
+storage. Deleting the record ends its replay guarantee; after discarding an uncertain
+workflow, inspect My Collection before starting another copy. The backend revalidates
+the session after pending provider verification before creating a new copy.
+See [SCANNER.md](SCANNER.md) for the complete workflow and limitations.
+
+The scanner specifically retains a hidden/inert same-owner confirmation during
+session revalidation. A pending save is aborted and becomes an uncertain explicit
+retry with its original key/payload; it cannot silently create a second copy on
+return from card details/camera. Logout, changed account or failed validation clears
+it. Other inventory views retain their established unmount-on-revalidation behavior.

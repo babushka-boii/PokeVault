@@ -1,0 +1,730 @@
+{
+  "purpose": "Iteration 5D physical-set and complete-checklist verification",
+  "request_budget": 10,
+  "official_references": [
+    "https://tcgdex.dev/rest/sets",
+    "https://tcgdex.dev/rest/set"
+  ],
+  "list_coverage": {
+    "english_count": 221,
+    "spanish_count": 160,
+    "english_only": [
+      "2014xy",
+      "2015xy",
+      "2016xy",
+      "2017sm",
+      "2018sm",
+      "2019sm",
+      "A3a",
+      "A3b",
+      "A4",
+      "B1",
+      "base4",
+      "base5",
+      "bog",
+      "col1",
+      "dc1",
+      "dp5",
+      "ecard1",
+      "ecard2",
+      "ecard3",
+      "ex11",
+      "ex12",
+      "ex13",
+      "ex14",
+      "ex15",
+      "ex16",
+      "ex2",
+      "ex3",
+      "ex4",
+      "ex5",
+      "ex5.5",
+      "ex6",
+      "ex7",
+      "ex8",
+      "ex9",
+      "fut2020",
+      "gym1",
+      "gym2",
+      "hgss3",
+      "hgss4",
+      "jumbo",
+      "lc",
+      "mfb",
+      "miscp",
+      "neo2",
+      "neo3",
+      "neo4",
+      "pl2",
+      "pl3",
+      "pop1",
+      "pop2",
+      "pop3",
+      "pop4",
+      "pop5",
+      "pop6",
+      "pop7",
+      "pop8",
+      "pop9",
+      "si1",
+      "sp",
+      "wp",
+      "xy0"
+    ],
+    "spanish_only": []
+  },
+  "requests": [
+    {
+      "url": "https://api.tcgdex.net/v2/en/sets",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:08.984822+00:00",
+      "status": 200,
+      "sha256": "fb9125bf11f771eb866c3e5dd5a6c6e36f72c7c4eb313aa9e24fe3f64736cb6e",
+      "summary": {
+        "count": 221,
+        "unique_ids": 221,
+        "fields": [
+          "cardCount",
+          "id",
+          "logo",
+          "name",
+          "symbol"
+        ],
+        "sample": [
+          {
+            "id": "base1",
+            "name": "Base Set",
+            "logo": "https://assets.tcgdex.net/en/base/base1/logo",
+            "cardCount": {
+              "total": 102,
+              "official": 102
+            }
+          },
+          {
+            "id": "swsh3",
+            "name": "Darkness Ablaze",
+            "logo": "https://assets.tcgdex.net/en/swsh/swsh3/logo",
+            "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol",
+            "cardCount": {
+              "total": 201,
+              "official": 189
+            }
+          },
+          {
+            "id": "sv03.5",
+            "name": "151",
+            "logo": "https://assets.tcgdex.net/en/sv/sv03.5/logo",
+            "symbol": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol",
+            "cardCount": {
+              "total": 207,
+              "official": 165
+            }
+          },
+          {
+            "id": "A1",
+            "name": "Genetic Apex",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A1/logo",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/A1/symbol",
+            "cardCount": {
+              "total": 286,
+              "official": 226
+            }
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/sets",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:09.085730+00:00",
+      "status": 200,
+      "sha256": "6cfe5077591c964bcd3ab436d887511e4dcc7913d876187a9ba3b48b37379fe4",
+      "summary": {
+        "count": 160,
+        "unique_ids": 160,
+        "fields": [
+          "cardCount",
+          "id",
+          "logo",
+          "name",
+          "symbol"
+        ],
+        "sample": [
+          {
+            "id": "base1",
+            "name": "Edición Básica",
+            "cardCount": {
+              "total": 102,
+              "official": 102
+            }
+          },
+          {
+            "id": "swsh3",
+            "name": "Oscuridad Incandescente",
+            "logo": "https://assets.tcgdex.net/es/swsh/swsh3/logo",
+            "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol",
+            "cardCount": {
+              "total": 201,
+              "official": 189
+            }
+          },
+          {
+            "id": "sv03.5",
+            "name": "151",
+            "logo": "https://assets.tcgdex.net/es/sv/sv03.5/logo",
+            "symbol": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol",
+            "cardCount": {
+              "total": 207,
+              "official": 165
+            }
+          },
+          {
+            "id": "A1",
+            "name": "Genes Formidables",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/A1/symbol",
+            "cardCount": {
+              "total": 286,
+              "official": 226
+            }
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/graphql",
+      "method": "POST",
+      "verified_at": "2026-11-09T23:39:09.164013+00:00",
+      "status": 200,
+      "sha256": "7efded0c61bc7c9870dc3850acc071b58224751165dfe4aae5500c4305eb196e",
+      "query": "{ sets { id name releaseDate logo symbol serie { id name } } }",
+      "summary": {
+        "count": 221,
+        "unique_ids": 221,
+        "series": [
+          "base",
+          "bw",
+          "col",
+          "dp",
+          "ecard",
+          "ex",
+          "gym",
+          "hgss",
+          "lc",
+          "mc",
+          "me",
+          "misc",
+          "neo",
+          "pl",
+          "pop",
+          "sm",
+          "sv",
+          "swsh",
+          "tcgp",
+          "tk",
+          "xy"
+        ],
+        "unknown_series_set_ids": [],
+        "pocket_sets": [
+          {
+            "id": "A1",
+            "name": "Genetic Apex",
+            "releaseDate": "2024-10-30",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A1/logo",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/A1/symbol",
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "P-A",
+            "name": "Promos-A",
+            "releaseDate": "2024-10-30",
+            "logo": "https://assets.tcgdex.net/en/tcgp/P-A/logo",
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A1a",
+            "name": "Mythical Island",
+            "releaseDate": "2024-12-17",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A1a/logo",
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A2",
+            "name": "Space-Time Smackdown",
+            "releaseDate": "2025-01-30",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A2/logo",
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A2a",
+            "name": "Triumphant Light",
+            "releaseDate": "2025-02-28",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A2a/logo",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/A2a/symbol",
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A2b",
+            "name": "Shining Revelry",
+            "releaseDate": "2025-03-27",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A2b/logo",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/A2b/symbol",
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A3",
+            "name": "Celestial Guardians",
+            "releaseDate": "2025-04-30",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A3/logo",
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A3a",
+            "name": "Extradimensional Crisis",
+            "releaseDate": "2025-05-29",
+            "logo": null,
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A3b",
+            "name": "Eevee Grove",
+            "releaseDate": "2025-06-26",
+            "logo": null,
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A4",
+            "name": "Wisdom of Sea and Sky",
+            "releaseDate": "2025-07-30",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A4/logo",
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "A4a",
+            "name": "Secluded Springs",
+            "releaseDate": "2025-08-28",
+            "logo": "https://assets.tcgdex.net/en/tcgp/A4a/logo",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/A4a/symbol",
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "B1",
+            "name": "Mega Rising",
+            "releaseDate": "2025-10-30",
+            "logo": "https://assets.tcgdex.net/en/tcgp/B1/logo",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/B1/symbol",
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "B1a",
+            "name": "Crimson Blaze",
+            "releaseDate": "2025-12-17",
+            "logo": null,
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "B2",
+            "name": "Fantastical Parade",
+            "releaseDate": "2026-01-29",
+            "logo": "https://assets.tcgdex.net/en/tcgp/B2/logo",
+            "symbol": "https://assets.tcgdex.net/univ/tcgp/B2/symbol",
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          },
+          {
+            "id": "B2a",
+            "name": "Paldean Wonders",
+            "releaseDate": "2026-02-26",
+            "logo": null,
+            "symbol": null,
+            "serie": {
+              "id": "tcgp",
+              "name": "Pokémon TCG Pocket"
+            }
+          }
+        ],
+        "errors": null
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/sets/base1",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:08.843220+00:00",
+      "status": 200,
+      "sha256": "fbf0c46daf1faa242732b4531cc2842c9b5018da67000dac879c7180fe4524dd",
+      "summary": {
+        "id": "base1",
+        "name": "Base Set",
+        "serie": {
+          "id": "base",
+          "name": "Base"
+        },
+        "releaseDate": "1999-01-09",
+        "logo": "https://assets.tcgdex.net/en/base/base1/logo",
+        "symbol": null,
+        "cardCount": {
+          "firstEd": 103,
+          "holo": 64,
+          "normal": 351,
+          "official": 102,
+          "reverse": 0,
+          "total": 102
+        },
+        "checklist_count": 102,
+        "unique_card_ids": 102,
+        "card_fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "cards_with_image": 102,
+        "sample": [
+          {
+            "id": "base1-1",
+            "image": "https://assets.tcgdex.net/en/base/base1/1",
+            "localId": "1",
+            "name": "Alakazam"
+          },
+          {
+            "id": "base1-102",
+            "image": "https://assets.tcgdex.net/en/base/base1/102",
+            "localId": "102",
+            "name": "Water Energy"
+          }
+        ],
+        "sorted_membership_sha256": "f20058d9c123977dc00badd1ba25b1c9e338c9cf68ee6334e0471e52e672bcac"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/sets/base1",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:08.798060+00:00",
+      "status": 200,
+      "sha256": "284094d0c7059010277610e6d00a69a50564c8f2c3ce94a457b8ed06b4f93a42",
+      "summary": {
+        "id": "base1",
+        "name": "Edición Básica",
+        "serie": {
+          "id": "base",
+          "name": "Clásica"
+        },
+        "releaseDate": "1999-01-09",
+        "logo": null,
+        "symbol": null,
+        "cardCount": {
+          "firstEd": 0,
+          "holo": 0,
+          "normal": 0,
+          "official": 102,
+          "reverse": 0,
+          "total": 102
+        },
+        "checklist_count": 0,
+        "unique_card_ids": 0,
+        "card_fields": [],
+        "cards_with_image": 0,
+        "sample": [],
+        "sorted_membership_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/sets/swsh3",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:09.469314+00:00",
+      "status": 200,
+      "sha256": "2bf855b98c709b3cf0cc9f8e88311554ed599bf83d02e166c2584ccf802e5049",
+      "summary": {
+        "id": "swsh3",
+        "name": "Darkness Ablaze",
+        "serie": {
+          "id": "swsh",
+          "name": "Sword & Shield"
+        },
+        "releaseDate": "2020-08-14",
+        "logo": "https://assets.tcgdex.net/en/swsh/swsh3/logo",
+        "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol",
+        "cardCount": {
+          "firstEd": 0,
+          "holo": 69,
+          "normal": 138,
+          "official": 189,
+          "reverse": 157,
+          "total": 201
+        },
+        "checklist_count": 201,
+        "unique_card_ids": 201,
+        "card_fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "cards_with_image": 201,
+        "sample": [
+          {
+            "id": "swsh3-1",
+            "image": "https://assets.tcgdex.net/en/swsh/swsh3/1",
+            "localId": "1",
+            "name": "Butterfree V"
+          },
+          {
+            "id": "swsh3-201",
+            "image": "https://assets.tcgdex.net/en/swsh/swsh3/201",
+            "localId": "201",
+            "name": "Capture Energy"
+          }
+        ],
+        "sorted_membership_sha256": "53573969886d0ce412c72458672e5a91c6821efa2e482b8c2ef496d13597ce03"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/sets/swsh3",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:09.475040+00:00",
+      "status": 200,
+      "sha256": "ac1f1fa51fbfa38bbadc63c96458602fa164bac8249442c2a2bd3fe72164e007",
+      "summary": {
+        "id": "swsh3",
+        "name": "Oscuridad Incandescente",
+        "serie": {
+          "id": "swsh",
+          "name": "Espada y Escudo"
+        },
+        "releaseDate": "2020-08-14",
+        "logo": "https://assets.tcgdex.net/es/swsh/swsh3/logo",
+        "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol",
+        "cardCount": {
+          "firstEd": 0,
+          "holo": 69,
+          "normal": 138,
+          "official": 189,
+          "reverse": 157,
+          "total": 201
+        },
+        "checklist_count": 201,
+        "unique_card_ids": 201,
+        "card_fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "cards_with_image": 201,
+        "sample": [
+          {
+            "id": "swsh3-1",
+            "image": "https://assets.tcgdex.net/es/swsh/swsh3/1",
+            "localId": "1",
+            "name": "Butterfree V"
+          },
+          {
+            "id": "swsh3-201",
+            "image": "https://assets.tcgdex.net/es/swsh/swsh3/201",
+            "localId": "201",
+            "name": "Energía Captura"
+          }
+        ],
+        "sorted_membership_sha256": "53573969886d0ce412c72458672e5a91c6821efa2e482b8c2ef496d13597ce03"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/sets/sv03.5",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:09.652155+00:00",
+      "status": 200,
+      "sha256": "c08470d9f287a71176ed0d5c8a32c719e1e247d4985ad9da9cc3e1d05f541364",
+      "summary": {
+        "id": "sv03.5",
+        "name": "151",
+        "serie": {
+          "id": "sv",
+          "name": "Scarlet & Violet"
+        },
+        "releaseDate": "2023-09-22",
+        "logo": "https://assets.tcgdex.net/en/sv/sv03.5/logo",
+        "symbol": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol",
+        "cardCount": {
+          "firstEd": 0,
+          "holo": 90,
+          "normal": 135,
+          "official": 165,
+          "reverse": 158,
+          "total": 207
+        },
+        "checklist_count": 207,
+        "unique_card_ids": 207,
+        "card_fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "cards_with_image": 207,
+        "sample": [
+          {
+            "id": "sv03.5-001",
+            "image": "https://assets.tcgdex.net/en/sv/sv03.5/001",
+            "localId": "001",
+            "name": "Bulbasaur"
+          },
+          {
+            "id": "sv03.5-207",
+            "image": "https://assets.tcgdex.net/en/sv/sv03.5/207",
+            "localId": "207",
+            "name": "Basic Psychic Energy"
+          }
+        ],
+        "sorted_membership_sha256": "a3de3ee4b7ad983912238154e6af758c217776e80ca92be79324fdf9f58d0882"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/es/sets/sv03.5",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:09.766536+00:00",
+      "status": 200,
+      "sha256": "f52c47a4614157024a06aa1bb92716f3a061af85c3204320b664b89eea7d6fc1",
+      "summary": {
+        "id": "sv03.5",
+        "name": "151",
+        "serie": {
+          "id": "sv",
+          "name": "Escarlata y Púrpura"
+        },
+        "releaseDate": "2023-09-22",
+        "logo": "https://assets.tcgdex.net/es/sv/sv03.5/logo",
+        "symbol": "https://assets.tcgdex.net/univ/sv/sv03.5/symbol",
+        "cardCount": {
+          "firstEd": 0,
+          "holo": 90,
+          "normal": 135,
+          "official": 165,
+          "reverse": 158,
+          "total": 207
+        },
+        "checklist_count": 207,
+        "unique_card_ids": 207,
+        "card_fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "cards_with_image": 207,
+        "sample": [
+          {
+            "id": "sv03.5-001",
+            "image": "https://assets.tcgdex.net/es/sv/sv03.5/001",
+            "localId": "001",
+            "name": "Bulbasaur"
+          },
+          {
+            "id": "sv03.5-207",
+            "image": "https://assets.tcgdex.net/es/sv/sv03.5/207",
+            "localId": "207",
+            "name": "Energía Psychic Básica"
+          }
+        ],
+        "sorted_membership_sha256": "a3de3ee4b7ad983912238154e6af758c217776e80ca92be79324fdf9f58d0882"
+      }
+    },
+    {
+      "url": "https://api.tcgdex.net/v2/en/sets/A1",
+      "method": "GET",
+      "verified_at": "2026-11-09T23:39:09.881653+00:00",
+      "status": 200,
+      "sha256": "75e72566ec51263b9dfd1a717380769bbcd921844dba85cc1ce91468b810a505",
+      "summary": {
+        "id": "A1",
+        "name": "Genetic Apex",
+        "serie": {
+          "id": "tcgp",
+          "name": "Pokémon TCG Pocket"
+        },
+        "releaseDate": "2024-10-30",
+        "logo": "https://assets.tcgdex.net/en/tcgp/A1/logo",
+        "symbol": "https://assets.tcgdex.net/univ/tcgp/A1/symbol",
+        "cardCount": {
+          "firstEd": 0,
+          "holo": 0,
+          "normal": 0,
+          "official": 226,
+          "reverse": 0,
+          "total": 286
+        },
+        "checklist_count": 286,
+        "unique_card_ids": 286,
+        "card_fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "cards_with_image": 286,
+        "sample": [
+          {
+            "id": "A1-001",
+            "image": "https://assets.tcgdex.net/en/tcgp/A1/001",
+            "localId": "001",
+            "name": "Bulbasaur"
+          },
+          {
+            "id": "A1-286",
+            "image": "https://assets.tcgdex.net/en/tcgp/A1/286",
+            "localId": "286",
+            "name": "Mewtwo ex"
+          }
+        ],
+        "sorted_membership_sha256": "884c903b53b5f09b68dd0905e653d1023acffc107a5b624e7799e64b6002cc2f"
+      }
+    }
+  ]
+}

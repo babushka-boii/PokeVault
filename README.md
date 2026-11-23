@@ -63,18 +63,27 @@ Fixed samples from both providers were validated on 2026-10-19. Complete catalog
 
 After configuring `backend/.env` from its example and installing the documented dependencies:
 
-- Apply migrations through `0003` with `cd backend`, then `.venv/bin/alembic upgrade head`.
+- Apply migrations through `0004` with `cd backend`, then `.venv/bin/alembic upgrade head`.
 - Start FastAPI with `.venv/bin/uvicorn app.main:create_app --factory --reload --no-access-log` from `backend`.
 - Start Vite with `npm run dev --prefix frontend` from the repository root.
 - Open `http://localhost:5173`; the API health contract is at `http://localhost:8000/api/v1/health`.
 - Run all offline checks with `bash scripts/check.sh`.
 
 The frontend provides `/`, `/boxes`, `/pokedex`, `/pokemon/:number/cards`,
-`/cards/:id`, `/login`, `/profile` and `/collection`, with persisted ES/EN switching.
+`/cards/:id`, `/login`, `/profile`, `/collection`, `/collection/:copyId`,
+`/sets`, `/sets/:setId` and `/scanner`, with persisted ES/EN switching.
 Sign in, open a real TCG card, choose Add to my collection, and manage individual
 copies in My collection. Quantities come from persisted copies; physical language
 and finish are independent of catalog artwork/text. No secrets belong in Git.
 
-See [inventory API and acceptance checks](docs/INVENTORY.md) and
-[macOS setup and validation](docs/DEVELOPMENT.md). Wishlist, personal boxes,
-set completion, prices and scanner remain future work.
+Personal boxes arrange existing copies; set completion counts distinct printings.
+The scanner accepts JPEG/PNG and supported WebP, runs local Tesseract OCR, offers
+editable clues and verified alternatives, then requires explicit inventory confirmation.
+Install Tesseract with English/Spanish language data using the
+[scanner setup and acceptance guide](docs/SCANNER.md). HEIC/HEIF are decoded with the installed pillow-heif dependency; manual
+identification remains available if OCR is absent. No scan history or photo storage
+is added, and the scanner needs no migration beyond `0004`.
+
+See [inventory](docs/INVENTORY.md), [personal boxes](docs/BOXES.md),
+[set completion](docs/SET_COMPLETION.md) and [macOS validation](docs/DEVELOPMENT.md).
+Wishlist, prices, trades, decks and the full visual redesign remain future work.

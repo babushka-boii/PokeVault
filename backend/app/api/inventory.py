@@ -1,10 +1,11 @@
 """All ownership predicates are derived from the existing authenticated session."""
 
-from uuid import UUID
+from uuid import UUID, uuid5
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, Response
+from pydantic import UUID4
 from sqlalchemy import func, select
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.cards import get_card_provider
 from app.auth.sessions import require_csrf, require_current_user
@@ -91,11 +92,24 @@ def list_copies(
 
 @router.post("", response_model=PublicCopy, status_code=201)
 async def add_copy(
+    request: Request,
     payload: CreateCopy,
     user: User = Depends(require_csrf),
     session=Depends(database),
     provider: CardProvider = Depends(get_card_provider),
+    idempotency_key: UUID4 | None = Header(None, alias="Idempotency-Key"),
 ):
+    # The existing primary key supplies persistent, cross-process retry identity.
+    # Namespace by the session owner: a key never identifies another user's copy.
+    copy_id = (
+        uuid5(user.id, f"inventory-create-v1:{idempotency_key}")
+        if idempotency_key is not None
+        else None
+    )
+    if copy_id is not None:
+        existing = session.get(InventoryCopy, copy_id)
+        if existing is not None:
+            return replay_copy(existing, user, payload)
     try:
         # Validate catalog identity; requested physical language need not be one
         # of the two catalog text languages supported by the application.
@@ -104,12 +118,36 @@ async def add_copy(
         raise HTTPException(404, detail="Card not found") from None
     except CardsUnavailable:
         raise HTTPException(503, detail="Card catalog is unavailable") from None
+    # A logout/expiry while the external catalog was pending invalidates the save.
+    require_current_user(request)
     record = InventoryCopy(user_id=user.id, **payload.model_dump())
-    session.add(record)
-    session.flush()
+    if copy_id is None:
+        session.add(record)
+        session.flush()
+    else:
+        record.id = copy_id
+        try:
+            with session.begin_nested():
+                session.add(record)
+                session.flush()
+        except IntegrityError:
+            # A concurrent confirmation with the same key won the PK race.
+            # The savepoint preserves this transaction for the owner/payload check.
+            existing = session.get(InventoryCopy, copy_id)
+            if existing is None:
+                raise
+            return replay_copy(existing, user, payload)
     result = PublicCopy.model_validate(record)
     session.commit()
     return result
+
+
+def replay_copy(record: InventoryCopy, user: User, payload: CreateCopy) -> PublicCopy:
+    if record.user_id != user.id or any(
+        getattr(record, field) != value for field, value in payload.model_dump().items()
+    ):
+        raise HTTPException(409, detail="idempotency_conflict")
+    return PublicCopy.model_validate(record)
 
 
 @router.get("/{copy_id}", response_model=PublicCopy)

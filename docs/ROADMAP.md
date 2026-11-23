@@ -244,3 +244,118 @@ worldwide/all-language completeness. Partial English checklists never produce a
 percentage; Spanish gaps preserve canonical membership. Official-numbered subsets,
 variant master sets, prices, scanning, trading and the final visual redesign remain
 deferred. The personal-box scroll issue is outside 5D unless it blocks acceptance.
+
+
+## Iteration 6 — OCR-assisted card scanner (2026-11-10–11)
+
+- [x] Audit clean `feat/iteration-6-card-scanner` at `9f2854c`, containing merged 5A–5D;
+  verify migration `0004 (head)` read-only and preserve all resumed local changes.
+- [x] Implement local Tesseract/Pillow validation, bounded isolated workers, cancellation,
+  conservative extraction and explicit unavailable/manual fallback.
+- [x] Reuse CardProvider for bounded physical EN/verified ES candidate matching, honest
+  ambiguity, editable clues and expansion selection; no fake confidence percentages.
+- [x] Add localized `/scanner`, native capture/upload, preview, human selection and shared
+  physical-copy confirmation with replay protection, exact copy/card/set destinations.
+- [x] Preserve inventory, derived completion, personal boxes and account isolation;
+  no scanner migration or photo/history persistence.
+- [x] Record final full-gate and real synthetic OCR evaluation evidence in DEVELOPMENT.md:
+  43 provider fixtures, 508 backend (75 PostgreSQL), 379 frontend; no skips or failures.
+- [ ] Complete real-photo, Google, camera and Safari/Chromium manual acceptance in SCANNER.md.
+- [ ] Student reviews/understands the implementation and decides on publication.
+
+The previous 5D future-work references are historical. Scanner functionality is now
+implemented; real-photo accuracy remains unverified. Wishlist, trades, prices, decks,
+bulk scanning, cloud photo storage and full visual redesign remain deferred.
+
+
+### Scanner checkpoint — 2026-11-23
+
+- [x] Milestone A: direct HEIC/HEIF processing and reproducible real-photo baseline verified.
+- [x] Original HEIC and baseline-identical PNG inputs produce the same current clues/ranks;
+  both authorized photos rank the correct printing first, without automatic registration.
+- [x] Focused gate: 66 backend + 20 frontend service tests; scoped lint/type checks pass.
+- [ ] Next milestone B: finish and validate safe recognition fallback with uncertain framing.
+- [ ] Later: finish pending hybrid/UI integration review, full project gate and real-browser acceptance.
+
+
+### Scanner Milestone B — 2026-11-23
+
+- [x] Restore bounded original-image OCR after an accepted but unproductive crop.
+- [x] Select coherent evidence deterministically; disclose conflicting paths without changing catalog quality labels.
+- [x] Preserve both real-photo identifications and the 14-image synthetic benchmark.
+- [x] Focused validation: 172 backend tests, no skips; scoped lint, TypeScript and whitespace pass.
+- [ ] Next isolated milestone: finish/review the existing consecutive-scanning UI and session lifecycle regressions.
+
+Hybrid integration, full project gate and browser acceptance remain separate pending work.
+
+
+### Scanner Milestone C — 2026-11-23
+
+- [x] Finish cancellable automatic recognition scheduling and next-scan keyboard focus.
+- [x] Validate fresh registration identities for repeated and different printings.
+- [x] Validate logout during recognition/save alongside existing session lifecycle coverage.
+- [x] 98 focused frontend tests passed; scoped ESLint, TypeScript and whitespace checks.
+- [ ] Next: real-device consecutive-scanning acceptance, including uncertain saves and account changes.
+
+Stop at Milestone C. Hybrid recognition, redesign and full integration gate remain separate.
+
+### Milestone D — final validation (2026-11-23)
+
+Real Zen browser acceptance completed with existing Google OAuth, local FastAPI,
+PostgreSQL, Tesseract 5.5.4 and pillow-heif 1.8.1. Original HEIC Cranidos → me05-044
+and Armarouge → me05-086 ranked first as possible matches. Explicit selection and
+save created exactly two acceptance copies, retained in the development database.
+Both collection detail pages and read-only PostgreSQL queries confirmed persistence;
+migration remains 0004. Spanish/English flow, next-scan reset and focus were observed.
+Race/failure scenarios have automated coverage, not browser fault-injection evidence.
+
+Final bash scripts/check.sh exited 0: 43 unittest cases, 586 backend cases (including
+75 PostgreSQL integration cases), 406 frontend cases across 32 files; zero failures
+or skips. Provider validation, Ruff, ESLint, TypeScript, build and whitespace passed.
+Earlier gate attempts found one copied-patch false positive in existing unintegrated
+visual code and 25 scanner lint violations. Fixed without enabling hybrid recognition
+or weakening tests. Focused runs: 43 backend, 98 frontend and 15 visual tests passed.
+
+Ready for final user acceptance. Mobile camera/touch, narrow-screen and VoiceOver
+remain manual: http://localhost:5173/scanner on the development Mac. No private images
+stored in the repository, secrets changed, database resets, commits or pushes.
+See docs/SCANNER.md for copy identifiers and detailed browser evidence.
+
+### Acceptance regression follow-up — 2026-11-23
+
+Recovered the two absent candidates in the five-photo sample with bounded fallback
+framing, layout-aware Trainer title OCR and language-aware discovery budget ordering.
+All five expected cards now rank first, as do the prior Cranidos/Armarouge HEICs.
+Jamming Tower and Zigzagoon numbers remain unreadable: same-name printings remain
+ambiguous, requiring explicit confirmation. This is not a general accuracy claim.
+Scorbunny retains a partial OCR title and uncertain confidence. See docs/SCANNER.md
+and research/scanner/acceptance_regression_{before,after}.json for measured evidence.
+
+Validation: 100 focused tests; one complete scripts/check.sh run passed with 43
+unittest, 593 backend and 406 frontend tests, zero skips/failures. Ruff, ESLint,
+TypeScript, production build and whitespace passed. Seven general regression cases
+cover bounded localized discovery, incomplete regional names, secret numbering,
+Trainer headers/title regions and interrupted geometric boundaries. No private
+images committed, inventory writes, credentials changes, commits or pushes.
+Remaining: improve outlined footer OCR using independent evidence; do not infer a
+printing solely from first rank. No hybrid recognition or Iteration 7 work.
+
+### Outlined collector numbers — 2026-11-23
+
+- [x] Added one bounded footer pass for numbers printed as a dark fill inside a light
+  outline (full-art and reverse-holo footers). Runs only after the plain and
+  thresholded footer passes find no number; worst case is now twelve native calls.
+- [x] Local A/B on 14 synthetic samples and 7 real photos: only Galarian Zigzagoon
+  (now 130/217) and Jamming Tower (now 261/217) changed; the other 19 are identical.
+- [x] Readings stay OCR evidence: matching still marks name/number conflicts as uncertain.
+- [ ] Re-run `bash scripts/check.sh` and real-browser acceptance on the development Mac.
+
+### Manual acceptance — 2026-11-23
+
+- [x] `bash scripts/check.sh` passed (exit code 0) on the development Mac.
+- [x] Safari on desktop and in responsive mode at iPhone size: scanner OK with
+  Galarian Zigzagoon (130/217) and Jamming Tower (261/217).
+- [ ] Real phone camera: pending, because Google OAuth only works on localhost.
+
+Limitation: the italic flagged "1" of this typeface is fragile in Tesseract (some
+preprocessing variants read 430 or 730). Never correct it from catalog expectations.

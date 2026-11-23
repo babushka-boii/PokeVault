@@ -205,9 +205,10 @@ test("retains input after a save failure and prevents repeated submissions while
   expect(screen.getByRole("button", { name: "Guardando…" })).toBeDisabled();
   expect(writes).toBe(1);
   await act(async () => { complete(json({}, 503)); });
-  expect(await screen.findByRole("alert")).toHaveTextContent("No se pudo guardar el cambio");
+  expect(await screen.findByRole("alert")).toHaveTextContent("No pudimos confirmar si se guardó la copia");
   expect(screen.getByLabelText("Notas personales")).toHaveValue("Keep draft");
-  await user.click(screen.getByRole("button", { name: "Guardar copia" }));
+  expect(screen.getByLabelText("Notas personales")).toBeDisabled();
+  await user.click(screen.getByRole("button", { name: "Reintentar la misma copia" }));
   expect(writes).toBe(2);
   await act(async () => { complete(json(copy, 201)); });
   expect(await screen.findByRole("status")).toHaveTextContent("Copia añadida");

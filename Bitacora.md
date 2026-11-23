@@ -574,3 +574,141 @@ no se realizaron interacciones de navegador 5D. Checklist y límites en SET_COMP
 Se mantiene pendiente el rediseño global, scroll de cajas, variantes master-set,
 precios, escáner, wishlist, intercambio y decks. No hubo commit/push/merge/rebase/reset,
 dependencias nuevas ni credenciales modificadas/reveladas.
+
+
+## 2026-11-10–11 — Iteración 6: escáner OCR y continuación verificada
+
+**Solicitud:** implementar el flujo completo imagen/cámara → OCR real → candidatas
+verificadas → corrección y selección humana → alta explícita en el inventario existente.
+Tras interrupciones de la sesión, se solicitó continuar desde los cambios guardados,
+sin reiniciar ni duplicar trabajo, preservando datos, credenciales y Git.
+
+**Auditoría:** rama `feat/iteration-6-card-scanner`, HEAD `9f2854c`, inicialmente limpia,
+con 5A–5D y migraciones 0001–0004. La revisión de continuidad conservó todos los archivos
+modificados/nuevos. Base comprobada: 43 fixtures, 355 backend (incluidas 66 PostgreSQL),
+315 frontend. `alembic current` de desarrollo confirmó 0004 en modo lectura.
+
+**Decisiones:** Tesseract 5.5.4 local con inglés/español, Pillow 13.0.0 y Python 3.14.10
+arm64. Sin framework ML, GPU, servicio OCR externo, OpenCV ni tabla de escaneos.
+Se instalaron motor nativo y datos oficiales de español con hash documentado.
+Validación de contenido real, 8 MiB, 16 millones de píxeles, 8192 px por lado, orientación
+EXIF y escala 2048 px. Procesamiento aislado, concurrencia y tiempos acotados, argv sin
+shell, terminación del grupo de procesos y limpieza temporal incluso al cancelar.
+No se guardan fotos, metadatos GPS ni texto OCR en PostgreSQL/logs.
+
+CardProvider sigue siendo la única integración TCGdex. La comparación combina nombre,
+número y expansión canónicos, aliases ES comprobados y conteo impreso oficial; Pocket
+queda excluido. Se muestran alternativas y evidencia sin porcentajes inventados.
+`/scanner` reutiliza artwork, autenticación, formularios e inventario. Reconocer nunca
+crea copias. Una confirmación usa la misma API y un UUID de intento para repetir una
+respuesta incierta sin duplicar; otra copia intencional obtiene otra clave. No migración.
+
+**Continuación y revisión:** ya estaban implementados OCR, matching, API y UI. Se
+completaron evaluación, documentación y regresiones: pérdida de estado al regresar
+de detalles/cámara durante revalidación, pista de expansión que quedaba oculta al
+limpiar, nombres oficiales cortos y fracciones HP/copyright mal interpretadas.
+La UI oculta/inactiva el estado durante validación, aborta peticiones y conserva el
+borrador sólo si se confirma la misma cuenta; logout, cambio o error lo descartan.
+Un guardado interrumpido conserva clave/atributos para reintento explícito. Once casos
+de ciclo de sesión fallaron antes de corregirse. Revisión independiente de las tres
+observaciones cerradas sin hallazgos pendientes en ese alcance.
+
+**Evidencia final:** `bash scripts/check.sh`, **exit 0**, **43 fixtures**, **508 backend**
+(incluidas **75 PostgreSQL**, +153 backend/+9 PostgreSQL frente a 5D), **379 frontend**
+en 32 archivos (+64). Ruff, ESLint, TypeScript, build 101 módulos y whitespace correctos;
+sin skips ni fallos. Pruebas nativas ejecutan Tesseract real; ausencia del ejecutable
+conserva arranque y búsqueda manual. Los tests normales no llaman proveedores externos.
+
+Evaluación OCR real sobre 14 imágenes sintéticas originales: 11/11 top-1/top-3, 2/2 abstenciones,
+1/1 ambigüedad conservada. Mediana 0.2334 s, rango 0.2020–0.4981 s; RSS aproximado muestreado
+180.05 MiB. Catálogo offline limitado a 510 identidades reales de tres expansiones.
+Se corrigió la fuente inicial que no representaba acentos antes de validar español.
+Un smoke de servicio con TCGdex real colocó `sv03.5-025` primero en 3.130 s, sin subir
+la foto ni crear inventario. Fuentes, hashes, generador y resultados en research/scanner.
+
+No se afirma precisión con fotografías reales ni aceptación de cámara/navegador/OAuth.
+Quedan aceptación manual y revisión/comprensión del estudiante; límites en SCANNER.md.
+No se hizo commit, push, merge, rebase, reset, cambio de secretos ni alteración destructiva
+de datos poblados. Se conserva la trazabilidad previa; rediseño global y otros módulos
+siguen fuera de alcance.
+
+
+## 2026-11-23 — Hito A del escáner, alcance limitado
+
+Se recuperaron los cambios interrumpidos sin reiniciar el trabajo y se completó sólo
+la verificación HEIC/baseline. Se añadieron regresiones de orientación, contenido
+corrupto y reconocimiento HTTP nativo sin escritura de inventario; se corrigió el
+caso antiguo que consideraba HEIC no soportado. Resultado: 66 pruebas backend y 20
+frontend de servicio aprobadas, sin skips; lint acotado y TypeScript correctos.
+El gate completo queda para la integración final por instrucción expresa.
+
+Los HEIC originales dieron Cranidos 044/084 → me05-044 y Armarouge 086/084 → me05-086,
+ambos primeros y posibles. El baseline daba «hat» con número correcto y «xe» sin
+número. La comprobación PNG usó los mismos hashes que el baseline; resultados iguales
+a HEIC. Son dos ejemplos de desarrollo, no una prueba de precisión general.
+No se subieron ni incorporaron fotografías privadas al repositorio. Se conservaron
+los originales, credenciales, datos y cambios pendientes; no hubo commit/push.
+
+
+## 2026-11-23 — Hito B: recuperación ante recorte incorrecto
+
+Se completó el fallback pendiente sin modificar el detector, catálogo, inventario ni
+UI global. Se conserva la imagen original validada y se compara OCR acotado cuando
+el detector acepta un recorte. Se elige una lectura coherente; contradicciones se
+advierten en ES/EN sin mezclar nombres y números de rutas distintas. Nueve regresiones
+nuevas incluyen OCR nativo y presupuesto temporal. Las dos fotografías mantienen
+nombre/número e identidad correctos con etiqueta posible; OCR 2.3296/2.2734 s frente a
+1.9509/1.6596 s del hito A. El benchmark sintético conserva 11/11 top-1/top-3,
+2/2 abstenciones y una ambigüedad. No se subieron fotos, modificaron secretos ni hubo
+operaciones Git de publicación. Gate completo y aceptación manual siguen pendientes.
+
+
+### 2026-11-23 — Scanner Milestone C
+
+Se conservó el flujo existente y se corrigieron dos pendientes: ejecución automática
+programada con cancelación y foco del selector al escanear otra carta. Se añadieron cuatro
+casos: registros consecutivos de igual/distinta impresión y cierre de sesión durante OCR
+o guardado. Resultado: 98 pruebas frontend focalizadas, cero fallos u omisiones; ESLint
+acotado y TypeScript correctos. Sin cambios backend, migraciones, fotografías, commits ni
+push. Aceptación móvil/manual pendiente; no se ejecutó el gate completo.
+
+### Milestone D — final validation (2026-11-23)
+
+Real Zen browser acceptance completed with existing Google OAuth, local FastAPI,
+PostgreSQL, Tesseract 5.5.4 and pillow-heif 1.8.1. Original HEIC Cranidos → me05-044
+and Armarouge → me05-086 ranked first as possible matches. Explicit selection and
+save created exactly two acceptance copies, retained in the development database.
+Both collection detail pages and read-only PostgreSQL queries confirmed persistence;
+migration remains 0004. Spanish/English flow, next-scan reset and focus were observed.
+Race/failure scenarios have automated coverage, not browser fault-injection evidence.
+
+Final bash scripts/check.sh exited 0: 43 unittest cases, 586 backend cases (including
+75 PostgreSQL integration cases), 406 frontend cases across 32 files; zero failures
+or skips. Provider validation, Ruff, ESLint, TypeScript, build and whitespace passed.
+Earlier gate attempts found one copied-patch false positive in existing unintegrated
+visual code and 25 scanner lint violations. Fixed without enabling hybrid recognition
+or weakening tests. Focused runs: 43 backend, 98 frontend and 15 visual tests passed.
+
+Ready for final user acceptance. Mobile camera/touch, narrow-screen and VoiceOver
+remain manual: http://localhost:5173/scanner on the development Mac. No private images
+stored in the repository, secrets changed, database resets, commits or pushes.
+See docs/SCANNER.md for copy identifiers and detailed browser evidence.
+
+### Acceptance regression follow-up — 2026-11-23
+
+Recovered the two absent candidates in the five-photo sample with bounded fallback
+framing, layout-aware Trainer title OCR and language-aware discovery budget ordering.
+All five expected cards now rank first, as do the prior Cranidos/Armarouge HEICs.
+Jamming Tower and Zigzagoon numbers remain unreadable: same-name printings remain
+ambiguous, requiring explicit confirmation. This is not a general accuracy claim.
+Scorbunny retains a partial OCR title and uncertain confidence. See docs/SCANNER.md
+and research/scanner/acceptance_regression_{before,after}.json for measured evidence.
+
+Validation: 100 focused tests; one complete scripts/check.sh run passed with 43
+unittest, 593 backend and 406 frontend tests, zero skips/failures. Ruff, ESLint,
+TypeScript, production build and whitespace passed. Seven general regression cases
+cover bounded localized discovery, incomplete regional names, secret numbering,
+Trainer headers/title regions and interrupted geometric boundaries. No private
+images committed, inventory writes, credentials changes, commits or pushes.
+Remaining: improve outlined footer OCR using independent evidence; do not infer a
+printing solely from first rank. No hybrid recognition or Iteration 7 work.

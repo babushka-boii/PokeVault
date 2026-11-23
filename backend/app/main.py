@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,6 +9,7 @@ from app.api.cards import router as cards_router
 from app.api.health import router as health_router
 from app.api.inventory import router as inventory_router
 from app.api.pokemon import router as pokemon_router
+from app.api.scans import router as scans_router
 from app.api.sets import router as sets_router
 from app.auth.google import GoogleOIDCClient
 from app.auth.middleware import AuthenticationPrivacyMiddleware
@@ -14,6 +17,7 @@ from app.cards.provider import CardProvider
 from app.core.config import Settings, get_settings
 from app.db.base import create_session_factory
 from app.pokemon.provider import PokemonProvider
+from app.scanner.ocr import OCRService
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -29,16 +33,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_origins=list(active_settings.cors_origins),
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE"],
-        allow_headers=["Accept", "Content-Type", "X-CSRF-Token"],
+        allow_headers=["Accept", "Content-Type", "X-CSRF-Token", "Idempotency-Key"],
     )
     app.add_middleware(AuthenticationPrivacyMiddleware)
     app.state.pokemon_provider = PokemonProvider()
     app.state.card_provider = CardProvider()
+    app.state.ocr_service = OCRService()
+    app.state.scan_upload_slots = asyncio.Semaphore(2)
+    app.state.scan_match_slots = asyncio.Semaphore(4)
     app.include_router(auth_router)
     app.include_router(inventory_router)
     app.include_router(boxes_router)
     app.include_router(pokemon_router)
     app.include_router(cards_router)
     app.include_router(sets_router)
+    app.include_router(scans_router)
     app.include_router(health_router)
     return app

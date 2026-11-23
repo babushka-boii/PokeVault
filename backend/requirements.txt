@@ -7,3 +7,7 @@ uvicorn==0.54.0
 httpx2==2.15.1
 authlib==1.9.1
 joserfc==1.7.1
+Pillow==13.0.0
+opencv-python-headless==4.14.0.94
+numpy==2.5.4
+pillow-heif==1.8.1

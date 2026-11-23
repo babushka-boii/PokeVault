@@ -575,3 +575,220 @@ distinct from deterministic component tests and public HTTP probes. Retained lim
 are English physical catalog coverage, conservative new-series exclusions, 2,000
 briefs per expansion, nullable incomplete progress, and no official-numbered subset
 or variant master-set tracking. Provider availability remains an external dependency.
+
+
+## Iteration 6 — OCR-assisted scanner (2026-11-10–11)
+
+The initial tree was clean on `feat/iteration-6-card-scanner` at `9f2854c`, after
+merged 5A–5D and a provider-evidence commit. The audited baseline gate passed 43
+provider-fixture checks, 355 backend tests (66 PostgreSQL) and 315 frontend tests.
+Development Alembic current was checked read-only at `0004 (head)` and reconfirmed
+after final verification on 2026-11-11. No migration,
+model/index change, development data mutation or Git history change was needed.
+
+The resumed audit preserved every modified/untracked scanner file. OCR supervision,
+image/extraction/matching services, API, React workflow, inventory retry identity and
+synthetic fixtures were already implemented. Final work closed review gaps: clearing
+an expansion also clears its hint; exact short official names work inside a selected
+set; same-owner focus/camera/details revalidation suspends and hides the workflow
+instead of losing its photo/draft/key. It still aborts pending work and clears state
+on logout, changed ownership or failed validation. Eleven lifecycle regressions were
+observed failing before the correction. Pending saves resume as explicit uncertain
+retries with the original key/payload. The independent reviewer rechecked all three
+findings and reported no remaining Critical/Important/Minor findings in that scope.
+
+### Runtime dependencies and reproducibility
+
+Python 3.14.10, Pillow 13.0.0 and native Tesseract 5.5.4/Leptonica 1.87.0 were verified on
+macOS arm64. The only added Python dependency is pinned Pillow. English/Spanish OCR
+data are installed; the exact Spanish source/hash, native output and fixture-font
+provenance are under `research/scanner/environment.json`. See [SCANNER.md](SCANNER.md)
+for macOS/Linux setup. Actual application tests cover installed capabilities and
+missing-executable startup/recognition failure with working manual matching.
+
+Recognition consumes a raw JPEG/PNG/supported-WebP body, 8 MiB maximum, 16 million decoded
+pixels, 8192 px edge limit and 2048 px working edge. HEIC is explicitly unsupported.
+Pillow/native OCR run in parent-managed temporary workers with output, concurrency
+and time bounds. No photo/EXIF/GPS/raw OCR is persisted or logged. A 20 s worker deadline
+plus separate 3 s language probe precedes a separately bounded 20 s matching stage.
+Session/CSRF, no-store, account isolation and provider canonical identity remain in
+existing infrastructure. API contracts and record-backed retry limits are in SCANNER.md.
+
+### Final complete gate — 2026-11-11
+
+`bash scripts/check.sh` completed with **exit 0** after all product review fixes:
+
+| Check | 5D baseline | Iteration 6 final |
+| --- | ---: | ---: |
+| Offline provider fixtures/report | 43 passed | **43 passed** |
+| Backend | 355 passed | **508 passed (+153)** |
+| PostgreSQL subset, included above | 66 passed | **75 passed (+9)** |
+| Frontend | 315 passed/29 files | **379 passed/32 files (+64)** |
+| Ruff / ESLint | Pass | **Pass** |
+| TypeScript | Pass | **Pass** |
+| Production build | Pass | **Pass, 101 modules** |
+| Whitespace | Pass | **Pass** |
+
+**No skipped or failing tests.** New backend cases comprise 47 image/OCR/extraction,
+56 matching/provider, 32 scanner HTTP/application, 9 inventory replay and 9 PostgreSQL
+integration tests. Four OCR tests execute the actual engine on original fixtures;
+an additional application test queries installed native capabilities. On a machine
+without native data these optional native cases can skip, which must be reported;
+none skipped here. All external catalog/Google boundaries in standard tests are
+offline. Database tests use the existing dedicated test DB's disposable schemas only.
+Concurrency tests prove identical confirmations yield one durable UUID, conflicting
+payloads fail without overwrite, different owners are isolated and intentional new
+keys create separate copies. Completion remains distinct-printing-derived and boxes
+are unchanged. Recognition/matching produce no inventory writes.
+
+A preliminary gate also passed 497 backend/368 frontend before final extraction and
+review regressions; it is not the final count. Sandbox attempts unable to reach
+localhost PostgreSQL or public TCGdex were rerun with approved access, never bypassed
+by skipping tests or weakening assertions. No credentials were printed or changed.
+
+### Actual OCR evidence and limits
+
+`research/scanner/results.json` retains the original run; `results-final.json` records
+the final recheck on 2026-11-11. Both use 14 original generated text/geometric samples
+and a real local OCR process with production matching against 510 captured physical
+catalog identities in three expansions. No copyrighted card artwork or private photo
+is committed. The first generation's default font lacked accented glyphs; it was
+replaced with a locally installed font, visually checked and evaluated again before
+claiming Spanish evidence. Font files are not redistributed.
+
+Final results: **11/11 top-1 and 11/11 top-3** labeled cases, **2/2 abstentions**, and
+**1/1 ambiguity preserved**. Observed OCR latency was **0.2020–0.4981 s, median 0.2334 s**;
+peak sampled evaluator/worker/native RSS approximately **180.05 MiB**. RSS sampling
+can miss peaks and is not a hard ceiling/two-worker benchmark. These small synthetic
+results do not establish real-card-photo or global retrieval accuracy. Latency excludes
+candidate matching and network work; no confidence percentages are shown in the app.
+
+Separately, `research/scanner/live_smoke.json` records one original upright sample
+through real OCR and live TCGdex matching: `sv03.5-025` ranked first among six
+alternatives in 3.130 s including provider work. That was a service-level public-data
+probe; it performed no inventory write, browser interaction or Google flow. Additional
+name-query probes and six captured EN/ES checklist sources retain URLs/hashes under
+research. No real-photo, mobile camera, Safari/Chromium or live OAuth acceptance was
+performed. Use SCANNER.md's checklist before publication. Standalone promo numbers
+without a fraction need manual entry; physical English coverage, provider uptime,
+foil/glare/perspective and limited global name discovery remain explicit limitations.
+
+
+## Scanner Milestone A — 2026-11-23
+
+Scoped continuation completed HEIC/baseline verification only. Existing native
+registration, image validation, API capability/schema changes, geometry/regional OCR,
+frontend HEIC upload and the verified baseline were recovered intact. No new OCR
+algorithm, dependency or UI redesign was added in this session.
+
+Added HEIF orientation/metadata and corrupt-content regressions, plus two real native
+HTTP cases covering both HEIC MIME aliases, exact fixture extraction, no-store and
+zero inventory writes. Replaced the obsolete unsupported-HEIC envelope case with
+unsupported TIFF; corrupt HEIC now exercises the real decoder instead of a fake OCR
+service. Fixed formatting/import lint in the touched modules.
+
+Focused validation: **66 backend tests passed, no skips** (HEIF, OCR/security and
+scanner HTTP); **20 frontend scanner-service tests passed**; scoped Ruff/ESLint and
+frontend TypeScript passed. Three initial process-cleanup assertions could not run
+`ps` inside the sandbox; the approved rerun passed without changing assertions.
+The complete gate was deliberately deferred per the one-milestone instruction.
+
+| Original private photograph | Preserved baseline | Current original HEIC |
+| --- | --- | --- |
+| Cranidos 044/084 | “hat”, 044/84; me05-044 first, uncertain | Cranidos, 044/84; me05-044 first, possible |
+| Armarouge 086/084 | “xe”, no number; no candidates | Armarouge, 086/84; me05-086 first, possible; me05-012 uncertain alternative |
+
+Direct HEIC OCR took 1.9509 / 1.6596 s; total OCR+catalog took 4.5785 / 1.6653 s.
+CPU was 3.0909 / 1.9993 s; approximate sampled process-tree RSS was 213.23 / 232.30 MiB.
+These are single runs, with provider cache warming between inputs; no throughput or
+general speed/accuracy claim follows. Preserved baseline OCR was 0.5021 / 3.0048 s.
+A current lossless-PNG rerun used exactly the baseline's processed-input hashes and
+returned the same clues and candidate ordering as direct HEIC. Art/visual reranking
+is not wired into the scanner route and contributed no evidence to these results.
+
+Reproduce using `research/scanner/evaluate_private.py` with the authorized input
+directory, `--date`, and `--output`; add `--baseline` for frozen source or `--png` for
+matched decoded inputs. Photos are selected by manifest hashes, never filename or
+production hardcoding. Results: `real_photo_heic_milestone_a.json` and
+`real_photo_png_milestone_a.json`. Original hashes remain unchanged; no private
+images were copied into the repository or uploaded. Tesseract 5.5.4 and pillow-heif
+1.8.1 were used. Real browser/camera acceptance remains pending.
+
+Next single milestone: B, focused completion/review of recognition fallback behavior
+when card localization is uncertain. Pending hybrid/UI integration work is preserved;
+this checkpoint does not claim the full branch is ready to commit.
+
+
+## Scanner Milestone B — 2026-11-23
+
+Finished only the accepted-crop fallback gap. The previously added unproductive-crop
+regression and six new deterministic cases failed before the fix. Nine new tests
+now cover empty/partial/strong/conflicting crops, no cross-path splicing, timeout
+preservation, shared four-second allowance, and actual native recovery after an
+overaggressive crop of upright/90-degree original synthetic images. Existing geometry
+cases retain uncertain/noisy/partial boundaries and mild rotations. No hybrid or UI
+redesign was started; only ES/EN notices were added to the existing display.
+
+Final focused command covers fallback, regions, geometry, extraction, OCR, HEIF,
+matching, provider and scanner HTTP: **172 passed, zero failures/skips**. Scoped Ruff, dictionary ESLint and frontend
+TypeScript pass. Full-project gate remains deferred by the milestone instruction.
+
+| Original HEIC | Name / number | Top candidate / quality | Evidence | A OCR → B OCR |
+| --- | --- | --- | --- | --- |
+| Cranidos | Cranidos / 044/084 | me05-044 / possible | exact name, number, printed total | 1.9509 → 2.3296 s |
+| Armarouge | Armarouge / 086/084 | me05-086 / possible | exact name, number, printed total | 1.6596 → 2.2734 s |
+
+Armarouge retains me05-012 as an uncertain alternative. Both disclose localization
+conflict; stronger cropped clues remain intact. Total service times were 5.1107 /
+2.2792 s (including live catalog work), CPU 3.4683 / 2.7454 s, sampled tree RSS
+223.14 / 244.27 MiB. Network/cache and single-run timing preclude a general speed claim.
+No match-quality labels were promoted.
+
+The separate 14-image original synthetic run preserves 11/11 top-1 and top-3 hits,
+2/2 abstentions, 1/1 ambiguity, and 14/14 normalized name/number/total/category checks.
+Median OCR 0.3221 s, range 0.2860–0.7697 s, approximate peak RSS 237.48 MiB. Evidence:
+`research/scanner/results-milestone-b.json`. Real photographs remain outside Git;
+original hashes are checked by the evaluator. No browser acceptance or full-gate pass
+is claimed. Next milestone should review the already pending consecutive-scan UI and
+its session/cancellation behavior, separately from this completed fallback change.
+
+### Milestone D — final validation (2026-11-23)
+
+Real Zen browser acceptance completed with existing Google OAuth, local FastAPI,
+PostgreSQL, Tesseract 5.5.4 and pillow-heif 1.8.1. Original HEIC Cranidos → me05-044
+and Armarouge → me05-086 ranked first as possible matches. Explicit selection and
+save created exactly two acceptance copies, retained in the development database.
+Both collection detail pages and read-only PostgreSQL queries confirmed persistence;
+migration remains 0004. Spanish/English flow, next-scan reset and focus were observed.
+Race/failure scenarios have automated coverage, not browser fault-injection evidence.
+
+Final bash scripts/check.sh exited 0: 43 unittest cases, 586 backend cases (including
+75 PostgreSQL integration cases), 406 frontend cases across 32 files; zero failures
+or skips. Provider validation, Ruff, ESLint, TypeScript, build and whitespace passed.
+Earlier gate attempts found one copied-patch false positive in existing unintegrated
+visual code and 25 scanner lint violations. Fixed without enabling hybrid recognition
+or weakening tests. Focused runs: 43 backend, 98 frontend and 15 visual tests passed.
+
+Ready for final user acceptance. Mobile camera/touch, narrow-screen and VoiceOver
+remain manual: http://localhost:5173/scanner on the development Mac. No private images
+stored in the repository, secrets changed, database resets, commits or pushes.
+See docs/SCANNER.md for copy identifiers and detailed browser evidence.
+
+### Acceptance regression follow-up — 2026-11-23
+
+Recovered the two absent candidates in the five-photo sample with bounded fallback
+framing, layout-aware Trainer title OCR and language-aware discovery budget ordering.
+All five expected cards now rank first, as do the prior Cranidos/Armarouge HEICs.
+Jamming Tower and Zigzagoon numbers remain unreadable: same-name printings remain
+ambiguous, requiring explicit confirmation. This is not a general accuracy claim.
+Scorbunny retains a partial OCR title and uncertain confidence. See docs/SCANNER.md
+and research/scanner/acceptance_regression_{before,after}.json for measured evidence.
+
+Validation: 100 focused tests; one complete scripts/check.sh run passed with 43
+unittest, 593 backend and 406 frontend tests, zero skips/failures. Ruff, ESLint,
+TypeScript, production build and whitespace passed. Seven general regression cases
+cover bounded localized discovery, incomplete regional names, secret numbering,
+Trainer headers/title regions and interrupted geometric boundaries. No private
+images committed, inventory writes, credentials changes, commits or pushes.
+Remaining: improve outlined footer OCR using independent evidence; do not infer a
+printing solely from first rank. No hybrid recognition or Iteration 7 work.
