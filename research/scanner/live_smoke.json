@@ -1,0 +1,42 @@
+{
+  "checked_at": "2026-11-11T18:21:15.533488+00:00",
+  "sample": "research/scanner/samples/upright-en.png",
+  "synthetic": true,
+  "engine_languages": [
+    "eng",
+    "spa"
+  ],
+  "clues": {
+    "name": "Pikachu",
+    "local_number": "025",
+    "printed_total": 165,
+    "set_id": null,
+    "set_hint": "",
+    "category": "Pokemon",
+    "language": "en"
+  },
+  "provider": "live TCGdex via existing CardProvider",
+  "status": "matches",
+  "candidate_ids": [
+    "sv03.5-025",
+    "ecard1-124",
+    "sv03.5-173",
+    "ecard1-25",
+    "ecard1-22",
+    "ecard1-58"
+  ],
+  "qualities": [
+    "possible",
+    "uncertain",
+    "uncertain",
+    "uncertain",
+    "uncertain",
+    "uncertain"
+  ],
+  "limited": false,
+  "warnings": [
+    "category_unverified",
+    "conflicting_clues"
+  ],
+  "elapsed_seconds": 3.13
+}

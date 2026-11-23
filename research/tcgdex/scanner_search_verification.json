@@ -1,0 +1,226 @@
+{
+  "purpose": "Iteration 6 bounded literal scanner-name discovery verification",
+  "verified_on": "2026-11-10",
+  "recorded_at": "2026-11-10T20:27:19.898880+00:00",
+  "request_budget": 6,
+  "official_reference": "https://tcgdex.dev/rest/filtering-sorting-pagination",
+  "coverage": "Sampled public name pages only; not a complete physical catalog",
+  "artwork_binaries_fetched": false,
+  "furret_language_membership": {
+    "english_count": 12,
+    "spanish_count": 4,
+    "intersection": 4
+  },
+  "requests": [
+    {
+      "case": "pikachu_en",
+      "url": "https://api.tcgdex.net/v2/en/cards?name=like%3APikachu&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=64",
+      "method": "GET",
+      "status": 200,
+      "sha256": "6ff6a982e580d6f85fcd5eacf0939e2128c301138ec608e532402484c4c15199",
+      "summary": {
+        "count": 64,
+        "unique_ids": 64,
+        "at_requested_bound": true,
+        "fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "sample": [
+          {
+            "id": "2014xy-5",
+            "localId": "5",
+            "name": "Pikachu"
+          },
+          {
+            "id": "2015xy-6",
+            "localId": "6",
+            "name": "Pikachu"
+          },
+          {
+            "id": "2016xy-6",
+            "localId": "6",
+            "name": "Pikachu"
+          }
+        ]
+      }
+    },
+    {
+      "case": "furret_en",
+      "url": "https://api.tcgdex.net/v2/en/cards?name=like%3AFurret&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=64",
+      "method": "GET",
+      "status": 200,
+      "sha256": "3b03c402cb49cec94a5a9d595f54a5196952b5f4e375b11a9ee1e82dd56e760c",
+      "summary": {
+        "count": 12,
+        "unique_ids": 12,
+        "at_requested_bound": false,
+        "fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "sample": [
+          {
+            "id": "A4-139",
+            "localId": "139",
+            "name": "Furret"
+          },
+          {
+            "id": "B2-129",
+            "localId": "129",
+            "name": "Furret"
+          },
+          {
+            "id": "dp3-27",
+            "localId": "27",
+            "name": "Furret"
+          }
+        ]
+      }
+    },
+    {
+      "case": "furret_es",
+      "url": "https://api.tcgdex.net/v2/es/cards?name=like%3AFurret&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=64",
+      "method": "GET",
+      "status": 200,
+      "sha256": "79fff3bd660fa7c1a09873f734b321b51a7bda40d2ceb1e12cd93f4c0095a66b",
+      "summary": {
+        "count": 4,
+        "unique_ids": 4,
+        "at_requested_bound": false,
+        "fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "sample": [
+          {
+            "id": "sv09-119",
+            "localId": "119",
+            "name": "Furret"
+          },
+          {
+            "id": "sv09-168",
+            "localId": "168",
+            "name": "Furret"
+          },
+          {
+            "id": "swsh3-136",
+            "localId": "136",
+            "name": "Furret"
+          }
+        ]
+      }
+    },
+    {
+      "case": "trainer_en",
+      "url": "https://api.tcgdex.net/v2/en/cards?name=like%3AProfessor+Oak&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=64",
+      "method": "GET",
+      "status": 200,
+      "sha256": "dc1c547f9a0ff95a524673934f5b351eef1903c17d9d1155fa2337d08ce843d0",
+      "summary": {
+        "count": 17,
+        "unique_ids": 17,
+        "at_requested_bound": false,
+        "fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "sample": [
+          {
+            "id": "base1-73",
+            "localId": "73",
+            "name": "Impostor Professor Oak"
+          },
+          {
+            "id": "base1-88",
+            "localId": "88",
+            "name": "Professor Oak"
+          },
+          {
+            "id": "base4-102",
+            "localId": "102",
+            "name": "Impostor Professor Oak"
+          }
+        ]
+      }
+    },
+    {
+      "case": "energy_en",
+      "url": "https://api.tcgdex.net/v2/en/cards?name=like%3AGrass+Energy&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=64",
+      "method": "GET",
+      "status": 200,
+      "sha256": "d2f151097ab62262403f87daca4e2a5c1324ff5f279a149df68b68fdb5217c87",
+      "summary": {
+        "count": 36,
+        "unique_ids": 36,
+        "at_requested_bound": false,
+        "fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "sample": [
+          {
+            "id": "base1-99",
+            "localId": "99",
+            "name": "Grass Energy"
+          },
+          {
+            "id": "base4-127",
+            "localId": "127",
+            "name": "Grass Energy"
+          },
+          {
+            "id": "bw1-105",
+            "localId": "105",
+            "name": "Grass Energy"
+          }
+        ]
+      }
+    },
+    {
+      "case": "energy_es",
+      "url": "https://api.tcgdex.net/v2/es/cards?name=like%3AEnerg%C3%ADa+Planta&sort%3Afield=id&sort%3Aorder=ASC&pagination%3Apage=1&pagination%3AitemsPerPage=64",
+      "method": "GET",
+      "status": 200,
+      "sha256": "6983c648e2103c53b17e561cdf6bfe01ff37ecf8c67bd187076be74280e1f7a5",
+      "summary": {
+        "count": 16,
+        "unique_ids": 16,
+        "at_requested_bound": false,
+        "fields": [
+          "id",
+          "image",
+          "localId",
+          "name"
+        ],
+        "sample": [
+          {
+            "id": "bw1-105",
+            "localId": "105",
+            "name": "Energía Planta"
+          },
+          {
+            "id": "mee-001",
+            "localId": "001",
+            "name": "Energía Planta"
+          },
+          {
+            "id": "mee-009",
+            "localId": "009",
+            "name": "Energía Planta Básica"
+          }
+        ]
+      }
+    }
+  ]
+}

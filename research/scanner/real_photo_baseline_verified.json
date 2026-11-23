@@ -1,0 +1,102 @@
+{
+  "date": "2026-11-20",
+  "implementation": "baseline",
+  "input_mode": "lossless full-image PNG decode",
+  "platform": "macOS-27.2.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.10",
+  "source_hashes": {
+    "worker.py": "4490a865b7970ade033ebf2b0cb2cbe7035016b565e62cadee1f004af96de3a9",
+    "__init__.py": "6bab311927e6a007070084d4bed9273f5a19632c36df8f0b735ca1447faf3667",
+    "matching.py": "c9300cd3eab938ef02accc1986a92770aff1c7b6a31599b46651db40b7ca65a6",
+    "ocr.py": "295d0768ad219be8f1aa8187215f6ddc90c47aceb748d50a3f006629bd9bbeb5",
+    "schemas.py": "f51e9ed85e28831ba8bcbd1155c0caa67e9a59f4cd1d7983d9db8f3ae16097a7",
+    "extraction.py": "483510fc00aa29c2b865507b10c1df17fc810f11ce79edded7975ce60c844e26",
+    "geometry.py": "03e095d5006371358824ea865c7de565536d58fb0ffc70c20f3d5401c8774d3e",
+    "images.py": "dcfea829b85b2863aeef18816d8d363a82e19ccd7b69e77e8ba3b09a0b3b543b",
+    "heif.py": "eeea786d963cd17c49fb484338cdf911fec54ca2ed4fea3ed42494eb545a8e44",
+    "errors.py": "12ad7b562d68b132f5f90e57e0464139745c0d4f776c455f883bf1f3e7824136",
+    "normalization.py": "9fdcf6cfdef8865d2da060ab015f78b519a57f081ab2f6ffcd049a06021fa278"
+  },
+  "scope": "Two authorized real photos; no independent held-out photo set. No global accuracy claim.",
+  "memory_method": "Approximate 50ms sampled evaluator/descendant RSS including brief ps; not a hard ceiling. CPU sums process self and reaped children.",
+  "metrics": {
+    "name_exact": 0,
+    "number_exact": 1,
+    "total_exact": 1,
+    "top1": 1,
+    "top3": 1
+  },
+  "photos": [
+    {
+      "sample": "photo-1",
+      "original_sha256": "bd14523b2a4940bde384783fe93b4939fc921b07a5b7f2fb01801139ce3ef849",
+      "processed_input_sha256": "65da775c424b6813e54c89d183f2cefe850e2906a357267cf39969e8cd01c42c",
+      "mime": "image/png",
+      "expected_id": "me05-044",
+      "clues": {
+        "name": "hat",
+        "local_number": "044",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "ocr_warnings": [],
+      "card_detected": null,
+      "name_exact": false,
+      "number_exact": true,
+      "total_exact": true,
+      "top1": true,
+      "top3": true,
+      "candidates": [
+        {
+          "id": "me05-044",
+          "quality": "uncertain",
+          "evidence": [
+            "number_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "match_warnings": [
+        "conflicting_clues"
+      ],
+      "limited": false,
+      "ocr_seconds": 0.5021,
+      "total_seconds": 3.1904,
+      "cpu_seconds": 1.3694,
+      "peak_sampled_tree_rss_mib": 203.48
+    },
+    {
+      "sample": "photo-2",
+      "original_sha256": "f69dd39fa2555a728cf28801c0d99ab3545ae3acb507429a0ab56b088d7b94e6",
+      "processed_input_sha256": "84ae761a08b74aea58454b3344914440d0afd25b762123d534a6551a121f0178",
+      "mime": "image/png",
+      "expected_id": "me05-086",
+      "clues": {
+        "name": "xe",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "card_detected": null,
+      "name_exact": false,
+      "number_exact": false,
+      "total_exact": false,
+      "top1": false,
+      "top3": false,
+      "candidates": [],
+      "match_warnings": [],
+      "limited": false,
+      "ocr_seconds": 3.0048,
+      "total_seconds": 3.0056,
+      "cpu_seconds": 3.5939,
+      "peak_sampled_tree_rss_mib": 236.16
+    }
+  ]
+}

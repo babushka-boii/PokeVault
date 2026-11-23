@@ -1,0 +1,572 @@
+{
+  "measured_at": "2026-11-11T01:52:29.734129+00:00",
+  "scope": "14 original synthetic text/geometric images; real local OCR; production matcher; offline captured facts for 510 physical cards in three expansions. No real photographs and no live provider calls. Small constrained catalog is not representative of global retrieval or card-photo accuracy.",
+  "environment": {
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "python": "3.14.10",
+    "pillow": "13.0.0",
+    "tesseract": "tesseract 5.5.4",
+    "languages": [
+      "eng",
+      "spa"
+    ]
+  },
+  "metrics": {
+    "total_images": 14,
+    "identified_images": 11,
+    "top1_hits": 11,
+    "top3_hits": 11,
+    "top1_accuracy": 1.0,
+    "top3_recall": 1.0,
+    "abstention_hits": 2,
+    "abstention_cases": 2,
+    "ambiguity_preserved": 1,
+    "ambiguity_cases": 1,
+    "name_exact_normalized": 14,
+    "number_exact": 14,
+    "total_exact": 14,
+    "category_exact": 14,
+    "ocr_latency_seconds_min": 0.2084,
+    "ocr_latency_seconds_median": 0.2323,
+    "ocr_latency_seconds_max": 0.5063,
+    "peak_sampled_tree_rss_mib": 178.27
+  },
+  "memory_method": "Sum of RSS for evaluator and descendants sampled via ps every ~50ms, including the brief ps process. This observed peak is approximate, includes interpreter/worker/Tesseract, and is not a hard limit or a simultaneous two-worker benchmark.",
+  "results": [
+    {
+      "case": "upright-en",
+      "expected_id": "sv03.5-025",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Pikachu",
+        "local_number": "025",
+        "printed_total": 165,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "sv03.5-025",
+        "sv03.5-173"
+      ],
+      "qualities": [
+        "possible",
+        "uncertain"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified",
+        "conflicting_clues"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2314,
+      "peak_sampled_tree_rss_mib": 146.09
+    },
+    {
+      "case": "upright-es",
+      "expected_id": "swsh3-136",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Furret",
+        "local_number": "136",
+        "printed_total": 189,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "es"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "swsh3-136"
+      ],
+      "qualities": [
+        "possible"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2187,
+      "peak_sampled_tree_rss_mib": 149.72
+    },
+    {
+      "case": "mild-rotation",
+      "expected_id": "sv03.5-025",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Pikachu",
+        "local_number": "025",
+        "printed_total": 165,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "sv03.5-025",
+        "sv03.5-173"
+      ],
+      "qualities": [
+        "possible",
+        "uncertain"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified",
+        "conflicting_clues"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2232,
+      "peak_sampled_tree_rss_mib": 150.08
+    },
+    {
+      "case": "low-contrast-trainer",
+      "expected_id": "base1-88",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Professor Oak",
+        "local_number": "088",
+        "printed_total": 102,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Trainer",
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "base1-88"
+      ],
+      "qualities": [
+        "possible"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.222,
+      "peak_sampled_tree_rss_mib": 150.05
+    },
+    {
+      "case": "small-punctuation",
+      "expected_id": "sv03.5-122",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Mr. Mime",
+        "local_number": "122",
+        "printed_total": 165,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "sv03.5-122",
+        "sv03.5-179"
+      ],
+      "qualities": [
+        "possible",
+        "uncertain"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified",
+        "conflicting_clues"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2084,
+      "peak_sampled_tree_rss_mib": 144.69
+    },
+    {
+      "case": "large-dimensions",
+      "expected_id": "sv03.5-025",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Pikachu",
+        "local_number": "025",
+        "printed_total": 165,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "sv03.5-025",
+        "sv03.5-173"
+      ],
+      "qualities": [
+        "possible",
+        "uncertain"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified",
+        "conflicting_clues"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2959,
+      "peak_sampled_tree_rss_mib": 178.27
+    },
+    {
+      "case": "quarter-turn",
+      "expected_id": "swsh3-136",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Furret",
+        "local_number": "136",
+        "printed_total": 189,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "en"
+      },
+      "ocr_warnings": [
+        "image_rotated"
+      ],
+      "candidate_ids": [
+        "swsh3-136"
+      ],
+      "qualities": [
+        "possible"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.5063,
+      "peak_sampled_tree_rss_mib": 152.09
+    },
+    {
+      "case": "upside-down-energy",
+      "expected_id": "base1-99",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Grass Energy",
+        "local_number": "099",
+        "printed_total": 102,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Energy",
+        "language": "en"
+      },
+      "ocr_warnings": [
+        "image_rotated"
+      ],
+      "candidate_ids": [
+        "base1-99"
+      ],
+      "qualities": [
+        "possible"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.4391,
+      "peak_sampled_tree_rss_mib": 150.25
+    },
+    {
+      "case": "spanish-accent-trainer",
+      "expected_id": "swsh3-159",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Ornitólogo",
+        "local_number": "159",
+        "printed_total": 189,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Trainer",
+        "language": "es"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "swsh3-159"
+      ],
+      "qualities": [
+        "possible"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2332,
+      "peak_sampled_tree_rss_mib": 149.11
+    },
+    {
+      "case": "spanish-energy",
+      "expected_id": "sv03.5-207",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Energia Psychic Basica",
+        "local_number": "207",
+        "printed_total": 165,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Energy",
+        "language": "es"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "sv03.5-207"
+      ],
+      "qualities": [
+        "possible"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2305,
+      "peak_sampled_tree_rss_mib": 149.62
+    },
+    {
+      "case": "deliberate-name-typo",
+      "expected_id": "sv03.5-025",
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Pikacbu",
+        "local_number": "025",
+        "printed_total": 165,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "sv03.5-025",
+        "sv03.5-173"
+      ],
+      "qualities": [
+        "possible",
+        "uncertain"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified",
+        "conflicting_clues"
+      ],
+      "matching_limited": false,
+      "top1": true,
+      "top3": true,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.2241,
+      "peak_sampled_tree_rss_mib": 149.88
+    },
+    {
+      "case": "ambiguous-name",
+      "expected_id": null,
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "Pikachu",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "en"
+      },
+      "ocr_warnings": [],
+      "candidate_ids": [
+        "base1-58",
+        "sv03.5-025",
+        "sv03.5-173"
+      ],
+      "qualities": [
+        "possible",
+        "possible",
+        "possible"
+      ],
+      "matching_status": "matches",
+      "matching_warnings": [
+        "category_unverified",
+        "search_limited"
+      ],
+      "matching_limited": true,
+      "top1": false,
+      "top3": false,
+      "expected_abstention": false,
+      "abstained": false,
+      "expected_ambiguity": true,
+      "ambiguity_preserved": true,
+      "ocr_seconds": 0.5011,
+      "peak_sampled_tree_rss_mib": 151.81
+    },
+    {
+      "case": "blank",
+      "expected_id": null,
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "ocr_warnings": [
+        "no_text_found"
+      ],
+      "candidate_ids": [],
+      "qualities": [],
+      "matching_status": "insufficient_clues",
+      "matching_warnings": [],
+      "matching_limited": false,
+      "top1": false,
+      "top3": false,
+      "expected_abstention": true,
+      "abstained": true,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.4102,
+      "peak_sampled_tree_rss_mib": 148.48
+    },
+    {
+      "case": "geometric-noise",
+      "expected_id": null,
+      "name_exact_normalized": true,
+      "printed_number_exact": true,
+      "printed_total_exact": true,
+      "category_exact": true,
+      "clues": {
+        "name": "",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "ocr_warnings": [
+        "no_identifying_clues"
+      ],
+      "candidate_ids": [],
+      "qualities": [],
+      "matching_status": "insufficient_clues",
+      "matching_warnings": [],
+      "matching_limited": false,
+      "top1": false,
+      "top3": false,
+      "expected_abstention": true,
+      "abstained": true,
+      "expected_ambiguity": false,
+      "ambiguity_preserved": false,
+      "ocr_seconds": 0.4395,
+      "peak_sampled_tree_rss_mib": 150.88
+    }
+  ]
+}

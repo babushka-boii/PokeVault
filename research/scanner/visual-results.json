@@ -1,0 +1,2003 @@
+{
+  "scope": "Original procedural controls only, not real photos or measured real-card accuracy. Six controls share layout and low-frequency art structure, with independent local geometric textures. No confidence calibration.",
+  "measured_at": "2026-11-19T19:20:20.765005+00:00",
+  "platform": "macOS-27.2.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.10",
+  "opencv": "4.14.0",
+  "numpy": "2.5.4",
+  "threads": 10,
+  "methods": "Global pHash/dHash with best of four orientations; ORB with art-region features, Hamming ratio, RANSAC and spatial verification. Cached reference hashes; ORB currently recomputes features for every pair. No network, cold process startup or artwork decode included.",
+  "summary": {
+    "phash": {
+      "top1": 29,
+      "top3": 34,
+      "cases": 42,
+      "median_ms": 0.927,
+      "max_ms": 2.467
+    },
+    "dhash": {
+      "top1": 28,
+      "top3": 36,
+      "cases": 42,
+      "median_ms": 0.732,
+      "max_ms": 2.039
+    },
+    "orb": {
+      "top1": 42,
+      "top3": 42,
+      "cases": 42,
+      "median_ms": 58.95,
+      "max_ms": 111.879
+    }
+  },
+  "negative_controls": [
+    {
+      "condition": "blank",
+      "orb_qualified_controls": []
+    },
+    {
+      "condition": "unseen_art_same_template",
+      "orb_qualified_controls": []
+    }
+  ],
+  "cases": [
+    {
+      "control": 0,
+      "condition": "already_rectified",
+      "sha256_pixels": "9008ba7ae4a4d146ed0f8c03931566e7363666749050e4b18c9b66d33cd20887",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            0,
+            6,
+            6,
+            14,
+            10,
+            12
+          ],
+          "elapsed_ms": 1.093
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            0,
+            6,
+            13,
+            14,
+            13,
+            12
+          ],
+          "elapsed_ms": 0.687
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 0,
+              "inliers": 536,
+              "support": 0.31905
+            },
+            {
+              "control": 3,
+              "inliers": 21,
+              "support": 0.06705
+            },
+            {
+              "control": 4,
+              "inliers": 20,
+              "support": 0.07277
+            }
+          ],
+          "elapsed_ms": 60.131
+        }
+      }
+    },
+    {
+      "control": 0,
+      "condition": "dim",
+      "sha256_pixels": "f27b709f9fd51a374957c0dfcb518cf632e73895da6e91d756b2247a66f6e975",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            0,
+            6,
+            6,
+            14,
+            10,
+            12
+          ],
+          "elapsed_ms": 0.895
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            5,
+            11,
+            18,
+            19,
+            18,
+            17
+          ],
+          "elapsed_ms": 0.728
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 0,
+              "inliers": 517,
+              "support": 0.31303
+            },
+            {
+              "control": 3,
+              "inliers": 15,
+              "support": 0.16707
+            }
+          ],
+          "elapsed_ms": 58.513
+        }
+      }
+    },
+    {
+      "control": 0,
+      "condition": "blur",
+      "sha256_pixels": "ee4c5c5c17675b05d16aa2e06d33fa804c89eee3f55f8cdd31ebff8e1de0dac8",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            0,
+            6,
+            6,
+            14,
+            10,
+            12
+          ],
+          "elapsed_ms": 0.91
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            0,
+            6,
+            13,
+            14,
+            13,
+            12
+          ],
+          "elapsed_ms": 0.709
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 0,
+              "inliers": 493,
+              "support": 0.2616
+            }
+          ],
+          "elapsed_ms": 56.457
+        }
+      }
+    },
+    {
+      "control": 0,
+      "condition": "quarter_turn",
+      "sha256_pixels": "2d63439462e8812c977679d7a436f48eecaeec1e891abd33be527a1e626e8487",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            0,
+            6,
+            6,
+            14,
+            10,
+            12
+          ],
+          "elapsed_ms": 0.949
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            0,
+            6,
+            13,
+            14,
+            13,
+            12
+          ],
+          "elapsed_ms": 0.745
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 0,
+              "inliers": 536,
+              "support": 0.31905
+            },
+            {
+              "control": 3,
+              "inliers": 21,
+              "support": 0.06705
+            },
+            {
+              "control": 4,
+              "inliers": 20,
+              "support": 0.07277
+            }
+          ],
+          "elapsed_ms": 58.942
+        }
+      }
+    },
+    {
+      "control": 0,
+      "condition": "synthetic_glare",
+      "sha256_pixels": "0559451829adde178e2d8612f49248eb2358d86bec8a008307f6eaa460f56da8",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            20,
+            20,
+            22,
+            20,
+            22
+          ],
+          "elapsed_ms": 0.872
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            7,
+            11,
+            18,
+            19,
+            14,
+            17
+          ],
+          "elapsed_ms": 0.701
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 0,
+              "inliers": 410,
+              "support": 0.31554
+            },
+            {
+              "control": 3,
+              "inliers": 21,
+              "support": 0.1906
+            },
+            {
+              "control": 2,
+              "inliers": 20,
+              "support": 0.06225
+            }
+          ],
+          "elapsed_ms": 57.624
+        }
+      }
+    },
+    {
+      "control": 0,
+      "condition": "perspective_background",
+      "sha256_pixels": "9c73b61ded778bc624759cba79cef098ad7b89f516eb6beb3c4afb513a7052d9",
+      "methods": {
+        "phash": {
+          "rank": 2,
+          "winner_unique": true,
+          "distances": [
+            26,
+            24,
+            26,
+            26,
+            30,
+            26
+          ],
+          "elapsed_ms": 2.015
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            31,
+            33,
+            36,
+            32,
+            32,
+            33
+          ],
+          "elapsed_ms": 1.718
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 0,
+              "inliers": 201,
+              "support": 0.30779
+            }
+          ],
+          "elapsed_ms": 104.809
+        }
+      }
+    },
+    {
+      "control": 0,
+      "condition": "small_in_background",
+      "sha256_pixels": "633d4c0cb5bd6ad821d435106069e1e549bcfb1975bf5a272b86eaed75ad7969",
+      "methods": {
+        "phash": {
+          "rank": 3,
+          "winner_unique": false,
+          "distances": [
+            30,
+            30,
+            32,
+            28,
+            28,
+            30
+          ],
+          "elapsed_ms": 2.467
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            23,
+            27,
+            24,
+            26,
+            25,
+            25
+          ],
+          "elapsed_ms": 1.974
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 0,
+              "inliers": 186,
+              "support": 0.26561
+            }
+          ],
+          "elapsed_ms": 82.21
+        }
+      }
+    },
+    {
+      "control": 1,
+      "condition": "already_rectified",
+      "sha256_pixels": "dd8a7179b8ea526bbfe4ce0d28aa0126418513e141951274f9f3e63627e932dd",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            0,
+            4,
+            14,
+            10,
+            12
+          ],
+          "elapsed_ms": 0.903
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            0,
+            11,
+            16,
+            13,
+            10
+          ],
+          "elapsed_ms": 0.729
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 1,
+              "inliers": 538,
+              "support": 0.35782
+            },
+            {
+              "control": 3,
+              "inliers": 23,
+              "support": 0.06705
+            }
+          ],
+          "elapsed_ms": 57.683
+        }
+      }
+    },
+    {
+      "control": 1,
+      "condition": "dim",
+      "sha256_pixels": "428cc7bef965a1af8eccaf9d6b81fe8c397fdaca030479368a17bf10e990c075",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            8,
+            2,
+            6,
+            14,
+            8,
+            12
+          ],
+          "elapsed_ms": 0.883
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            11,
+            5,
+            16,
+            21,
+            18,
+            15
+          ],
+          "elapsed_ms": 0.691
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 1,
+              "inliers": 516,
+              "support": 0.35251
+            }
+          ],
+          "elapsed_ms": 56.322
+        }
+      }
+    },
+    {
+      "control": 1,
+      "condition": "blur",
+      "sha256_pixels": "7889b94b401a36172d61526e485af63b44a594063877c2cfc29914a2da125771",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            2,
+            4,
+            14,
+            8,
+            12
+          ],
+          "elapsed_ms": 0.921
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            0,
+            11,
+            16,
+            13,
+            10
+          ],
+          "elapsed_ms": 0.724
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 1,
+              "inliers": 495,
+              "support": 0.29688
+            }
+          ],
+          "elapsed_ms": 64.726
+        }
+      }
+    },
+    {
+      "control": 1,
+      "condition": "quarter_turn",
+      "sha256_pixels": "4eadf9eb459f93b820db0f5015162598589e3ec0acf329a82c0f2fc9fbf87066",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            0,
+            4,
+            14,
+            10,
+            12
+          ],
+          "elapsed_ms": 0.931
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            0,
+            11,
+            16,
+            13,
+            10
+          ],
+          "elapsed_ms": 0.744
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 1,
+              "inliers": 538,
+              "support": 0.35782
+            },
+            {
+              "control": 3,
+              "inliers": 23,
+              "support": 0.06705
+            }
+          ],
+          "elapsed_ms": 58.515
+        }
+      }
+    },
+    {
+      "control": 1,
+      "condition": "synthetic_glare",
+      "sha256_pixels": "0ff9bde77e5c6f25af848131c4d181321bd2c3f3e985a56170d6ef1b0fc64159",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            18,
+            14,
+            16,
+            22,
+            18,
+            20
+          ],
+          "elapsed_ms": 0.897
+        },
+        "dhash": {
+          "rank": 2,
+          "winner_unique": false,
+          "distances": [
+            7,
+            7,
+            16,
+            17,
+            12,
+            15
+          ],
+          "elapsed_ms": 0.723
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 1,
+              "inliers": 350,
+              "support": 0.35697
+            },
+            {
+              "control": 0,
+              "inliers": 21,
+              "support": 0.06852
+            },
+            {
+              "control": 3,
+              "inliers": 20,
+              "support": 0.06699
+            },
+            {
+              "control": 4,
+              "inliers": 19,
+              "support": 0.06035
+            }
+          ],
+          "elapsed_ms": 60.275
+        }
+      }
+    },
+    {
+      "control": 1,
+      "condition": "perspective_background",
+      "sha256_pixels": "29b58296bebf93bc5add09695008d0a59be1c7110a31c6d39c14de6ccda7b52f",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            26,
+            24,
+            26,
+            26,
+            30,
+            26
+          ],
+          "elapsed_ms": 2.352
+        },
+        "dhash": {
+          "rank": 2,
+          "winner_unique": true,
+          "distances": [
+            30,
+            32,
+            37,
+            32,
+            33,
+            34
+          ],
+          "elapsed_ms": 1.813
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 1,
+              "inliers": 193,
+              "support": 0.34343
+            }
+          ],
+          "elapsed_ms": 103.603
+        }
+      }
+    },
+    {
+      "control": 1,
+      "condition": "small_in_background",
+      "sha256_pixels": "c785a9cb290fbd9ba37d31642ff74a7ef69b9ce336db9a2b93d2eae4457ecbe4",
+      "methods": {
+        "phash": {
+          "rank": 4,
+          "winner_unique": false,
+          "distances": [
+            30,
+            30,
+            32,
+            28,
+            28,
+            30
+          ],
+          "elapsed_ms": 2.399
+        },
+        "dhash": {
+          "rank": 6,
+          "winner_unique": true,
+          "distances": [
+            23,
+            27,
+            24,
+            26,
+            25,
+            25
+          ],
+          "elapsed_ms": 2.019
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 1,
+              "inliers": 208,
+              "support": 0.25691
+            }
+          ],
+          "elapsed_ms": 76.429
+        }
+      }
+    },
+    {
+      "control": 2,
+      "condition": "already_rectified",
+      "sha256_pixels": "2aab0f12168d8116eb32be63623714f392141b9583064e050ae2aefff4198ca0",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            4,
+            0,
+            10,
+            6,
+            10
+          ],
+          "elapsed_ms": 0.902
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            13,
+            11,
+            0,
+            15,
+            12,
+            13
+          ],
+          "elapsed_ms": 0.802
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 2,
+              "inliers": 551,
+              "support": 0.32149
+            }
+          ],
+          "elapsed_ms": 58.119
+        }
+      }
+    },
+    {
+      "control": 2,
+      "condition": "dim",
+      "sha256_pixels": "4a06f9d4381441c9a525676667225361024a733cb0154b3ab1eb22a7b67ea115",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            4,
+            0,
+            10,
+            6,
+            10
+          ],
+          "elapsed_ms": 0.92
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            19,
+            19,
+            10,
+            21,
+            18,
+            15
+          ],
+          "elapsed_ms": 0.731
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 2,
+              "inliers": 524,
+              "support": 0.31627
+            }
+          ],
+          "elapsed_ms": 58.538
+        }
+      }
+    },
+    {
+      "control": 2,
+      "condition": "blur",
+      "sha256_pixels": "947152cbac76216488ffb926e797cd0aca586e76429f1046d2f4c1462a1e98b3",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            4,
+            0,
+            10,
+            6,
+            10
+          ],
+          "elapsed_ms": 0.892
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            12,
+            1,
+            14,
+            13,
+            12
+          ],
+          "elapsed_ms": 0.7
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 2,
+              "inliers": 506,
+              "support": 0.26186
+            }
+          ],
+          "elapsed_ms": 55.927
+        }
+      }
+    },
+    {
+      "control": 2,
+      "condition": "quarter_turn",
+      "sha256_pixels": "01ce160653df9336b364e84bb3c10442d71c21667c74477a8d869e0a2cad4c87",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            6,
+            4,
+            0,
+            10,
+            6,
+            10
+          ],
+          "elapsed_ms": 0.943
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            13,
+            11,
+            0,
+            15,
+            12,
+            13
+          ],
+          "elapsed_ms": 0.745
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 2,
+              "inliers": 551,
+              "support": 0.32149
+            }
+          ],
+          "elapsed_ms": 58.766
+        }
+      }
+    },
+    {
+      "control": 2,
+      "condition": "synthetic_glare",
+      "sha256_pixels": "6ebbac64881fa18e9b82815263dfc5cd253fc07e0cdd3afc97d10f519448e0f3",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            18,
+            18,
+            16,
+            22,
+            18,
+            22
+          ],
+          "elapsed_ms": 0.908
+        },
+        "dhash": {
+          "rank": 4,
+          "winner_unique": true,
+          "distances": [
+            11,
+            13,
+            14,
+            19,
+            12,
+            19
+          ],
+          "elapsed_ms": 0.728
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 2,
+              "inliers": 398,
+              "support": 0.31417
+            }
+          ],
+          "elapsed_ms": 57.783
+        }
+      }
+    },
+    {
+      "control": 2,
+      "condition": "perspective_background",
+      "sha256_pixels": "16413caad1ede2971ec7e9d157343eb388c363ddccd9606f1efca0e427d22156",
+      "methods": {
+        "phash": {
+          "rank": 3,
+          "winner_unique": true,
+          "distances": [
+            26,
+            24,
+            26,
+            26,
+            30,
+            26
+          ],
+          "elapsed_ms": 1.921
+        },
+        "dhash": {
+          "rank": 6,
+          "winner_unique": true,
+          "distances": [
+            29,
+            31,
+            36,
+            33,
+            32,
+            33
+          ],
+          "elapsed_ms": 1.712
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 2,
+              "inliers": 224,
+              "support": 0.30837
+            }
+          ],
+          "elapsed_ms": 103.415
+        }
+      }
+    },
+    {
+      "control": 2,
+      "condition": "small_in_background",
+      "sha256_pixels": "21f510761a5043d368f5560f40cc7bec64bc6ec7255f1f3869b4fa6b694eb2ec",
+      "methods": {
+        "phash": {
+          "rank": 6,
+          "winner_unique": false,
+          "distances": [
+            30,
+            30,
+            32,
+            28,
+            28,
+            30
+          ],
+          "elapsed_ms": 2.266
+        },
+        "dhash": {
+          "rank": 2,
+          "winner_unique": true,
+          "distances": [
+            23,
+            27,
+            24,
+            26,
+            25,
+            25
+          ],
+          "elapsed_ms": 1.909
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 2,
+              "inliers": 218,
+              "support": 0.26352
+            }
+          ],
+          "elapsed_ms": 79.403
+        }
+      }
+    },
+    {
+      "control": 3,
+      "condition": "already_rectified",
+      "sha256_pixels": "5c266bd683f55c085f718c2073f3b234bacc0182e14e4e3ad3c9e86a4a51ee52",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            14,
+            10,
+            0,
+            8,
+            12
+          ],
+          "elapsed_ms": 0.923
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            16,
+            15,
+            0,
+            13,
+            16
+          ],
+          "elapsed_ms": 0.707
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 3,
+              "inliers": 523,
+              "support": 0.31057
+            },
+            {
+              "control": 4,
+              "inliers": 23,
+              "support": 0.06474
+            }
+          ],
+          "elapsed_ms": 57.219
+        }
+      }
+    },
+    {
+      "control": 3,
+      "condition": "dim",
+      "sha256_pixels": "20b342bf327ac45f4ec61912f976fb4346139ddad06324be9e0dfe0c54aafee1",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            14,
+            10,
+            0,
+            8,
+            12
+          ],
+          "elapsed_ms": 0.859
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            17,
+            19,
+            18,
+            7,
+            20,
+            19
+          ],
+          "elapsed_ms": 0.697
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 3,
+              "inliers": 501,
+              "support": 0.30532
+            }
+          ],
+          "elapsed_ms": 55.904
+        }
+      }
+    },
+    {
+      "control": 3,
+      "condition": "blur",
+      "sha256_pixels": "4c9e97749496ff40b105f42a6f4b3b99174514809607651e77f0ca9771798560",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            14,
+            10,
+            0,
+            8,
+            12
+          ],
+          "elapsed_ms": 0.883
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            16,
+            15,
+            0,
+            13,
+            16
+          ],
+          "elapsed_ms": 0.696
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 3,
+              "inliers": 480,
+              "support": 0.25743
+            }
+          ],
+          "elapsed_ms": 74.992
+        }
+      }
+    },
+    {
+      "control": 3,
+      "condition": "quarter_turn",
+      "sha256_pixels": "88ad6696e3b341fa073c7b96c0b88c6304705c3151442714cc344d34105a84d4",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            14,
+            10,
+            0,
+            8,
+            12
+          ],
+          "elapsed_ms": 0.909
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            14,
+            16,
+            15,
+            0,
+            13,
+            16
+          ],
+          "elapsed_ms": 0.726
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 3,
+              "inliers": 523,
+              "support": 0.31057
+            },
+            {
+              "control": 4,
+              "inliers": 23,
+              "support": 0.06474
+            }
+          ],
+          "elapsed_ms": 58.234
+        }
+      }
+    },
+    {
+      "control": 3,
+      "condition": "synthetic_glare",
+      "sha256_pixels": "4a395a0f5e910a0aac5eee49191c7d938ddb333d390ad325ecf22decde2242c0",
+      "methods": {
+        "phash": {
+          "rank": 5,
+          "winner_unique": true,
+          "distances": [
+            20,
+            18,
+            16,
+            20,
+            18,
+            22
+          ],
+          "elapsed_ms": 0.886
+        },
+        "dhash": {
+          "rank": 3,
+          "winner_unique": true,
+          "distances": [
+            10,
+            12,
+            17,
+            12,
+            13,
+            16
+          ],
+          "elapsed_ms": 0.725
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 3,
+              "inliers": 321,
+              "support": 0.30407
+            }
+          ],
+          "elapsed_ms": 57.009
+        }
+      }
+    },
+    {
+      "control": 3,
+      "condition": "perspective_background",
+      "sha256_pixels": "f165de53e89332a4ad760d7c98473d5220fc8c837745d63039ceaff9bdd71614",
+      "methods": {
+        "phash": {
+          "rank": 4,
+          "winner_unique": true,
+          "distances": [
+            26,
+            24,
+            26,
+            26,
+            30,
+            26
+          ],
+          "elapsed_ms": 1.853
+        },
+        "dhash": {
+          "rank": 3,
+          "winner_unique": true,
+          "distances": [
+            28,
+            30,
+            35,
+            33,
+            35,
+            33
+          ],
+          "elapsed_ms": 1.692
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 3,
+              "inliers": 203,
+              "support": 0.27924
+            }
+          ],
+          "elapsed_ms": 100.355
+        }
+      }
+    },
+    {
+      "control": 3,
+      "condition": "small_in_background",
+      "sha256_pixels": "92f36f90a508151aba76d4912266e7c70a6d2da04d665cb68a9742ad5bfedb3c",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": false,
+          "distances": [
+            30,
+            30,
+            32,
+            28,
+            28,
+            30
+          ],
+          "elapsed_ms": 2.312
+        },
+        "dhash": {
+          "rank": 5,
+          "winner_unique": true,
+          "distances": [
+            23,
+            27,
+            24,
+            26,
+            25,
+            25
+          ],
+          "elapsed_ms": 1.954
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 3,
+              "inliers": 227,
+              "support": 0.24278
+            }
+          ],
+          "elapsed_ms": 74.047
+        }
+      }
+    },
+    {
+      "control": 4,
+      "condition": "already_rectified",
+      "sha256_pixels": "0931e9b0f53f3f7d545fd5d0b3584f9d0df954338ed3b32e1a65e1922e02f675",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            10,
+            10,
+            6,
+            8,
+            0,
+            12
+          ],
+          "elapsed_ms": 0.9
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            13,
+            13,
+            12,
+            13,
+            0,
+            13
+          ],
+          "elapsed_ms": 0.715
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 4,
+              "inliers": 559,
+              "support": 0.31761
+            },
+            {
+              "control": 1,
+              "inliers": 21,
+              "support": 0.06391
+            }
+          ],
+          "elapsed_ms": 57.807
+        }
+      }
+    },
+    {
+      "control": 4,
+      "condition": "dim",
+      "sha256_pixels": "a60e6614f93be00bd653673afdcab61a6fb79a4365b2b72a5079f551b9445309",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            12,
+            12,
+            8,
+            8,
+            2,
+            12
+          ],
+          "elapsed_ms": 0.887
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            19,
+            19,
+            20,
+            21,
+            8,
+            17
+          ],
+          "elapsed_ms": 0.683
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 4,
+              "inliers": 523,
+              "support": 0.31229
+            }
+          ],
+          "elapsed_ms": 58.664
+        }
+      }
+    },
+    {
+      "control": 4,
+      "condition": "blur",
+      "sha256_pixels": "5ba3fe270cd2a5dff94075a4ab6e1e079115c0926c59a1606450ab863d677f62",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            10,
+            10,
+            6,
+            8,
+            0,
+            12
+          ],
+          "elapsed_ms": 0.935
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            13,
+            13,
+            12,
+            13,
+            0,
+            13
+          ],
+          "elapsed_ms": 0.732
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 4,
+              "inliers": 503,
+              "support": 0.26317
+            }
+          ],
+          "elapsed_ms": 56.338
+        }
+      }
+    },
+    {
+      "control": 4,
+      "condition": "quarter_turn",
+      "sha256_pixels": "a27af1216e72aa8d921b903c118d4eeacbba0514b355dbf3aa80be36b083367a",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            10,
+            10,
+            6,
+            8,
+            0,
+            12
+          ],
+          "elapsed_ms": 0.959
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            13,
+            13,
+            12,
+            13,
+            0,
+            13
+          ],
+          "elapsed_ms": 0.779
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 4,
+              "inliers": 559,
+              "support": 0.31761
+            },
+            {
+              "control": 1,
+              "inliers": 21,
+              "support": 0.06391
+            }
+          ],
+          "elapsed_ms": 58.957
+        }
+      }
+    },
+    {
+      "control": 4,
+      "condition": "synthetic_glare",
+      "sha256_pixels": "dc301691c85788606ae05d0fe97e4c2237871efe6d3e13280aa6b23b9fd23c05",
+      "methods": {
+        "phash": {
+          "rank": 3,
+          "winner_unique": false,
+          "distances": [
+            18,
+            16,
+            16,
+            22,
+            16,
+            22
+          ],
+          "elapsed_ms": 0.883
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            13,
+            13,
+            16,
+            19,
+            8,
+            17
+          ],
+          "elapsed_ms": 0.708
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 4,
+              "inliers": 435,
+              "support": 0.31703
+            },
+            {
+              "control": 5,
+              "inliers": 20,
+              "support": 0.08779
+            }
+          ],
+          "elapsed_ms": 58.179
+        }
+      }
+    },
+    {
+      "control": 4,
+      "condition": "perspective_background",
+      "sha256_pixels": "b4eb23b2d2e24f23d6be6b16f868e534592d3293686dc6589b3361ef7dd4bb8e",
+      "methods": {
+        "phash": {
+          "rank": 6,
+          "winner_unique": true,
+          "distances": [
+            26,
+            24,
+            26,
+            26,
+            30,
+            26
+          ],
+          "elapsed_ms": 1.947
+        },
+        "dhash": {
+          "rank": 6,
+          "winner_unique": true,
+          "distances": [
+            28,
+            30,
+            35,
+            32,
+            35,
+            34
+          ],
+          "elapsed_ms": 1.719
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 4,
+              "inliers": 217,
+              "support": 0.30535
+            }
+          ],
+          "elapsed_ms": 95.214
+        }
+      }
+    },
+    {
+      "control": 4,
+      "condition": "small_in_background",
+      "sha256_pixels": "21f9ae43f062ac767f39f5ae8a4466945bf4129265f16d99d5bd5ffadb48d60a",
+      "methods": {
+        "phash": {
+          "rank": 2,
+          "winner_unique": false,
+          "distances": [
+            30,
+            30,
+            32,
+            28,
+            28,
+            30
+          ],
+          "elapsed_ms": 2.282
+        },
+        "dhash": {
+          "rank": 3,
+          "winner_unique": true,
+          "distances": [
+            23,
+            27,
+            24,
+            26,
+            25,
+            25
+          ],
+          "elapsed_ms": 1.998
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 4,
+              "inliers": 200,
+              "support": 0.26292
+            }
+          ],
+          "elapsed_ms": 78.768
+        }
+      }
+    },
+    {
+      "control": 5,
+      "condition": "already_rectified",
+      "sha256_pixels": "47d5cf3afb343d822ae33caf8bc4033f5e41d2a295638ca868a7cd2592a3397b",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            12,
+            12,
+            10,
+            12,
+            12,
+            0
+          ],
+          "elapsed_ms": 0.931
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            12,
+            10,
+            13,
+            16,
+            13,
+            0
+          ],
+          "elapsed_ms": 0.719
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 5,
+              "inliers": 555,
+              "support": 0.32183
+            },
+            {
+              "control": 1,
+              "inliers": 20,
+              "support": 0.09748
+            },
+            {
+              "control": 4,
+              "inliers": 20,
+              "support": 0.09347
+            }
+          ],
+          "elapsed_ms": 59.839
+        }
+      }
+    },
+    {
+      "control": 5,
+      "condition": "dim",
+      "sha256_pixels": "6169c0aba13f95ec73111b1ac0066a621473b3132ce3943c6dc4f342c29b22e5",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            12,
+            12,
+            10,
+            12,
+            12,
+            0
+          ],
+          "elapsed_ms": 0.905
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            16,
+            16,
+            19,
+            20,
+            17,
+            6
+          ],
+          "elapsed_ms": 0.71
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 5,
+              "inliers": 522,
+              "support": 0.31577
+            }
+          ],
+          "elapsed_ms": 59.26
+        }
+      }
+    },
+    {
+      "control": 5,
+      "condition": "blur",
+      "sha256_pixels": "bc03d55cab381856fe2d692d81b1a34ed1ec329f1ba6e5bab7d8bdce19411bfb",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            12,
+            12,
+            10,
+            12,
+            12,
+            0
+          ],
+          "elapsed_ms": 0.937
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            11,
+            11,
+            14,
+            15,
+            12,
+            1
+          ],
+          "elapsed_ms": 0.735
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 5,
+              "inliers": 518,
+              "support": 0.26613
+            }
+          ],
+          "elapsed_ms": 63.7
+        }
+      }
+    },
+    {
+      "control": 5,
+      "condition": "quarter_turn",
+      "sha256_pixels": "acf9385877a6f76f27c86d5eadf43e138295e817396c6493f82cce07a76f3af0",
+      "methods": {
+        "phash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            12,
+            12,
+            10,
+            12,
+            12,
+            0
+          ],
+          "elapsed_ms": 0.947
+        },
+        "dhash": {
+          "rank": 1,
+          "winner_unique": true,
+          "distances": [
+            12,
+            10,
+            13,
+            16,
+            13,
+            0
+          ],
+          "elapsed_ms": 0.736
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 5,
+              "inliers": 555,
+              "support": 0.32183
+            },
+            {
+              "control": 1,
+              "inliers": 20,
+              "support": 0.09748
+            },
+            {
+              "control": 4,
+              "inliers": 20,
+              "support": 0.09347
+            }
+          ],
+          "elapsed_ms": 59.65
+        }
+      }
+    },
+    {
+      "control": 5,
+      "condition": "synthetic_glare",
+      "sha256_pixels": "96a3ddb9c1ab215f017a71e0428b950e59a799248736eba74c39515b1a286ea5",
+      "methods": {
+        "phash": {
+          "rank": 5,
+          "winner_unique": true,
+          "distances": [
+            18,
+            16,
+            18,
+            24,
+            20,
+            20
+          ],
+          "elapsed_ms": 0.921
+        },
+        "dhash": {
+          "rank": 2,
+          "winner_unique": false,
+          "distances": [
+            12,
+            10,
+            19,
+            18,
+            11,
+            10
+          ],
+          "elapsed_ms": 0.743
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 5,
+              "inliers": 369,
+              "support": 0.32019
+            },
+            {
+              "control": 1,
+              "inliers": 20,
+              "support": 0.07352
+            }
+          ],
+          "elapsed_ms": 57.458
+        }
+      }
+    },
+    {
+      "control": 5,
+      "condition": "perspective_background",
+      "sha256_pixels": "808d64ecacdc233d23cd6ae1f6c388d44e31ac9288cb6b45c9ca6443744c75dc",
+      "methods": {
+        "phash": {
+          "rank": 5,
+          "winner_unique": true,
+          "distances": [
+            28,
+            26,
+            28,
+            28,
+            32,
+            28
+          ],
+          "elapsed_ms": 2.032
+        },
+        "dhash": {
+          "rank": 3,
+          "winner_unique": true,
+          "distances": [
+            29,
+            31,
+            34,
+            34,
+            32,
+            31
+          ],
+          "elapsed_ms": 1.802
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 5,
+              "inliers": 233,
+              "support": 0.31138
+            }
+          ],
+          "elapsed_ms": 111.879
+        }
+      }
+    },
+    {
+      "control": 5,
+      "condition": "small_in_background",
+      "sha256_pixels": "2aa9412efb3b335e940cb7fc22a4058cc51d1b6ad9693e5c3d8f8b57964294b6",
+      "methods": {
+        "phash": {
+          "rank": 5,
+          "winner_unique": false,
+          "distances": [
+            30,
+            30,
+            32,
+            28,
+            28,
+            30
+          ],
+          "elapsed_ms": 2.382
+        },
+        "dhash": {
+          "rank": 4,
+          "winner_unique": true,
+          "distances": [
+            23,
+            27,
+            24,
+            26,
+            25,
+            25
+          ],
+          "elapsed_ms": 2.039
+        },
+        "orb": {
+          "rank": 1,
+          "matches": [
+            {
+              "control": 5,
+              "inliers": 211,
+              "support": 0.2499
+            }
+          ],
+          "elapsed_ms": 76.261
+        }
+      }
+    }
+  ]
+}

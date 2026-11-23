@@ -1,0 +1,55 @@
+{
+  "measured_at": "2026-11-11T01:52:29.734129+00:00",
+  "platform": "macOS-27.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "python": "3.14.10",
+  "pillow": "13.0.0",
+  "tesseract": "tesseract 5.5.4",
+  "languages": [
+    "eng",
+    "spa"
+  ],
+  "tesseract_version_output": [
+    "tesseract 5.5.4",
+    " leptonica-1.87.0",
+    "  libgif 6.1.3 : libjpeg 8d (libjpeg-turbo 3.2.0) : libpng 1.6.59 : libtiff 4.7.2 : zlib 1.2.12 : libwebp 1.6.0 : libopenjp2 2.5.4",
+    " Found NEON",
+    " Found libarchive 3.8.11 zlib/1.2.12 liblzma/5.8.4 bz2lib/1.0.8 liblz4/1.11.0 libzstd/1.5.7 expat/expat_2.7.4 CommonCrypto/system libb2/system",
+    " Found libcurl/8.7.1 SecureTransport (LibreSSL/3.3.6) zlib/1.2.12 nghttp2/1.69.0"
+  ],
+  "selected_engine_languages": [
+    "eng",
+    "spa"
+  ],
+  "english_data": {
+    "installation": "Homebrew Tesseract bundled eng data",
+    "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+  },
+  "spanish_data": {
+    "source_url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/4.1.0/spa.traineddata",
+    "upstream_tag": "4.1.0",
+    "installation": "/opt/homebrew/share/tessdata/spa.traineddata",
+    "sha256": "6f2e04d02774a18f01bed44b1111f2cd7f3ba7ac9dc4373cd3f898a40ea6b464"
+  },
+  "font": {
+    "name": "Arial Regular",
+    "path": "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "sha256": "525979822591a3447cfc49d943d6f7683508e25543407871c0ed8fed05fd2bd9",
+    "copied_font_file": false
+  },
+  "bounds": {
+    "upload_bytes": 8388608,
+    "decoded_pixels": 16000000,
+    "decoded_edge": 8192,
+    "normalized_edge": 2048,
+    "recognition_capacity": 2,
+    "native_openmp_threads": 1,
+    "native_call_seconds": 5,
+    "image_worker_seconds": 20,
+    "separate_language_probe_seconds": 3,
+    "orthogonal_attempts": 4,
+    "native_output_bytes": 262144,
+    "worker_response_bytes": 32768
+  },
+  "scope": "Original synthetic specimens only; no real photographs or browser/OAuth acceptance. Memory is approximate sampled evaluator+descendant RSS, not a hard limit."
+}

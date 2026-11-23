@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-19",
+  "pipeline": "preserved pre-geometry Iteration 6",
+  "inputs": "same HEIC originals, lossless metadata-free full-image PNG decode for baseline compatibility",
+  "native_heic_supported": false,
+  "photos": [
+    {
+      "sample": "photo-1",
+      "original_sha256": "bd14523b2a4940bde384783fe93b4939fc921b07a5b7f2fb01801139ce3ef849",
+      "decoded_sha256": "65da775c424b6813e54c89d183f2cefe850e2906a357267cf39969e8cd01c42c",
+      "ocr": {
+        "clues": {
+          "name": "hat",
+          "local_number": "044",
+          "printed_total": 84,
+          "set_id": null,
+          "set_hint": "",
+          "category": null,
+          "language": null
+        },
+        "engine_languages": [
+          "eng",
+          "spa"
+        ],
+        "warnings": []
+      },
+      "ocr_seconds": 0.487,
+      "card_detection": "not implemented in baseline",
+      "matching_error": "CardsUnavailable",
+      "total_seconds": 0.5283
+    },
+    {
+      "sample": "photo-2",
+      "original_sha256": "f69dd39fa2555a728cf28801c0d99ab3545ae3acb507429a0ab56b088d7b94e6",
+      "decoded_sha256": "84ae761a08b74aea58454b3344914440d0afd25b762123d534a6551a121f0178",
+      "ocr": {
+        "clues": {
+          "name": "xe",
+          "local_number": "",
+          "printed_total": null,
+          "set_id": null,
+          "set_hint": "",
+          "category": null,
+          "language": "en"
+        },
+        "engine_languages": [
+          "eng",
+          "spa"
+        ],
+        "warnings": []
+      },
+      "ocr_seconds": 2.9619,
+      "card_detection": "not implemented in baseline",
+      "matching": {
+        "clues": {
+          "name": "xe",
+          "local_number": "",
+          "printed_total": null,
+          "set_id": null,
+          "set_hint": "",
+          "category": null,
+          "language": "en"
+        },
+        "candidates": [],
+        "status": "insufficient_clues",
+        "limited": false,
+        "warnings": []
+      },
+      "total_seconds": 2.9652
+    }
+  ]
+}

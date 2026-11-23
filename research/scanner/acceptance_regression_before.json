@@ -1,0 +1,651 @@
+[
+  {
+    "file": "Pegado 11:11:2026 a la(s) 9.37.41 p.m..heic",
+    "sha256": "bd14523b2a4940bde384783fe93b4939fc921b07a5b7f2fb01801139ce3ef849",
+    "ocr": {
+      "clues": {
+        "name": "Cranidos",
+        "local_number": "044",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": "en"
+      },
+      "engine_languages": [
+        "eng",
+        "spa"
+      ],
+      "warnings": [
+        "card_rectified",
+        "localization_conflict"
+      ]
+    },
+    "match": {
+      "clues": {
+        "name": "Cranidos",
+        "local_number": "044",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": "en"
+      },
+      "candidates": [
+        {
+          "card": {
+            "id": "me05-044",
+            "name": "Cranidos",
+            "local_id": "044",
+            "language": "es",
+            "image_url": "https://assets.tcgdex.net/es/me/me05/044/high.webp",
+            "thumbnail_url": "https://assets.tcgdex.net/es/me/me05/044/low.webp",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me05/044",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me05/044",
+                "language": "en"
+              }
+            ],
+            "image_language": "es"
+          },
+          "set": {
+            "id": "me05",
+            "name": "Oscuridad Absoluta",
+            "logo_url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+            "symbol_url": "https://assets.tcgdex.net/univ/me/me05/symbol.png",
+            "logo_sources": [
+              {
+                "url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+                "language": "es"
+              },
+              {
+                "url": "https://assets.tcgdex.net/en/me/me05/logo.png",
+                "language": "en"
+              }
+            ],
+            "name_language": "es",
+            "serie": {
+              "id": "me",
+              "name": "Megaevoluci\u00f3n"
+            },
+            "release_date": "2026-07-17",
+            "official_count": 84,
+            "provider_total": 120
+          },
+          "quality": "possible",
+          "evidence": [
+            "number_exact",
+            "name_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "status": "matches",
+      "limited": false,
+      "warnings": []
+    },
+    "ocr_seconds": 2.3477692090091296,
+    "total_seconds": 4.978698541992344
+  },
+  {
+    "file": "Pegado 11:11:2026 a la(s) 9.37.46 p.m..heic",
+    "sha256": "f69dd39fa2555a728cf28801c0d99ab3545ae3acb507429a0ab56b088d7b94e6",
+    "ocr": {
+      "clues": {
+        "name": "Armarouge",
+        "local_number": "086",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "engine_languages": [
+        "eng",
+        "spa"
+      ],
+      "warnings": [
+        "card_rectified",
+        "localization_conflict"
+      ]
+    },
+    "match": {
+      "clues": {
+        "name": "Armarouge",
+        "local_number": "086",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "candidates": [
+        {
+          "card": {
+            "id": "me05-086",
+            "name": "Armarouge",
+            "local_id": "086",
+            "language": "es",
+            "image_url": "https://assets.tcgdex.net/es/me/me05/086/high.webp",
+            "thumbnail_url": "https://assets.tcgdex.net/es/me/me05/086/low.webp",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me05/086",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me05/086",
+                "language": "en"
+              }
+            ],
+            "image_language": "es"
+          },
+          "set": {
+            "id": "me05",
+            "name": "Oscuridad Absoluta",
+            "logo_url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+            "symbol_url": "https://assets.tcgdex.net/univ/me/me05/symbol.png",
+            "logo_sources": [
+              {
+                "url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+                "language": "es"
+              },
+              {
+                "url": "https://assets.tcgdex.net/en/me/me05/logo.png",
+                "language": "en"
+              }
+            ],
+            "name_language": "es",
+            "serie": {
+              "id": "me",
+              "name": "Megaevoluci\u00f3n"
+            },
+            "release_date": "2026-07-17",
+            "official_count": 84,
+            "provider_total": 120
+          },
+          "quality": "possible",
+          "evidence": [
+            "number_exact",
+            "name_exact",
+            "printed_total"
+          ]
+        },
+        {
+          "card": {
+            "id": "me05-012",
+            "name": "Armarouge",
+            "local_id": "012",
+            "language": "es",
+            "image_url": "https://assets.tcgdex.net/es/me/me05/012/high.webp",
+            "thumbnail_url": "https://assets.tcgdex.net/es/me/me05/012/low.webp",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me05/012",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me05/012",
+                "language": "en"
+              }
+            ],
+            "image_language": "es"
+          },
+          "set": {
+            "id": "me05",
+            "name": "Oscuridad Absoluta",
+            "logo_url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+            "symbol_url": "https://assets.tcgdex.net/univ/me/me05/symbol.png",
+            "logo_sources": [
+              {
+                "url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+                "language": "es"
+              },
+              {
+                "url": "https://assets.tcgdex.net/en/me/me05/logo.png",
+                "language": "en"
+              }
+            ],
+            "name_language": "es",
+            "serie": {
+              "id": "me",
+              "name": "Megaevoluci\u00f3n"
+            },
+            "release_date": "2026-07-17",
+            "official_count": 84,
+            "provider_total": 120
+          },
+          "quality": "uncertain",
+          "evidence": [
+            "name_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "status": "matches",
+      "limited": false,
+      "warnings": [
+        "conflicting_clues"
+      ]
+    },
+    "ocr_seconds": 2.3582307499891613,
+    "total_seconds": 2.3640388749772683
+  },
+  {
+    "file": "WhatsApp Image 2026-11-23 at 15.51.22 (1).jpeg",
+    "sha256": "0e0809285020beb8160f086a18fbb5e7e135a4325cb4fd865c0585c46b6b89e1",
+    "ocr": {
+      "clues": {
+        "name": "corbu",
+        "local_number": "036",
+        "printed_total": 217,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "es"
+      },
+      "engine_languages": [
+        "eng",
+        "spa"
+      ],
+      "warnings": [
+        "card_rectified",
+        "localization_conflict"
+      ]
+    },
+    "match": {
+      "clues": {
+        "name": "corbu",
+        "local_number": "036",
+        "printed_total": 217,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "es"
+      },
+      "candidates": [
+        {
+          "card": {
+            "id": "me02.5-036",
+            "name": "Scorbunny",
+            "local_id": "036",
+            "language": "es",
+            "image_url": "https://assets.tcgdex.net/es/me/me02.5/036/high.webp",
+            "thumbnail_url": "https://assets.tcgdex.net/es/me/me02.5/036/low.webp",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me02.5/036",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me02.5/036",
+                "language": "en"
+              }
+            ],
+            "image_language": "es"
+          },
+          "set": {
+            "id": "me02.5",
+            "name": "H\u00e9roes Ascendentes",
+            "logo_url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+            "symbol_url": "https://assets.tcgdex.net/univ/me/me02.5/symbol.png",
+            "logo_sources": [
+              {
+                "url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+                "language": "es"
+              },
+              {
+                "url": "https://assets.tcgdex.net/en/me/me02.5/logo.png",
+                "language": "en"
+              }
+            ],
+            "name_language": "es",
+            "serie": {
+              "id": "me",
+              "name": "Megaevoluci\u00f3n"
+            },
+            "release_date": "2026-01-30",
+            "official_count": 217,
+            "provider_total": 295
+          },
+          "quality": "uncertain",
+          "evidence": [
+            "number_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "status": "matches",
+      "limited": false,
+      "warnings": [
+        "category_unverified",
+        "conflicting_clues"
+      ]
+    },
+    "ocr_seconds": 1.8527440830075648,
+    "total_seconds": 3.3496621669910382
+  },
+  {
+    "file": "WhatsApp Image 2026-11-23 at 15.51.22.jpeg",
+    "sha256": "da106ff33d242b5ecabe79c957c6a37468fa69c1da9dcc95eddfe3865ed58c7e",
+    "ocr": {
+      "clues": {
+        "name": "EN: TRENADOR",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "engine_languages": [
+        "eng",
+        "spa"
+      ],
+      "warnings": [
+        "card_boundary_uncertain"
+      ]
+    },
+    "match": {
+      "clues": {
+        "name": "EN: TRENADOR",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "candidates": [],
+      "status": "insufficient_clues",
+      "limited": false,
+      "warnings": []
+    },
+    "ocr_seconds": 3.3205345000023954,
+    "total_seconds": 3.32085320801707
+  },
+  {
+    "file": "WhatsApp Image 2026-11-23 at 15.51.23 (1).jpeg",
+    "sha256": "184f11dd5e33f9dfe02e64552dd560500020ab18975abba493cb585165e5aaeb",
+    "ocr": {
+      "clues": {
+        "name": "Misdreavus",
+        "local_number": "085",
+        "printed_total": 217,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "es"
+      },
+      "engine_languages": [
+        "eng",
+        "spa"
+      ],
+      "warnings": [
+        "card_rectified",
+        "localization_conflict"
+      ]
+    },
+    "match": {
+      "clues": {
+        "name": "Misdreavus",
+        "local_number": "085",
+        "printed_total": 217,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "es"
+      },
+      "candidates": [
+        {
+          "card": {
+            "id": "me02.5-085",
+            "name": "Misdreavus",
+            "local_id": "085",
+            "language": "es",
+            "image_url": "https://assets.tcgdex.net/es/me/me02.5/085/high.webp",
+            "thumbnail_url": "https://assets.tcgdex.net/es/me/me02.5/085/low.webp",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me02.5/085",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me02.5/085",
+                "language": "en"
+              }
+            ],
+            "image_language": "es"
+          },
+          "set": {
+            "id": "me02.5",
+            "name": "H\u00e9roes Ascendentes",
+            "logo_url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+            "symbol_url": "https://assets.tcgdex.net/univ/me/me02.5/symbol.png",
+            "logo_sources": [
+              {
+                "url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+                "language": "es"
+              },
+              {
+                "url": "https://assets.tcgdex.net/en/me/me02.5/logo.png",
+                "language": "en"
+              }
+            ],
+            "name_language": "es",
+            "serie": {
+              "id": "me",
+              "name": "Megaevoluci\u00f3n"
+            },
+            "release_date": "2026-01-30",
+            "official_count": 217,
+            "provider_total": 295
+          },
+          "quality": "possible",
+          "evidence": [
+            "number_exact",
+            "name_exact",
+            "printed_total"
+          ]
+        },
+        {
+          "card": {
+            "id": "me02.5-233",
+            "name": "Misdreavus",
+            "local_id": "233",
+            "language": "es",
+            "image_url": "https://assets.tcgdex.net/es/me/me02.5/233/high.webp",
+            "thumbnail_url": "https://assets.tcgdex.net/es/me/me02.5/233/low.webp",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me02.5/233",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me02.5/233",
+                "language": "en"
+              }
+            ],
+            "image_language": "es"
+          },
+          "set": {
+            "id": "me02.5",
+            "name": "H\u00e9roes Ascendentes",
+            "logo_url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+            "symbol_url": "https://assets.tcgdex.net/univ/me/me02.5/symbol.png",
+            "logo_sources": [
+              {
+                "url": "https://assets.tcgdex.net/es/me/me02.5/logo.png",
+                "language": "es"
+              },
+              {
+                "url": "https://assets.tcgdex.net/en/me/me02.5/logo.png",
+                "language": "en"
+              }
+            ],
+            "name_language": "es",
+            "serie": {
+              "id": "me",
+              "name": "Megaevoluci\u00f3n"
+            },
+            "release_date": "2026-01-30",
+            "official_count": 217,
+            "provider_total": 295
+          },
+          "quality": "uncertain",
+          "evidence": [
+            "name_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "status": "matches",
+      "limited": false,
+      "warnings": [
+        "category_unverified",
+        "conflicting_clues"
+      ]
+    },
+    "ocr_seconds": 1.1105742919899058,
+    "total_seconds": 1.1226264580036514
+  },
+  {
+    "file": "WhatsApp Image 2026-11-23 at 15.51.23 (2).jpeg",
+    "sha256": "25f392c1f60df26fcce0394339957d28b6289f458fe34c2d9fc48106b3cfc7b1",
+    "ocr": {
+      "clues": {
+        "name": "Zigzagoon de Galar",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "es"
+      },
+      "engine_languages": [
+        "eng",
+        "spa"
+      ],
+      "warnings": [
+        "card_rectified",
+        "localization_conflict"
+      ]
+    },
+    "match": {
+      "clues": {
+        "name": "Zigzagoon de Galar",
+        "local_number": "",
+        "printed_total": null,
+        "set_id": null,
+        "set_hint": "",
+        "category": "Pokemon",
+        "language": "es"
+      },
+      "candidates": [],
+      "status": "no_match",
+      "limited": true,
+      "warnings": [
+        "category_unverified",
+        "search_limited"
+      ]
+    },
+    "ocr_seconds": 3.107546540995827,
+    "total_seconds": 6.621027832996333
+  },
+  {
+    "file": "WhatsApp Image 2026-11-23 at 15.51.23.jpeg",
+    "sha256": "e5e35ac9ec2769ceb33a89be3e9adc501e666cdbe01061ee4033e20b4c0db639",
+    "ocr": {
+      "clues": {
+        "name": "Palafin",
+        "local_number": "022",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "engine_languages": [
+        "eng",
+        "spa"
+      ],
+      "warnings": [
+        "card_rectified",
+        "localization_conflict"
+      ]
+    },
+    "match": {
+      "clues": {
+        "name": "Palafin",
+        "local_number": "022",
+        "printed_total": 84,
+        "set_id": null,
+        "set_hint": "",
+        "category": null,
+        "language": null
+      },
+      "candidates": [
+        {
+          "card": {
+            "id": "me05-022",
+            "name": "Palafin",
+            "local_id": "022",
+            "language": "es",
+            "image_url": "https://assets.tcgdex.net/es/me/me05/022/high.webp",
+            "thumbnail_url": "https://assets.tcgdex.net/es/me/me05/022/low.webp",
+            "image_sources": [
+              {
+                "base_url": "https://assets.tcgdex.net/es/me/me05/022",
+                "language": "es"
+              },
+              {
+                "base_url": "https://assets.tcgdex.net/en/me/me05/022",
+                "language": "en"
+              }
+            ],
+            "image_language": "es"
+          },
+          "set": {
+            "id": "me05",
+            "name": "Oscuridad Absoluta",
+            "logo_url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+            "symbol_url": "https://assets.tcgdex.net/univ/me/me05/symbol.png",
+            "logo_sources": [
+              {
+                "url": "https://assets.tcgdex.net/es/me/me05/logo.png",
+                "language": "es"
+              },
+              {
+                "url": "https://assets.tcgdex.net/en/me/me05/logo.png",
+                "language": "en"
+              }
+            ],
+            "name_language": "es",
+            "serie": {
+              "id": "me",
+              "name": "Megaevoluci\u00f3n"
+            },
+            "release_date": "2026-07-17",
+            "official_count": 84,
+            "provider_total": 120
+          },
+          "quality": "possible",
+          "evidence": [
+            "number_exact",
+            "name_exact",
+            "printed_total"
+          ]
+        }
+      ],
+      "status": "matches",
+      "limited": false,
+      "warnings": []
+    },
+    "ocr_seconds": 2.5575097920082044,
+    "total_seconds": 2.563652709010057
+  }
+]

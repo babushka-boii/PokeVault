@@ -1,0 +1,23 @@
+{
+  "scope": "Two privately authorized original HEIC photographs; labels verified visually and against public TCGdex. No private paths, metadata or image bytes.",
+  "catalog_source": "https://api.tcgdex.net/v2/en/sets/me05",
+  "catalog_sha256": "6f5510ce498011f20e6a4b612c6932324e83b1c29251e3041822bb50de5e58f1",
+  "cases": [
+    {
+      "sample": "photo-1",
+      "sha256": "bd14523b2a4940bde384783fe93b4939fc921b07a5b7f2fb01801139ce3ef849",
+      "name": "Cranidos",
+      "number": "044",
+      "total": 84,
+      "expected_id": "me05-044"
+    },
+    {
+      "sample": "photo-2",
+      "sha256": "f69dd39fa2555a728cf28801c0d99ab3545ae3acb507429a0ab56b088d7b94e6",
+      "name": "Armarouge",
+      "number": "086",
+      "total": 84,
+      "expected_id": "me05-086"
+    }
+  ]
+}

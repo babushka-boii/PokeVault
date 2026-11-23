@@ -1,0 +1,660 @@
+{
+  "scope": "Two user-authorized local photographs. Bounded supplied reference pool; measures verification/ranking, not catalog-wide discovery. No calibrated confidence or claim of general accuracy. No image bytes, paths or metadata are retained in this result.",
+  "measured_at": "2026-11-20T20:14:53.393451+00:00",
+  "platform": "macOS-27.2.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.10",
+  "opencv": "4.14.0",
+  "numpy": "2.5.4",
+  "reference_ids": [
+    "me05-044",
+    "me05-086",
+    "me05-012",
+    "me05-045",
+    "me05-046",
+    "me05-052",
+    "me05-060",
+    "me05-085",
+    "me05-087",
+    "me05-001",
+    "swsh10-076",
+    "sm5-64",
+    "dp2-43",
+    "sv01-041",
+    "sv01-203",
+    "sv04.5-115"
+  ],
+  "results": [
+    {
+      "case": "photo-1",
+      "expected_id": "me05-044",
+      "variant": "full_image",
+      "methods": {
+        "phash": {
+          "expected_rank": 9,
+          "scores": [
+            {
+              "card_id": "me05-052",
+              "distance": 20
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 22
+            },
+            {
+              "card_id": "me05-087",
+              "distance": 24
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 24
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-086",
+              "distance": 26
+            },
+            {
+              "card_id": "dp2-43",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-044",
+              "distance": 30
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 32
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 32
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 32
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 34
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 34
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 36
+            }
+          ],
+          "elapsed_ms": 17.279
+        },
+        "dhash": {
+          "expected_rank": 8,
+          "scores": [
+            {
+              "card_id": "me05-087",
+              "distance": 22
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 24
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 25
+            },
+            {
+              "card_id": "me05-086",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 27
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 27
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-044",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 29
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 29
+            },
+            {
+              "card_id": "me05-052",
+              "distance": 30
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 33
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 33
+            },
+            {
+              "card_id": "dp2-43",
+              "distance": 35
+            }
+          ],
+          "elapsed_ms": 9.7
+        },
+        "orb": {
+          "expected_rank": 1,
+          "qualified": [
+            {
+              "card_id": "me05-044",
+              "inliers": 179,
+              "support": 0.33175
+            }
+          ],
+          "elapsed_ms": 330.479
+        }
+      }
+    },
+    {
+      "case": "photo-1",
+      "expected_id": "me05-044",
+      "variant": "automatic_rectangle",
+      "methods": {
+        "phash": {
+          "expected_rank": 1,
+          "scores": [
+            {
+              "card_id": "me05-044",
+              "distance": 14
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 22
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 24
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 24
+            },
+            {
+              "card_id": "dp2-43",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 26
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 26
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 28
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-052",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-086",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-087",
+              "distance": 30
+            }
+          ],
+          "elapsed_ms": 11.751
+        },
+        "dhash": {
+          "expected_rank": 1,
+          "scores": [
+            {
+              "card_id": "me05-044",
+              "distance": 5
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 22
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 23
+            },
+            {
+              "card_id": "dp2-43",
+              "distance": 24
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 24
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 24
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 24
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 25
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 25
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-087",
+              "distance": 27
+            },
+            {
+              "card_id": "me05-052",
+              "distance": 29
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-086",
+              "distance": 30
+            }
+          ],
+          "elapsed_ms": 8.423
+        },
+        "orb": {
+          "expected_rank": 1,
+          "qualified": [
+            {
+              "card_id": "me05-044",
+              "inliers": 234,
+              "support": 0.35
+            }
+          ],
+          "elapsed_ms": 323.905
+        }
+      }
+    },
+    {
+      "case": "photo-2",
+      "expected_id": "me05-086",
+      "variant": "full_image",
+      "methods": {
+        "phash": {
+          "expected_rank": 8,
+          "scores": [
+            {
+              "card_id": "dp2-43",
+              "distance": 24
+            },
+            {
+              "card_id": "me05-087",
+              "distance": 24
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 24
+            },
+            {
+              "card_id": "me05-044",
+              "distance": 26
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-086",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-052",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 30
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 32
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 32
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 34
+            }
+          ],
+          "elapsed_ms": 12.887
+        },
+        "dhash": {
+          "expected_rank": 15,
+          "scores": [
+            {
+              "card_id": "me05-052",
+              "distance": 20
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 24
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 25
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 26
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-087",
+              "distance": 27
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-044",
+              "distance": 29
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 29
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 29
+            },
+            {
+              "card_id": "dp2-43",
+              "distance": 30
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 30
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-086",
+              "distance": 32
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 33
+            }
+          ],
+          "elapsed_ms": 9.213
+        },
+        "orb": {
+          "expected_rank": 1,
+          "qualified": [
+            {
+              "card_id": "me05-086",
+              "inliers": 45,
+              "support": 0.23186
+            }
+          ],
+          "elapsed_ms": 342.407
+        }
+      }
+    },
+    {
+      "case": "photo-2",
+      "expected_id": "me05-086",
+      "variant": "automatic_rectangle",
+      "methods": {
+        "phash": {
+          "expected_rank": 1,
+          "scores": [
+            {
+              "card_id": "me05-086",
+              "distance": 10
+            },
+            {
+              "card_id": "me05-052",
+              "distance": 20
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 22
+            },
+            {
+              "card_id": "dp2-43",
+              "distance": 24
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-044",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 26
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 26
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 28
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-087",
+              "distance": 30
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 30
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 30
+            }
+          ],
+          "elapsed_ms": 11.557
+        },
+        "dhash": {
+          "expected_rank": 1,
+          "scores": [
+            {
+              "card_id": "me05-086",
+              "distance": 11
+            },
+            {
+              "card_id": "dp2-43",
+              "distance": 19
+            },
+            {
+              "card_id": "me05-052",
+              "distance": 22
+            },
+            {
+              "card_id": "me05-001",
+              "distance": 24
+            },
+            {
+              "card_id": "sv01-203",
+              "distance": 26
+            },
+            {
+              "card_id": "swsh10-076",
+              "distance": 26
+            },
+            {
+              "card_id": "me05-046",
+              "distance": 27
+            },
+            {
+              "card_id": "sv01-041",
+              "distance": 27
+            },
+            {
+              "card_id": "me05-012",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-044",
+              "distance": 28
+            },
+            {
+              "card_id": "me05-060",
+              "distance": 28
+            },
+            {
+              "card_id": "sv04.5-115",
+              "distance": 28
+            },
+            {
+              "card_id": "sm5-64",
+              "distance": 29
+            },
+            {
+              "card_id": "me05-085",
+              "distance": 30
+            },
+            {
+              "card_id": "me05-045",
+              "distance": 33
+            },
+            {
+              "card_id": "me05-087",
+              "distance": 34
+            }
+          ],
+          "elapsed_ms": 8.046
+        },
+        "orb": {
+          "expected_rank": 1,
+          "qualified": [
+            {
+              "card_id": "me05-086",
+              "inliers": 66,
+              "support": 0.24732
+            }
+          ],
+          "elapsed_ms": 295.507
+        }
+      }
+    }
+  ]
+}
