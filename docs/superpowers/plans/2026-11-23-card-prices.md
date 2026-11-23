@@ -200,10 +200,10 @@ Notes:
 
 ### Task 7: Review, validation and docs
 
-- [ ] Independent review of the whole diff against Review focus; fix findings with
+- [x] Independent review of the whole diff against Review focus; fix findings with
   regression tests.
-- [ ] Student runs `bash scripts/check.sh` (expect exit 0) and `alembic upgrade head`.
-- [ ] New `docs/PRICES.md`; update DATA_MODEL, ARCHITECTURE, UX_UI, DEVELOPMENT,
+- [x] Student runs `bash scripts/check.sh` (expect exit 0) and `alembic upgrade head`.
+- [x] New `docs/PRICES.md`; update DATA_MODEL, ARCHITECTURE, UX_UI, DEVELOPMENT,
   ROADMAP, `Bitacora.md`, `Autoria.md` with exact evidence and limitations.
 - [ ] Manual acceptance on the development Mac: the five sample cards show the expected
   prices from spec §6.2 (values may have moved since 2026-11-22; check source/date),
@@ -211,4 +211,11 @@ Notes:
 
 ## Execution evidence
 
-_Empty until implementation starts._
+- Review (inline, against Review focus): one finding fixed in `747fc8c` — the public
+  card endpoint stored a `no_data` row for every TCGdex 404, letting invented ids grow
+  the table; unknown ids now live in a bounded in-memory cache (2048, 24 h). No other
+  isolation, variant, Decimal or outage defect found.
+- `bash scripts/check.sh` was run in this session on the development Mac (exit 0):
+  43 provider, 790 backend (PostgreSQL included, no skips), 421 frontend tests.
+- Migration `0005` applied by the student; `alembic current` = `0005 (head)`.
+- Manual browser acceptance remains pending (checklist in `docs/ROADMAP.md`).

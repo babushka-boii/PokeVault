@@ -792,3 +792,19 @@ Trainer headers/title regions and interrupted geometric boundaries. No private
 images committed, inventory writes, credentials changes, commits or pushes.
 Remaining: improve outlined footer OCR using independent evidence; do not infer a
 printing solely from first rank. No hybrid recognition or Iteration 7 work.
+
+## Iteration 7 — Reference prices (2026-11-23)
+
+Apply migration `0005` before starting the API (sign-in writes `user_settings`, which now
+has `preferred_currency`):
+
+- `cd backend && .venv/bin/alembic upgrade head` → `.venv/bin/alembic current` shows `0005 (head)`.
+
+No new dependencies or environment variables. Prices come from TCGdex and exchange
+rates from `https://open.er-api.com/v6/latest/USD`; tests never use the network.
+`research/prices/capture_exchangerate.py` refreshes the rate sample (run it rarely: a 429
+blocks the client for 20 minutes).
+
+Final gate: `bash scripts/check.sh` exit 0 — 43 provider fixtures, 790 backend tests
+(PostgreSQL integration included, no skips), 421 frontend tests in 34 files; Ruff,
+ESLint, TypeScript, production build and whitespace passed. See [PRICES.md](PRICES.md).

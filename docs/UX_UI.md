@@ -357,3 +357,19 @@ is confirmed. Logout, changed ownership or failed validation discards retained s
 no private browser persistence is added. Automated component
 coverage is separate from physical-camera, Safari/Chromium and real-photo acceptance.
 The final visual redesign and personal-box scrolling remain outside this iteration.
+
+## Iteration 7 — Reference prices
+
+- Card detail: "Reference price" section with one row per catalog variant (converted
+  amount, original amount, source, metric and date), the note that prices are market
+  references equal for Spanish and English cards and not an appraisal, and a CLP/USD
+  switch.
+- My collection: each copy shows its price or the reason it has none; prices load after
+  the list and a failure only shows a small retry. A `Variant` filter is available and
+  `?variant=unknown` opens the copies without a variant.
+- Profile: collection value card with total, "X of Y copies priced", stale/pending
+  notices, copies-without-variant link and the five most valuable copies.
+- Personal boxes: value of the selected box under the grid.
+- Converted amounts always carry a discreet "Rates By Exchange Rate API" link and the
+  rate date. Missing prices are explained in text, never by color alone; price
+  loading/errors use no alert roles so they do not interrupt the page's own messages.

@@ -15,7 +15,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - Frontend: React + TypeScript + Vite + Tailwind + React Router, ES/EN (`frontend/src/i18n`).
 - Backend: Python + FastAPI + SQLAlchemy + Alembic + PostgreSQL. Login con Google (OIDC).
 - Integraciones: PokéAPI, TCGdex, Tesseract + Pillow + pillow-heif (OCR).
-- Migración actual: `0004`. El escáner no agrega migraciones.
+- Migración actual: `0005` (precios de referencia, Iteración 7).
 
 ## Comandos (en el Mac de Naim)
 - Validación completa: `bash scripts/check.sh` (unittest, pytest, ruff, vitest, eslint, tsc, build, git diff --check).
@@ -32,12 +32,11 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - El escáner preserva la incertidumbre: nunca inventa identificaciones ni registra solo; exige confirmación explícita.
 
 ## Estado (verificar antes de confiar)
-- Rama `feat/iteration-6-card-scanner`, subida a GitHub (4 commits el 2026-11-23). Última validación completa: código 0.
-- Iteración 6 (escáner): milestones A–D hechos; las 5 fotos de prueba rankean la carta correcta primero.
-- Números contorneados (relleno oscuro + borde claro) se leen con `_enclosed_glyphs` en worker.py (Zigzagoon 130/217, Torre de Interferencia 261/217). El "1" cursivo de esa tipografía sigue frágil: nunca corregir números con el catálogo.
-- Pendiente: aceptación manual en celular, pantallas chicas y Safari; decidir PR/merge.
+- Iteración 6 (escáner) mezclada en `main` (PR #4). Números contorneados se leen con `_enclosed_glyphs` en worker.py; el "1" cursivo sigue frágil: nunca corregir números con el catálogo. Pendiente: cámara de celular real (OAuth solo en localhost).
+- Iteración 7 (precios de referencia) en la rama `feat/iteration-7-card-prices`, sin push. Tareas 0–7 hechas; última `check.sh`: código 0. Pendiente: aceptación manual (checklist en docs/ROADMAP.md) y decidir PR/merge.
+- Precios: TCGdex Cardmarket `trend` EUR (respaldo TCGplayer `marketPrice` USD) por variante de la copia; tasas de ExchangeRate-API (mindicador.cl no respondió). Atribución obligatoria "Rates By Exchange Rate API" y no redistribuir tasas. Detalle en docs/PRICES.md.
 - Prueba local del OCR: la sesión de Claude puede copiar `backend/app` y fotos a su entorno y correr `recognize_file` con Tesseract (Python 3.13 necesita paréntesis en `except A, B:`; no tocar el repo por eso).
-- Futuro: precios (Cardmarket/TCGplayer, aún no implementado), rediseño visual (retro Esmeralda + moderno gen 5 Negro), valorización de colecciones.
+- Futuro: wishlist/intercambios, rediseño visual (retro Esmeralda + moderno gen 5 Negro).
 
 ## Documentación
-`docs/` (ARCHITECTURE, DATA_MODEL, INVENTORY, BOXES, SET_COMPLETION, SCANNER, UX_UI, DEVELOPMENT, ROADMAP), `Bitacora.md` (log semanal), `Autoria.md` (uso de IA).
+`docs/` (ARCHITECTURE, DATA_MODEL, INVENTORY, BOXES, SET_COMPLETION, SCANNER, PRICES, UX_UI, DEVELOPMENT, ROADMAP), `Bitacora.md` (log semanal), `Autoria.md` (uso de IA).
