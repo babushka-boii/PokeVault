@@ -157,9 +157,14 @@ Notes (implementation decisions, no spec change in behavior):
 
 Files: `backend/tests/integration/test_prices_postgres.py`.
 
-- [ ] Two users with overlapping cards: totals, top 5 and box values never mix.
-- [ ] Inventory, boxes and set-completion endpoints return identical results with price
+- [x] Two users with overlapping cards: totals, top 5 and box values never mix.
+- [x] Inventory, boxes and set-completion endpoints return identical results with price
   providers failing (regression guard).
+
+Notes: both users own the same printing (`base1-4`); one shared snapshot and one provider
+request serve both, while totals, top 5, copy batches and box values stay per owner.
+With TCGdex and rates failing and the price tables emptied, inventory, boxes and set
+progress responses are byte-for-byte equal to the baseline. Backend suite: 789 passed.
 
 ### Task 6: Frontend
 

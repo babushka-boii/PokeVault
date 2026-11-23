@@ -229,3 +229,132 @@ def test_user_deletion_leaves_shared_prices_untouched(prices_database):
         session.delete(session.get(User, user_id))
     with factory() as session:
         assert set(store.get_snapshots(session, ["me05-044"])) == {"me05-044"}
+
+
+# --- Isolation and failure evidence through the HTTP API (Task 5) ---
+
+
+class _Provider:
+    def __init__(self):
+        self.calls = []
+        self.fail = False
+
+    async def card_pricing(self, card_id):
+        from app.cards.provider import CardPricing, CardsUnavailable
+
+        self.calls.append(card_id)
+        if self.fail:
+            raise CardsUnavailable
+        # base1-4 has normal and holo: normal from Cardmarket, holo only TCGplayer.
+        return CardPricing(
+            {
+                "cardmarket": {"unit": "EUR", "trend": 2.0},
+                "tcgplayer": {"unit": "USD", "holofoil": {"marketPrice": 5.0}},
+            },
+            {"normal": True, "holo": True, "reverse": False},
+        )
+
+
+class _Rates:
+    def __init__(self):
+        self.fail = False
+
+    async def fetch(self):
+        from app.prices.rates import RatesUnavailable
+
+        if self.fail:
+            raise RatesUnavailable("down")
+        return ExchangeRates(Decimal("1000"), Decimal("0.8"), NOW)
+
+
+def _priced_app(factory):
+    from app.prices.service import PriceService
+
+    from .test_boxes_postgres import application
+
+    app = application(factory)
+    provider, rates = _Provider(), _Rates()
+    app.state.price_service = PriceService(provider, rates)
+    return app, provider, rates
+
+
+def test_two_users_with_the_same_card_never_share_totals_or_boxes(prices_database):
+    from .test_boxes_postgres import client_for, insert_placement, seed_owner
+
+    factory, _ = prices_database
+    # seed_owner gives duplicate base1-4 copies: even index holo, odd index normal.
+    ash = seed_owner(factory, copies=3, boxes=1)
+    misty = seed_owner(factory, copies=2, boxes=1)
+    with factory.begin() as session:
+        for position, copy_id in enumerate(ash["copies"][:2]):
+            insert_placement(session, ash, copy=copy_id, position=position)
+        insert_placement(session, misty, copy=misty["copies"][0])
+    app, provider, _ = _priced_app(factory)
+    ash_ids = {str(i) for i in ash["copies"]}
+    misty_ids = {str(i) for i in misty["copies"]}
+
+    with client_for(app, ash) as client:
+        value = client.get("/api/v1/prices/collection").json()
+        # holo 5 USD x 1000 (x2) + normal 2 EUR x 1250 = 12500 CLP
+        assert (value["total"], value["copy_count"]) == ("12500", 3)
+        assert {item["copy_id"] for item in value["top"]} == ash_ids
+        box = client.get(f"/api/v1/boxes/{ash['boxes'][0]}/value").json()
+        assert (box["total"], box["copy_count"]) == ("7500", 2)
+        foreign = client.get(f"/api/v1/boxes/{misty['boxes'][0]}/value")
+        assert foreign.status_code == 404
+        batch = client.get(
+            "/api/v1/prices/copies", params={"copy_id": sorted(misty_ids)}
+        ).json()
+        assert batch["results"] == []
+
+    with client_for(app, misty) as client:
+        value = client.get("/api/v1/prices/collection").json()
+        assert (value["total"], value["copy_count"]) == ("7500", 2)
+        assert {item["copy_id"] for item in value["top"]} == misty_ids
+        box = client.get(f"/api/v1/boxes/{misty['boxes'][0]}/value").json()
+        assert box["total"] == "5000"
+        assert client.get(f"/api/v1/boxes/{ash['boxes'][0]}/value").status_code == 404
+
+    # Prices are shared catalog data: one provider request served both users.
+    assert provider.calls == ["base1-4"]
+    with factory() as session:
+        assert session.scalar(text("SELECT count(*) FROM card_price_snapshots")) == 1
+
+
+def test_price_outages_leave_inventory_boxes_and_sets_identical(prices_database):
+    from test_set_completion import checklist
+
+    from .test_boxes_postgres import client_for, insert_placement, seed_owner
+
+    factory, _ = prices_database
+    owner = seed_owner(factory, copies=2, boxes=1)
+    with factory.begin() as session:
+        insert_placement(session, owner)
+    app, provider, rates = _priced_app(factory)
+    fixture = checklist()
+
+    async def get_checklist(set_id, language="es"):
+        return fixture.model_copy(deep=True)
+
+    app.state.card_provider.get_set_checklist = get_checklist
+    paths = [
+        "/api/v1/inventory",
+        f"/api/v1/inventory/{owner['copies'][0]}",
+        "/api/v1/boxes",
+        f"/api/v1/boxes/{owner['boxes'][0]}",
+        "/api/v1/boxes/views/owned",
+        "/api/v1/sets/progress?set_id=sv03.5",
+    ]
+    with client_for(app, owner) as client:
+        baseline = {path: client.get(path).json() for path in paths}
+        provider.fail = rates.fail = True
+        with factory.begin() as session:
+            session.execute(text("DELETE FROM card_price_snapshots"))
+            session.execute(text("DELETE FROM exchange_rates"))
+        degraded = client.get("/api/v1/prices/collection")
+        assert degraded.status_code == 200
+        assert degraded.json()["unpriced_by_reason"] == {"source_unavailable": 2}
+        for path in paths:
+            response = client.get(path)
+            assert response.status_code == 200, path
+            assert response.json() == baseline[path], path
