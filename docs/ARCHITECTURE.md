@@ -1,7 +1,8 @@
 # PokéVault — Incremental architecture (v0.2)
 
 **Status:** Public catalog, Google authentication (5A), personal copy inventory (5B),
-personal boxes (5C) and expansion/completion exploration (5D) are implemented.
+personal boxes (5C), expansion/completion exploration (5D) and OCR-assisted
+human-confirmed scanning (6) are implemented.
 Future modules are marked as conceptual; live acceptance is separate from automated evidence.
 
 ## 1. System overview
@@ -39,7 +40,9 @@ Prefer a **modular monolith** over microservices for a single-developer academic
 - **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001`, authentication `0002`, physical copies `0003` and personal boxes `0004`. Completion adds no schema change.
 - **Auth implemented (5A):** backend Google OIDC code flow with S256 PKCE, browser-bound single-use transactions and digest-backed opaque server sessions. Live credentials/manual login remain pending; see `AUTHENTICATION.md`.
 - **Language:** checked-in ES/EN translation dictionaries; no automatic translation service.
-- **Scanning:** restricted image upload, preprocessing (OpenCV candidate), OCR engine to be selected, extract number/name/set, rank catalog matches, manual confirmation.
+- **Scanning (6):** bounded raw-image upload, Pillow validation/preprocessing in an
+  isolated worker, local Tesseract, editable clues, verified catalog candidates and
+  explicit shared inventory confirmation. No OpenCV, cloud recognition or scan table.
 
 ## 3. Current and proposed backend modules
 
@@ -67,7 +70,7 @@ backend/
   migrations/
 ```
 
-`api`, `core`, `db`, `auth`, `pokemon`, `cards`, `inventory` and `boxes` exist today.
+`api`, `core`, `db`, `auth`, `pokemon`, `cards`, `inventory`, `boxes` and `scanner` exist today.
 Expansion catalog/completion schemas and services extend `cards` through `api/sets.py`;
 there is no parallel catalog provider. Other listed directories remain conceptual.
 
@@ -86,7 +89,7 @@ there is no parallel catalog provider. Other listed directories remain conceptua
 | Deck / DeckCard | Deck list and card quantity; format validation separate from storage. |
 | Transaction | Buy/sell record, per-card quantity and monetary amounts. |
 | PriceSnapshot | Provider, date, currency and unit price; nullable missing-price support. |
-| ScanAttempt | Optional image recognition metadata, candidate IDs and user confirmation. |
+| Scan attempt | Stateless processing in Iteration 6; no persisted history, photos or raw OCR. |
 
 **Key constraint:** inventory copies must be owned by a specific user; a public catalog card is shared across users. Do not infer that all Pokémon TCG cards map to exactly one species.
 
@@ -429,3 +432,34 @@ validated return destinations and numeric accessible progress. Account-keyed pri
 subtrees abort on revalidation/logout/account changes while public metadata remains
 available. Completion has no stored flags or new database schema. Exact contracts,
 cache/coverage decisions and manual checks are in [SET_COMPLETION.md](SET_COMPLETION.md).
+
+
+## Iteration 6 — Stateless scanner and explicit confirmation
+
+`api/scans.py` enforces the existing session/CSRF boundary, streamed size/time limits,
+no-store responses, bounded admission and disconnect cancellation. `scanner/images.py`
+verifies decoded format/dimensions and removes metadata; `extraction.py` extracts
+conservative name/number/count/header clues; `ocr.py` supervises `worker.py` and its
+native Tesseract descendants. The parent owns temporary cleanup even on process kill.
+Native work runs outside the event loop with minimal environment, explicit argv,
+bounded output/deadlines and two recognition slots. Missing OCR does not prevent startup.
+
+`scanner/matching.py` ranks only canonical physical checklist members from the existing
+CardProvider. Shared metadata/checklist caches, clients, five-request semaphore and
+asset validation remain authoritative. A bounded name-discovery extension uses literal
+filters and verified language aliases; no global card download/per-candidate detail
+fanout occurs. Partial/ambiguous evidence remains explicit; no calibrated probability
+or species/category inference is invented. `schemas.py` contains strict public DTOs.
+
+React adds `/scanner` and small image/manual/results/confirmation components, with
+local-only object URLs and account-scoped mounted state. Selecting a candidate reuses
+CopyForm and inventory POST; success links to the exact copy, printing and expansion.
+An optional owner-namespaced idempotency key uses the existing inventory primary key
+for retry/concurrent-submit protection. No model/migration or alternate inventory API
+is introduced. Full contracts, limits, setup and manual checks: [SCANNER.md](SCANNER.md).
+
+Scanner focus/camera/detail return revalidation suspends the same-owner subtree:
+it becomes hidden/inert immediately, aborts active work and refreshes owned quantity
+after successful validation. An uncertain save retains its original retry key and
+payload. Logout, changed ownership or failed validation discards the subtree.
+This preserves local drafts without retaining data across authenticated accounts.

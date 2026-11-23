@@ -333,3 +333,27 @@ so refreshing one saved copy cannot silently discard another draft. Delete requi
 confirmation. Catalog failures preserve management by ID, and artwork never implies
 the language or finish of the collector's physical copy. Private UI disappears during
 session validation, logout and account changes. Manual desktop/mobile approval is pending.
+
+
+## Iteration 6 — Functional scanner, without global redesign
+
+The existing navigation exposes Scanner in ES/EN. Signed-out users get sign-in and
+public expansion browsing. The private workflow has separate native library/camera
+inputs, a local preview, explicit recognize/cancel/retry controls, editable clues,
+expansion search, evidence-labeled alternatives and explicit selection. Unknown,
+limited or failed identification stays visible and leaves manual correction available.
+HEIC guidance and byte/pixel limits are explicit; no live camera framework is added.
+
+Candidate cards reuse CardArtwork and stable printing/set identity. Detail inspection
+and confirmation distinguish suggestions from verified catalog metadata. Confirmation
+reuses all physical-copy attributes and shows current exact-printing quantity or an
+honest unavailable state. A successful save shows the new UUID and direct inventory,
+printing and expansion links. Retry protection never prevents an intentional next copy.
+
+Native semantic controls, labels, focus targets, status/error announcements and
+responsive styles support keyboard/touch use. Same-owner session revalidation hides/inerts
+the workflow and aborts requests, then restores local previews/drafts only after identity
+is confirmed. Logout, changed ownership or failed validation discards retained state;
+no private browser persistence is added. Automated component
+coverage is separate from physical-camera, Safari/Chromium and real-photo acceptance.
+The final visual redesign and personal-box scrolling remain outside this iteration.

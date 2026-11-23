@@ -153,3 +153,20 @@ the denominator is the unique complete checklist, not either count copied blindl
 Incomplete/empty checklists have explicit unavailable percentages. Spanish fallback
 does not alter identity. See [SET_COMPLETION.md](SET_COMPLETION.md) for the formula,
 coverage limits, aggregation, API and future variant-specific master-set boundary.
+
+
+## Iteration 6 — No persistent scan model
+
+Recognition is stateless. Photos, embedded metadata/GPS and raw OCR do not enter
+PostgreSQL; editable clues and suggestions live only for the request/workflow.
+Human confirmation inserts the same `inventory_copies` record used by collection,
+boxes and derived completion. No scan history, parallel copy, progress or idempotency
+table is added. The migration head remains `0004`.
+
+An optional UUIDv4 `Idempotency-Key` on inventory creation derives a stable UUIDv5
+within the session owner's namespace, using the existing copy primary key to arbitrate
+concurrent requests. Same key/payload replays one record; different payload returns 409.
+A fresh key intentionally creates another physical copy. The guarantee lasts while
+the row exists; deleting it ends replay protection and editing it may conflict with
+an old payload. This is documented record-backed retry identity, not a permanent
+transaction ledger. Existing attributes, constraints and box ownership remain intact.
