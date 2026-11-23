@@ -95,10 +95,10 @@ Files: `research/prices/` (README, samples); `backend/tests/fixtures/prices/`.
 Files: `backend/app/prices/{__init__,schemas,normalize,selection,conversion}.py`;
 `backend/tests/test_price_rules.py`.
 
-- [ ] Write failing tests for every row of spec §6.2 and the sample table, `0`/`null`/
+- [x] Write failing tests for every row of spec §6.2 and the sample table, `0`/`null`/
   negative/cap/unit handling, `highPrice` never read, missing `variants`.
-- [ ] Write failing tests for conversion (EUR/USD → CLP/USD), rounding and sum-then-round.
-- [ ] Implement until green; Ruff clean.
+- [x] Write failing tests for conversion (EUR/USD → CLP/USD), rounding and sum-then-round.
+- [x] Implement until green; Ruff clean. (42 tests green; full backend suite without PostgreSQL: 563 passed.)
 
 ### Task 2: Migration 0005 and storage
 

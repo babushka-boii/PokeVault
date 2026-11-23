@@ -146,8 +146,8 @@ Per card printing (`card_id`), store only selectable values:
 | `tp_updated` | `tcgplayer.updated` | — |
 | `has_normal`, `has_holo`, `has_reverse` | TCGdex `variants` (nullable when absent) | — |
 
-Values that are `null`, `0`, negative, non-numeric or above a sanity cap (10 000 per
-unit, logged as rejected) become `NULL`. A unit other than `EUR`/`USD` respectively
+Values that are `null`, `0`, negative, non-numeric or above a sanity cap (1 000 000 per
+unit, only to stop broken values; real cards above 10 000 are accepted) become `NULL`. A unit other than `EUR`/`USD` respectively
 rejects that source. A card with no `pricing` object, or a TCGdex 404, stores a snapshot
 with all values `NULL` (status `no_data`) so it is not re-fetched for 24 h.
 
