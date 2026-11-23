@@ -350,5 +350,12 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 - [x] Readings stay OCR evidence: matching still marks name/number conflicts as uncertain.
 - [ ] Re-run `bash scripts/check.sh` and real-browser acceptance on the development Mac.
 
+### Manual acceptance — 2026-11-23
+
+- [x] `bash scripts/check.sh` passed (exit code 0) on the development Mac.
+- [x] Safari on desktop and in responsive mode at iPhone size: scanner OK with
+  Galarian Zigzagoon (130/217) and Jamming Tower (261/217).
+- [ ] Real phone camera: pending, because Google OAuth only works on localhost.
+
 Limitation: the italic flagged "1" of this typeface is fragile in Tesseract (some
 preprocessing variants read 430 or 730). Never correct it from catalog expectations.

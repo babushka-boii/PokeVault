@@ -8,6 +8,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - **Antes de cada tarea, indicar modelo (Opus/Sonnet/Haiku) y esfuerzo recomendados** y esperar su "dale".
 - No inventar el estado del proyecto: verificarlo en el repo (git, docs/ROADMAP.md, docs/SCANNER.md).
 - Codex y Claude se turnan el trabajo (Codex sobre todo en el frontend visual). Dejar cambios claros, con commits pequeños y bitácora actualizada.
+- Conversación en español. Código, commits y docs/ en inglés.
 - No hacer commit/push sin que lo pida o confirme. Nunca leer ni subir `backend/.env` ni fotos privadas.
 
 ## Stack
