@@ -143,4 +143,5 @@ def test_trainer_recovery_uses_wide_title_region_without_extra_retries(
     result = worker.recognize_file(upload, "image/png", "unused", "eng", 5)
     assert result.clues.name == "Wind Stadium"
     assert calls.count(6) == 1
-    assert len(calls) <= 7
+    # 4 orientations, title, footer, threshold footer, outlined footer.
+    assert len(calls) <= 8

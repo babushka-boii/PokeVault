@@ -339,3 +339,16 @@ Trainer headers/title regions and interrupted geometric boundaries. No private
 images committed, inventory writes, credentials changes, commits or pushes.
 Remaining: improve outlined footer OCR using independent evidence; do not infer a
 printing solely from first rank. No hybrid recognition or Iteration 7 work.
+
+### Outlined collector numbers — 2026-11-23
+
+- [x] Added one bounded footer pass for numbers printed as a dark fill inside a light
+  outline (full-art and reverse-holo footers). Runs only after the plain and
+  thresholded footer passes find no number; worst case is now twelve native calls.
+- [x] Local A/B on 14 synthetic samples and 7 real photos: only Galarian Zigzagoon
+  (now 130/217) and Jamming Tower (now 261/217) changed; the other 19 are identical.
+- [x] Readings stay OCR evidence: matching still marks name/number conflicts as uncertain.
+- [ ] Re-run `bash scripts/check.sh` and real-browser acceptance on the development Mac.
+
+Limitation: the italic flagged "1" of this typeface is fragile in Tesseract (some
+preprocessing variants read 430 or 730). Never correct it from catalog expectations.

@@ -77,7 +77,8 @@ def test_original_evidence_compared_without_mixing_paths(
     assert result.clues.local_number == want_number
     assert ("localization_conflict" in result.warnings) == conflict
     assert (1000, 1000) in calls
-    assert len(calls) <= 11
+    # 4 crop orientations, title, 3 footer passes, up to 4 original orientations.
+    assert len(calls) <= 12
 
 
 def test_original_fallback_timeout_preserves_crop(tmp_path, monkeypatch):

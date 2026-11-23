@@ -126,6 +126,33 @@ def _lines(
     return lines
 
 
+def _enclosed_glyphs(pixels: np.ndarray) -> np.ndarray:
+    """Render glyphs printed as a dark fill inside a light outline.
+
+    Full-art and reverse-holo footers print the collector number this way, so
+    Tesseract only sees thin light strokes. Light outlines are thresholded,
+    everything reachable from the border is background, and the enclosed dark
+    regions (the actual glyph shapes) become black text on white.
+    """
+    outline = cv2.adaptiveThreshold(
+        pixels, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, -10
+    )
+    height, width = outline.shape
+    padded = cv2.copyMakeBorder(outline, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=0)
+    cv2.floodFill(padded, np.zeros((height + 4, width + 4), np.uint8), (0, 0), 255)
+    enclosed = (padded[1:-1, 1:-1] == 0).astype(np.uint8)
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(enclosed)
+    glyphs = np.full((height, width), 255, np.uint8)
+    for index in range(1, count):
+        # Drop specks from foil texture; glyph interiors are taller than 4%.
+        if (
+            stats[index, cv2.CC_STAT_AREA] > 40
+            and stats[index, cv2.CC_STAT_HEIGHT] > height * 0.04
+        ):
+            glyphs[labels == index] = 0
+    return glyphs
+
+
 def recognize_file(
     upload: Path, mime: str, engine: str, languages: str, timeout: float
 ) -> OCRResult:
@@ -253,6 +280,15 @@ def recognize_file(
                 11,
             )
             lines = read(Image.fromarray(pixels), region=footer_box)
+            footer_clues = extract_clues(lines)
+            best_lines += lines
+        if not footer_clues.local_number:
+            # Outlined numbers: one bounded pass. Its reading is OCR evidence
+            # only; matching still flags it when it contradicts the name.
+            lines = read(
+                Image.fromarray(_enclosed_glyphs(np.asarray(footer))),
+                region=footer_box,
+            )
             footer_clues = extract_clues(lines)
             best_lines += lines
         best.local_number = footer_clues.local_number

@@ -270,7 +270,8 @@ A complete crop receives one original-frame check at its selected orientation. A
 incomplete crop can try at most four distinct orthogonal original orientations,
 starting with the crop's selected orientation. These passes share at most four
 seconds and the existing 18-second internal/20-second supervisor deadline. Together
-with the existing crop/title/footer work there are at most eleven native calls.
+with the existing crop/title/footer work (including the outlined-number footer
+pass) there are at most twelve native calls.
 Uncertain geometry already uses the whole frame and does not duplicate this work.
 
 Original-frame tokens require native confidence >=55. Deterministic selection orders
@@ -474,3 +475,22 @@ Security limits, worker isolation, HEIC, auth/CSRF, retry identity and inventory
 are unchanged. Real-browser acceptance was not repeated for this regression session.
 
 Final verification: 100 focused tests passed. One complete scripts/check.sh run passed: 43 unittest, 593 backend, 406 frontend; zero skips/failures. Lint, types, build and whitespace passed.
+
+### Outlined collector numbers — 2026-11-23
+
+Galarian Zigzagoon and Jamming Tower print the collector number as a dark fill
+inside a light outline. Tesseract read only the outline strokes (for example
+"1130/2178)"), so no number survived. A third footer pass, used only when the plain
+and thresholded passes fail, thresholds the light outline, flood-fills everything
+reachable from the crop border as background and keeps the enclosed dark regions
+(the glyph shapes) as black text on white (`_enclosed_glyphs` in worker.py).
+
+Local evaluation (Tesseract 5, eng+spa, single run, not a benchmark): Zigzagoon
+130/217 and Jamming Tower 261/217 are now read; the 14 synthetic samples and the
+other five photos produce identical clues. Jamming Tower OCR also finished sooner
+because the original-frame fallback stops at a complete reading.
+
+The italic flagged "1" remains fragile: some preprocessing variants (other block
+sizes, English-only, shear correction) consistently read 430 or 730. Agreement
+between variants is therefore not proof. The reading is only OCR evidence; matching
+keeps reporting name/number conflicts as uncertain and still requires confirmation.
