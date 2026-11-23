@@ -1,0 +1,428 @@
+{
+ "es/me02.5-036": {
+  "name": "Scorbunny",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.149Z",
+    "unit": "EUR",
+    "idProduct": 869647,
+    "avg": 0.03,
+    "low": 0.02,
+    "trend": 0.03,
+    "avg1": 0.02,
+    "avg7": 0.03,
+    "avg30": 0.03,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "normal": {
+     "productId": 675848,
+     "lowPrice": 0.01,
+     "midPrice": 0.16,
+     "highPrice": 19.66,
+     "marketPrice": 0.14,
+     "directLowPrice": 0.03
+    }
+   }
+  }
+ },
+ "es/me02.5-085": {
+  "name": "Misdreavus",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.149Z",
+    "unit": "EUR",
+    "idProduct": 869696,
+    "avg": 0.04,
+    "low": 0.02,
+    "trend": 0.04,
+    "avg1": 0.04,
+    "avg7": 0.03,
+    "avg30": 0.03,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "normal": {
+     "productId": 675897,
+     "lowPrice": 0.01,
+     "midPrice": 0.19,
+     "highPrice": 19.66,
+     "marketPrice": 0.18,
+     "directLowPrice": 0.06
+    }
+   }
+  }
+ },
+ "es/me02.5-130": {
+  "name": "Zigzagoon de Galar",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.162Z",
+    "unit": "EUR",
+    "idProduct": 869741,
+    "avg": 0.03,
+    "low": 0.02,
+    "trend": 0.03,
+    "avg1": 0.06,
+    "avg7": 0.03,
+    "avg30": 0.03,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "normal": {
+     "productId": 675942,
+     "lowPrice": 0.01,
+     "midPrice": 0.15,
+     "highPrice": 19.66,
+     "marketPrice": 0.13,
+     "directLowPrice": 0.03
+    }
+   }
+  }
+ },
+ "es/me02.5-261": {
+  "name": "Torre de Interferencia",
+  "variants": {
+   "firstEdition": false,
+   "holo": true,
+   "normal": false,
+   "reverse": false,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.149Z",
+    "unit": "EUR",
+    "idProduct": 869872,
+    "avg": 0.8,
+    "low": 0.17,
+    "trend": 0.83,
+    "avg1": 0.38,
+    "avg7": 0.75,
+    "avg30": 0.82,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "holofoil": {
+     "productId": 676073,
+     "lowPrice": 0.2,
+     "midPrice": 0.99,
+     "highPrice": 4321,
+     "marketPrice": 0.66,
+     "directLowPrice": null
+    }
+   }
+  }
+ },
+ "es/me05-044": {
+  "name": "Cranidos",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.157Z",
+    "unit": "EUR",
+    "idProduct": 895830,
+    "avg": 0.03,
+    "low": 0.02,
+    "trend": 0.03,
+    "avg1": 0.02,
+    "avg7": 0.02,
+    "avg30": 0.03,
+    "avg-holo": 0.07,
+    "low-holo": 0.02,
+    "trend-holo": 0.07,
+    "avg1-holo": 0.2,
+    "avg7-holo": 0.07,
+    "avg30-holo": 0.07
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.784Z",
+    "reverse-holofoil": {
+     "productId": 704801,
+     "lowPrice": 0.01,
+     "midPrice": 0.25,
+     "highPrice": 2.37,
+     "marketPrice": 0.25,
+     "directLowPrice": 0.19
+    },
+    "normal": {
+     "productId": 704801,
+     "lowPrice": 0.01,
+     "midPrice": 0.19,
+     "highPrice": 6.99,
+     "marketPrice": 0.19,
+     "directLowPrice": 0.03
+    }
+   }
+  }
+ },
+ "en/me02.5-036": {
+  "name": "Scorbunny",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.157Z",
+    "unit": "EUR",
+    "idProduct": 869647,
+    "avg": 0.03,
+    "low": 0.02,
+    "trend": 0.03,
+    "avg1": 0.02,
+    "avg7": 0.03,
+    "avg30": 0.03,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "normal": {
+     "productId": 675848,
+     "lowPrice": 0.01,
+     "midPrice": 0.16,
+     "highPrice": 19.66,
+     "marketPrice": 0.14,
+     "directLowPrice": 0.03
+    }
+   }
+  }
+ },
+ "en/me02.5-085": {
+  "name": "Misdreavus",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.162Z",
+    "unit": "EUR",
+    "idProduct": 869696,
+    "avg": 0.04,
+    "low": 0.02,
+    "trend": 0.04,
+    "avg1": 0.04,
+    "avg7": 0.03,
+    "avg30": 0.03,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "normal": {
+     "productId": 675897,
+     "lowPrice": 0.01,
+     "midPrice": 0.19,
+     "highPrice": 19.66,
+     "marketPrice": 0.18,
+     "directLowPrice": 0.06
+    }
+   }
+  }
+ },
+ "en/me02.5-130": {
+  "name": "Galarian Zigzagoon",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.157Z",
+    "unit": "EUR",
+    "idProduct": 869741,
+    "avg": 0.03,
+    "low": 0.02,
+    "trend": 0.03,
+    "avg1": 0.06,
+    "avg7": 0.03,
+    "avg30": 0.03,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "normal": {
+     "productId": 675942,
+     "lowPrice": 0.01,
+     "midPrice": 0.15,
+     "highPrice": 19.66,
+     "marketPrice": 0.13,
+     "directLowPrice": 0.03
+    }
+   }
+  }
+ },
+ "en/me02.5-261": {
+  "name": "Jamming Tower",
+  "variants": {
+   "firstEdition": false,
+   "holo": true,
+   "normal": false,
+   "reverse": false,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.162Z",
+    "unit": "EUR",
+    "idProduct": 869872,
+    "avg": 0.8,
+    "low": 0.17,
+    "trend": 0.83,
+    "avg1": 0.38,
+    "avg7": 0.75,
+    "avg30": 0.82,
+    "avg-holo": null,
+    "low-holo": null,
+    "trend-holo": 0,
+    "avg1-holo": null,
+    "avg7-holo": null,
+    "avg30-holo": null
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "holofoil": {
+     "productId": 676073,
+     "lowPrice": 0.2,
+     "midPrice": 0.99,
+     "highPrice": 4321,
+     "marketPrice": 0.66,
+     "directLowPrice": null
+    }
+   }
+  }
+ },
+ "en/me05-044": {
+  "name": "Cranidos",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "cardmarket": {
+    "updated": "2026-11-22T22:16:19.162Z",
+    "unit": "EUR",
+    "idProduct": 895830,
+    "avg": 0.03,
+    "low": 0.02,
+    "trend": 0.03,
+    "avg1": 0.02,
+    "avg7": 0.02,
+    "avg30": 0.03,
+    "avg-holo": 0.07,
+    "low-holo": 0.02,
+    "trend-holo": 0.07,
+    "avg1-holo": 0.2,
+    "avg7-holo": 0.07,
+    "avg30-holo": 0.07
+   },
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.784Z",
+    "reverse-holofoil": {
+     "productId": 704801,
+     "lowPrice": 0.01,
+     "midPrice": 0.25,
+     "highPrice": 2.37,
+     "marketPrice": 0.25,
+     "directLowPrice": 0.19
+    },
+    "normal": {
+     "productId": 704801,
+     "lowPrice": 0.01,
+     "midPrice": 0.19,
+     "highPrice": 6.99,
+     "marketPrice": 0.19,
+     "directLowPrice": 0.03
+    }
+   }
+  }
+ }
+}
