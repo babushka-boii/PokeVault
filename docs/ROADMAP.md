@@ -377,17 +377,17 @@ Wishlist, trades, transactions and missing-card cost stay deferred.
   variant, box total, CLP/USD switch, ES/EN, exchange-rate attribution.
 - [x] Review fix: unknown card ids are no longer stored (public endpoint abuse).
 - [x] `bash scripts/check.sh` exit 0: 43 provider, 790 backend, 421 frontend tests.
-- [ ] Manual acceptance on the development Mac (see below).
-- [ ] Student reviews the branch and decides on PR/merge.
+- [x] Manual acceptance on the development Mac, Safari (2026-11-23; two checks remain, see below).
+- [x] Student reviewed the branch and merged it into `main` (PR #5).
 
-### Manual acceptance checklist (pending)
+### Manual acceptance — 2026-11-23 (Safari, development Mac)
 
-- [ ] Card detail for the five sample cards: prices match spec §6.2 by variant (values
-  may have moved since 2026-11-22; check source and date), language note visible.
-- [ ] My collection: list appears first, then one price or reason per copy.
-- [ ] Profile: total, "X of Y priced", copies-without-variant link, top 5 links.
-- [ ] Personal box: total changes after placing/removing a copy.
-- [ ] CLP/USD switch: persists per account; signed out it persists in the browser.
-- [ ] Attribution link opens https://www.exchangerate-api.com in a new tab.
+- [x] Card detail: reference prices by variant shown OK.
+- [x] A copy in `reverse`: its price shows OK in My collection.
+- [x] Profile: collection value card OK.
+- [x] CLP/USD switch OK both signed in and signed out.
+- [x] Personal box: box value OK.
+- [ ] Attribution link opens https://www.exchangerate-api.com in a new tab (not checked).
 - [ ] Network off (or API down): collection, boxes and expansions still work; prices
-  show the last saved value or "no price".
+  show the last saved value or "no price" (not checked manually; covered by automated
+  tests).

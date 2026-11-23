@@ -33,7 +33,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 
 ## Estado (verificar antes de confiar)
 - Iteración 6 (escáner) mezclada en `main` (PR #4). Números contorneados se leen con `_enclosed_glyphs` en worker.py; el "1" cursivo sigue frágil: nunca corregir números con el catálogo. Pendiente: cámara de celular real (OAuth solo en localhost).
-- Iteración 7 (precios de referencia) en la rama `feat/iteration-7-card-prices`, sin push. Tareas 0–7 hechas; última `check.sh`: código 0. Pendiente: aceptación manual (checklist en docs/ROADMAP.md) y decidir PR/merge.
+- Iteración 7 (precios de referencia) mezclada en `main` (PR #5). Aceptación manual en Safari OK el 2026-11-23 (detalle de carta, copia reverse, Perfil, CLP/USD con y sin sesión, caja). Pendiente: revisar el enlace de atribución y el comportamiento sin red.
 - Precios: TCGdex Cardmarket `trend` EUR (respaldo TCGplayer `marketPrice` USD) por variante de la copia; tasas de ExchangeRate-API (mindicador.cl no respondió). Atribución obligatoria "Rates By Exchange Rate API" y no redistribuir tasas. Detalle en docs/PRICES.md.
 - Prueba local del OCR: la sesión de Claude puede copiar `backend/app` y fotos a su entorno y correr `recognize_file` con Tesseract (Python 3.13 necesita paréntesis en `except A, B:`; no tocar el repo por eso).
 - Futuro: wishlist/intercambios, rediseño visual (retro Esmeralda + moderno gen 5 Negro).
