@@ -105,10 +105,10 @@ Files: `backend/app/prices/{__init__,schemas,normalize,selection,conversion}.py`
 Files: `backend/app/db/models.py`; `backend/migrations/versions/0005_create_prices.py`;
 `backend/app/prices/store.py`; `backend/tests/integration/test_prices_postgres.py`.
 
-- [ ] Failing PostgreSQL tests: upgrade/downgrade in disposable schemas with existing
+- [x] Failing PostgreSQL tests: upgrade/downgrade in disposable schemas with existing
   0004 data intact, checks (status, currency, positive rates), upsert, freshness queries.
-- [ ] Add `CardPriceSnapshot`, `ExchangeRate` models and
-  `UserSettings.preferred_currency`; write migration; implement store.
+- [x] Add `CardPriceSnapshot`, `ExchangeRate` models and
+  `UserSettings.preferred_currency`; write migration; implement store. (Also SQLite unit tests in `tests/test_price_store.py`; existing `head == 0004` assertions moved to `0005`. Backend suite incl. PostgreSQL: 673 passed.)
 - [ ] Student runs `alembic upgrade head` on the development DB only after review.
 
 ### Task 3: Provider clients

@@ -1,13 +1,14 @@
 """Pure normalization of TCGdex ``pricing``/``variants`` into a PriceSnapshot."""
 
 from datetime import UTC, datetime
-from decimal import Decimal
+from decimal import ROUND_HALF_EVEN, Decimal
 
 from app.prices.schemas import PriceSnapshot
 
 # Real cards can exceed 10 000 and highPrice is never read, so this bound only stops
 # broken values (e.g. a misplaced decimal), not expensive cards.
 MAX_UNIT_PRICE = Decimal("1000000")
+PRICE_PRECISION = Decimal("0.0001")
 
 
 def _price(value: object) -> Decimal | None:
@@ -18,9 +19,12 @@ def _price(value: object) -> Decimal | None:
         number = Decimal(str(value))
     except ArithmeticError:
         return None
-    if not number.is_finite() or number <= 0 or number > MAX_UNIT_PRICE:
+    if not number.is_finite() or number > MAX_UNIT_PRICE:
         return None
-    return number
+    # Same precision as the NUMERIC(12, 4) columns, so storing never changes a value
+    # and a price too small to represent is "no price", never 0.
+    number = number.quantize(PRICE_PRECISION, rounding=ROUND_HALF_EVEN)
+    return number if number > 0 else None
 
 
 def _timestamp(value: object) -> datetime | None:

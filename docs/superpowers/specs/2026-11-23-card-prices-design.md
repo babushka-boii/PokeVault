@@ -235,7 +235,7 @@ and the matching filter in `CollectionPage`.
 ## 9. Data model (migration `0005`)
 
 - `card_price_snapshots`: `card_id` (PK, string 100), fields from §6.1 as
-  `NUMERIC(12,2)`, `cm_updated`/`tp_updated` timestamptz nullable, `has_*` booleans
+  `NUMERIC(12,4)` (sub-cent prices such as 0.004 must survive; values are quantized to 4 decimals and a value that rounds to 0 is "no price"), `cm_updated`/`tp_updated` timestamptz nullable, `has_*` booleans
   nullable, `status` (`ok`/`no_data`, checked), `fetched_at` timestamptz not null.
   Shared catalog data, no `user_id`.
 - `exchange_rates`: `source` (PK, `exchangerate-api`), `usd_clp` and `eur_per_usd`

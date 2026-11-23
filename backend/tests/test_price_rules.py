@@ -83,6 +83,17 @@ def test_values_above_the_sanity_cap_are_rejected():
     assert normalize_pricing(raw, None).cm_trend == Decimal("1000000")
 
 
+def test_small_prices_keep_four_decimals_and_unrepresentable_ones_are_dropped():
+    def trend(value):
+        raw = {"cardmarket": {"unit": "EUR", "trend": value}}
+        return normalize_pricing(raw, None).cm_trend
+
+    assert trend(0.004) == Decimal("0.004")
+    assert trend(0.0001) == Decimal("0.0001")
+    assert trend(0.00004) is None  # would round to 0.0000
+    assert trend(0.12345) == Decimal("0.1234")  # half-even at 4 decimals
+
+
 def test_expensive_real_cards_above_ten_thousand_are_accepted():
     raw = {
         "cardmarket": {"unit": "EUR", "trend": 25000, "updated": "2026-11-22T00:00:00Z"}
