@@ -148,8 +148,11 @@ Per card printing (`card_id`), store only selectable values:
 
 Values that are `null`, `0`, negative, non-numeric or above a sanity cap (1 000 000 per
 unit, only to stop broken values; real cards above 10 000 are accepted) become `NULL`. A unit other than `EUR`/`USD` respectively
-rejects that source. A card with no `pricing` object, or a TCGdex 404, stores a snapshot
-with all values `NULL` (status `no_data`) so it is not re-fetched for 24 h.
+rejects that source. A card with no `pricing` object stores a snapshot with all values `NULL`
+(status `no_data`) so it is not re-fetched for 24 h. A TCGdex 404 (card not in the
+catalog) is remembered only in memory (at most 2048 ids, 24 h) and never stored: the
+public card endpoint must not let anyone fill the table with invented identifiers
+(decided during the Task 7 review, 2026-11-23).
 
 ### 6.2 Variant selection
 

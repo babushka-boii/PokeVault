@@ -162,15 +162,32 @@ def test_provider_failure_serves_stale_value_and_pauses_refreshes(factory):
     assert recovered["new-1"].snapshot.status == "no_data"
 
 
-def test_not_found_cards_store_no_data_and_are_not_refetched(factory):
+def test_not_found_cards_are_remembered_in_memory_but_never_stored(factory):
     provider = FakeProvider()
     clock = Clock()
     prices = service(provider, clock=clock)
     result = run(prices.snapshots(factory, ["gone-1"]))
     assert result["gone-1"].snapshot.status == "no_data"
-    clock.advance(hours=12)
-    run(prices.snapshots(factory, ["gone-1"]))
+    with factory() as session:
+        assert store.get_snapshots(session, ["gone-1"]) == {}
+    clock.advance(hours=23)
+    later = run(prices.snapshots(factory, ["gone-1"]))
+    assert later["gone-1"].snapshot.status == "no_data"
     assert provider.calls == ["gone-1"]
+    clock.advance(hours=1)
+    run(prices.snapshots(factory, ["gone-1"]))
+    assert provider.calls == ["gone-1", "gone-1"]
+
+
+def test_invented_identifiers_cannot_grow_the_database_or_memory(factory):
+    from app.prices import service as service_module
+
+    prices = service(FakeProvider(), refresh_budget=5000)
+    ids = [f"fake-{n}" for n in range(service_module.MISSING_CAPACITY + 100)]
+    run(prices.snapshots(factory, ids))
+    with factory() as session:
+        assert store.get_snapshots(session, ids) == {}
+    assert len(prices._missing) == service_module.MISSING_CAPACITY
 
 
 def test_refresh_budget_limits_requests_and_reports_pending(factory):

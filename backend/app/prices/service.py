@@ -12,7 +12,7 @@
 
 import asyncio
 import logging
-from collections import Counter
+from collections import Counter, OrderedDict
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -49,6 +49,9 @@ logger = logging.getLogger(__name__)
 PRICED_VARIANTS = ("normal", "reverse", "holo")
 _NO_DATA = PriceSnapshot(status="no_data")
 _FAILED = object()
+# Unknown card ids are remembered in memory only: the public card endpoint must not let
+# anyone fill the database with snapshots for invented identifiers.
+MISSING_CAPACITY = 2048
 
 
 @dataclass(frozen=True)
@@ -113,6 +116,7 @@ class PriceService:
         self._cooldown = provider_cooldown
         self._provider_down_until: datetime | None = None
         self._inflight: dict[str, asyncio.Task] = {}
+        self._missing: OrderedDict[str, datetime] = OrderedDict()
         self._rates_lock = asyncio.Lock()
 
     # --- Snapshots ---
@@ -131,7 +135,9 @@ class PriceService:
         stale: list[str] = []
         for card_id in ids:
             found = stored.get(card_id)
-            if found is None:
+            if found is None and self._known_missing(card_id, now):
+                results[card_id] = SnapshotResult(_NO_DATA)
+            elif found is None:
                 missing.append(card_id)
             elif store.is_fresh(found.fetched_at, now, store.SNAPSHOT_TTL):
                 results[card_id] = SnapshotResult(found.snapshot)
@@ -164,6 +170,21 @@ class PriceService:
             card_id: task.result() for card_id, task in tasks.items() if task in done
         }
 
+    def _known_missing(self, card_id: str, now: datetime) -> bool:
+        seen = self._missing.get(card_id)
+        if seen is None:
+            return False
+        if not store.is_fresh(seen, now, store.SNAPSHOT_TTL):
+            del self._missing[card_id]
+            return False
+        return True
+
+    def _remember_missing(self, card_id: str) -> None:
+        self._missing[card_id] = self._clock()
+        self._missing.move_to_end(card_id)
+        while len(self._missing) > MISSING_CAPACITY:
+            self._missing.popitem(last=False)
+
     def _refresh_task(self, factory, card_id: str) -> asyncio.Task:
         task = self._inflight.get(card_id)
         if task is None:
@@ -180,11 +201,10 @@ class PriceService:
                 logger.warning("Unexpected pricing failure (%s)", type(error).__name__)
             self._provider_down_until = self._clock() + self._cooldown
             return _FAILED
-        snapshot = (
-            normalize_pricing(raw.pricing, raw.variants)
-            if raw is not None
-            else _NO_DATA
-        )
+        if raw is None:  # not in the catalog: never persisted (see MISSING_CAPACITY)
+            self._remember_missing(card_id)
+            return _NO_DATA
+        snapshot = normalize_pricing(raw.pricing, raw.variants)
         try:
             with factory.begin() as session:
                 store.save_snapshot(session, card_id, snapshot, self._clock())
