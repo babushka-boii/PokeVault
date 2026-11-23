@@ -16,7 +16,7 @@ exact variant of the copy.
 
 Success means a user can see, for each copy, which source and date produced its price
 (or why it has none), see totals in CLP or USD, and keep using the collection normally
-when TCGdex or mindicador.cl are unavailable.
+when TCGdex or the exchange-rate provider are unavailable.
 
 ## 2. Evidence
 
@@ -42,7 +42,11 @@ Observed facts that shape this design:
   against `marketPrice` 0.66). It is never read or stored.
 - Cardmarket and TCGplayer carry separate `updated` timestamps.
 
-No real mindicador.cl response is committed yet; Task 0 of the plan captures one.
+Exchange-rate source: mindicador.cl was the first choice but did not respond from the
+student's network on 2026-11-23 (`curl`: 0 bytes in 60 s) and was dropped. The source is
+ExchangeRate-API open access; `research/prices/exchangerate_sample.json` holds a real
+response captured 2026-11-23 (`rates.CLP` 1016.589577 and `rates.EUR` 0.911134 per USD,
+`time_last_update_utc` Mon, 23 Nov 2026 00:02:32 +0000).
 
 ## 3. Confirmed product decisions
 
@@ -57,9 +61,17 @@ No real mindicador.cl response is committed yet; Task 0 of the plan captures one
 - `highPrice` is never used.
 - No condition adjustment. Labeled "reference price", not appraisal.
 - Display currency: CLP by default; the user can switch to USD (stored preference).
-- Exchange rates from `https://mindicador.cl/api` (`dolar.valor`, `euro.valor`, in CLP,
-  Banco Central de Chile). USD from EUR = `euro.valor / dolar.valor`.
-- Cache: prices 24 h, rates 12 h, persisted in migration `0005`.
+- Exchange rates from ExchangeRate-API open access,
+  `GET https://open.er-api.com/v6/latest/USD` (no key): `rates.CLP` is CLP per USD and
+  `rates.EUR` is EUR per USD. EUR → CLP = `CLP / EUR`; EUR → USD = `1 / EUR`.
+  `time_last_update_utc` is the rate date.
+- Cache: prices 24 h, rates 24 h (the provider updates once a day), persisted in
+  migration `0005`. Rates are never requested per user request; a 429 blocks the client
+  for 20 minutes, so after any failed or 429 attempt no new attempt is made for 20 min.
+- Terms of use require attribution and forbid redistributing the data: views showing
+  converted prices include a discreet link "Rates By Exchange Rate API" to
+  https://www.exchangerate-api.com; the API only exposes converted values and the rate
+  date, never a rates table.
 - If a provider fails: show the last stored value with its date, or "no price". Never
   block the collection.
 - Views: card detail, per copy in My collection, profile total + top 5, per personal box.
@@ -74,7 +86,7 @@ No real mindicador.cl response is committed yet; Task 0 of the plan captures one
 
 - Normalization of TCGdex `pricing` into a minimal stored snapshot per card printing.
 - Pure, deterministic variant → price selection.
-- mindicador.cl rate client and conversion EUR/USD → CLP/USD with `Decimal`.
+- ExchangeRate-API rate client and conversion EUR/USD → CLP/USD with `Decimal`.
 - Persistent caches (migration `0005`) and stale-value fallback.
 - User currency preference (CLP/USD) with an authenticated settings endpoint.
 - Price APIs: card detail, copy batch, collection valuation, box valuation.
@@ -101,7 +113,7 @@ New package `backend/app/prices/`:
 | `normalize.py` | Pure: raw TCGdex `pricing` + `variants` → `PriceSnapshot` (drops `0`, `null`, negatives, `highPrice`) |
 | `selection.py` | Pure: `select_price(snapshot, variant) -> PriceQuote \| NoPrice` |
 | `conversion.py` | Pure: `convert(amount, source_currency, target, rates) -> Decimal`, rounding rules |
-| `rates.py` | mindicador.cl client with timeout, size cap and validation |
+| `rates.py` | ExchangeRate-API client with timeout, size cap, validation and 20-minute retry backoff |
 | `store.py` | Read/write snapshots and rates in PostgreSQL; freshness checks |
 | `service.py` | `PriceService`: fresh-or-refresh-or-stale logic, bounded refresh, valuation |
 
@@ -185,15 +197,18 @@ and the matching filter in `CollectionPage`.
 
 ## 7. Currency
 
-- Rates: `euro.valor` and `dolar.valor` (CLP per unit) plus their `fecha`.
-- Validation: both positive, within sanity bounds (`dolar` 300–3000, `euro` 300–3500
-  CLP), otherwise the response is rejected and the previous rates kept.
+- Rates: `result == "success"`, `base_code == "USD"`, `rates.CLP` (CLP per USD),
+  `rates.EUR` (EUR per USD) and `time_last_update_utc` (the rate date).
+- Validation: both rates positive and within sanity bounds (`CLP` 300–3000, `EUR`
+  0.4–2.0), otherwise the response is rejected and the previous rates kept.
 - Conversion with `Decimal`:
-  - EUR → CLP: `amount × euro`; USD → CLP: `amount × dolar`.
-  - EUR → USD: `amount × euro / dolar`; USD → USD: unchanged.
+  - USD → CLP: `amount × CLP`; EUR → CLP: `amount × CLP / EUR`.
+  - EUR → USD: `amount / EUR`; USD → USD: unchanged.
+  - Check with the sample: 1 EUR = 1016.589577 / 0.911134 ≈ 1115.7 CLP.
 - Rounding: only at presentation and on final totals (`ROUND_HALF_EVEN`): CLP to whole
   pesos, USD to cents. Totals are summed from unrounded converted values.
-- Every converted value carries the rate date. Original amount and currency are always
+- Every converted value carries the rate date, and views with converted values show the
+  attribution link (§3). Original amount and currency are always
   returned alongside (e.g. "$ 29 · 0.03 € Cardmarket").
 - With no rates stored at all, converted values are `null` and the UI shows the original
   EUR/USD amount with a "conversion unavailable" notice. Totals are then shown per source
@@ -205,7 +220,7 @@ and the matching filter in `CollectionPage`.
 
 ## 8. Caching and failure behavior
 
-- Snapshot is **fresh** if `fetched_at` < 24 h; rates are fresh if < 12 h.
+- Snapshot is **fresh** if `fetched_at` < 24 h; rates are fresh if < 24 h, with a 20-minute minimum gap between attempts.
 - Stale or missing → refresh attempt. Success replaces the row atomically (upsert).
 - Refresh failure (timeout, 5xx, invalid JSON, validation) → keep the old row and return
   it with `stale: true` and its date. No row at all → no price, `source_unavailable`.
@@ -223,8 +238,10 @@ and the matching filter in `CollectionPage`.
   `NUMERIC(12,2)`, `cm_updated`/`tp_updated` timestamptz nullable, `has_*` booleans
   nullable, `status` (`ok`/`no_data`, checked), `fetched_at` timestamptz not null.
   Shared catalog data, no `user_id`.
-- `exchange_rates`: `source` (PK, `mindicador`), `usd_clp`, `eur_clp`
-  `NUMERIC(12,4)` positive checks, `observed_on` date, `fetched_at` timestamptz.
+- `exchange_rates`: `source` (PK, `exchangerate-api`), `usd_clp` and `eur_per_usd`
+  `NUMERIC(14,6)` with positive checks, `rates_updated_at` timestamptz
+  (`time_last_update_utc`), `fetched_at` timestamptz, `last_attempt_at` timestamptz
+  (drives the 20-minute backoff after failures/429).
 - `user_settings.preferred_currency`: `VARCHAR(3)` not null, default `'CLP'`, check
   `IN ('CLP','USD')`.
 
@@ -262,6 +279,10 @@ may all appear. Totals include every copy of the user, each duplicate counted.
 
 ## 11. UI
 
+- **Attribution:** every view that shows a converted price (card detail, collection,
+  profile, boxes) includes a small, discreet link "Rates By Exchange Rate API" →
+  https://www.exchangerate-api.com (translated label kept in English as the provider
+  requires). It is omitted when only original EUR/USD amounts are shown.
 - **Card detail** (`TcgCardPage`): "Reference price" panel with one row per catalog
   variant, source and date, plus note: "Market reference, same for Spanish and English
   cards. Not an appraisal; condition is not considered."
@@ -321,5 +342,5 @@ may all appear. Totals include every copy of the user, each duplicate counted.
 ## 15. Sources
 
 - TCGdex card reference and pricing: https://tcgdex.dev/reference/card
-- mindicador.cl API: https://mindicador.cl/api
+- ExchangeRate-API open access: https://www.exchangerate-api.com/docs/free (terms: https://www.exchangerate-api.com/terms)
 - `research/prices/tcgdex_sample.json` (retrieved 2026-11-23).

@@ -1,0 +1,59 @@
+{
+ "_note": "DERIVED fixture (not a provider response): English sample entries with pricing.cardmarket removed, to exercise the TCGplayer USD fallback. Source: research/prices/tcgdex_sample.json, retrieved 2026-11-23.",
+ "en/me05-044#no-cardmarket": {
+  "name": "Cranidos",
+  "variants": {
+   "firstEdition": false,
+   "holo": false,
+   "normal": true,
+   "reverse": true,
+   "wPromo": false
+  },
+  "pricing": {
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.784Z",
+    "reverse-holofoil": {
+     "productId": 704801,
+     "lowPrice": 0.01,
+     "midPrice": 0.25,
+     "highPrice": 2.37,
+     "marketPrice": 0.25,
+     "directLowPrice": 0.19
+    },
+    "normal": {
+     "productId": 704801,
+     "lowPrice": 0.01,
+     "midPrice": 0.19,
+     "highPrice": 6.99,
+     "marketPrice": 0.19,
+     "directLowPrice": 0.03
+    }
+   }
+  }
+ },
+ "en/me02.5-261#no-cardmarket": {
+  "name": "Jamming Tower",
+  "variants": {
+   "firstEdition": false,
+   "holo": true,
+   "normal": false,
+   "reverse": false,
+   "wPromo": false
+  },
+  "pricing": {
+   "tcgplayer": {
+    "unit": "USD",
+    "updated": "2026-11-22T22:16:35.495Z",
+    "holofoil": {
+     "productId": 676073,
+     "lowPrice": 0.2,
+     "midPrice": 0.99,
+     "highPrice": 4321,
+     "marketPrice": 0.66,
+     "directLowPrice": null
+    }
+   }
+  }
+ }
+}

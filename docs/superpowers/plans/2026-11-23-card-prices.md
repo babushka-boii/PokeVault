@@ -8,7 +8,7 @@
 collection, profile-top-5 and personal-box totals, never blocking the collection.
 
 **Architecture:** New `backend/app/prices/` package. Pure normalization, variant
-selection and conversion; persistent 24 h price snapshots and 12 h rates (migration
+selection and conversion; persistent 24 h price snapshots and 24 h rates (migration
 `0005`); `PriceService` with fresh/refresh/stale logic and a bounded refresh budget.
 Separate price APIs so inventory, boxes and set completion are untouched.
 
@@ -44,8 +44,11 @@ React/TypeScript/Vite. No new dependencies (`httpx2` already used, `Decimal` fro
   collection and avoids a new process.
 - **Conversion in backend:** totals must be exact and consistent across pages; the
   backend converts with `Decimal` and the frontend only formats.
-- **mindicador.cl vs other FX APIs:** chosen by the student; official Banco Central
-  values in CLP, no key required.
+- **ExchangeRate-API vs mindicador.cl:** mindicador.cl timed out from the student's
+  network (2026-11-23), so ExchangeRate-API open access (no key) replaces it. Its terms
+  require attribution and forbid redistribution, so only converted values and the rate
+  date are exposed, with a discreet attribution link. Rates change once a day: 24 h
+  cache and a 20-minute retry backoff because a 429 blocks the client for 20 minutes.
 
 ## Shared interfaces
 
@@ -57,7 +60,7 @@ React/TypeScript/Vite. No new dependencies (`httpx2` already used, `Decimal` fro
   `round_for(currency, value) -> Decimal`.
 - `CardProvider.card_pricing(card_id) -> RawPricing | None` (English endpoint; `None` on
   404; raises `CardsUnavailable` on transport failure).
-- `RatesClient.fetch() -> ExchangeRates` (raises on invalid/out-of-bounds data).
+- `RatesClient.fetch() -> ExchangeRates` (`usd_clp`, `eur_per_usd`, `updated_at`; raises on invalid/out-of-bounds data; honors the 20-minute backoff).
 - `PriceService.quotes_for_cards(card_ids, budget) -> dict[card_id, SnapshotResult]`,
   `value_copies(copies, currency) -> Valuation`, `rates() -> RatesResult`.
 - API and response shapes exactly as spec §10.
@@ -68,7 +71,7 @@ React/TypeScript/Vite. No new dependencies (`httpx2` already used, `Decimal` fro
 2. Another user's copies or boxes never affect totals, top 5 or batch results.
 3. Provider outages: collection/boxes/completion pages still load; stale values carry
    their date; no 5xx from price endpoints due to providers.
-4. Decimal math: totals summed before rounding; EUR→USD uses `euro/dolar`.
+4. Decimal math: totals summed before rounding; EUR→CLP uses `CLP / EUR`, EUR→USD uses `1 / EUR`. Rates are never fetched per request.
 5. Account switch/logout while prices are loading: private totals discarded, late
    responses ignored (same pattern as the scanner and boxes).
 
@@ -78,12 +81,13 @@ React/TypeScript/Vite. No new dependencies (`httpx2` already used, `Decimal` fro
 
 Files: `research/prices/` (README, samples); `backend/tests/fixtures/prices/`.
 
-- [ ] Add a short `research/prices/README.md` (source URLs, retrieval date,
+- [x] Add a short `research/prices/README.md` (source URLs, retrieval date,
   observations from spec §2). The sample itself is committed with the approved spec.
-- [ ] Capture one real `https://mindicador.cl/api` response (only `dolar`, `euro`,
-  `fecha`, `version`, `autor`) as `research/prices/mindicador_sample.json`. The student
-  runs the capture command if the session has no network.
-- [ ] Create test fixtures from the samples plus one labeled derived fixture without
+- [x] mindicador.cl did not respond (2026-11-23); replaced by ExchangeRate-API. Captured
+  one real response with `research/prices/capture_exchangerate.py` as
+  `research/prices/exchangerate_sample.json` (only `base_code`,
+  `time_last_update_utc`, `rates.CLP`, `rates.EUR`).
+- [x] Create test fixtures from the samples plus one labeled derived fixture without
   Cardmarket (USD fallback cases).
 
 ### Task 1: Pure price rules (no DB, no network)
@@ -114,7 +118,8 @@ Files: `backend/app/cards/provider.py` (new `card_pricing`); `backend/app/prices
 
 - [ ] Failing tests with `httpx.MockTransport`: sample payloads, 404 → `None`, 5xx and
   timeout → unavailable, invalid JSON, oversized body (cap 256 KiB), non-HTTPS redirect.
-- [ ] Failing tests for rates: valid sample, missing fields, out-of-bounds values.
+- [ ] Failing tests for rates: the real sample, missing fields, out-of-bounds values, 429 and the 20-minute backoff, no extra request within 24 h.
+- [ ] Frontend attribution link is covered in Task 6.
 - [ ] Implement using the existing semaphore and timeouts; English endpoint only.
 
 ### Task 4: Price service and APIs
@@ -152,7 +157,7 @@ Files: `frontend/src/services/prices.ts`; `frontend/src/hooks/usePrices.ts`;
   links; collection `variant` filter; box total; CLP/USD switch persisted via settings,
   `localStorage` when signed out, account preference wins on sign-in; ES/EN formatting; logout/account switch
   discards totals and ignores late responses.
-- [ ] Implement with `Intl.NumberFormat`; accessible at desktop and 390 px.
+- [ ] Implement with `Intl.NumberFormat`; accessible at desktop and 390 px. Show the discreet "Rates By Exchange Rate API" link (https://www.exchangerate-api.com) wherever converted prices appear; test it is present with converted values and absent with original-only amounts.
 - [ ] Vitest, ESLint, TypeScript green.
 
 ### Task 7: Review, validation and docs
