@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
+import { CollectionValue } from "../components/prices/CollectionValue";
+import { CurrencySwitch } from "../components/prices/PriceDisplay";
 import { useLocale } from "../i18n/LocaleProvider";
 import type { AuthUser } from "../services/auth";
 import "../auth/auth.css";
@@ -30,6 +32,7 @@ export function ProfilePage() {
           <p className="auth-status">{dictionary.auth.authenticated}</p>
         </div>
       </div>}
+      {!auth.validating && !auth.loggingOut && <CollectionValue key={auth.user.id} />}
       {auth.error && <p className="auth-error" role="alert">{dictionary.auth.errors[auth.error]}</p>}
       <button className="auth-button auth-button--secondary" type="button" onClick={auth.logout} disabled={auth.loggingOut}>
         {auth.loggingOut ? dictionary.auth.loggingOut : dictionary.auth.logout}
@@ -37,6 +40,7 @@ export function ProfilePage() {
     </>}
     {auth.status === "unauthenticated" && <>
       <p>{dictionary.profile.description}</p>
+      <section aria-label={dictionary.profile.preferences}><CurrencySwitch /></section>
       <Link className="auth-button" to="/login">{dictionary.auth.signIn}</Link>
     </>}
     <p className="auth-catalog-note">{dictionary.auth.publicCatalog}</p>

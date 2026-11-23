@@ -12,7 +12,7 @@ export type CopyAttributes = {
 };
 export type InventoryCopy = CopyAttributes & { id: string; card_id: string; created_at: string; updated_at: string };
 export type InventoryPage = { results: InventoryCopy[]; total: number; quantities: Record<string, number>; offset: number; limit: number };
-export type InventoryFilters = { offset: number; card_id: string; condition: string; language: string };
+export type InventoryFilters = { offset: number; card_id: string; condition: string; language: string; variant?: string };
 export class InventoryError extends Error {
   constructor(public readonly status: number) { super("Inventory request failed"); }
 }
@@ -44,13 +44,14 @@ export function isInventoryCopy(v: unknown): v is InventoryCopy {
 }
 export async function fetchInventory(filters: InventoryFilters, signal: AbortSignal): Promise<InventoryPage> {
   const params = new URLSearchParams({ offset: String(filters.offset), limit: "24" });
-  for (const key of ["card_id", "language", "condition"] as const) if (filters[key]) params.set(key, filters[key]);
+  for (const key of ["card_id", "language", "condition", "variant"] as const) { const value = filters[key]; if (value) params.set(key, value); }
   const payload = await request(`?${params}`, { signal, headers: { Accept: "application/json" } });
   if (!record(payload) || !Array.isArray(payload.results) || !payload.results.every(isInventoryCopy)
     || payload.results.length > 24 || new Set(payload.results.map((r) => r.id)).size !== payload.results.length
     || payload.offset !== filters.offset || payload.limit !== 24 || !Number.isSafeInteger(payload.total) || (payload.total as number) < 0
     || !record(payload.quantities) || !Object.entries(payload.quantities).every(([key, n]) => isCardId(key) && Number.isSafeInteger(n) && (n as number) > 0)
-    || (filters.card_id !== "" && (payload.results.some((copy) => copy.card_id !== filters.card_id) || Object.keys(payload.quantities).some((key) => key !== filters.card_id)))) {
+    || (filters.card_id !== "" && (payload.results.some((copy) => copy.card_id !== filters.card_id) || Object.keys(payload.quantities).some((key) => key !== filters.card_id)))
+    || (!!filters.variant && payload.results.some((copy) => copy.variant !== filters.variant))) {
     throw new InventoryError(0);
   }
   return payload as InventoryPage;

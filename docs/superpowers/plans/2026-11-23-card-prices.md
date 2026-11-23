@@ -172,14 +172,31 @@ Files: `frontend/src/services/prices.ts`; `frontend/src/hooks/usePrices.ts`;
 `frontend/src/components/prices/*`; `TcgCardPage.tsx`, `CollectionPage.tsx`,
 `ProfilePage.tsx`, `PersonalBoxesPage.tsx`; `i18n/dictionaries.ts`; tests next to each.
 
-- [ ] Failing tests first: price panel per variant with source/date/language note; each
+- [x] Failing tests first: price panel per variant with source/date/language note; each
   `NoPrice` reason text; stale label; collection list renders before prices; profile
   value card with counts, no-variant count linking to `?variant=unknown`, and top 5
   links; collection `variant` filter; box total; CLP/USD switch persisted via settings,
   `localStorage` when signed out, account preference wins on sign-in; ES/EN formatting; logout/account switch
   discards totals and ignores late responses.
-- [ ] Implement with `Intl.NumberFormat`; accessible at desktop and 390 px. Show the discreet "Rates By Exchange Rate API" link (https://www.exchangerate-api.com) wherever converted prices appear; test it is present with converted values and absent with original-only amounts.
-- [ ] Vitest, ESLint, TypeScript green.
+- [x] Implement with `Intl.NumberFormat`; accessible at desktop and 390 px. Show the discreet "Rates By Exchange Rate API" link (https://www.exchangerate-api.com) wherever converted prices appear; test it is present with converted values and absent with original-only amounts.
+- [x] Vitest, ESLint, TypeScript green.
+
+Notes:
+- Order deviation: in this task the components were written before their tests (the
+  tests were added right after and all pass); backend tasks followed red → green.
+- `CurrencyProvider` (inside `AuthProvider`) keeps CLP/USD in `localStorage` signed out;
+  on sign-in it loads `/api/v1/me/settings`, which wins and overwrites the local value.
+  Price requests wait for that sync, so a signed-in page never fetches the wrong currency.
+- Price loading/error texts use no `status`/`alert` roles, so they never compete with
+  the collection's own messages; a price failure only hides prices.
+- Four existing `Auth.test.tsx` tests counted or sequenced every `fetch`. They now route
+  `/me/settings` and `/prices/*` separately and still count only `/auth/me` requests;
+  the stored-keys assertion now allows `pokevault.currency` (a display preference).
+- New: `services/prices.ts`, `components/prices/*`, `src/test/priceFixtures.ts`,
+  `services/prices.test.ts`, `pages/Prices.test.tsx`; inventory `variant` filter and the
+  optional `price` slot in `OwnedCopy`.
+- Full `bash scripts/check.sh` exit 0: 43 provider, 789 backend, 421 frontend tests;
+  Ruff, ESLint, TypeScript, build (110 modules) and whitespace passed.
 
 ### Task 7: Review, validation and docs
 

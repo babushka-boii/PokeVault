@@ -4,7 +4,7 @@ import { useLocale } from "../../i18n/LocaleProvider";
 import { deleteCopy, InventoryError, type InventoryCopy } from "../../services/inventory";
 import { CopyForm } from "./CopyForm";
 
-export function OwnedCopy({ copy, onChanged, locked, onActiveChange }: { copy: InventoryCopy; onChanged: (message: "updated" | "removed") => void; locked: boolean; onActiveChange: (id: string | null) => void }) {
+export function OwnedCopy({ copy, onChanged, locked, onActiveChange, price }: { copy: InventoryCopy; onChanged: (message: "updated" | "removed") => void; locked: boolean; onActiveChange: (id: string | null) => void; price?: React.ReactNode }) {
   const { dictionary } = useLocale();
   const text = dictionary.inventory;
   const auth = useAuth();
@@ -17,6 +17,7 @@ export function OwnedCopy({ copy, onChanged, locked, onActiveChange }: { copy: I
     <p>{text.conditions[copy.condition]} · {text.languages[copy.language]} · {text.variants[copy.variant]}</p>
     {copy.acquired_on && <p>{text.date}: <time dateTime={copy.acquired_on}>{copy.acquired_on}</time></p>}
     {copy.notes && <p className="inventory-notes">{copy.notes}</p>}
+    {price && <div className="inventory-price">{price}</div>}
     {mode === "edit" ? <CopyForm cardId={copy.card_id} copy={copy} onCancel={() => { setMode("view"); onActiveChange(null); }} onSaved={() => onChanged("updated")} />
       : mode === "confirm" ? <div className="inventory-confirm">
         <p>{text.confirmText}</p>

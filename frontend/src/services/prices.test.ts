@@ -1,0 +1,61 @@
+import { afterEach, expect, test, vi } from "vitest";
+import { cardPrices, copyId, copyPrice, quote, rates, valuation } from "../test/priceFixtures";
+import { jsonResponse as json } from "../test/tcgFixtures";
+import { fetchCardPrices, fetchCollectionValue, fetchCopyPrices, fetchCurrencySetting, saveCurrencySetting } from "./prices";
+
+afterEach(() => vi.unstubAllGlobals());
+const signal = () => new AbortController().signal;
+
+test("card prices are requested with the chosen currency and strictly validated", async () => {
+  const request = vi.fn(async () => json(cardPrices("USD")));
+  vi.stubGlobal("fetch", request);
+  const result = await fetchCardPrices("sm9-33", "USD", signal());
+  expect(result.variants[0].price?.amount).toBe("0.04");
+  expect(request).toHaveBeenCalledWith("http://localhost:8000/api/v1/prices/cards/sm9-33?currency=USD", expect.objectContaining({ credentials: "include", cache: "no-store" }));
+  for (const broken of [
+    { ...cardPrices("USD"), currency: "CLP" },
+    { ...cardPrices("USD"), rates: { ...rates, attribution_url: "https://evil.example" } },
+    { ...cardPrices("USD"), variants: cardPrices("USD").variants.slice(0, 2) },
+    { ...cardPrices("USD"), variants: [{ variant: "normal", price: quote("1", "USD"), reason: "pending" }, ...cardPrices("USD").variants.slice(1)] },
+    { ...cardPrices("USD"), variants: [{ variant: "normal", price: quote("1e5", "USD"), reason: null }, ...cardPrices("USD").variants.slice(1)] },
+  ]) {
+    vi.stubGlobal("fetch", vi.fn(async () => json(broken)));
+    await expect(fetchCardPrices("sm9-33", "USD", signal())).rejects.toMatchObject({ status: 0 });
+  }
+  await expect(fetchCardPrices("../x", "USD", signal())).rejects.toMatchObject({ status: 404 });
+});
+
+test("copy prices send each id once and reject rows that were not requested", async () => {
+  const request = vi.fn(async () => json({ currency: "CLP", rates, results: [copyPrice(1, quote("38"))] }));
+  vi.stubGlobal("fetch", request);
+  await fetchCopyPrices([copyId(1), copyId(2), copyId(1)], "CLP", signal());
+  const url = new URL((request.mock.calls[0] as unknown as [string])[0]);
+  expect(url.searchParams.getAll("copy_id")).toEqual([copyId(1), copyId(2)]);
+  expect(url.searchParams.get("currency")).toBe("CLP");
+  vi.stubGlobal("fetch", vi.fn(async () => json({ currency: "CLP", rates, results: [copyPrice(9, quote("38"))] })));
+  await expect(fetchCopyPrices([copyId(1)], "CLP", signal())).rejects.toMatchObject({ status: 0 });
+  const tooMany = Array.from({ length: 101 }, (_, n) => copyId(n));
+  await expect(fetchCopyPrices(tooMany, "CLP", signal())).rejects.toMatchObject({ status: 422 });
+});
+
+test("valuations must be internally consistent", async () => {
+  vi.stubGlobal("fetch", vi.fn(async () => json(valuation())));
+  expect((await fetchCollectionValue("CLP", signal())).total).toBe("1112");
+  for (const broken of [valuation({ priced_count: 4 }), valuation({ top: Array.from({ length: 6 }, (_, n) => copyPrice(n, quote("1"))) }),
+    valuation({ top: [copyPrice(1, null, "pending")] }), valuation({ unpriced_by_reason: { invented: 1 } as never })]) {
+    vi.stubGlobal("fetch", vi.fn(async () => json(broken)));
+    await expect(fetchCollectionValue("CLP", signal())).rejects.toMatchObject({ status: 0 });
+  }
+});
+
+test("the currency setting is read and saved with CSRF", async () => {
+  const request = vi.fn(async (_input: string, options?: RequestInit) => json({ preferred_currency: options?.method === "PUT" ? "USD" : "CLP" }));
+  vi.stubGlobal("fetch", request);
+  expect(await fetchCurrencySetting(signal())).toBe("CLP");
+  expect(await saveCurrencySetting("USD", "csrf-test", signal())).toBe("USD");
+  const [url, options] = request.mock.calls[1];
+  expect(url).toBe("http://localhost:8000/api/v1/me/settings");
+  expect(options).toMatchObject({ method: "PUT", body: JSON.stringify({ preferred_currency: "USD" }), headers: { "X-CSRF-Token": "csrf-test", "Content-Type": "application/json" } });
+  vi.stubGlobal("fetch", vi.fn(async () => json({ preferred_currency: "EUR" })));
+  await expect(fetchCurrencySetting(signal())).rejects.toMatchObject({ status: 0 });
+});

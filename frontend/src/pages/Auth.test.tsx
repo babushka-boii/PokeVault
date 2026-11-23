@@ -10,11 +10,20 @@ const userProfile = { id: "4f6a3fab-002c-44e1-b3e8-0247badc013c", display_name: 
 const session = { user: userProfile, csrf_token: "test-csrf-token" };
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status });
 afterEach(() => vi.unstubAllGlobals());
+// The signed-in profile also loads the currency preference and collection value.
+// These tests sequence and count only authentication requests, so answer the
+// price-related ones separately and pass everything else to the auth mock.
+const withPriceRoutes = (auth: (input: string, options?: RequestInit) => Promise<Response>) => (input: string, options?: RequestInit) => {
+  const path = new URL(input).pathname;
+  if (path === "/api/v1/me/settings") return Promise.resolve(json({ preferred_currency: "CLP" }));
+  if (path.startsWith("/api/v1/prices/")) return Promise.resolve(json({}, 503));
+  return auth(input, options);
+};
 
 test("restores the real profile once in StrictMode, shows loading and never persists credentials", async () => {
   let finish!: (response: Response) => void;
   const request = vi.fn(() => new Promise<Response>((resolve) => { finish = resolve; }));
-  vi.stubGlobal("fetch", request);
+  vi.stubGlobal("fetch", withPriceRoutes(request));
   render(<StrictMode><App initialEntries={["/profile"]} /></StrictMode>);
   expect(screen.getByRole("status")).toHaveTextContent("Comprobando sesión…");
   expect(screen.queryByText("Ash Ketchum")).not.toBeInTheDocument();
@@ -25,7 +34,9 @@ test("restores the real profile once in StrictMode, shows loading and never pers
   expect(screen.getByRole("img", { name: "Foto de Ash Ketchum" })).toHaveAttribute("referrerpolicy", "no-referrer");
   expect(request).toHaveBeenCalledTimes(1);
   expect(request).toHaveBeenCalledWith("http://localhost:8000/api/v1/auth/me", expect.objectContaining({ credentials: "include", headers: { Accept: "application/json" } }));
-  expect(Object.keys(localStorage)).toEqual(["pokevault.locale"]);
+  // Only display preferences are stored locally; never identity or credentials.
+  await waitFor(() => expect(Object.keys(localStorage).sort()).toEqual(["pokevault.currency", "pokevault.locale"]));
+  expect(localStorage.getItem("pokevault.currency")).toBe("CLP");
 });
 
 test("offers Google sign-in on an unauthenticated profile and localizes login", async () => {
@@ -125,7 +136,7 @@ test("falls back for a broken profile picture and omits missing email", async ()
 
 test("prevents a late refresh from restoring a logged out identity", async () => {
   let finish!: (response: Response) => void;
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(json(session)).mockImplementationOnce(() => new Promise<Response>((resolve) => { finish = resolve; })).mockResolvedValueOnce(new Response(null, { status: 204 })));
+  vi.stubGlobal("fetch", withPriceRoutes(vi.fn().mockResolvedValueOnce(json(session)).mockImplementationOnce(() => new Promise<Response>((resolve) => { finish = resolve; })).mockResolvedValueOnce(new Response(null, { status: 204 }))));
   const user = userEvent.setup();
   render(<App initialEntries={["/profile"]} />);
   await screen.findByRole("heading", { name: "Ash Ketchum" });
@@ -137,7 +148,7 @@ test("prevents a late refresh from restoring a logged out identity", async () =>
 });
 
 test("replaces an expired session with the sign-in action on focus", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(json(session)).mockResolvedValueOnce(json({}, 401)));
+  vi.stubGlobal("fetch", withPriceRoutes(vi.fn().mockResolvedValueOnce(json(session)).mockResolvedValueOnce(json({}, 401))));
   render(<App initialEntries={["/profile"]} />);
   await screen.findByRole("heading", { name: "Ash Ketchum" });
   fireEvent.focus(window);
@@ -168,7 +179,7 @@ test("a fresh provider never restores a previous provider's pending identity", a
 test("coalesces overlapping revalidation events without requesting a session on route changes", async () => {
   let finish!: (response: Response) => void;
   const request = vi.fn().mockResolvedValueOnce(json(session)).mockImplementationOnce(() => new Promise<Response>((resolve) => { finish = resolve; }));
-  vi.stubGlobal("fetch", request);
+  vi.stubGlobal("fetch", withPriceRoutes(request));
   const user = userEvent.setup();
   render(<App initialEntries={["/profile"]} />);
   await screen.findByRole("heading", { name: "Ash Ketchum" });

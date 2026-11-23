@@ -1,0 +1,11 @@
+.price { display: inline-flex; flex-direction: column; gap: 0.1rem; }
+.price-amount { font-variant-numeric: tabular-nums; }
+.price-meta, .price-note, .price-attribution { font-size: 0.85em; opacity: 0.85; margin: 0.25rem 0; overflow-wrap: anywhere; }
+.price-missing { font-style: italic; }
+.price-stale { font-weight: 600; }
+.price-attribution a { color: inherit; }
+.price-currency label { display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.price-panel ul, .price-value ul { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; gap: 0.5rem; }
+.price-panel li, .price-value li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
+.price-total { font-size: 1.5rem; margin: 0.25rem 0; }
+.price-value { margin-top: 1rem; }
