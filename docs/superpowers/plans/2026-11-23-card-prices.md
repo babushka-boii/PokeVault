@@ -134,13 +134,24 @@ Files: `backend/app/prices/service.py`; `backend/app/api/prices.py`;
 (`api/auth.py` or new `api/settings.py`); box value route in `api/boxes.py`; `main.py`
 wiring; privacy middleware; `backend/tests/test_prices_api.py`.
 
-- [ ] Failing tests: fresh/stale/missing paths with injected clock, refresh budget of 40
+- [x] Failing tests: fresh/stale/missing paths with injected clock, refresh budget of 40
   and `pending`, coalesced concurrent refresh, provider failure → stale/`source_unavailable`.
-- [ ] Failing API tests: public card prices, auth on copies/collection/box/settings, CSRF
+- [x] Failing API tests: public card prices, auth on copies/collection/box/settings, CSRF
   on PUT settings, foreign ids omitted, foreign box 404, duplicates summed, top 5 order
   and ties, currency param vs preference, `no-store`, inventory `variant` filter
   (isolation preserved, invalid value 422).
-- [ ] Implement until green.
+- [x] Implement until green.
+
+Notes (implementation decisions, no spec change in behavior):
+- Refresh deadline of 10 s per request: unfinished refreshes keep running in the
+  background and serve the next request; the caller gets stale values or `pending`.
+- After a TCGdex failure, no refresh is attempted for 60 s (stale values or
+  `source_unavailable`), so an outage never means 40 timeouts per request.
+- Rates info is reported once per response (`rates.updated_at`), not per quote; the
+  rates themselves are never returned (no redistribution).
+- Without rates, `top` is empty (EUR and USD amounts are not comparable).
+- Private price endpoints re-check the session after provider work (logout/switch).
+- Backend suite incl. PostgreSQL: 787 passed.
 
 ### Task 5: Isolation and integration evidence
 

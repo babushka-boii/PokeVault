@@ -9,14 +9,18 @@ from app.api.cards import router as cards_router
 from app.api.health import router as health_router
 from app.api.inventory import router as inventory_router
 from app.api.pokemon import router as pokemon_router
+from app.api.prices import router as prices_router
 from app.api.scans import router as scans_router
 from app.api.sets import router as sets_router
+from app.api.settings import router as settings_router
 from app.auth.google import GoogleOIDCClient
 from app.auth.middleware import AuthenticationPrivacyMiddleware
 from app.cards.provider import CardProvider
 from app.core.config import Settings, get_settings
 from app.db.base import create_session_factory
 from app.pokemon.provider import PokemonProvider
+from app.prices.rates import RatesClient
+from app.prices.service import PriceService
 from app.scanner.ocr import OCRService
 
 
@@ -38,12 +42,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(AuthenticationPrivacyMiddleware)
     app.state.pokemon_provider = PokemonProvider()
     app.state.card_provider = CardProvider()
+    app.state.price_service = PriceService(app.state.card_provider, RatesClient())
     app.state.ocr_service = OCRService()
     app.state.scan_upload_slots = asyncio.Semaphore(2)
     app.state.scan_match_slots = asyncio.Semaphore(4)
     app.include_router(auth_router)
     app.include_router(inventory_router)
     app.include_router(boxes_router)
+    app.include_router(prices_router)
+    app.include_router(settings_router)
     app.include_router(pokemon_router)
     app.include_router(cards_router)
     app.include_router(sets_router)

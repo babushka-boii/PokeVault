@@ -18,6 +18,7 @@ from app.inventory.schemas import (
     CreateCopy,
     InventoryPage,
     PhysicalLanguage,
+    Variant,
 )
 from app.inventory.schemas import (
     InventoryCopy as PublicCopy,
@@ -55,6 +56,7 @@ def list_copies(
     card_id: Identifier | None = Query(None),
     language: PhysicalLanguage | None = Query(None),
     condition: Condition | None = Query(None),
+    variant: Variant | None = Query(None),
 ):
     # Counts and rows must share a snapshot when another tab changes copies.
     if session.get_bind().dialect.name == "postgresql":
@@ -64,6 +66,7 @@ def list_copies(
         (InventoryCopy.card_id, card_id),
         (InventoryCopy.language, language),
         (InventoryCopy.condition, condition),
+        (InventoryCopy.variant, variant),
     ):
         if value is not None:
             predicates.append(column == value)
