@@ -37,7 +37,7 @@ Prefer a **modular monolith** over microservices for a single-developer academic
 - **Frontend implemented:** typed backend Pokédex client, responsive species grid, loading/empty/error/retry and missing-sprite states.
 - **Frontend implemented (5B):** typed inventory client, individual-copy forms, quantities, filters and pagination. Component libraries and charts remain pending; Tailwind CSS, shadcn/ui, TanStack Query and Recharts are not installed.
 - **Backend implemented:** Python + FastAPI + Pydantic Settings + SQLAlchemy + Alembic.
-- **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001`, authentication `0002`, physical copies `0003` and personal boxes `0004`. Completion adds no schema change.
+- **Database implemented:** native PostgreSQL connection, health probe, technical migration `0001`, authentication `0002`, physical copies `0003`, personal boxes `0004` and reference prices `0005`. Completion adds no schema change.
 - **Auth implemented (5A):** backend Google OIDC code flow with S256 PKCE, browser-bound single-use transactions and digest-backed opaque server sessions. Live credentials/manual login remain pending; see `AUTHENTICATION.md`.
 - **Language:** checked-in ES/EN translation dictionaries; no automatic translation service.
 - **Scanning (6):** bounded raw-image upload, Pillow validation/preprocessing in an
@@ -463,3 +463,18 @@ it becomes hidden/inert immediately, aborts active work and refreshes owned quan
 after successful validation. An uncertain save retains its original retry key and
 payload. Logout, changed ownership or failed validation discards the subtree.
 This preserves local drafts without retaining data across authenticated accounts.
+
+## Iteration 7 — Reference prices
+
+`app/prices/` separates pure rules (`normalize`, `selection`, `conversion`), storage
+(`store`, migration `0005`), clients (`CardProvider.card_pricing`, `RatesClient`) and
+the on-demand `PriceService`. Price APIs live in `app/api/prices.py` and
+`app/api/settings.py`. Database work happens in short transactions around provider
+calls, never during them. The service refreshes at most 40 snapshots per request within
+10 s, coalesces concurrent refreshes of a card, pauses TCGdex for 60 s after a failure
+and follows a 24 h / 20 min policy for exchange rates. Inventory, boxes and set
+completion do not depend on it.
+
+Frontend: `CurrencyProvider` (inside `AuthProvider`) owns CLP/USD; price components
+fetch after the page's own data and degrade to "no price" or a retry without blocking
+it. Details and contracts: [PRICES.md](PRICES.md).

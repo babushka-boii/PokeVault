@@ -13,6 +13,7 @@ import httpx2 as httpx
 from pydantic import BaseModel, Field, HttpUrl
 
 from app.cards.schemas import (
+    IDENTIFIER_PATTERN,
     Card,
     CardAbility,
     CardAttack,
@@ -42,6 +43,18 @@ from app.pokemon.schemas import NATIONAL_DEX_TOTAL
 
 class CardsUnavailable(Exception):
     """The provider cannot supply complete, verified card data."""
+
+
+@dataclass(frozen=True)
+class CardPricing:
+    """Raw TCGdex ``pricing``/``variants`` objects; None when absent or malformed."""
+
+    pricing: dict | None
+    variants: dict | None
+
+
+# A card with its pricing is a few KiB; anything larger is not a card response.
+PRICING_MAX_BYTES = 256 * 1024
 
 
 class CardNotFound(Exception):
@@ -1176,6 +1189,33 @@ class CardProvider:
                 AttributeError,
             ) as error:
                 raise CardsUnavailable from error
+
+    async def card_pricing(self, card_id: str) -> CardPricing | None:
+        """Price data from the English endpoint (identical to es); None if not found.
+
+        Uses the shared five-request semaphore but not the global card lock, so a
+        batch of price refreshes never stalls card browsing. Redirects are refused.
+        """
+        if len(card_id) > 100 or not re.fullmatch(IDENTIFIER_PATTERN, card_id):
+            return None
+        try:
+            async with self._client() as client:
+                response = await self._get(client, f"en/cards/{card_id}")
+                if response.status_code == 404:
+                    return None
+                response.raise_for_status()
+                if len(response.content) > PRICING_MAX_BYTES:
+                    raise ValueError("Oversized pricing response")
+                data = response.json()
+                if not isinstance(data, dict) or data.get("id") != card_id:
+                    raise ValueError("Unexpected card identity")
+        except (httpx.HTTPError, TimeoutError, ValueError) as error:
+            raise CardsUnavailable from error
+        pricing, variants = data.get("pricing"), data.get("variants")
+        return CardPricing(
+            pricing if isinstance(pricing, dict) else None,
+            variants if isinstance(variants, dict) else None,
+        )
 
     async def _briefs(
         self, client: httpx.AsyncClient, params: dict[str, str | int], limit: int

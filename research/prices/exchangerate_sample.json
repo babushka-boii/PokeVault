@@ -1,0 +1,14 @@
+{
+ "metadata": {
+  "source_url": "https://open.er-api.com/v6/latest/USD",
+  "retrieved_at": "2026-11-23T21:55:02.581572+00:00"
+ },
+ "payload": {
+  "base_code": "USD",
+  "time_last_update_utc": "Mon, 23 Nov 2026 00:02:32 +0000",
+  "rates": {
+   "CLP": 1016.589577,
+   "EUR": 0.911134
+  }
+ }
+}

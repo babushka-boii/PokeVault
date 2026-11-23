@@ -359,3 +359,35 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 
 Limitation: the italic flagged "1" of this typeface is fragile in Tesseract (some
 preprocessing variants read 430 or 730). Never correct it from catalog expectations.
+
+## Iteration 7 — Reference card prices (2026-11-23)
+
+Scope reduced from the original row 7: reference prices and collection/box value only.
+Wishlist, trades, transactions and missing-card cost stay deferred.
+
+- [x] Spec and plan approved (`docs/superpowers/specs|plans/2026-11-23-card-prices*`);
+  real TCGdex and ExchangeRate-API evidence in `research/prices/`.
+- [x] Pure variant selection and Decimal conversion; migration `0005` (price snapshots,
+  exchange rates, `user_settings.preferred_currency`), applied on the development DB.
+- [x] TCGdex pricing and ExchangeRate-API clients; price service with 24 h caches,
+  40-refresh budget, 10 s deadline, 60 s TCGdex pause and 20 min rate backoff.
+- [x] Card, copy, collection, box-value and currency-setting APIs; inventory `variant`
+  filter; isolation proven with two PostgreSQL users owning the same card.
+- [x] UI: card price panel, price per copy, profile value + top 5 + copies without
+  variant, box total, CLP/USD switch, ES/EN, exchange-rate attribution.
+- [x] Review fix: unknown card ids are no longer stored (public endpoint abuse).
+- [x] `bash scripts/check.sh` exit 0: 43 provider, 790 backend, 421 frontend tests.
+- [ ] Manual acceptance on the development Mac (see below).
+- [ ] Student reviews the branch and decides on PR/merge.
+
+### Manual acceptance checklist (pending)
+
+- [ ] Card detail for the five sample cards: prices match spec §6.2 by variant (values
+  may have moved since 2026-11-22; check source and date), language note visible.
+- [ ] My collection: list appears first, then one price or reason per copy.
+- [ ] Profile: total, "X of Y priced", copies-without-variant link, top 5 links.
+- [ ] Personal box: total changes after placing/removing a copy.
+- [ ] CLP/USD switch: persists per account; signed out it persists in the browser.
+- [ ] Attribution link opens https://www.exchangerate-api.com in a new tab.
+- [ ] Network off (or API down): collection, boxes and expansions still work; prices
+  show the last saved value or "no price".

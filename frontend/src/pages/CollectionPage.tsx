@@ -1,16 +1,19 @@
 import { useCallback, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
 import { CardArtwork } from "../components/cards/CardArtwork";
 import { OwnedCopy } from "../components/inventory/OwnedCopy";
+import { useCurrency } from "../components/prices/currency";
+import { CurrencySwitch, PriceOrReason, RatesAttribution } from "../components/prices/PriceDisplay";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import { fetchTcgCard, isCardId } from "../services/cards";
-import { conditions, fetchInventory, InventoryError, physicalLanguages, type InventoryCopy, type InventoryFilters } from "../services/inventory";
+import { conditions, fetchInventory, InventoryError, physicalLanguages, variants, type InventoryCopy, type InventoryFilters } from "../services/inventory";
+import { fetchCopyPrices, PricesError, type CopyPrice } from "../services/prices";
 import "../components/inventory/inventory.css";
 
-function CardGroup({ id, copies, quantity, onChanged, activeCopy, onActiveChange }: { id: string; copies: InventoryCopy[]; quantity: number; onChanged: (message: "updated" | "removed") => void; activeCopy: string | null; onActiveChange: (id: string | null) => void }) {
+function CardGroup({ id, copies, quantity, onChanged, activeCopy, onActiveChange, prices, pricesLoading }: { id: string; copies: InventoryCopy[]; quantity: number; onChanged: (message: "updated" | "removed") => void; activeCopy: string | null; onActiveChange: (id: string | null) => void; prices: Map<string, CopyPrice>; pricesLoading: boolean }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.inventory;
   const request = useCallback((signal: AbortSignal) => fetchTcgCard(id, locale, signal), [id, locale]);
@@ -26,17 +29,25 @@ function CardGroup({ id, copies, quantity, onChanged, activeCopy, onActiveChange
         {state.kind === "error" && <><p>{text.providerError}</p><button type="button" onClick={retry}>{text.providerRetry}</button></>}
       </div>
     </div>
-    <ul className="inventory-copies">{copies.map((copy) => <OwnedCopy key={copy.id} copy={copy} onChanged={onChanged} locked={activeCopy !== null && activeCopy !== copy.id} onActiveChange={onActiveChange} />)}</ul>
+    <ul className="inventory-copies">{copies.map((copy) => {
+      const price = prices.get(copy.id);
+      return <OwnedCopy key={copy.id} copy={copy} onChanged={onChanged} locked={activeCopy !== null && activeCopy !== copy.id} onActiveChange={onActiveChange}
+        price={price ? <PriceOrReason price={price.price} reason={price.reason} /> : pricesLoading ? <span className="price-meta">{dictionary.prices.loading}</span> : null} />;
+    })}</ul>
   </article>;
 }
-const initialFilters: InventoryFilters = { offset: 0, card_id: "", language: "", condition: "" };
+const initialFilters: InventoryFilters = { offset: 0, card_id: "", language: "", condition: "", variant: "" };
+const isVariant = (value: string | null): value is string => variants.some((variant) => variant === value);
 
 function PersonalCollection() {
   const { dictionary } = useLocale();
   const text = dictionary.inventory;
   const { retrySession } = useAuth();
-  const [filters, setFilters] = useState(initialFilters);
-  const [draft, setDraft] = useState(initialFilters);
+  const { currency, ready } = useCurrency();
+  const [searchParams] = useSearchParams();
+  const linked = searchParams.get("variant");
+  const [filters, setFilters] = useState<InventoryFilters>(() => ({ ...initialFilters, variant: isVariant(linked) ? linked : "" }));
+  const [draft, setDraft] = useState(filters);
   const [activeCopy, setActiveCopy] = useState<string | null>(null);
   const [message, setMessage] = useState<"updated" | "removed" | null>(null);
   const request = useCallback((signal: AbortSignal) => fetchInventory(filters, signal).catch((error: unknown) => {
@@ -51,9 +62,18 @@ function PersonalCollection() {
     else retry();
   };
   const data = state.kind === "loaded" ? state.data : null;
+  const idKey = data?.results.map((copy) => copy.id).join(",") ?? "";
+  // Prices load after the list and never block it; a failure only hides the prices.
+  const priceRequest = useCallback((signal: AbortSignal) => fetchCopyPrices(idKey.split(","), currency, signal).catch((error: unknown) => {
+    if (!signal.aborted && error instanceof PricesError && error.status === 401) retrySession();
+    throw error;
+  }), [idKey, currency, retrySession]);
+  const priceState = useTcgResource(ready && idKey ? `${idKey}:${currency}` : undefined, priceRequest);
+  const priceData = priceState.state.kind === "loaded" ? priceState.state.data : null;
+  const prices = new Map((priceData?.results ?? []).map((row) => [row.copy_id, row]));
   const groups = new Map<string, InventoryCopy[]>();
   for (const copy of data?.results ?? []) groups.set(copy.card_id, [...(groups.get(copy.card_id) ?? []), copy]);
-  const filtered = !!(filters.card_id || filters.condition || filters.language);
+  const filtered = !!(filters.card_id || filters.condition || filters.language || filters.variant);
   return <>
     <form className="inventory-filter-form" onSubmit={(event) => { event.preventDefault(); setMessage(null); setFilters({ ...draft, offset: 0 }); }}>
       <fieldset className="inventory-filters" disabled={activeCopy !== null}>
@@ -64,6 +84,9 @@ function PersonalCollection() {
       <label>{text.language}<select value={draft.language} onChange={(e) => setDraft({ ...draft, language: e.target.value })}>
         <option value="">{text.all}</option>{physicalLanguages.map((v) => <option key={v} value={v}>{text.languages[v]}</option>)}
       </select></label>
+      <label>{text.variantFilter}<select value={draft.variant} onChange={(e) => setDraft({ ...draft, variant: e.target.value })}>
+        <option value="">{text.all}</option>{variants.map((v) => <option key={v} value={v}>{text.variants[v]}</option>)}
+      </select></label>
       <button type="submit" disabled={!!draft.card_id && !isCardId(draft.card_id)}>{text.filter}</button>
       <button type="button" onClick={() => { setDraft(initialFilters); setFilters(initialFilters); setMessage(null); }}>{text.clear}</button>
       </fieldset>
@@ -73,9 +96,13 @@ function PersonalCollection() {
     {state.kind === "error" && <><p role="alert">{text.loadError}</p><button type="button" onClick={retry}>{text.retry}</button></>}
     {data && <>
       <p>{text.total.replace("{count}", String(data.total))}</p>
+      {filters.variant === "unknown" && <p className="inventory-hint">{text.withoutVariantFilter}</p>}
+      {data.total > 0 && <CurrencySwitch />}
+      {priceState.state.kind === "error" && <p className="price-meta">{dictionary.prices.error} <button type="button" onClick={priceState.retry}>{dictionary.prices.retry}</button></p>}
       {data.total === 0 ? <p>{filtered ? text.noMatches : text.empty}</p> : <>
         <p className="inventory-hint">{text.physicalNote}</p>
-        {[...groups].map(([id, copies]) => <CardGroup key={id} id={id} copies={copies} quantity={data.quantities[id]} onChanged={changed} activeCopy={activeCopy} onActiveChange={setActiveCopy} />)}
+        {[...groups].map(([id, copies]) => <CardGroup key={id} id={id} copies={copies} quantity={data.quantities[id]} onChanged={changed} activeCopy={activeCopy} onActiveChange={setActiveCopy} prices={prices} pricesLoading={priceState.state.kind === "loading" && !!idKey} />)}
+        {priceData && priceData.results.some((row) => row.price?.amount != null) && <RatesAttribution rates={priceData.rates} />}
       </>}
       <div className="inventory-actions">
         <button type="button" disabled={activeCopy !== null || filters.offset === 0} onClick={() => setFilters({ ...filters, offset: Math.max(0, filters.offset - 24) })}>{text.previous}</button>

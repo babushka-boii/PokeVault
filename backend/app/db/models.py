@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
@@ -9,6 +10,7 @@ from sqlalchemy import (
     ForeignKey,
     ForeignKeyConstraint,
     Index,
+    Numeric,
     String,
     UniqueConstraint,
     Uuid,
@@ -59,6 +61,9 @@ class UserSettings(Base):
             "favorite_pokemon_id BETWEEN 1 AND 1025",
             name="ck_settings_favorite_pokemon",
         ),
+        CheckConstraint(
+            "preferred_currency IN ('CLP', 'USD')", name="ck_settings_currency"
+        ),
     )
 
     user_id: Mapped[UUID] = mapped_column(
@@ -70,6 +75,9 @@ class UserSettings(Base):
     display_name: Mapped[str | None] = mapped_column(String(255))
     trainer_avatar_id: Mapped[str | None] = mapped_column(String(64))
     favorite_pokemon_id: Mapped[int | None]
+    preferred_currency: Mapped[str] = mapped_column(
+        String(3), nullable=False, default="CLP", server_default="CLP"
+    )
 
 
 class AuthSession(Base):
@@ -214,3 +222,80 @@ class BoxMembership(Base):
     box_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
     position: Mapped[int] = mapped_column(primary_key=True)
     copy_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+
+
+_PRICE_COLUMNS = (
+    "cm_trend",
+    "cm_trend_reverse",
+    "tp_normal",
+    "tp_holofoil",
+    "tp_reverse",
+)
+_ANY_PRICE = " OR ".join(f"{name} IS NOT NULL" for name in _PRICE_COLUMNS)
+
+
+class CardPriceSnapshot(Base):
+    """Latest selectable reference prices for one catalog printing (shared data).
+
+    Only values a copy can be priced with are stored; highPrice never is. No user_id:
+    prices belong to the catalog, copies are valued by joining at read time.
+    """
+
+    __tablename__ = "card_price_snapshots"
+    __table_args__ = (
+        CheckConstraint("status IN ('ok', 'no_data')", name="ck_price_status"),
+        CheckConstraint(
+            f"(status = 'ok') = ({_ANY_PRICE})", name="ck_price_status_data"
+        ),
+        *(
+            CheckConstraint(
+                f"{name} IS NULL OR ({name} > 0 AND {name} <= 1000000)",
+                name=f"ck_price_{name}",
+            )
+            for name in _PRICE_COLUMNS
+        ),
+    )
+
+    card_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    status: Mapped[str] = mapped_column(String(8), nullable=False)
+    cm_trend: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    cm_trend_reverse: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    cm_updated: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    tp_normal: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    tp_holofoil: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    tp_reverse: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    tp_updated: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    has_normal: Mapped[bool | None] = mapped_column(Boolean)
+    has_holo: Mapped[bool | None] = mapped_column(Boolean)
+    has_reverse: Mapped[bool | None] = mapped_column(Boolean)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class ExchangeRate(Base):
+    """Single cached provider row. Rates are null until the first successful fetch."""
+
+    __tablename__ = "exchange_rates"
+    __table_args__ = (
+        CheckConstraint("length(source) > 0", name="ck_rates_source"),
+        CheckConstraint(
+            "(usd_clp IS NULL) = (eur_per_usd IS NULL) "
+            "AND (usd_clp IS NULL) = (rates_updated_at IS NULL) "
+            "AND (usd_clp IS NULL) = (fetched_at IS NULL)",
+            name="ck_rates_all_or_none",
+        ),
+        CheckConstraint("usd_clp IS NULL OR usd_clp > 0", name="ck_rates_usd_clp"),
+        CheckConstraint(
+            "eur_per_usd IS NULL OR eur_per_usd > 0", name="ck_rates_eur_per_usd"
+        ),
+    )
+
+    source: Mapped[str] = mapped_column(String(32), primary_key=True)
+    usd_clp: Mapped[Decimal | None] = mapped_column(Numeric(14, 6))
+    eur_per_usd: Mapped[Decimal | None] = mapped_column(Numeric(14, 6))
+    rates_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    last_attempt_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )

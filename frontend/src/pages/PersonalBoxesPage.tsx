@@ -7,6 +7,7 @@ import { PersonalDetails } from "../components/boxes/personalDetails";
 import { PersonalGrid } from "../components/boxes/personalGrid";
 import { generationGroup, usePersonalMetadata } from "../components/boxes/personalMetadata";
 import { wallpapers, type Wallpaper } from "../components/boxes/wallpapers";
+import { BoxValue } from "../components/prices/BoxValue";
 import { useRetroAudio } from "../hooks/useRetroAudio";
 import { useSpriteMode } from "../hooks/useSpriteMode";
 import { useTcgResource } from "../hooks/useTcgResource";
@@ -159,6 +160,7 @@ function PersonalWorkspace() {
           <footer className="pc-help">{dictionary.boxes.keyboard}</footer>
         </section>
       </div>
+      {box && <BoxValue boxId={box.id} version={box.slots.map((slot) => `${slot.position}:${slot.copy.id}`).join(",")} />}
       {metadata.loading && <p role="status">{dictionary.cards.detailLoading}</p>}
       {metadata.failed && <p>{dictionary.inventory.providerError} <button type="button" onClick={metadata.retry}>{dictionary.inventory.providerRetry}</button></p>}
       {box && <div className="pc-personal-actions">

@@ -712,3 +712,22 @@ Trainer headers/title regions and interrupted geometric boundaries. No private
 images committed, inventory writes, credentials changes, commits or pushes.
 Remaining: improve outlined footer OCR using independent evidence; do not infer a
 printing solely from first rank. No hybrid recognition or Iteration 7 work.
+
+## Iteración 7 — Precios de referencia (23/11/2026)
+
+### Trabajo realizado
+
+- Spec y plan aprobados por el estudiante, con seis decisiones propias: variante `unknown` sin precio y enlace para corregirla; holo de carta con normal solo vía TCGplayer; sin tasa, precio original con aviso; moneda en `localStorage` sin sesión y preferencia de la cuenta al iniciar sesión; límite de 40 refrescos por petición; evidencia en `research/prices/`.
+- Evidencia real: precios de TCGdex para cinco cartas propias (iguales en es y en) y una respuesta de ExchangeRate-API. mindicador.cl no respondió desde la red del estudiante ni desde la sesión de IA; el estudiante decidió cambiar de fuente y exigir la atribución que piden sus términos.
+- Backend: reglas puras de selección por variante y conversión con `Decimal`; migración `0005` (aplicada por el estudiante); clientes de TCGdex y de tasas; servicio con cachés de 24 h, límite de 40 refrescos, plazo de 10 s, pausa de 60 s tras fallos de TCGdex y espera de 20 min tras fallos de tasas; APIs de precio por carta, por copia, colección, caja y preferencia de moneda; filtro `variant` en el inventario.
+- Frontend: precio por variante en el detalle de carta, precio por copia en Mi colección, valor de la colección y top 5 en Perfil, valor por caja, selector CLP/USD, textos ES/EN y atribución de tasas.
+- Revisión final: se detectó que el endpoint público podía guardar filas para ids inventados; ahora los 404 solo se recuerdan en memoria.
+
+### Revisiones del estudiante
+
+- Pidió subir el tope de cordura de 10 000 a 1 000 000 (hay cartas reales más caras) y columnas `NUMERIC(12,4)` para no perder precios menores a un centavo; ambos cambios quedaron con pruebas.
+- Pidió atención especial al aislamiento por usuario y a que una caída de precios no afecte inventario, cajas ni expansiones; hay pruebas con dos usuarios en PostgreSQL y una prueba que compara esas respuestas con los proveedores caídos.
+
+### Validación
+
+`bash scripts/check.sh` terminó con código 0: 43 pruebas de proveedores, 790 de backend (incluidas las de PostgreSQL, sin saltos) y 421 de frontend, además de Ruff, ESLint, TypeScript, build y espacios. Queda pendiente la aceptación manual en el navegador (lista en `docs/ROADMAP.md`). Sin push.

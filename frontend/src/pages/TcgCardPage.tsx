@@ -4,6 +4,7 @@ import { AddToCollection } from "../components/inventory/AddToCollection";
 import { CardArtwork } from "../components/cards/CardArtwork";
 import { CardLanguageNote } from "../components/cards/CardLanguageNote";
 import { InteractiveCard } from "../components/cards/InteractiveCard";
+import { CardPricePanel } from "../components/prices/CardPricePanel";
 import { SetLogo } from "../components/cards/SetLogo";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
@@ -68,6 +69,7 @@ export function TcgCardPage() {
               <CardLanguageNote card={card} />
             </header>
             <AddToCollection cardId={card.id} />
+            <CardPricePanel cardId={card.id} />
             {card.category === "Pokemon" && <section className="tcg-detail-section tcg-pokemon-traits" aria-label={text.cardInformation}>
               <div className="tcg-hp-types">
                 {card.hp !== null && <p className="tcg-hp"><span>{text.hp}</span> <strong>{card.hp}</strong></p>}

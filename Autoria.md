@@ -1,7 +1,7 @@
 # Declaración de autoría — PokéVault
 
 **Proyecto:** TICS316, Diseño de Software (individual)  
-**Última actualización:** 2026-10-24 (Iteración 5A)
+**Última actualización:** 2026-11-23 (Iteración 7)
 
 Este archivo declara qué partes son de concepción del estudiante, cuáles han recibido apoyo de herramientas de IA y qué materiales externos se prevé consultar.
 
@@ -421,3 +421,17 @@ Trainer headers/title regions and interrupted geometric boundaries. No private
 images committed, inventory writes, credentials changes, commits or pushes.
 Remaining: improve outlined footer OCR using independent evidence; do not infer a
 printing solely from first rank. No hybrid recognition or Iteration 7 work.
+
+## Iteración 7 — Precios de referencia (23/11/2026)
+
+### Aportes del estudiante
+
+- Definió las fuentes (Cardmarket `trend` en EUR, respaldo TCGplayer en USD), la regla por variante de cada copia física, la etiqueta "precio de referencia" sin ajuste por estado, CLP por defecto con opción USD, las cachés y las vistas.
+- Resolvió las seis preguntas abiertas del spec, cambió la fuente de tasas a ExchangeRate-API con atribución, y revisó y corrigió el tope de precios y la precisión de las columnas.
+- Aplicó la migración `0005` en su base y decidió el ritmo de commits (sin push).
+
+### Uso de IA (Claude Code)
+
+- Redacción del spec, del plan, de esta documentación y de la evidencia en `research/prices/`.
+- Implementación completa del backend y del frontend de precios con sus pruebas, y una revisión final que encontró y corrigió un problema de seguridad (filas por ids inventados).
+- El código fue escrito por la IA y revisado por el estudiante por tareas; debe ser entendido por él antes de la entrega.

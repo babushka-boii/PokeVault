@@ -137,7 +137,7 @@ def client_for(app, owner):
 def test_migration_has_owner_foreign_keys_and_exact_unique_keys(boxes_database):
     factory, config = boxes_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0004"
+    assert scripts.get_current_head() == "0005"
     assert scripts.get_revision("0004").down_revision == "0003"
     with factory() as session:
         inspector = inspect(session.get_bind())

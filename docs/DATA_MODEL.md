@@ -170,3 +170,22 @@ A fresh key intentionally creates another physical copy. The guarantee lasts whi
 the row exists; deleting it ends replay protection and editing it may conflict with
 an old payload. This is documented record-backed retry identity, not a permanent
 transaction ledger. Existing attributes, constraints and box ownership remain intact.
+
+## Iteration 7 — Reference prices (migration `0005`)
+
+- `card_price_snapshots` (shared catalog data, no `user_id`): `card_id` PK; `status`
+  `ok|no_data`; five selectable prices `NUMERIC(12,4)` (`cm_trend`, `cm_trend_reverse`,
+  `tp_normal`, `tp_holofoil`, `tp_reverse`), each NULL or `> 0 AND <= 1000000`;
+  `cm_updated`/`tp_updated`; catalog variant flags `has_normal|has_holo|has_reverse`
+  (nullable); `fetched_at`. Check: `status = 'ok'` exactly when some price is present.
+  `highPrice` has no column. TCGdex 404s are never stored.
+- `exchange_rates`: `source` PK (`exchangerate-api`); `usd_clp`, `eur_per_usd`
+  `NUMERIC(14,6) > 0`; `rates_updated_at` (provider date); `fetched_at`;
+  `last_attempt_at` (20-minute backoff). The four rate fields are all set or all NULL,
+  so a first failed attempt can still record the backoff.
+- `user_settings.preferred_currency` `VARCHAR(3)` NOT NULL default `CLP`, check
+  `CLP|USD`. Existing users get CLP.
+
+No price is stored per copy: copy, collection and box values are derived at read time
+from the owner's copies and the shared snapshots. Downgrade to `0004` drops both tables
+and the column without touching inventory or boxes. Head: `0005`.
