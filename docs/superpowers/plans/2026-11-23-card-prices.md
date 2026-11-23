@@ -114,13 +114,18 @@ Files: `backend/app/db/models.py`; `backend/migrations/versions/0005_create_pric
 ### Task 3: Provider clients
 
 Files: `backend/app/cards/provider.py` (new `card_pricing`); `backend/app/prices/rates.py`;
-`backend/app/core/config.py` (timeouts/URL settings); `backend/tests/test_price_provider.py`.
+`backend/tests/test_price_provider.py`.
 
-- [ ] Failing tests with `httpx.MockTransport`: sample payloads, 404 → `None`, 5xx and
+- [x] Failing tests with `httpx.MockTransport`: sample payloads, 404 → `None`, 5xx and
   timeout → unavailable, invalid JSON, oversized body (cap 256 KiB), non-HTTPS redirect.
-- [ ] Failing tests for rates: the real sample, missing fields, out-of-bounds values, 429 and the 20-minute backoff, no extra request within 24 h.
+- [x] Failing tests for rates: the real sample, missing fields, out-of-bounds values, 429 (`rate_limited`, exactly one request, no client retries). The 24 h cache and 20-minute backoff are `store.rates_refresh_allowed` (Task 2); the no-extra-request-within-24 h/20 min tests that compose client + store belong to Task 4.
 - [ ] Frontend attribution link is covered in Task 6.
-- [ ] Implement using the existing semaphore and timeouts; English endpoint only.
+- [x] Implement using the existing semaphore and timeouts; English endpoint only.
+
+Notes: no new settings were needed (URL/timeouts are module constants; `RatesClient` and
+`CardProvider` accept a transport for tests). `card_pricing` skips the global card lock,
+refuses redirects and returns `None` for identifiers that do not match the catalog pattern.
+Backend suite incl. PostgreSQL: 732 passed.
 
 ### Task 4: Price service and APIs
 
