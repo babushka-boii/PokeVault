@@ -16,6 +16,15 @@ export type InventoryFilters = { offset: number; card_id: string; condition: str
 export class InventoryError extends Error {
   constructor(public readonly status: number) { super("Inventory request failed"); }
 }
+/** getRandomValues also works on local HTTP origins where randomUUID is absent. */
+export function createCopyIdempotencyKey(): string {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (value) => value.toString(16).padStart(2, "0"));
+  return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`;
+}
 const base = `${(import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000").replace(/\/$/, "")}/api/v1/inventory`;
 
 async function request(path: string, options: RequestInit): Promise<unknown> {
@@ -40,15 +49,17 @@ export async function fetchInventory(filters: InventoryFilters, signal: AbortSig
   if (!record(payload) || !Array.isArray(payload.results) || !payload.results.every(isInventoryCopy)
     || payload.results.length > 24 || new Set(payload.results.map((r) => r.id)).size !== payload.results.length
     || payload.offset !== filters.offset || payload.limit !== 24 || !Number.isSafeInteger(payload.total) || (payload.total as number) < 0
-    || !record(payload.quantities) || !Object.entries(payload.quantities).every(([key, n]) => isCardId(key) && Number.isSafeInteger(n) && (n as number) > 0)) {
+    || !record(payload.quantities) || !Object.entries(payload.quantities).every(([key, n]) => isCardId(key) && Number.isSafeInteger(n) && (n as number) > 0)
+    || (filters.card_id !== "" && (payload.results.some((copy) => copy.card_id !== filters.card_id) || Object.keys(payload.quantities).some((key) => key !== filters.card_id)))) {
     throw new InventoryError(0);
   }
   return payload as InventoryPage;
 }
-export async function saveCopy(cardId: string, attributes: CopyAttributes, csrf: string, signal: AbortSignal, id?: string): Promise<InventoryCopy> {
+export async function saveCopy(cardId: string, attributes: CopyAttributes, csrf: string, signal: AbortSignal, id?: string, idempotencyKey?: string): Promise<InventoryCopy> {
   const payload = await request(id ? `/${encodeURIComponent(id)}` : "", {
     method: id ? "PUT" : "POST", signal,
-    headers: { Accept: "application/json", "Content-Type": "application/json", "X-CSRF-Token": csrf },
+    headers: { Accept: "application/json", "Content-Type": "application/json", "X-CSRF-Token": csrf,
+      ...(!id && idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}) },
     body: JSON.stringify(id ? attributes : { card_id: cardId, ...attributes }),
   });
   if (!isInventoryCopy(payload) || payload.card_id !== cardId || (id && payload.id !== id)) throw new InventoryError(0);

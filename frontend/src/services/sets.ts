@@ -35,11 +35,11 @@ async function request(path: string, signal?: AbortSignal, privateRequest = fals
   return response.json();
 }
 
-function isSummary(value: unknown): value is SetSummary {
+export function isSetSummary(value: unknown): value is SetSummary {
   return isCardSet(value) && nullableCount((value as SetSummary).official_count) && nullableCount((value as SetSummary).provider_total);
 }
 function isDetail(value: unknown): value is SetDetail {
-  if (!isSummary(value)) return false;
+  if (!isSetSummary(value)) return false;
   const detail = value as SetDetail;
   if (!natural(detail.checklist_size) || detail.checklist_size > 2000) return false;
   return detail.checklist_status === "verified"
@@ -47,7 +47,7 @@ function isDetail(value: unknown): value is SetDetail {
     : ["incomplete", "empty"].includes(detail.checklist_status) && detail.checklist_revision === null &&
       (detail.checklist_status !== "empty" || detail.checklist_size === 0);
 }
-function isSetCard(value: unknown): value is SetCard {
+export function isSetCard(value: unknown): value is SetCard {
   return record(value) && text(value.id) && isCardId(value.id) && text(value.name) && text(value.local_id) && locale(value.language) &&
     (value.image_url === null || isOfficialAssetUrl(value.image_url)) && (value.thumbnail_url === null || isOfficialAssetUrl(value.thumbnail_url)) &&
     Array.isArray(value.image_sources) && value.image_sources.length <= 2 && value.image_sources.every((source) => record(source) &&
@@ -86,7 +86,7 @@ export async function fetchSets(language: Locale, filters: SetFilters, signal?: 
   const payload = await request(`?${params}`, signal);
   if (!record(payload) || payload.coverage !== "english_physical_catalog" || payload.page !== filters.page || payload.page_size !== PAGE_SIZE ||
     !natural(payload.total) || payload.total > 512 || !natural(payload.excluded_pocket) || !natural(payload.excluded_unknown_series) ||
-    !Array.isArray(payload.results) || payload.results.length > PAGE_SIZE || payload.results.length > payload.total || !payload.results.every(isSummary) ||
+    !Array.isArray(payload.results) || payload.results.length > PAGE_SIZE || payload.results.length > payload.total || !payload.results.every(isSetSummary) ||
     new Set(payload.results.map((set) => set.id)).size !== payload.results.length || !Array.isArray(payload.series) || payload.series.length > 512 ||
     !payload.series.every((series) => record(series) && text(series.id) && isSetId(series.id) && text(series.name)) ||
     new Set(payload.series.map((series) => series.id)).size !== payload.series.length) throw invalid();

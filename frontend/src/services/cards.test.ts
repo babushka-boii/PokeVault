@@ -23,6 +23,7 @@ test.each([
   "/pokemon/25/cards?page=2&sort=id&set_id=sm9&returnTo=%2Fpokedex",
   "/sets?q=base&sort=oldest&page=2",
   "/sets/sv03.5?ownership=missing&page=3",
+  "/scanner",
 ])("preserves allowed return destinations: %s", (destination) => {
   expect(safeReturnTo(destination)).toBe(destination);
 });

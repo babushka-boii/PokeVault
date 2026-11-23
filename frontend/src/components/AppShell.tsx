@@ -10,6 +10,7 @@ export function AppShell() {
     ["/boxes", dictionary.nav.boxes],
     ["/pokedex", dictionary.nav.pokedex],
     ["/sets", dictionary.sets.title],
+    ["/scanner", dictionary.scanner.title],
     ["/collection", dictionary.inventory.title],
     ["/profile", dictionary.nav.profile],
   ] as const;
