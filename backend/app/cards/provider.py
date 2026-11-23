@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import re
 from collections import OrderedDict
 from collections.abc import Callable
 from contextlib import asynccontextmanager
@@ -49,6 +50,14 @@ class CardNotFound(Exception):
 
 class SetNotFound(Exception):
     """The requested identity is absent from the supported physical catalog."""
+
+
+@dataclass
+class ScannerNameDiscovery:
+    """Expansion hints from a bounded name page, never verified card identities."""
+
+    set_ids: list[str]
+    limited: bool = True
 
 
 # Positive classifications observed in the official metadata verification.
@@ -424,6 +433,72 @@ class CardProvider:
         self._checklists: OrderedDict[
             tuple[str, Language], tuple[float, SetChecklist]
         ] = OrderedDict()
+        self._scanner_lock = asyncio.Lock()
+        self._scanner_names: OrderedDict[
+            tuple[str, Language], tuple[float, list[str]]
+        ] = OrderedDict()
+        self._scanner_art: OrderedDict[str, tuple[float, bytes]] = OrderedDict()
+        self._scanner_art_slots = asyncio.Semaphore(3)
+
+    async def scanner_artwork(self, card: SetCard, set_id: str) -> bytes:
+        """Fetch a canonical candidate's public reference, never a supplied URL.
+
+        Decoding happens in the disposable visual worker. The public-only LRU
+        holds at most 16 one-MiB assets for five minutes; private photos never
+        enter this cache. Use the same transport and request semaphore as metadata.
+        """
+        if not card.image_sources:
+            raise CardsUnavailable
+        try:
+            base = HttpUrl(card.image_sources[0].base_url)
+            _validate_asset(base)
+            parts = base.path.strip("/").split("/")
+            if (
+                len(parts) != 4
+                or parts[0] not in {"en", "es"}
+                or parts[1] not in PHYSICAL_SERIES
+                or parts[2] != set_id
+                or parts[3] != card.local_id
+                or card.id != f"{set_id}-{card.local_id}"
+                or any(not re.fullmatch(r"[A-Za-z0-9._-]+", part) for part in parts)
+            ):
+                raise ValueError("Unexpected artwork identity")
+            url = f"{str(base).rstrip('/')}/high.webp"
+            cached = self._scanner_art.get(url)
+            if cached is not None and cached[0] > self._clock():
+                self._scanner_art.move_to_end(url)
+                return cached[1]
+            async with (
+                asyncio.timeout(5),
+                self._scanner_art_slots,
+                self._semaphore,
+                self._client() as client,
+                client.stream("GET", url, headers={"Accept": "image/webp"}) as response,
+            ):
+                if response.status_code != 200 or response.headers.get(
+                    "content-type", ""
+                ).split(";")[0].lower() != "image/webp":
+                    raise ValueError("Invalid artwork response")
+                length = response.headers.get("content-length")
+                if length is not None and (
+                    not length.isascii()
+                    or not length.isdigit()
+                    or len(length) > 10
+                    or int(length) > 1_048_576
+                ):
+                    raise ValueError("Invalid artwork size")
+                body = bytearray()
+                async for chunk in response.aiter_bytes(chunk_size=8192):
+                    if len(body) + len(chunk) > 1_048_576:
+                        raise ValueError("Invalid artwork size")
+                    body.extend(chunk)
+                if not body:
+                    raise ValueError("Empty artwork")
+            data = bytes(body)
+            self._store(self._scanner_art, url, data, 16)
+            return data
+        except (ValueError, httpx.HTTPError, TimeoutError):
+            raise CardsUnavailable from None
 
     def _client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(
@@ -591,6 +666,112 @@ class CardProvider:
                     excluded_pocket=pocket,
                     excluded_unknown_series=unknown,
                 )
+        except (
+            ExceptionGroup,
+            httpx.HTTPError,
+            TimeoutError,
+            ValueError,
+            TypeError,
+            AttributeError,
+        ) as error:
+            raise CardsUnavailable from error
+
+    async def scanner_catalog(self, language: Language = "en") -> list[SetSummary]:
+        """Reuse the physical metadata snapshot, without loading any card details."""
+        try:
+            async with asyncio.timeout(15), self._client() as client:
+                catalog, _, _ = await self._physical_catalog(client, language)
+                return [catalog[key].model_copy(deep=True) for key in sorted(catalog)]
+        except (
+            ExceptionGroup,
+            httpx.HTTPError,
+            TimeoutError,
+            ValueError,
+            TypeError,
+            AttributeError,
+        ) as error:
+            raise CardsUnavailable from error
+
+    async def scanner_name_discovery(
+        self, name: str, language: Language = "en"
+    ) -> ScannerNameDiscovery:
+        """Search at most two 64-brief pages through literal REST filters.
+
+        This is deliberately a search hint, not an exhaustive name index. A
+        provider brief only suggests an expansion when its explicit localId and
+        an existing physical catalog ID agree exactly with its official ID.
+        Callers must still verify membership and names against the checklist.
+        Opaque/nonstandard IDs remain usable through explicit set selection.
+        """
+        if (
+            not 3 <= len(name) <= 100
+            or sum(char.isalpha() for char in name) < 3
+            or any(ord(char) < 32 or ord(char) == 127 for char in name)
+            or any(char in "|*" for char in name)
+            or re.match(
+                r"^(?:eq|neq|like|not|notlike|gte|lte|gt|lt|null|notnull)\s*:",
+                name,
+                re.IGNORECASE,
+            )
+        ):
+            raise ValueError("Invalid literal name query")
+        words = re.findall(r"[^\W_]+(?:['’-][^\W_]+)*", name)
+        query = name
+        if any(
+            not (char.isalnum() or char == " " or char in "-'’.&♀♂") for char in name
+        ):
+            # E.g. the verified name "Type: Null" searches literal "Null".
+            # The catalog comparison still uses the full original name. Never
+            # pass provider operators/wildcards through as query grammar.
+            query = max(reversed(words), key=len)
+        prefix = max(reversed(words), key=len)[:3]
+        terms = [query]
+        if len(prefix) == 3 and prefix.casefold() != query.casefold():
+            terms.append(prefix)
+        key = (query, language)
+        try:
+            async with asyncio.timeout(15), self._scanner_lock:
+                found, cached = self._cached(self._scanner_names, key)
+                if found:
+                    return ScannerNameDiscovery(list(cached))
+                async with self._client() as client:
+                    catalog, _, _ = await self._physical_catalog(client, "en")
+                    identifiers = set()
+                    for term in terms:
+                        response = await self._get(
+                            client,
+                            f"{language}/cards",
+                            params={
+                                "name": f"like:{term}",
+                                "sort:field": "id",
+                                "sort:order": "ASC",
+                                "pagination:page": 1,
+                                "pagination:itemsPerPage": 64,
+                            },
+                        )
+                        response.raise_for_status()
+                        data = response.json()
+                        if not isinstance(data, list) or len(data) > 64:
+                            raise ValueError("Invalid scanner name page")
+                        briefs = [
+                            _SetMembershipBrief.model_validate(row) for row in data
+                        ]
+                        if len({row.id for row in briefs}) != len(briefs):
+                            raise ValueError("Duplicate scanner name results")
+                        for brief in briefs:
+                            if not str(brief.localId).strip():
+                                raise ValueError("Missing scanner local number")
+                            _validate_asset(brief.image)
+                            identifiers.update(
+                                set_id
+                                for set_id in catalog
+                                if brief.id == f"{set_id}-{brief.localId}"
+                            )
+                        if identifiers:
+                            break
+                result = sorted(identifiers)
+                self._store(self._scanner_names, key, result, 32)
+                return ScannerNameDiscovery(list(result))
         except (
             ExceptionGroup,
             httpx.HTTPError,
