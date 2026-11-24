@@ -8,9 +8,6 @@ const sheets = import.meta.glob("/src/**/*.css", { query: "?raw", import: "defau
 
 /** Files still using hard-coded colors. Task 4 of 8A removes every entry. */
 const LEGACY_FILES = new Set([
-  "/src/styles.css",
-  "/src/auth/auth.css",
-  "/src/components/typeBadge.css",
   "/src/components/cards/cards.css",
   "/src/components/cards/artwork.css",
   "/src/components/cards/interactive-card.css",
