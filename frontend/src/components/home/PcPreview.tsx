@@ -45,7 +45,7 @@ export function PcPreview() {
   const unassignedCount = unassigned.state.kind === "loaded" ? unassigned.state.data.total : 0;
   const noBoxes = list.state.kind === "loaded" && !first;
 
-  return <CutPanel className="pv-home__pc pv-home-pc pc-page" aria-labelledby="home-pc-title">
+  return <CutPanel className="pv-home__pc pv-home-pc" aria-labelledby="home-pc-title">
     <div className="pv-home__section-head">
       <h2 id="home-pc-title">{text.pcTitle}</h2>
       <Link to={PC_LINK}>{text.pcOpen}</Link>

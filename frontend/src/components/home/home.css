@@ -54,7 +54,11 @@
 /* Mi PC preview: dark dotted screen, cyan cursor (selection styling comes from boxes.css under .pc-page). */
 .pv-home-pc__layout { display: grid; gap: var(--pv-space-4); grid-template-columns: minmax(0, 1fr); }
 .pv-home-pc__screen { background-color: var(--pv-bg); background-image: radial-gradient(var(--pv-border) 1px, transparent 1.5px); background-size: 16px 16px; border: 1px solid var(--pv-border); padding: var(--pv-space-2); }
-.pv-home-pc__screen .pc-slot--empty, .pv-home-pc__screen .pc-slot { color: var(--pv-text-3); }
+.pv-home-pc .pc-slot { background: transparent; border: 2px solid transparent; border-radius: 0; color: var(--pv-text-3); cursor: pointer; padding: 0; transition: background-color var(--pv-dur-fast) var(--pv-ease), border-color var(--pv-dur-fast) var(--pv-ease); }
+.pv-home-pc .pc-slot:hover { background: var(--pv-cyan-soft); }
+/* Cyan cursor; the dark inset ring keeps it readable and leaves the focus outline alone. */
+.pv-home-pc .pc-grid [aria-selected="true"] .pc-slot { background: var(--pv-cyan-soft); border-color: var(--pv-cyan); box-shadow: inset 0 0 0 2px var(--pv-bg); }
+.pv-home-pc .pc-slot:focus-visible { outline: 3px solid var(--pv-focus); outline-offset: -3px; z-index: 1; }
 .pv-home-pc__panel { background: var(--pv-panel-raised); border: 1px solid var(--pv-border); min-width: 0; padding: var(--pv-space-4); }
 .pv-home-pc__panel h3 { font-size: var(--pv-text-lg); margin: 0 0 var(--pv-space-1); overflow-wrap: anywhere; }
 .pv-home-pc__facts { display: grid; gap: var(--pv-space-2); margin: var(--pv-space-3) 0; }
