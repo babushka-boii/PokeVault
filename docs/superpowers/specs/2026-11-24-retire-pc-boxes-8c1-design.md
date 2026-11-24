@@ -161,7 +161,10 @@ reuse existing endpoints and components:
   and a "page N of 35" label. This uses `fetchPokemonPage(offset)`, which already exists
   and is validated for up to 30 results.
 - **Search by name or number** with the existing `searchPokemon` (`/pokemon/search`):
-  results link to the species gallery, and the Pokédex shows them as the same cards.
+  the endpoint returns only a name and a number (at most 8 matches), so the results are a
+  list of links such as "#559 Scraggy", each opening the species' TCG gallery, not full
+  cards. The pager is a labelled group, not a second `<nav>`, because the shell requires a
+  single navigation landmark.
 
 The grid, cards and "Ver cartas TCG" action do not change. The description changes from
 "first 20" to the full National Pokédex. Tests are in §9.

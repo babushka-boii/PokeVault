@@ -157,15 +157,29 @@ This task comes **before** the removal, so no commit leaves species #21–#1025 
 path.
 
 **Steps:**
-- [ ] Write failing tests (spec §9.4): offsets by page, bounds 1–35, invalid `?page`,
+- [x] Write failing tests (spec §9.4): offsets by page, bounds 1–35, invalid `?page`,
   previous and next links, page 35 shows #1021–#1025, search by name and by number with
   links to the species gallery, debounce, obsolete responses, no results, sanitized error
   with retry, abort on navigation.
-- [ ] Implement pagination with `?page=` and `fetchPokemonPage(offset)`, and the search
+- [x] Implement pagination with `?page=` and `fetchPokemonPage(offset)`, and the search
   with `searchPokemon`. The grid, cards and "Ver cartas TCG" action stay as they are, and
   the description text changes.
-- [ ] Keep every existing Pokédex test green without edits except the description text.
-- [ ] Commit.
+- [x] Keep every existing Pokédex test green without edits except the description text.
+- [x] Commit.
+- Evidence:
+  - `PokedexPage` requests `?offset=(page-1)*30&limit=30` (it used the default 20 before),
+    with `?page=` limited to 1..35 (anything else is page 1), previous and next links, and
+    "Página N de 35". `PokedexSearch` searches by name or number with a 300 ms pause, ignores
+    obsolete responses, and shows loading, empty and error states with retry. Every species
+    card keeps its "Ver cartas TCG" action.
+  - 11 new tests and 1 adapted: the first-page request URL in the existing test changed from
+    `/pokemon` to `/pokemon?offset=0&limit=30` (that is the intended behavior change). The
+    other Pokédex tests (loading, translated types, sanitized error with keyboard retry,
+    empty, malformed data, abort on navigation) pass unedited. `fetchPokemon`, now unused,
+    was removed.
+  - The pager is a labelled group instead of a `<nav>`: the first version tripped the
+    shell's "exactly one navigation landmark" test, which was kept strict.
+  - Frontend: 41 files / 541 tests green; lint and typecheck clean.
 
 ### Task 3: Redirects, navigation and removal of the catalog boxes
 

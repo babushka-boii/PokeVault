@@ -22,3 +22,10 @@
 .pokemon-sprite { align-items: center; display: flex; justify-content: center; min-height: 96px; font-size: .8rem; }
 .pokemon-sprite img { image-rendering: pixelated; }
 .pokemon-types { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center; list-style: none; padding: 0; }
+
+.pokedex-search { display: grid; gap: .5rem; margin: 1rem 0; max-width: 28rem; }
+.pokedex-search label { color: var(--pv-text-2); font-size: var(--pv-text-sm); }
+.pokedex-search__field { display: flex; gap: .5rem; }
+.pokedex-search__field input { flex: 1; min-height: var(--pv-touch); min-width: 0; padding: .5rem .75rem; }
+.pokedex-search__results { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+.pokedex-pager { align-items: center; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; margin-top: 1.5rem; }
