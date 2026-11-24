@@ -45,6 +45,15 @@ describe("PokéVault application shell", () => {
     expect(document.documentElement.lang).toBe("en");
   });
 
+  test("old personal-box links open the binders, and /boxes is the catalog only", async () => {
+    const { unmount } = render(<App initialEntries={["/boxes?mode=personal"]} />);
+    expect(await screen.findByRole("heading", { level: 1, name: "Mis carpetas" })).toBeInTheDocument();
+    unmount();
+    render(<App initialEntries={["/boxes"]} />);
+    expect(screen.queryByRole("group", { name: "Cajas" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Mis cajas" })).not.toBeInTheDocument();
+  });
+
   test("falls back to Spanish for an unsupported persisted locale", () => {
     localStorage.setItem("pokevault.locale", "fr");
 

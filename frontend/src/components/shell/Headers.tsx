@@ -9,7 +9,7 @@ import { CurrencyToggle, LocaleToggle } from "./Toggles";
 export function DesktopHeader() {
   const { dictionary } = useLocale();
   const text = dictionary.shell.nav;
-  const links = [["/", text.home], ["/pokedex", text.pokedex], ["/boxes", text.boxes], ["/sets", text.sets], ["/collection", text.collection]] as const;
+  const links = [["/", text.home], ["/pokedex", text.pokedex], ["/boxes", text.boxes], ["/sets", text.sets], ["/binders", text.binders], ["/collection", text.collection]] as const;
   return <header className="pv-header">
     <div className="pv-header__inner">
       <LogoLink />

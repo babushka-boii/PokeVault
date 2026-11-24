@@ -100,11 +100,28 @@ export async function fetchCollectionValue(currency: Currency, signal: AbortSign
   if (!isValuation(v, currency)) throw new PricesError(0);
   return v;
 }
-export async function fetchBoxValue(boxId: string, currency: Currency, signal: AbortSignal): Promise<Valuation> {
-  if (!uuid(boxId)) throw new PricesError(404);
-  const v = await request(`/boxes/${encodeURIComponent(boxId)}/value?${query(currency)}`, signal);
+export async function fetchBinderValue(binderId: string, currency: Currency, signal: AbortSignal): Promise<Valuation> {
+  if (!uuid(binderId)) throw new PricesError(404);
+  const v = await request(`/binders/${encodeURIComponent(binderId)}/value?${query(currency)}`, signal);
   if (!isValuation(v, currency)) throw new PricesError(0);
   return v;
+}
+
+export type BinderValue = { binder_id: string; total: string | null; original_totals: Partial<Record<"EUR" | "USD", string>>;
+  copy_count: number; priced_count: number; pending_count: number; stale_count: number };
+export type BinderValues = { currency: Currency; results: BinderValue[]; rates: RatesInfo };
+function isBinderValue(v: unknown): v is BinderValue {
+  return record(v) && uuid(v.binder_id) && (v.total === null || decimal(v.total)) && amounts(v.original_totals) && count(v.copy_count)
+    && count(v.priced_count) && v.priced_count <= v.copy_count && count(v.pending_count) && count(v.stale_count);
+}
+/** Every owned binder's value in one request (the shelf). */
+export async function fetchBinderValues(currency: Currency, signal: AbortSignal): Promise<BinderValues> {
+  const v = await request(`/prices/binders?${query(currency)}`, signal);
+  if (!record(v) || v.currency !== currency || !isRates(v.rates) || !Array.isArray(v.results) || v.results.length > 100
+    || !v.results.every(isBinderValue) || new Set(v.results.map((row) => (row as BinderValue).binder_id)).size !== v.results.length) {
+    throw new PricesError(0);
+  }
+  return v as BinderValues;
 }
 
 export async function fetchCurrencySetting(signal: AbortSignal): Promise<Currency> {

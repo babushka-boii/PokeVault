@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useLocale } from "../i18n/LocaleProvider";
 import { BOX_SIZE, NATIONAL_DEX_TOTAL, locatePokemon, type SpeciesMatch } from "../services/pokemon";
 import { useCatalogBox } from "../hooks/useCatalogBox";
@@ -11,7 +11,6 @@ import { SelectedPokemon } from "../components/boxes/SelectedPokemon";
 import { StorageGrid } from "../components/boxes/StorageGrid";
 import { DEFAULT_WALLPAPER, wallpapers, type Wallpaper } from "../components/boxes/wallpapers";
 import "../components/boxes/boxes.css";
-import { PersonalBoxesPage } from "./PersonalBoxesPage";
 
 function readBoxLocation(params: URLSearchParams) {
   const box = Number(params.get("box"));
@@ -103,15 +102,12 @@ function CatalogBoxesPage() {
   </section>;
 }
 
+/**
+ * Catalog boxes only (species discovery). Personal storage moved to binders in 8C;
+ * old `?mode=personal` links redirect there.
+ */
 export function BoxesPage() {
-  const { dictionary } = useLocale();
-  const [params, setParams] = useSearchParams();
-  const personal = params.get("mode") === "personal";
-  return <>
-    <div className="pc-mode-switch" role="group" aria-label={dictionary.boxes.title}>
-      <button type="button" aria-pressed={!personal} onClick={() => { const next = new URLSearchParams(params); next.delete("mode"); setParams(next); }}>{dictionary.personalBoxes.catalog}</button>
-      <button type="button" aria-pressed={personal} onClick={() => { const next = new URLSearchParams(params); next.set("mode", "personal"); setParams(next); }}>{dictionary.personalBoxes.personal}</button>
-    </div>
-    {personal ? <PersonalBoxesPage /> : <CatalogBoxesPage />}
-  </>;
+  const [params] = useSearchParams();
+  if (params.get("mode") === "personal") return <Navigate to="/binders" replace />;
+  return <CatalogBoxesPage />;
 }

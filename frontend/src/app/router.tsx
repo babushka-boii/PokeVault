@@ -4,6 +4,8 @@ import { AppShell } from "../components/AppShell";
 import { CollectionPage } from "../pages/CollectionPage";
 import { InventoryCopyPage } from "../pages/InventoryCopyPage";
 import { BoxesPage } from "../pages/BoxesPage";
+import { BinderPage } from "../pages/BinderPage";
+import { BindersPage } from "../pages/BindersPage";
 import { LoginPage } from "../pages/LoginPage";
 import { HomePage } from "../pages/HomePage";
 import { PokedexPage } from "../pages/PokedexPage";
@@ -21,6 +23,8 @@ export function AppRoutes() {
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
         <Route path="boxes" element={<BoxesPage />} />
+        <Route path="binders" element={<BindersPage />} />
+        <Route path="binders/:binderId" element={<BinderPage />} />
         <Route path="pokedex" element={<PokedexPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="collection" element={<CollectionPage />} />

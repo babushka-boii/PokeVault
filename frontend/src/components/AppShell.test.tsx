@@ -29,7 +29,7 @@ describe("desktop shell", () => {
     const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
     expect(screen.getAllByRole("navigation")).toHaveLength(1);
     expect(within(navigation).getAllByRole("link").map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
-      ["Inicio", "/"], ["Pokédex", "/pokedex"], ["Cajas PC", "/boxes"], ["Expansiones", "/sets"], ["Mi colección", "/collection"],
+      ["Inicio", "/"], ["Pokédex", "/pokedex"], ["Cajas PC", "/boxes"], ["Expansiones", "/sets"], ["Mis carpetas", "/binders"], ["Mi colección", "/collection"],
     ]);
     expect(within(navigation).getByRole("link", { name: "Pokédex" })).toHaveAttribute("aria-current", "page");
     expect(within(navigation).getByRole("link", { name: "Inicio" })).not.toHaveAttribute("aria-current");
@@ -66,7 +66,7 @@ describe("desktop shell", () => {
     render(<App initialEntries={["/pokedex"]} />);
     await user.click(screen.getByRole("button", { name: "English" }));
     const navigation = screen.getByRole("navigation", { name: "Main navigation" });
-    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual(["Home", "Pokédex", "PC Boxes", "Expansions", "My collection"]);
+    expect(within(navigation).getAllByRole("link").map((link) => link.textContent)).toEqual(["Home", "Pokédex", "PC Boxes", "Expansions", "My binders", "My collection"]);
     expect(screen.getByRole("link", { name: "Scan" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Profile" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Display currency" })).toBeInTheDocument();
@@ -99,16 +99,16 @@ describe("mobile shell", () => {
   test("replaces the header navigation with a bottom bar that centers the scan action", () => {
     stubMedia({ mobile: true });
     stubApi();
-    render(<App initialEntries={["/boxes"]} />);
+    render(<App initialEntries={["/binders"]} />);
     expect(screen.getAllByRole("navigation")).toHaveLength(1);
     const navigation = screen.getByRole("navigation", { name: "Navegación principal" });
     const links = within(navigation).getAllByRole("link");
     expect(links.map((link) => [link.textContent, link.getAttribute("href")])).toEqual([
-      ["Inicio", "/"], ["Cajas", "/boxes"], ["Escanear", "/scanner"], ["Colección", "/collection"], ["Perfil", "/profile"],
+      ["Inicio", "/"], ["Carpetas", "/binders"], ["Escanear", "/scanner"], ["Colección", "/collection"], ["Perfil", "/profile"],
     ]);
     expect(links[2].closest("li")).toHaveClass("pv-tabbar__scan");
-    expect(within(navigation).getByRole("link", { name: "Cajas" })).toHaveAttribute("aria-current", "page");
-    // The boxes page has its own <header> inside <main>; jsdom also exposes it as a banner. The shell's comes first.
+    expect(within(navigation).getByRole("link", { name: "Carpetas" })).toHaveAttribute("aria-current", "page");
+    // Pages may have their own <header> inside <main>; jsdom also exposes it as a banner. The shell's comes first.
     const banner = screen.getAllByRole("banner")[0];
     expect(banner).toHaveClass("pv-header--mobile");
     expect(within(banner).queryByRole("link", { name: "Pokédex" })).not.toBeInTheDocument();
@@ -118,7 +118,7 @@ describe("mobile shell", () => {
     expect(within(banner).getByRole("button", { name: "English" })).toBeInTheDocument();
   });
 
-  test("the explore menu reaches Pokédex and expansions and closes with Escape or a choice", async () => {
+  test("the explore menu reaches Pokédex, PC boxes and expansions and closes with Escape or a choice", async () => {
     stubMedia({ mobile: true });
     stubApi();
     const user = userEvent.setup();
@@ -129,6 +129,7 @@ describe("mobile shell", () => {
     await user.click(explore);
     expect(explore).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("link", { name: "Expansiones" })).toHaveAttribute("href", "/sets");
+    expect(screen.getByRole("link", { name: "Cajas PC" })).toHaveAttribute("href", "/boxes");
     await user.keyboard("{Escape}");
     expect(explore).toHaveAttribute("aria-expanded", "false");
     expect(explore).toHaveFocus();
@@ -145,7 +146,7 @@ describe("mobile shell", () => {
     expect(within(screen.getByRole("navigation")).getByRole("link", { name: "Cajas PC" })).toBeInTheDocument();
     act(() => media.set({ mobile: true }));
     expect(screen.getAllByRole("navigation")).toHaveLength(1);
-    expect(within(screen.getByRole("navigation")).getByRole("link", { name: "Cajas" })).toBeInTheDocument();
+    expect(within(screen.getByRole("navigation")).getByRole("link", { name: "Carpetas" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Cajas PC" })).not.toBeInTheDocument();
     act(() => media.set({ mobile: false }));
     expect(within(screen.getByRole("navigation")).getByRole("link", { name: "Cajas PC" })).toBeInTheDocument();
