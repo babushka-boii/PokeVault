@@ -6,11 +6,8 @@ import { describe, expect, test } from "vitest";
  */
 const sheets = import.meta.glob("/src/**/*.css", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 
-/** Files still using hard-coded colors. Task 4 of 8A removes every entry. */
-const LEGACY_FILES = new Set([
-  "/src/components/boxes/boxes.css",
-  "/src/components/boxes/personal.css",
-]);
+/** Files still using hard-coded colors. Emptied by 8A Task 4; new stylesheets must use tokens from the start. */
+const LEGACY_FILES = new Set<string>();
 
 const TOKENS = "/src/styles/tokens.css";
 const BASE = "/src/styles/base.css";
@@ -85,6 +82,10 @@ describe("design tokens", () => {
 describe("stylesheets", () => {
   test("the contract sees the tokens, the base layer and the feature stylesheets", () => {
     expect(Object.keys(sheets)).toEqual(expect.arrayContaining([TOKENS, BASE, "/src/styles.css", "/src/components/boxes/boxes.css"]));
+  });
+
+  test("every stylesheet has been migrated to tokens", () => {
+    expect([...LEGACY_FILES]).toEqual([]);
   });
 
   test("legacy entries still exist, so the list shrinks instead of going stale", () => {

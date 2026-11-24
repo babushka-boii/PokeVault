@@ -296,20 +296,42 @@ Alternatives that were considered and rejected:
 5. `boxes.css`, `personal.css`
 
 **Steps:**
-- [ ] For each group, replace the literals following the mapping in spec §10, then
+- [x] For each group, replace the literals following the mapping in spec §10, then
   remove the files from `LEGACY_FILES`. Do not change any selector, class name,
   breakpoint or DOM.
-- [ ] Remove the per-file focus colors and `!important` focus overrides, because the
+- [x] Remove the per-file focus colors and `!important` focus overrides, because the
   global ring from `base.css` applies. Keep the existing reduced-motion blocks.
-- [ ] Price amounts become gold Space Grotesk with tabular numbers. Gold that was used
+- [x] Price amounts become gold Space Grotesk with tabular numbers. Gold that was used
   as "active" becomes cyan.
-- [ ] The catalog PC: the console frame goes dark, and the wallpaper screens stay
+- [x] The catalog PC: the console frame goes dark, and the wallpaper screens stay
   allow-listed content. The selected-slot cursor becomes cyan.
-- [ ] After each group, the full frontend suite passes **with no test edits**.
+- [x] After each group, the full frontend suite passes **with no test edits**.
   `LEGACY_FILES` is empty at the end.
 - [ ] **Stop for the student:** run `npm run dev` and do a quick Safari pass over every
   route in spec §14 before building Home. A regression found now is cheaper than one
   found after Task 6.
+- Evidence:
+  - Five commits, one per group: `07009dc`, `f79af41`, `6976b63`, `98a6c56` and the
+    boxes commit.
+  - 38 files / 486 tests green. No existing test was edited in this task. Lint,
+    typecheck and build pass.
+  - `LEGACY_FILES` is empty, and a new contract test keeps it empty.
+  - The raw-color contract was verified by planting a hex literal in `styles.css`: the
+    test failed, then passed again once the literal was removed.
+  - Allow-listed content blocks: type badge colors, holo glare/iridescence, and the PC
+    wallpaper screens (including the empty-slot dots and hover drawn on them).
+  - Removed per-file focus colors (`#173f70`, `#317ec5`, `#bf700f`) and the PC slot
+    `outline … !important`. The PC selection cursor now uses a cyan border plus a dark
+    inset ring (`box-shadow`, not `outline`), so the focus ring is never overridden.
+    The two remaining focus rules are intentional: inward offsets (−3px) for PC slots
+    and `main`.
+  - Spec deviations, all minor:
+    - The ability label (`.tcg-ability-kind`, previously red) uses secondary text.
+    - Language and coverage notes use secondary text rather than the notice
+      treatment, which is reserved for real notices: scanner notices and uncertain
+      quality.
+    - The catalog box title uses Space Grotesk uppercase rather than Silkscreen,
+      because personal box names can be long user text.
 
 ### Task 5: Home structure, guest, empty and status footer
 
