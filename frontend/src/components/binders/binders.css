@@ -101,18 +101,22 @@
 .pv-pocket__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pv-pocket__price { font-size: var(--pv-text-xs); }
 
-/* Store: the card drops in from above, settles with a small bounce, and the sleeve shines. */
-.pv-pocket[data-arrived="true"] .pv-pocket__sleeve > :first-child { animation: pv-pocket-drop 600ms var(--pv-ease) 1; }
-.pv-pocket[data-arrived="true"] .pv-pocket__shine { animation: pv-sleeve-shine 600ms ease-out 1; }
+/*
+ * Entry into the sleeve (about 450 ms) after the flight: the card slides in from above and
+ * settles softly (no hard bounce), then the sleeve shines. It starts where the flying clone
+ * ended (30% of the card above the sleeve, see HOVER_RATIO in flight.ts).
+ */
+.pv-pocket[data-arrived="true"] .pv-pocket__sleeve > :first-child { animation: pv-pocket-drop 450ms cubic-bezier(.22, .61, .36, 1) 1; }
+.pv-pocket[data-arrived="true"] .pv-pocket__shine { animation: pv-sleeve-shine 300ms ease-out 200ms 1 both; }
 @keyframes pv-pocket-drop {
-  0% { opacity: 0; transform: translateY(-120%); }
-  60% { opacity: 1; transform: translateY(6%); }
-  80% { transform: translateY(-2%); }
+  0% { transform: translateY(-30%); }
+  70% { transform: translateY(1.5%); }
   100% { transform: translateY(0); }
 }
 @keyframes pv-sleeve-shine {
-  0%, 66% { opacity: 0.35; transform: translateX(-60%); }
-  100% { opacity: 0.9; transform: translateX(60%); }
+  0% { opacity: 0.2; transform: translateX(-70%); }
+  60% { opacity: 0.9; transform: translateX(-10%); }
+  100% { opacity: 0.35; transform: translateX(0); }
 }
 
 /* Page turn: a short leaf turn around the spine. */
@@ -121,7 +125,7 @@
 @keyframes pv-page-turn-next { from { opacity: 0.4; transform: rotateY(-24deg); } to { opacity: 1; transform: rotateY(0); } }
 @keyframes pv-page-turn-prev { from { opacity: 0.4; transform: rotateY(24deg); } to { opacity: 1; transform: rotateY(0); } }
 
-/* FLIP flight: the floating clone; the destination stays empty until it lands. */
+/* FLIP flight: the floating clone (its motion is the Web Animations keyframes in flight.ts); the destination stays empty until it lands. */
 .pv-flight { box-shadow: var(--pv-shadow-1); overflow: hidden; will-change: transform; }
 .pv-pocket[data-incoming="true"] .pv-pocket__sleeve > :first-child { visibility: hidden; }
 

@@ -13,7 +13,7 @@ import { InlineError } from "../components/ui/InlineError";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useBinderMutations, type BinderErrorKey } from "../hooks/useBinderMutations";
 import { MOBILE_QUERY, REDUCED_MOTION_QUERY, useMediaQuery } from "../hooks/useMediaQuery";
-import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, SCROLL_WAIT_MS, wait, type FlightOrigin } from "../components/binders/flight";
+import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, SCROLL_WAIT_MS, wait, type FlightOrigin, type FlightResult } from "../components/binders/flight";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import {
@@ -37,8 +37,8 @@ function useGuard() {
   }, [retrySession]);
 }
 
-function Tray({ mode, binderId, busy, onStore, version, onCancel }: {
-  mode: Mode; binderId: string; busy: boolean; version: number;
+function Tray({ mode, binderId, busy, onStore, version, onCancel, consumed }: {
+  mode: Mode; binderId: string; busy: boolean; version: number; consumed: ReadonlySet<string>;
   onStore: (copy: InventoryCopy, origin: FlightOrigin | null) => void; onCancel: () => void;
 }) {
   const { dictionary, locale } = useLocale();
@@ -47,7 +47,9 @@ function Tray({ mode, binderId, busy, onStore, version, onCancel }: {
   const [offset, setOffset] = useState(0);
   const request = useCallback((signal: AbortSignal) => fetchCopyView("unassigned", offset, signal).catch((e: unknown) => guard(e, signal)), [offset, guard]);
   const tray = useTcgResource<CopyViewPage>(`${binderId}:${offset}:${version}`, request);
-  const page = tray.state.kind === "loaded" ? tray.state.data : undefined;
+  const loaded = tray.state.kind === "loaded" ? tray.state.data : undefined;
+  // Copies whose flight just landed are already in a pocket: never show them twice while the tray reloads.
+  const page = loaded && { ...loaded, results: loaded.results.filter((copy) => !consumed.has(copy.id)) };
   const metadata = useCardMetadata(page?.results.map((copy) => copy.card_id) ?? [], locale);
   const fillTarget = mode.kind === "fill" ? mode.target : null;
   return <section className="pv-tray" aria-labelledby="pv-tray-title">
@@ -127,7 +129,10 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   const alive = useRef(true);
   // Each new action bumps this, so a late arrival never steals focus or state.
   const arrival = useRef(0);
-  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  const flight = useRef<AbortController | null>(null);
+  const [consumed, setConsumed] = useState<ReadonlySet<string>>(() => new Set());
+  // Leaving the page cancels a flight in progress (the clone is removed, the original restored).
+  useEffect(() => { alive.current = true; return () => { alive.current = false; flight.current?.abort(); }; }, []);
   const [turn, setTurn] = useState<"next" | "prev" | null>(null);
   const [status, setStatus] = useState("");
   const [problem, setProblem] = useState<BinderErrorKey | null>(null);
@@ -141,7 +146,8 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   // also works when reduced motion removes the animation and no animationend fires.
   useEffect(() => {
     if (!arrived) return;
-    const timer = window.setTimeout(() => setArrived(null), 700);
+    // 450 ms entry plus the sleeve shine, then the mark clears.
+    const timer = window.setTimeout(() => setArrived(null), 650);
     return () => window.clearTimeout(timer);
   }, [arrived]);
   useEffect(() => {
@@ -190,21 +196,26 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     else setStatus(fill(text.movedFrom, { ...where, from: result.moved_from.binder_name }));
   }
   /**
-   * Arrival choreography: turn the page if needed, scroll the pocket into view, fly the
-   * captured card there (FLIP), then let the pocket play its drop, bounce and shine.
-   * With reduced motion (or nothing to fly) the change is direct.
+   * Arrival choreography, in this order: turn the page if the pocket is on another one,
+   * scroll it into view, fly the captured card there (lift, curved flight, descent: see
+   * flight.ts) with the original hidden, then let the pocket play its entry and shine.
+   * With reduced motion (or nothing to fly) the change is direct. A new action cancels it.
    */
-  async function arrive(target: PocketRef, origin: FlightOrigin | null) {
+  async function arrive(target: PocketRef, origin: FlightOrigin | null, fromTray?: string) {
     const token = ++arrival.current;
     const current = () => alive.current && arrival.current === token;
+    const controller = new AbortController();
+    flight.current = controller;
     const fly = !reduced && origin !== null;
     if (fly) setIncoming(target);
     if (!visible.includes(target.page)) {
       goTo(target.page);
       if (fly) await wait(PAGE_TURN_WAIT_MS);
     }
+    let result: FlightResult = "skipped";
     if (fly) {
-      let sleeve: Element | null | undefined = null;
+      // Look first, wait only if the pocket is not rendered yet (page just turned).
+      let sleeve: Element | null | undefined = buttons.current.get(key(target))?.querySelector(".pv-pocket__sleeve");
       for (let attempt = 0; attempt < 20 && current() && !sleeve; attempt++) {
         await wait(16);
         sleeve = buttons.current.get(key(target))?.querySelector(".pv-pocket__sleeve");
@@ -214,22 +225,26 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           sleeve.scrollIntoView({ block: "center", behavior: "smooth" });
           await wait(SCROLL_WAIT_MS);
         }
-        if (current()) await flyCard(origin, sleeve);
+        if (current()) result = await flyCard(origin, sleeve, controller.signal);
       }
       if (!alive.current) return;
       setIncoming((value) => value && value.page === target.page && value.pocket === target.pocket ? null : value);
+      // A completed flight leaves the card in its pocket: drop it from the tray at the same moment.
+      if (result === "completed" && fromTray) setConsumed((ids) => new Set(ids).add(fromTray));
       if (!current()) return;
     }
     if (!current()) return;
     setArrived(target); setSelected(target); setFocusRequest(target);
   }
-  function cancelArrival() { arrival.current++; setIncoming(null); }
-  function landed(result: StoreResult, origin: FlightOrigin | null = null) {
+  function cancelArrival() { arrival.current++; flight.current?.abort(); flight.current = null; setIncoming(null); }
+  function landed(result: StoreResult, origin: FlightOrigin | null = null, fromTray?: string) {
     announce(result);
     setMode({ kind: "idle" }); setProblem(null);
     if (result.binder.id === binderId) {
       if (loaded) setLocal({ base: loaded, value: result.binder });
-      void arrive({ page: result.page, pocket: result.pocket }, origin);
+      // The tray reloads once the flight is over (or cancelled), so it never shifts under the clone.
+      void arrive({ page: result.page, pocket: result.pocket }, origin, fromTray).finally(() => setTrayVersion((v) => v + 1));
+      return;
     } else if (binder && loaded && result.moved_from) {
       // Moved out of this binder: drop it here without refetching the whole binder.
       const from = result.moved_from;
@@ -249,7 +264,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     const target = mode.kind === "fill" ? mode.target : null;
     const outcome = await run((csrf, signal) => target ? placeInPocket(binderId, target, copy.id, csrf, signal) : storeNext(binderId, copy.id, csrf, signal));
     if (!outcome) return;
-    if (outcome.ok) landed(outcome.value, origin); else failed(outcome.error);
+    if (outcome.ok) landed(outcome.value, origin, copy.id); else failed(outcome.error);
   }
   async function moveTo(target: PocketRef | "next") {
     if (mode.kind !== "move") return;
@@ -267,6 +282,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     if (!outcome.ok) { failed(outcome.error); return; }
     if (binder && loaded) setLocal({ base: loaded, value: { ...binder, copy_count: binder.copy_count - 1,
       pockets: binder.pockets.filter((p) => !(p.page === target.page && p.pocket === target.pocket)) } });
+    setConsumed((ids) => { const next = new Set(ids); next.delete(copy.id); return next; });
     setStatus(text.removed); setProblem(null); setArrived(null); setTrayVersion((v) => v + 1);
     setFocusRequest(null); document.getElementById("pv-tray-title")?.focus();
   }
@@ -329,7 +345,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           <Button disabled={busy} onClick={() => setMode({ kind: "fill", target: selected })}>{text.fillFromTray}</Button>
         </>}
       </aside>
-      <Tray mode={mode} binderId={binderId} busy={busy} version={trayVersion} onStore={(copy, origin) => void store(copy, origin)} onCancel={() => setMode({ kind: "idle" })} />
+      <Tray mode={mode} binderId={binderId} busy={busy} version={trayVersion} consumed={consumed} onStore={(copy, origin) => void store(copy, origin)} onCancel={() => setMode({ kind: "idle" })} />
     </div>
   </>;
 }

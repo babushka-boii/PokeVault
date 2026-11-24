@@ -509,10 +509,12 @@ Spec and plan: `docs/superpowers/specs|plans/2026-11-23-binders-8c*`. Reference:
     M") and to the next free pocket.
   - "Sacar de la carpeta" returns the card to the tray.
   - All of it works by keyboard alone.
-- [ ] Storing from the tray: the card visibly flies from its tray position to the pocket,
-  then drops into the sleeve with the bounce and shine. A pocket on another page turns the
-  page first; one out of view scrolls into view. Moving between pockets flies from the
-  source pocket.
+- [ ] Storing from the tray: the card lifts, flies in a curve (slight tilt, slowing down at
+  the end), settles over the pocket and slides into the sleeve with a soft landing and the
+  shine, in about 1.3 s. The tray card stays in place but invisible while it flies, so there
+  is never a second card. A pocket on another page turns the page first; one out of view
+  scrolls into view. Moving between pockets flies from the source pocket. Doing something
+  else mid-flight cancels it and leaves no card floating.
 - [ ] With "Reduce motion" on, there is no flight, drop or turn animation and changes are
   immediate.
 - [ ] Copy detail: "¿Dónde está esta carta?" opens the right page and focuses the pocket.

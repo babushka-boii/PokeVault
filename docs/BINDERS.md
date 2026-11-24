@@ -103,13 +103,23 @@ prices.
   - "Sacar de la carpeta" returns the card to the tray.
   - Results are announced in a polite status region, and conflicts in an alert.
 - **Motion:**
-  - On store or move, the card flies (FLIP) as a floating `position: fixed` clone, animated
-    with the Web Animations API (300 ms) from its tray thumbnail or source pocket to just
-    above the destination. Then the pocket plays its 600 ms drop with a bounce and a
-    sleeve shine (about 900 ms in total).
+  - On store or move, the card moves like a hand carrying it (FLIP): a floating
+    `position: fixed` clone, one Web Animations API animation with keyframe offsets, from
+    its tray thumbnail or source pocket to just above the destination:
+    1. **Lift** (150 ms): it rises a little (scale 1 → 1.06) and its shadow grows.
+    2. **Flight** (550 ms): a curved path elevated above the straight line in proportion to
+       the distance, a slight tilt toward the direction of travel that returns to 0, and
+       a deceleration at the end (`cubic-bezier(.22, .61, .36, 1)`).
+    3. **Descent** (150 ms): back to scale 1 over the pocket, with a smaller shadow.
+    4. **Entry** (about 450 ms, CSS): the card slides into the sleeve from above and settles
+       softly (no hard bounce), then the sleeve shines. About 1.3 s in total.
+  - While it flies the original (the tray thumbnail or the source pocket) is invisible
+    (`visibility: hidden`) but keeps its place in the layout, so there is never a second
+    card and nothing shifts. The tray reloads when the flight ends.
   - A destination on another page turns the page first (280 ms leaf turn). A destination
     out of view is scrolled into view before the flight.
-  - The clone is always removed, and a newer action cancels a pending arrival.
+  - A newer action, or leaving the page, cancels the flight: the clone is removed and the
+    original is visible again.
   - With `prefers-reduced-motion` there is no flight, drop or turn: the change is direct.
 - **Elsewhere:**
   - The copy detail answers "¿Dónde está esta carta?".

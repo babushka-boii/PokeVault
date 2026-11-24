@@ -148,10 +148,16 @@ describe("stylesheets", () => {
     expect(reduced?.[1]).toMatch(/\.pv-home-scanner__sweep\s*\{\s*display:\s*none/);
   });
 
-  test("binder motion: a ~600 ms drop and a short page turn, both removed for reduced motion", () => {
+  test("binder motion: a soft ~450 ms entry, a shine, a short page turn, all removed for reduced motion", () => {
     const css = stripComments(sheets["/src/components/binders/binders.css"]);
     const drop = /\[data-arrived="true"\][^{]*\{[^}]*animation:\s*pv-pocket-drop\s+(\d+)ms[^;]*\b1\b/.exec(css);
-    expect(Number(drop?.[1])).toBe(600);
+    expect(Number(drop?.[1])).toBe(450);
+    // A soft settle, never a hard bounce: the entry overshoots by at most 3% of the card.
+    const entry = /@keyframes pv-pocket-drop\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    const shifts = [...entry.matchAll(/translateY\((-?[\d.]+)%?\)/g)].map((match) => Number(match[1]));
+    expect(shifts.length).toBeGreaterThanOrEqual(3);
+    expect(Math.max(...shifts)).toBeLessThanOrEqual(3);
+    expect(css).toMatch(/\[data-arrived="true"\] \.pv-pocket__shine \{ animation: pv-sleeve-shine 300ms/);
     const turns = [...css.matchAll(/animation:\s*pv-page-turn-(?:next|prev)\s+(\d+)ms[^;]*\b1\b/g)].map((match) => Number(match[1]));
     expect(turns).toHaveLength(2);
     turns.forEach((duration) => { expect(duration).toBeGreaterThanOrEqual(250); expect(duration).toBeLessThanOrEqual(300); });

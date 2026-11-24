@@ -376,3 +376,34 @@ rebuilt-table fidelity (1).
 ## Execution evidence
 
 (Filled in during implementation.)
+
+### Follow-up: natural card flight (2026-11-24)
+
+The student found the 8C flight fast, straight and fake. `components/binders/flight.ts` now
+builds one Web Animations animation with keyframe offsets, computed once (no frame-by-frame
+JavaScript):
+- **Lift** 150 ms (scale 1 → 1.06, bigger shadow), **flight** 550 ms (a curve elevated in
+  proportion to the distance, a tilt toward the travel direction that returns to 0, the
+  `cubic-bezier(.22, .61, .36, 1)` deceleration sampled into the keyframes so it decelerates
+  once instead of at every segment) and **descent** 150 ms (back to scale 1, smaller
+  shadow). The pocket's CSS entry follows: 450 ms, soft settle (at most 1.5% overshoot, no
+  hard bounce) and then the sleeve shine, about 1.3 s in total.
+- The original (tray thumbnail or source sleeve) is `visibility: hidden` while the clone
+  flies, so it keeps its place in the layout, and is restored at the end or on cancel. The
+  tray used to reload at the moment of landing and would have shifted under the clone; it
+  now reloads when the flight ends, and a completed flight drops the card from the tray at
+  the same moment the clone is removed.
+- Kept: page turn first, scroll into view, cancellation by a newer action (now an
+  `AbortController` that also cancels the animation), clone cleanup and reduced motion
+  without flight.
+- Tests: 11 unit tests for the keyframes (offsets and phases, lift scale and shadow,
+  curve elevation growing with distance, tilt direction returning to 0, deceleration,
+  descent) and for `flyCard` (original hidden but in the layout, restored on completion,
+  on cancel and when already cancelled, nothing touched without the API); 6 integration
+  tests (original hidden during the flight and the tray unchanged, page turn → flight →
+  entry order, cancel by a new action, leaving the page, flight from the source pocket,
+  reduced motion). A planted bug for each of four behaviors (never hiding, never restoring,
+  linear flight, a new action not cancelling) made tests fail, and the files were restored.
+- The new tests found a real bug: leaving the page mid-flight left the clone floating. The
+  flight is now cancelled on unmount.
+- The style contract now expects the 450 ms entry, a soft settle and the shine.
