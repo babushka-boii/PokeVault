@@ -345,7 +345,7 @@ Alternatives that were considered and rejected:
 - `frontend/src/app/App.test.tsx` (`/` heading).
 
 **Steps:**
-- [ ] Write failing tests:
+- [x] Write failing tests:
   - Guest render with zero private requests.
   - Auth resolving shows skeletons and makes no private requests.
   - The visually hidden h1 "Inicio" / "Home".
@@ -358,14 +358,23 @@ Alternatives that were considered and rejected:
     - The existing `SystemStatus` behavior stays covered by `SystemStatus.test`.
   - Full ES/EN coverage of the new strings. Dictionary parity is enforced by the
     existing type.
-- [ ] Implement the page skeleton:
+- [x] Implement the page skeleton:
   - The responsive grid (spec §9.1).
   - Auth gating, with the subtree keyed by `user.id`.
   - Guest and empty states (spec §9.3).
   - The scanner card: static scanline, and a single 600 ms sweep on hover or focus,
     disabled under reduced motion.
-- [ ] Write the ES/EN strings (spec §9.5, plus all state, error, retry and status
+- [x] Write the ES/EN strings (spec §9.5, plus all state, error, retry and status
   strings). Counters use the `one`/`other` keys.
+- Evidence:
+  - 39 files / 491 tests green; lint, typecheck and build pass.
+  - `EmptyHome` moves to Task 6: the empty state depends on `copy_count`, which comes
+    from the valuation request that Task 6 adds. The full ES/EN `home` dictionary
+    (including Task 6 strings) was written here.
+  - The scanner card's scanlines live in the panel's `--pv-cut-fill`, because the cut
+    corner fill layer would otherwise cover a background on the element itself.
+  - `App.test`: the heading for `/` is now "Inicio"; the status footer is covered in
+    `Home.test` with a signed-in session.
 
 ### Task 6: Home data sections
 

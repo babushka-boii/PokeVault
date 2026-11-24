@@ -1,0 +1,27 @@
+/* Home on "Unova Noir" tokens (Iteration 8A). Colors only from tokens. */
+.pv-home { display: grid; gap: var(--pv-space-5); }
+.pv-home__grid { display: grid; gap: var(--pv-space-4); grid-template-columns: minmax(0, 1fr); }
+.pv-home__hero, .pv-home__side, .pv-home__wide { min-width: 0; }
+.pv-home__guest-title { font-size: var(--pv-text-xl); margin: var(--pv-space-3) 0; }
+.pv-home__lead { color: var(--pv-text-2); margin: 0 0 var(--pv-space-4); max-width: 40rem; }
+.pv-home__public { display: grid; gap: var(--pv-space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.pv-home__link-panel { align-items: center; display: flex; justify-content: center; }
+
+.pv-home-scanner { display: grid; gap: var(--pv-space-3); overflow: hidden; }
+.pv-home-scanner__text { margin: 0; max-width: 28rem; }
+/* One 600 ms sweep on hover/focus; nothing moves on its own. */
+.pv-home-scanner__sweep { background: linear-gradient(180deg, transparent, var(--pv-cyan-soft), transparent); height: 40%; left: 0; opacity: 0; pointer-events: none; position: absolute; right: 0; top: -40%; }
+.pv-home-scanner:hover .pv-home-scanner__sweep, .pv-home-scanner:focus-within .pv-home-scanner__sweep { animation: pv-scan-sweep 600ms var(--pv-ease) 1; }
+@keyframes pv-scan-sweep { 0% { opacity: 1; top: -40%; } 100% { opacity: 0; top: 100%; } }
+@media (prefers-reduced-motion: reduce) { .pv-home-scanner__sweep { display: none; } }
+
+.pv-home__status { color: var(--pv-text-2); font-size: var(--pv-text-sm); }
+.pv-home__status summary { cursor: pointer; display: flex; align-items: center; min-height: var(--pv-touch); }
+.pv-home__status[open] summary { color: var(--pv-text); }
+
+@media (min-width: 1024px) {
+  .pv-home__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .pv-home__hero { grid-column: span 8; }
+  .pv-home__side { grid-column: span 4; }
+  .pv-home__wide { grid-column: 1 / -1; }
+}

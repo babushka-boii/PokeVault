@@ -15,7 +15,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("PokéVault application shell", () => {
   test.each([
-    ["/", "Estado del sistema"],
+    ["/", "Inicio"],
     ["/boxes", "Cajas"],
     ["/pokedex", "Pokédex"],
     ["/profile", "Perfil"],
