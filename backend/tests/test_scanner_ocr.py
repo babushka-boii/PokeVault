@@ -190,7 +190,10 @@ def test_hard_worker_deadline_stops_native_descendants_and_cleans_temp(tmp_path)
     service = OCRService(
         tesseract_command=str(fake_engine(tmp_path, "slow")),
         temp_root=temp_root,
-        worker_timeout=0.4,
+        # Long enough for the worker to import Pillow/OpenCV on a busy machine and
+        # start the fake engine (which sleeps 60 s), so the deadline still fires
+        # and stops its child.
+        worker_timeout=3.0,
     )
     with pytest.raises(ScanError) as caught:
         asyncio.run(service.recognize(image_bytes(), "image/png"))
