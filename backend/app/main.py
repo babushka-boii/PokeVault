@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.auth import router as auth_router
 from app.api.binders import router as binders_router
-from app.api.boxes import router as boxes_router
 from app.api.cards import router as cards_router
 from app.api.health import router as health_router
 from app.api.inventory import router as inventory_router
@@ -49,7 +48,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.scan_match_slots = asyncio.Semaphore(4)
     app.include_router(auth_router)
     app.include_router(inventory_router)
-    app.include_router(boxes_router)
     app.include_router(binders_router)
     app.include_router(prices_router)
     app.include_router(settings_router)

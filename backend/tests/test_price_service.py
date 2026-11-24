@@ -369,6 +369,27 @@ def test_valuation_sums_duplicates_before_rounding_and_ranks_top_copies(factory)
     assert result.rates.attribution_url == "https://www.exchangerate-api.com"
 
 
+def test_group_values_use_one_evaluation_and_sum_each_group_before_rounding(factory):
+    provider = FakeProvider(CARDS)
+    rates = FakeRates()
+    tesoros, repetidas, empty = UUID(int=100), UUID(int=101), UUID(int=102)
+    groups = {tesoros: ASH[:3], repetidas: ASH[3:], empty: []}
+    values, info = run(service(provider, rates).values_by_group(factory, groups, "CLP"))
+    # Each card is requested once for the whole shelf, and rates once.
+    assert sorted(provider.calls) == sorted(set(provider.calls))
+    assert rates.calls == 1
+    # 2 x 0.03 + 0.83 = 0.89 EUR x 1250 = 1112.5 -> 1112, like the single value.
+    assert values[tesoros].total == "1112"
+    assert (values[tesoros].copy_count, values[tesoros].priced_count) == (3, 3)
+    assert values[repetidas].total == "0"  # reverse without data, unknown, unpriced
+    assert values[repetidas].copy_count == 3
+    assert (values[empty].total, values[empty].copy_count) == ("0", 0)
+    assert all(value.top == [] for value in values.values())
+    assert info.info().available is True
+    single = run(service(FakeProvider(CARDS)).value(factory, ASH[:3], "CLP", top=0))
+    assert single.total == values[tesoros].total
+
+
 def test_valuation_in_usd(factory):
     result = run(service(FakeProvider(CARDS)).value(factory, ASH, "USD", top=5))
     assert result.total == "1.11"  # 0.89 EUR / 0.8 = 1.1125

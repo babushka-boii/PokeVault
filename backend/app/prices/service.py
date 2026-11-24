@@ -13,7 +13,7 @@
 import asyncio
 import logging
 from collections import Counter, OrderedDict
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -318,6 +318,37 @@ class PriceService:
         self, factory, refs: Sequence[CopyRef], currency: TargetCurrency, *, top: int
     ) -> Valuation:
         prices, priced, rates = await self._evaluate(factory, refs, currency)
+        return self._aggregate(prices, priced, rates, currency, top)
+
+    async def values_by_group(
+        self,
+        factory,
+        groups: Mapping[UUID, Sequence[CopyRef]],
+        currency: TargetCurrency,
+    ) -> tuple[dict[UUID, Valuation], RatesResult]:
+        """Value several groups (binders) with one evaluation and one refresh budget.
+
+        Each copy belongs to at most one group; every group total is summed before
+        rounding, exactly like ``value``.
+        """
+        refs = [ref for group in groups.values() for ref in group]
+        prices, priced, rates = await self._evaluate(factory, refs, currency)
+        price_by_copy = {item.copy_id: item for item in prices}
+        priced_by_copy = {item.ref.copy_id: item for item in priced}
+        values = {}
+        for group_id, group in groups.items():
+            ids = [ref.copy_id for ref in group]
+            values[group_id] = self._aggregate(
+                [price_by_copy[i] for i in ids],
+                [priced_by_copy[i] for i in ids if i in priced_by_copy],
+                rates,
+                currency,
+                0,
+            )
+        return values, rates
+
+    @staticmethod
+    def _aggregate(prices, priced, rates, currency, top) -> Valuation:
         reasons = Counter(item.reason for item in prices if item.reason is not None)
         originals: dict[str, list[Decimal]] = {}
         for item in priced:

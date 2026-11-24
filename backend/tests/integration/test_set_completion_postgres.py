@@ -80,8 +80,7 @@ def seed_owner(factory, card_ids=(), *, subject=None, expired=False):
             AuthSession(
                 token_digest=token_digest(token),
                 user_id=user_id,
-                expires_at=datetime.now(UTC)
-                + timedelta(hours=-1 if expired else 1),
+                expires_at=datetime.now(UTC) + timedelta(hours=-1 if expired else 1),
             )
         )
         copies = [
@@ -191,9 +190,7 @@ def test_twelve_physical_copies_eight_printings_are_eight_percent(
         assert payload["quantities"]["base1-1"] == 2
         assert payload["quantities"]["base1-8"] == 1
         assert payload["quantities"].get("base1-9", 0) == 0
-        assert set(payload["quantities"]) <= {
-            card["id"] for card in payload["results"]
-        }
+        assert set(payload["quantities"]) <= {card["id"] for card in payload["results"]}
 
 
 @pytest.mark.parametrize(
@@ -317,7 +314,7 @@ def test_only_removing_last_physical_copy_makes_printing_missing(
                 assert page["quantities"].get("base1-1", 0) == 0
 
 
-def test_physical_attributes_and_box_placement_do_not_change_completion(
+def test_physical_attributes_and_binder_placement_do_not_change_completion(
     set_completion_database,
 ):
     factory, _ = set_completion_database
@@ -339,19 +336,21 @@ def test_physical_attributes_and_box_placement_do_not_change_completion(
         assert updated.status_code == 200
         assert updated.json()["language"] == "ja"
         created = client.post(
-            "/api/v1/boxes", headers=headers(owner), json={"name": "Favorites"}
+            "/api/v1/binders", headers=headers(owner), json={"name": "Favorites"}
         )
         assert created.status_code == 201
-        box_id = created.json()["id"]
+        binder_id = created.json()["id"]
         placed = client.put(
-            f"/api/v1/boxes/{box_id}/slots/29",
+            f"/api/v1/binders/{binder_id}/pockets/4/3",
             headers=headers(owner),
             json={"copy_id": copy_id},
         )
         assert placed.status_code == 200
         assert client.get(PROGRESS).json() == before
         assert (
-            client.delete(f"/api/v1/boxes/{box_id}", headers=headers(owner)).status_code
+            client.delete(
+                f"/api/v1/binders/{binder_id}", headers=headers(owner)
+            ).status_code
             == 204
         )
         assert client.get(PROGRESS).json() == before
@@ -520,8 +519,9 @@ def test_unavailable_private_progress_is_sanitized_and_does_not_read_inventory(
     factory, _ = set_completion_database
     owner = seed_owner(factory, ["base1-1"])
     with (
-        application(factory, {"base1": CardsUnavailable("Internal upstream detail")})
-        as app,
+        application(
+            factory, {"base1": CardsUnavailable("Internal upstream detail")}
+        ) as app,
         client_for(app, owner) as client,
         capture_statements(factory) as statements,
     ):

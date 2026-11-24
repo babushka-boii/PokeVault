@@ -20,9 +20,9 @@ from app.core.config import Settings
 from app.db.base import Base
 from app.db.models import (
     AuthSession,
-    BoxMembership,
+    Binder,
+    BinderPocket,
     InventoryCopy,
-    PersonalBox,
     User,
     UserSettings,
 )
@@ -129,17 +129,18 @@ def copy(factory, owner_id, card_id, variant):
         return str(record.id)
 
 
-def box(factory, owner_id, copy_ids, order=0):
+def binder(factory, owner_id, copy_ids, order=0):
     with factory.begin() as session:
-        record = PersonalBox(user_id=owner_id, name=f"Box {order}", display_order=order)
+        record = Binder(user_id=owner_id, name=f"Binder {order}", display_order=order)
         session.add(record)
         session.flush()
-        for position, copy_id in enumerate(copy_ids):
+        for index, copy_id in enumerate(copy_ids):
             session.add(
-                BoxMembership(
+                BinderPocket(
                     user_id=owner_id,
-                    box_id=record.id,
-                    position=position,
+                    binder_id=record.id,
+                    page=index // 9 + 1,
+                    pocket=index % 9 + 1,
                     copy_id=copy_id,
                 )
             )
@@ -158,8 +159,10 @@ def seed(factory, users):
         "zigzagoon": copy(factory, ash, "me02.5-130", "unknown"),
         "misty_towers": [copy(factory, misty, "me02.5-261", "holo") for _ in range(3)],
     }
-    ids["ash_box"] = box(factory, ash, [UUID(ids["tower"]), UUID(ids["cranidos_a"])])
-    ids["misty_box"] = box(factory, misty, [UUID(i) for i in ids["misty_towers"]])
+    ids["ash_binder"] = binder(
+        factory, ash, [UUID(ids["tower"]), UUID(ids["cranidos_a"])]
+    )
+    ids["misty_binder"] = binder(factory, misty, [UUID(i) for i in ids["misty_towers"]])
     return ids
 
 
@@ -267,7 +270,8 @@ def test_settings_put_creates_missing_rows_and_validates_input(prices):
     [
         ("get", "/api/v1/prices/collection"),
         ("get", f"/api/v1/prices/copies?copy_id={uuid4()}"),
-        ("get", f"/api/v1/boxes/{uuid4()}/value"),
+        ("get", f"/api/v1/binders/{uuid4()}/value"),
+        ("get", "/api/v1/prices/binders"),
         ("get", "/api/v1/me/settings"),
         ("put", "/api/v1/me/settings"),
     ],
@@ -328,33 +332,65 @@ def test_copy_prices_validate_the_batch(prices):
     )
 
 
-# --- Box value ---
+# --- Binder value ---
 
 
-def test_box_value_includes_only_that_boxs_copies_and_hides_foreign_boxes(prices):
+def test_binder_value_includes_only_that_binders_copies_and_hides_foreign(prices):
     client, factory, _, users, _, _ = prices
     ids = seed(factory, users)
     identity(client, "ash")
-    response = client.get(f"/api/v1/boxes/{ids['ash_box']}/value")
+    response = client.get(f"/api/v1/binders/{ids['ash_binder']}/value")
     assert response.status_code == 200
     assert response.headers["cache-control"] == "no-store"
     value = response.json()
     assert value["copy_count"] == 2
     assert value["total"] == "1075"  # (0.83 + 0.03) x 1250
-    assert value["top"] == []  # box totals carry no ranking
-    missing = client.get(f"/api/v1/boxes/{uuid4()}/value")
-    foreign = client.get(f"/api/v1/boxes/{ids['misty_box']}/value")
+    assert value["top"] == []  # binder totals carry no ranking
+    missing = client.get(f"/api/v1/binders/{uuid4()}/value")
+    foreign = client.get(f"/api/v1/binders/{ids['misty_binder']}/value")
     assert missing.status_code == foreign.status_code == 404
     assert missing.json() == foreign.json()
-    assert client.get("/api/v1/boxes/not-a-uuid/value").status_code == 422
+    assert client.get("/api/v1/binders/not-a-uuid/value").status_code == 422
 
 
-def test_empty_box_value_is_zero(prices):
+def test_empty_binder_value_is_zero(prices):
     client, factory, _, users, _, _ = prices
-    empty = box(factory, users["ash"], [], order=5)
+    empty = binder(factory, users["ash"], [], order=5)
     identity(client, "ash")
-    value = client.get(f"/api/v1/boxes/{empty}/value").json()
+    value = client.get(f"/api/v1/binders/{empty}/value").json()
     assert (value["total"], value["copy_count"]) == ("0", 0)
+
+
+def test_shelf_values_every_owned_binder_in_one_request(prices):
+    client, factory, _, users, _, _ = prices
+    ids = seed(factory, users)
+    empty = binder(factory, users["ash"], [], order=5)
+    identity(client, "ash")
+    response = client.get("/api/v1/prices/binders")
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"
+    body = response.json()
+    assert body["currency"] == "CLP"
+    assert body["rates"]["available"] is True
+    by_id = {item["binder_id"]: item for item in body["results"]}
+    assert list(by_id) == [ids["ash_binder"], empty]  # owned only, in shelf order
+    assert by_id[ids["ash_binder"]]["total"] == "1075"  # same as the single value
+    assert by_id[ids["ash_binder"]]["copy_count"] == 2
+    assert (by_id[empty]["total"], by_id[empty]["copy_count"]) == ("0", 0)
+    assert set(by_id[empty]) == {
+        "binder_id",
+        "total",
+        "original_totals",
+        "copy_count",
+        "priced_count",
+        "pending_count",
+        "stale_count",
+    }
+    usd = client.get("/api/v1/prices/binders?currency=USD").json()
+    assert usd["currency"] == "USD"
+    identity(client, "misty")
+    misty = client.get("/api/v1/prices/binders").json()["results"]
+    assert [item["binder_id"] for item in misty] == [ids["misty_binder"]]
 
 
 # --- Public card prices ---
@@ -459,7 +495,7 @@ class Exploding:
         raise AssertionError(f"price service must not be used ({name})")
 
 
-def test_inventory_boxes_and_sets_never_depend_on_prices(prices):
+def test_inventory_binders_and_sets_never_depend_on_prices(prices):
     client, factory, app, users, _, _ = prices
     ids = seed(factory, users)
     app.state.price_service = Exploding()
@@ -473,9 +509,11 @@ def test_inventory_boxes_and_sets_never_depend_on_prices(prices):
     for path in (
         "/api/v1/inventory",
         f"/api/v1/inventory/{ids['tower']}",
-        "/api/v1/boxes",
-        f"/api/v1/boxes/{ids['ash_box']}",
-        "/api/v1/boxes/views/owned",
+        "/api/v1/binders",
+        f"/api/v1/binders/{ids['ash_binder']}",
+        "/api/v1/binders/views/unassigned",
+        "/api/v1/binders/views/recent",
+        f"/api/v1/binders/locations?copy_id={ids['tower']}",
         "/api/v1/sets/progress?set_id=sv03.5",
         "/api/v1/sets/sv03.5/progress",
     ):
