@@ -142,6 +142,32 @@ describe("tray and actions", () => {
   });
 });
 
+describe("tray paging", () => {
+  test("pages the tray 30 cards at a time with bounded offsets", async () => {
+    const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [] }], tray: Array.from({ length: 31 }, (_, index) => physical(index)) });
+    const base = world.request.getMockImplementation()!;
+    world.request.mockImplementation(async (input: string, options?: RequestInit) => {
+      const url = new URL(input);
+      if (url.pathname === "/api/v1/binders/views/unassigned") {
+        const offset = Number(url.searchParams.get("offset"));
+        const all = Array.from({ length: 31 }, (_, index) => physical(index));
+        return json({ results: all.slice(offset, offset + 30), total: 31, offset, limit: 30 });
+      }
+      return base(input, options);
+    });
+    const user = userEvent.setup();
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const tray = await screen.findByRole("region", { name: "Sin carpeta" });
+    expect(await within(tray).findByText("31 sin carpeta")).toBeVisible();
+    expect(within(tray).getAllByRole("listitem")).toHaveLength(30);
+    expect(within(tray).getByRole("button", { name: "Cartas anteriores" })).toBeDisabled();
+    await user.click(within(tray).getByRole("button", { name: "Más cartas" }));
+    await waitFor(() => expect(within(tray).getAllByRole("listitem")).toHaveLength(1));
+    expect(world.request.mock.calls.some(([input]) => String(input).includes("/views/unassigned?offset=30&limit=30"))).toBe(true);
+    expect(within(tray).getByRole("button", { name: "Más cartas" })).toBeDisabled();
+  });
+});
+
 describe("conflicts, sessions and outages", () => {
   test("an occupied pocket refreshes the binder and explains the conflict", async () => {
     const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [] }], tray: [physical(0)] });

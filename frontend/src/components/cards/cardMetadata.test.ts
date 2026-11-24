@@ -1,18 +1,7 @@
 import { afterEach, expect, test, vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { generationGroup, usePersonalMetadata } from "./personalMetadata";
-import { bulbasaurCard, pikachuCard } from "../../test/tcgFixtures";
-
-test("derives generation only from every official species association", () => {
-  expect(generationGroup(bulbasaurCard)).toBe("1");
-  expect(generationGroup(pikachuCard)).toBe("mixed");
-  expect(generationGroup({ ...bulbasaurCard, dex_ids: [1, 25] })).toBe("1");
-  expect(generationGroup({ ...bulbasaurCard, dex_ids: [] })).toBe("unknown");
-  expect(generationGroup({ ...bulbasaurCard, category: "Trainer" })).toBe("Trainer");
-  expect(generationGroup({ ...bulbasaurCard, category: "Energy" })).toBe("Energy");
-  expect(generationGroup(undefined)).toBe("unknown");
-});
-
+import { useCardMetadata } from "./cardMetadata";
+import { bulbasaurCard } from "../../test/tcgFixtures";
 
 afterEach(() => vi.unstubAllGlobals());
 test("bounds metadata concurrency and deduplicates visible printing requests", async () => {
@@ -25,7 +14,7 @@ test("bounds metadata concurrency and deduplicates visible printing requests", a
   }));
   vi.stubGlobal("fetch", fetcher);
   const ids = Array.from({ length: 9 }, (_, i) => `base1-${i + 1}`);
-  const hook = renderHook(() => usePersonalMetadata([...ids, ids[0]], "en"));
+  const hook = renderHook(() => useCardMetadata([...ids, ids[0]], "en"));
   await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(4));
   while (pending.length) {
     await act(async () => { const batch = pending.splice(0); batch.forEach((resolve) => resolve()); });

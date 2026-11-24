@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useLocale } from "../../i18n/LocaleProvider";
 import type { Valuation } from "../../services/prices";
-import { usePersonalMetadata } from "../boxes/personalMetadata";
+import { useCardMetadata } from "../cards/cardMetadata";
 import { formatMoney } from "./format";
 import { CurrencySwitch, PriceText, RatesAttribution, ReferenceNote } from "./PriceDisplay";
 import { useCollectionValuation } from "./useCollectionValuation";
@@ -25,7 +25,7 @@ export function CollectionValue() {
   const text = dictionary.prices;
   const { state, retry } = useCollectionValuation();
   const value = state.kind === "loaded" ? state.data : null;
-  const names = usePersonalMetadata(value?.top.map((item) => item.card_id) ?? [], locale);
+  const names = useCardMetadata(value?.top.map((item) => item.card_id) ?? [], locale);
   const withoutVariant = value?.unpriced_by_reason.variant_unknown ?? 0;
   return <section className="price-value" aria-labelledby="collection-value-title">
     <h2 id="collection-value-title">{text.collectionValue}</h2>

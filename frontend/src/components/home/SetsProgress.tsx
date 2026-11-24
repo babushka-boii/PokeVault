@@ -6,7 +6,7 @@ import { useLocale } from "../../i18n/LocaleProvider";
 import { BindersError, fetchCopyView } from "../../services/binders";
 import { CardRequestError } from "../../services/cards";
 import { fetchSetProgress } from "../../services/sets";
-import { usePersonalMetadata } from "../boxes/personalMetadata";
+import { useCardMetadata } from "../cards/cardMetadata";
 import { SetProgress } from "../sets/SetProgress";
 import { CutPanel } from "../ui/CutPanel";
 import { InlineError } from "../ui/InlineError";
@@ -30,7 +30,7 @@ export function SetsProgress() {
   }), [retrySession]);
   const recent = useTcgResource("recent", recentRequest);
   const cardIds = recent.state.kind === "loaded" ? [...new Set(recent.state.data.results.map((copy) => copy.card_id))] : [];
-  const metadata = usePersonalMetadata(cardIds, locale);
+  const metadata = useCardMetadata(cardIds, locale);
   const sets: { id: string; name: string; language: string }[] = [];
   for (const id of cardIds) {
     const set = metadata.cards[id]?.set;

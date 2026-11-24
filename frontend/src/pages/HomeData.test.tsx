@@ -111,8 +111,8 @@ describe("Mis carpetas", () => {
     expect(within(section).getByRole("link", { name: "+ Nueva carpeta" })).toHaveAttribute("href", "/binders");
   });
 
-  test("never shows or announces a copy UUID and hides the tray link when empty", async () => {
-    stubHome({ unassigned: 0 });
+  test("never shows or announces a copy UUID, never writes, and hides the tray link when empty", async () => {
+    const request = stubHome({ unassigned: 0 });
     render(<App initialEntries={["/"]} />);
     const section = await screen.findByRole("region", { name: "Mis carpetas" });
     await within(section).findByText("Card 1 · Expansion 1");
@@ -120,6 +120,8 @@ describe("Mis carpetas", () => {
     expect(section.textContent).not.toMatch(uuid);
     for (const element of section.querySelectorAll("[aria-label]")) expect(element.getAttribute("aria-label")).not.toMatch(uuid);
     expect(within(section).queryByRole("link", { name: /sin carpeta/ })).not.toBeInTheDocument();
+    expect(within(section).queryAllByRole("button")).toHaveLength(0);
+    expect(request.mock.calls.every(([, options]) => !(options as RequestInit | undefined)?.method || (options as RequestInit).method === "GET")).toBe(true);
   });
 
   test("invites the first binder when none exists", async () => {

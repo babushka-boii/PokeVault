@@ -2,17 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { fetchTcgCard, type TcgCard } from "../../services/cards";
 import type { Locale } from "../../i18n/LocaleProvider";
 
-export function generationGroup(card: TcgCard | undefined): string {
-  if (!card) return "unknown";
-  if (card.category !== "Pokemon") return card.category;
-  if (!card.dex_ids.length) return "unknown";
-  const ends = [151, 251, 386, 493, 649, 721, 809, 905, 1025];
-  const generations = new Set(card.dex_ids.map((id) => ends.findIndex((end) => id <= end) + 1));
-  return generations.size === 1 ? String([...generations][0]) : "mixed";
-}
-
-/** Public printing metadata only. Private inventory and memberships never enter this cache. */
-export function usePersonalMetadata(ids: string[], locale: Locale) {
+/** Public card (printing) metadata, 4 requests at a time. Private inventory never enters this cache. */
+export function useCardMetadata(ids: string[], locale: Locale) {
   const key = JSON.stringify([...new Set(ids)].sort());
   const cache = useRef(new Map<string, TcgCard>());
   const [attempt, setAttempt] = useState(0);

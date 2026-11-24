@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
-import { usePersonalMetadata } from "../components/boxes/personalMetadata";
+import { useCardMetadata } from "../components/cards/cardMetadata";
 import { CardArtwork } from "../components/cards/CardArtwork";
 import { cardIdentity, fill, plural } from "../components/binders/labels";
 import { PageGrid, type PocketRef } from "../components/binders/PageGrid";
@@ -47,7 +47,7 @@ function Tray({ mode, binderId, busy, onStore, version, onCancel }: {
   const request = useCallback((signal: AbortSignal) => fetchCopyView("unassigned", offset, signal).catch((e: unknown) => guard(e, signal)), [offset, guard]);
   const tray = useTcgResource<CopyViewPage>(`${binderId}:${offset}:${version}`, request);
   const page = tray.state.kind === "loaded" ? tray.state.data : undefined;
-  const metadata = usePersonalMetadata(page?.results.map((copy) => copy.card_id) ?? [], locale);
+  const metadata = useCardMetadata(page?.results.map((copy) => copy.card_id) ?? [], locale);
   const fillTarget = mode.kind === "fill" ? mode.target : null;
   return <section className="pv-tray" aria-labelledby="pv-tray-title">
     <div className="pv-tray__head">
@@ -76,8 +76,8 @@ function Tray({ mode, binderId, busy, onStore, version, onCancel }: {
       })}
     </ul>}
     {page && page.total > 30 && <div className="pv-tray__pages">
-      <Button disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - 30))}>{dictionary.inventory.previous}</Button>
-      <Button disabled={offset + 30 >= page.total} onClick={() => setOffset(offset + 30)}>{dictionary.inventory.next}</Button>
+      <Button disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - 30))}>{text.trayPrevious}</Button>
+      <Button disabled={offset + 30 >= page.total} onClick={() => setOffset(offset + 30)}>{text.trayNext}</Button>
     </div>}
   </section>;
 }
@@ -147,7 +147,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   }, [focusRequest, binder, first]);
 
   const visiblePockets = binder?.pockets.filter((p) => visible.includes(p.page)) ?? [];
-  const metadata = usePersonalMetadata(visiblePockets.map((p) => p.copy.card_id), locale);
+  const metadata = useCardMetadata(visiblePockets.map((p) => p.copy.card_id), locale);
   const ids = visiblePockets.map((p) => p.copy.id).join(",");
   const pricesRequest = useCallback((signal: AbortSignal) => fetchCopyPrices(ids.split(","), currency, signal).catch((e: unknown) => guard(e, signal)), [ids, currency, guard]);
   const prices = useTcgResource(ready && ids ? `${ids}:${currency}` : undefined, pricesRequest);

@@ -5,7 +5,7 @@ import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { BindersError, fetchBinder, fetchBinders, fetchCopyView } from "../../services/binders";
 import { mostRecent } from "../binders/recent";
-import { usePersonalMetadata } from "../boxes/personalMetadata";
+import { useCardMetadata } from "../cards/cardMetadata";
 import { cardIdentity, fill } from "../binders/labels";
 import { CardArtwork } from "../cards/CardArtwork";
 import { ButtonLink } from "../ui/Button";
@@ -36,7 +36,7 @@ export function BinderPreview() {
   const latest = binder?.pockets.reduce<(typeof binder.pockets)[number] | undefined>((best, pocket) => !best || Date.parse(pocket.placed_at) > Date.parse(best.placed_at) ? pocket : best, undefined);
   const page = latest?.page ?? 1;
   const pockets = binder?.pockets.filter((pocket) => pocket.page === page) ?? [];
-  const metadata = usePersonalMetadata(pockets.map((pocket) => pocket.copy.card_id), locale);
+  const metadata = useCardMetadata(pockets.map((pocket) => pocket.copy.card_id), locale);
   const loose = tray.state.kind === "loaded" ? tray.state.data.total : 0;
   const open = chosen ? `/binders/${encodeURIComponent(chosen.id)}?page=${page}` : "/binders";
   const noBinders = list.state.kind === "loaded" && !chosen;
