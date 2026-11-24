@@ -113,8 +113,8 @@ function ScannerSession({ suspended }: { suspended: boolean }) {
   }, [suspended, capabilities, image, identify]);
   const imagePreview = image && <figure className="scanner-photo">{image.url ? <img src={image.url} alt={text.preview} /> : <p className="scanner-hint">{text.previewUnavailable}</p>}<figcaption>{image.file.name}</figcaption></figure>;
   if (saved && selected) return <section className="scanner-success" aria-labelledby="scanner-saved"><h2 id="scanner-saved" tabIndex={-1} ref={success}>{dictionary.inventory.added}</h2>
-    <p><span>{dictionary.personalBoxes.copyId}: </span><code>{saved.id}</code></p>
     <div className="scanner-actions"><Link to={`/collection/${encodeURIComponent(saved.id)}`}>{text.savedCopy}</Link>
+      <Link to="/binders">{text.storeInBinder}</Link>
       <Link to={`/cards/${encodeURIComponent(saved.card_id)}?returnTo=%2Fscanner`}>{text.savedCard}</Link>
       <Link to={`/sets/${encodeURIComponent(selected.set.id)}`}>{text.savedSet}</Link></div>
     <button type="button" onClick={() => { focusNextCapture.current = true; removeImage(); setClues(emptyClues()); setSelected(null); setSaved(null); setManualOpen(!capabilities?.available || capabilitiesFailed); }}>{text.another}</button></section>;

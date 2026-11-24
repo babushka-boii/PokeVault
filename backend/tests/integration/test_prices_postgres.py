@@ -54,7 +54,7 @@ def table_names(factory):
 def test_0005_follows_0004_and_creates_the_price_tables(prices_database):
     factory, config = prices_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0006"
+    assert scripts.get_current_head() == "0007"
     assert scripts.get_revision("0005").down_revision == "0004"
     assert {"card_price_snapshots", "exchange_rates"} <= table_names(factory)
     with factory() as session:
@@ -90,7 +90,7 @@ def test_downgrade_and_upgrade_keep_inventory_and_default_existing_users_to_clp(
             "reverse",
             "Kept across 0005",
         )
-        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0006"
+        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0007"
 
     # A second full cycle is also clean (constraints are recreated by name).
     command.downgrade(config, "0004")
@@ -270,7 +270,7 @@ class _Rates:
 def _priced_app(factory):
     from app.prices.service import PriceService
 
-    from .test_boxes_postgres import application
+    from .test_binders_postgres import application
 
     app = application(factory)
     provider, rates = _Provider(), _Rates()
@@ -278,17 +278,17 @@ def _priced_app(factory):
     return app, provider, rates
 
 
-def test_two_users_with_the_same_card_never_share_totals_or_boxes(prices_database):
-    from .test_boxes_postgres import client_for, insert_placement, seed_owner
+def test_two_users_with_the_same_card_never_share_totals_or_binders(prices_database):
+    from .test_binders_postgres import client_for, insert_pocket, seed_owner
 
     factory, _ = prices_database
     # seed_owner gives duplicate base1-4 copies: even index holo, odd index normal.
-    ash = seed_owner(factory, copies=3, boxes=1)
-    misty = seed_owner(factory, copies=2, boxes=1)
+    ash = seed_owner(factory, copies=3, binders=1)
+    misty = seed_owner(factory, copies=2, binders=1)
     with factory.begin() as session:
-        for position, copy_id in enumerate(ash["copies"][:2]):
-            insert_placement(session, ash, copy=copy_id, position=position)
-        insert_placement(session, misty, copy=misty["copies"][0])
+        for index, copy_id in enumerate(ash["copies"][:2]):
+            insert_pocket(session, ash, copy=copy_id, pocket=index + 1)
+        insert_pocket(session, misty, copy=misty["copies"][0])
     app, provider, _ = _priced_app(factory)
     ash_ids = {str(i) for i in ash["copies"]}
     misty_ids = {str(i) for i in misty["copies"]}
@@ -298,10 +298,14 @@ def test_two_users_with_the_same_card_never_share_totals_or_boxes(prices_databas
         # holo 5 USD x 1000 (x2) + normal 2 EUR x 1250 = 12500 CLP
         assert (value["total"], value["copy_count"]) == ("12500", 3)
         assert {item["copy_id"] for item in value["top"]} == ash_ids
-        box = client.get(f"/api/v1/boxes/{ash['boxes'][0]}/value").json()
-        assert (box["total"], box["copy_count"]) == ("7500", 2)
-        foreign = client.get(f"/api/v1/boxes/{misty['boxes'][0]}/value")
+        binder = client.get(f"/api/v1/binders/{ash['binders'][0]}/value").json()
+        assert (binder["total"], binder["copy_count"]) == ("7500", 2)
+        foreign = client.get(f"/api/v1/binders/{misty['binders'][0]}/value")
         assert foreign.status_code == 404
+        shelf = client.get("/api/v1/prices/binders").json()["results"]
+        assert [(item["binder_id"], item["total"]) for item in shelf] == [
+            (str(ash["binders"][0]), "7500")
+        ]
         batch = client.get(
             "/api/v1/prices/copies", params={"copy_id": sorted(misty_ids)}
         ).json()
@@ -311,9 +315,10 @@ def test_two_users_with_the_same_card_never_share_totals_or_boxes(prices_databas
         value = client.get("/api/v1/prices/collection").json()
         assert (value["total"], value["copy_count"]) == ("7500", 2)
         assert {item["copy_id"] for item in value["top"]} == misty_ids
-        box = client.get(f"/api/v1/boxes/{misty['boxes'][0]}/value").json()
-        assert box["total"] == "5000"
-        assert client.get(f"/api/v1/boxes/{ash['boxes'][0]}/value").status_code == 404
+        binder = client.get(f"/api/v1/binders/{misty['binders'][0]}/value").json()
+        assert binder["total"] == "5000"
+        mine = client.get(f"/api/v1/binders/{ash['binders'][0]}/value")
+        assert mine.status_code == 404
 
     # Prices are shared catalog data: one provider request served both users.
     assert provider.calls == ["base1-4"]
@@ -321,15 +326,15 @@ def test_two_users_with_the_same_card_never_share_totals_or_boxes(prices_databas
         assert session.scalar(text("SELECT count(*) FROM card_price_snapshots")) == 1
 
 
-def test_price_outages_leave_inventory_boxes_and_sets_identical(prices_database):
+def test_price_outages_leave_inventory_binders_and_sets_identical(prices_database):
     from test_set_completion import checklist
 
-    from .test_boxes_postgres import client_for, insert_placement, seed_owner
+    from .test_binders_postgres import client_for, insert_pocket, seed_owner
 
     factory, _ = prices_database
-    owner = seed_owner(factory, copies=2, boxes=1)
+    owner = seed_owner(factory, copies=2, binders=1)
     with factory.begin() as session:
-        insert_placement(session, owner)
+        insert_pocket(session, owner)
     app, provider, rates = _priced_app(factory)
     fixture = checklist()
 
@@ -340,9 +345,10 @@ def test_price_outages_leave_inventory_boxes_and_sets_identical(prices_database)
     paths = [
         "/api/v1/inventory",
         f"/api/v1/inventory/{owner['copies'][0]}",
-        "/api/v1/boxes",
-        f"/api/v1/boxes/{owner['boxes'][0]}",
-        "/api/v1/boxes/views/owned",
+        "/api/v1/binders",
+        f"/api/v1/binders/{owner['binders'][0]}",
+        "/api/v1/binders/views/unassigned",
+        f"/api/v1/binders/locations?copy_id={owner['copies'][0]}",
         "/api/v1/sets/progress?set_id=sv03.5",
     ]
     with client_for(app, owner) as client:

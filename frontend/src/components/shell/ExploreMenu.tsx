@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { ExploreIcon } from "./icons";
 
-/** Mobile-only menu for the sections that do not fit the bottom bar (Pokédex, expansions). */
+/** Mobile-only menu for exploration that does not fit the bottom bar (Pokédex, PC boxes, expansions). */
 export function ExploreMenu() {
   const { dictionary } = useLocale();
   const [open, setOpen] = useState(false);
@@ -37,6 +37,7 @@ export function ExploreMenu() {
     <div id={id} className="pv-explore__panel" hidden={!open}>
       {open && <ul>
         <li><NavLink to="/pokedex" onClick={close}>{dictionary.shell.nav.pokedex}</NavLink></li>
+        <li><NavLink to="/boxes" onClick={close}>{dictionary.shell.nav.boxes}</NavLink></li>
         <li><NavLink to="/sets" onClick={close}>{dictionary.shell.nav.sets}</NavLink></li>
       </ul>}
     </div>

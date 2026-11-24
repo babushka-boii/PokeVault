@@ -78,3 +78,11 @@
 @media (min-width: 640px) and (max-width: 1023px) {
   .pv-home-pc__layout { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
 }
+
+/* Home "Mis carpetas": a mini shelf of binder covers. */
+.pv-home-shelf__list { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 7.5rem), 1fr)); list-style: none; margin: var(--pv-space-2) 0 0; padding: 0; }
+.pv-home-shelf__item { display: grid; gap: 2px; min-width: 0; align-content: start; }
+.pv-home-shelf__name { font-size: var(--pv-text-md); margin: var(--pv-space-2) 0 0; overflow-wrap: anywhere; }
+.pv-home-shelf__name a { color: var(--pv-text); text-decoration: none; }
+.pv-home-shelf__name a:hover { color: var(--pv-cyan); text-decoration: underline; }
+.pv-home-shelf__value { font-size: var(--pv-text-md); margin: 0; }

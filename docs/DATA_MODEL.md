@@ -199,3 +199,20 @@ and the column without touching inventory or boxes.
   the old default, so nothing is rewritten.
 - Downgrade to `0005` maps `noir` to `classic` and restores the four-value check and the
   `classic` default. Head: `0006`.
+
+## Iteration 8C — Binders (migration `0007`)
+
+- New table `binders`: id, owner, name (1–80, trimmed), `display_order` (unique per
+  owner), `cover` (default `noir`, checked `IN ('noir')`), timestamps.
+- New table `binder_pockets`:
+  - Primary key `(binder_id, page, pocket)`; `page` 1–40, `pocket` 1–9.
+  - `copy_id` is unique (one binder per copy).
+  - Composite owner foreign keys to `binders` and `inventory_copies`, with cascades.
+  - `placed_at`.
+- Upgrade copies each `personal_boxes` row into `binders` (same id, name, order and
+  timestamps) and each `box_memberships` row into `binder_pockets` (page `p // 9 + 1`,
+  pocket `p % 9 + 1`).
+- The box tables are frozen, not dropped, so the downgrade to `0006` only drops the binder
+  tables and is exact. A later migration drops `personal_boxes` and `box_memberships`.
+- Stickers and other covers are not modeled yet (8D). Head: `0007`. Details are in
+  `docs/BINDERS.md`.

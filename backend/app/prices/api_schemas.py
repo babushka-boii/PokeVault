@@ -84,3 +84,19 @@ class CurrencySettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     preferred_currency: TargetCurrency
+
+
+class BinderValue(BaseModel):
+    binder_id: UUID
+    total: str | None
+    original_totals: dict[str, str]
+    copy_count: int
+    priced_count: int
+    pending_count: int
+    stale_count: int
+
+
+class BinderValues(BaseModel):
+    currency: TargetCurrency
+    results: list[BinderValue]
+    rates: RatesInfo

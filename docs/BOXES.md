@@ -1,4 +1,10 @@
-# Personal PC Boxes — Iteration 5C
+# Personal PC Boxes — Iteration 5C (retired in 8C)
+
+> **Retired in Iteration 8C.** Binders replace personal boxes (`docs/BINDERS.md`). Migration
+> `0007` copied every box into a binder. The box tables stay frozen (no API or code reads
+> or writes them) until a later migration drops them. Catalog boxes, the species
+> discovery feature described first below, are unchanged. The rest of this document is
+> historical.
 
 Catalog Boxes remain public species discovery (#1–1025, 35 groups). My Boxes store
 placements of the authenticated user's existing physical `InventoryCopy` records.

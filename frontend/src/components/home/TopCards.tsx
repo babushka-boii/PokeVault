@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useLocale } from "../../i18n/LocaleProvider";
 import type { CopyPrice } from "../../services/prices";
 import type { TcgCard } from "../../services/cards";
-import { usePersonalMetadata } from "../boxes/personalMetadata";
+import { useCardMetadata } from "../cards/cardMetadata";
 import { CardArtwork } from "../cards/CardArtwork";
 import { InteractiveCard } from "../cards/InteractiveCard";
 import { PriceOrReason } from "../prices/PriceDisplay";
@@ -32,7 +32,7 @@ export function TopCards({ resource }: { resource: ValuationResource }) {
   const text = dictionary.home;
   const { state } = resource;
   const top = state.kind === "loaded" ? state.data.top : [];
-  const metadata = usePersonalMetadata(top.map((item) => item.card_id), locale);
+  const metadata = useCardMetadata(top.map((item) => item.card_id), locale);
   return <section className="pv-home__section pv-home__wide" aria-labelledby="home-top-title">
     <div className="pv-home__section-head">
       <h2 id="home-top-title">{text.topTitle}</h2>

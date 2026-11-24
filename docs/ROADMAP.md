@@ -470,3 +470,67 @@ Routes (look at each one; the first is the redesigned page):
   the signed-in user owns at least one copy. In 8A, Home derives them from the 30 most
   recent copies (decision D4), which is honest but incomplete. 8E (3×3 binder and
   master set) needs the complete list.
+
+## Iteration 8C — Binders ("Mis carpetas") (2026-11-24)
+
+8C became binders (album-like storage with 9-pocket pages). This replaces the earlier
+"easy Mi PC" placeholder. 8A was merged as PR #6.
+
+Spec and plan: `docs/superpowers/specs|plans/2026-11-23-binders-8c*`. Reference:
+`docs/BINDERS.md`.
+
+- [x] Spec and plan approved (2026-11-24) with D1–D8. D6 adjustment: a moved copy
+  announces where it came from.
+- [x] Migration `0007`: binders and pockets; every personal box copied into a binder
+  (page = ceil(pos/9), pocket = ((pos−1) mod 9)+1); the box tables are frozen.
+- [x] Binders API (store in the next free pocket, place, move with `moved_from`, remove,
+  tray, recent, locations), binder values, and the boxes API retired.
+- [x] Frontend: shelf, binder view (spreads, pockets, tray, move, take out, status
+  messages, motion with reduced-motion fallbacks), copy location, Home "Mis carpetas",
+  navigation (D4), and the UUID-free scanner success.
+- [x] `bash scripts/check.sh` exit 0 (counts in the plan's execution evidence).
+- [ ] Student applies `0007` (`cd backend && .venv/bin/alembic upgrade head`).
+- [ ] Manual acceptance in Safari (checklist below), then push and PR.
+
+### Manual acceptance checklist (pending — desktop and iPhone-size responsive mode)
+
+- [ ] After `alembic upgrade head`, existing boxes appear as binders with the same names
+  and order, and each card sits on the expected page and pocket (slot 30 → page 4,
+  pocket 3).
+- [ ] Shelf: Noir covers, names, counts, gold values, empty state, create, rename,
+  reorder and delete (the cards go back to the tray).
+- [ ] Binder: two pages on desktop and one on iPhone, card images in sleeves, names and
+  gold prices, page turn by buttons and Page Up / Page Down.
+- [ ] Tray and actions:
+  - Tapping stores a card in the next free pocket, with the drop animation and the
+    status message.
+  - "Elegir de la bandeja" fills the chosen pocket.
+  - Move within the binder, to another binder ("Movida desde X a Y · pág. N · bolsillo
+    M") and to the next free pocket.
+  - "Sacar de la carpeta" returns the card to the tray.
+  - All of it works by keyboard alone.
+- [ ] Storing from the tray: the card visibly flies from its tray position to the pocket,
+  then drops into the sleeve with the bounce and shine. A pocket on another page turns the
+  page first; one out of view scrolls into view. Moving between pockets flies from the
+  source pocket.
+- [ ] With "Reduce motion" on, there is no flight, drop or turn animation and changes are
+  immediate.
+- [ ] Copy detail: "¿Dónde está esta carta?" opens the right page and focuses the pocket.
+- [ ] Home "Mis carpetas" shows a mini shelf of covers (name, count, gold value) linking to
+  each binder, and "N cartas sin carpeta · guardar".
+- [ ] Scanner success: no UUID; "Guardar en una carpeta" opens the binders.
+- [ ] Navigation: desktop "Mis carpetas"; mobile "Carpetas"; "Cajas PC" under Explorar;
+  catalog boxes unchanged; old `/boxes?mode=personal` links open the binders.
+- [ ] Prices or TCGdex down: binders, inventory and expansions keep working (no images or
+  prices only).
+- [ ] VoiceOver: pocket and tray names, status messages, no UUIDs.
+
+### Technical debt (8C)
+
+- [ ] **Drop the frozen box tables** (`personal_boxes`, `box_memberships`) in a later
+  migration once 8C passes acceptance. Its downgrade must rebuild boxes from binders:
+  one box per 30 pockets, with name suffixes " (2)", " (3)".
+- [ ] The copy detail page still prints the copy UUID under the card id. It was outside
+  this request; the same anti-UUID rule could apply.
+- [ ] 8D: covers and stickers (the proposed `binder_stickers` shape is in the 8C spec,
+  §5.5).

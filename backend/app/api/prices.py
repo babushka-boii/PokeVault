@@ -14,8 +14,15 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth.sessions import SESSION_COOKIE, require_current_user
 from app.cards.schemas import IDENTIFIER_PATTERN
-from app.db.models import BoxMembership, InventoryCopy, PersonalBox, User, UserSettings
-from app.prices.api_schemas import CardPrices, CopyPrices, TargetCurrency, Valuation
+from app.db.models import Binder, BinderPocket, InventoryCopy, User, UserSettings
+from app.prices.api_schemas import (
+    BinderValue,
+    BinderValues,
+    CardPrices,
+    CopyPrices,
+    TargetCurrency,
+    Valuation,
+)
 from app.prices.service import CopyRef, PriceService
 
 router = APIRouter(prefix="/api/v1", tags=["prices"])
@@ -133,31 +140,29 @@ async def collection_value(
     return result
 
 
-@router.get("/boxes/{box_id}/value", response_model=Valuation)
-async def box_value(
+@router.get("/binders/{binder_id}/value", response_model=Valuation)
+async def binder_value(
     request: Request,
-    box_id: UUID,
+    binder_id: UUID,
     currency: CurrencyParam = None,
     user: User = Depends(require_current_user),
     service: PriceService = Depends(get_price_service),
 ) -> Valuation:
     def load(session):
         owned = session.scalar(
-            select(PersonalBox.id).where(
-                PersonalBox.id == box_id, PersonalBox.user_id == user.id
-            )
+            select(Binder.id).where(Binder.id == binder_id, Binder.user_id == user.id)
         )
         if owned is None:
-            raise HTTPException(404, detail="Box not found")
+            raise HTTPException(404, detail="Binder not found")
         rows = session.execute(
             select(*_COPY_COLUMNS)
-            .join(BoxMembership, BoxMembership.copy_id == InventoryCopy.id)
+            .join(BinderPocket, BinderPocket.copy_id == InventoryCopy.id)
             .where(
-                BoxMembership.box_id == box_id,
-                BoxMembership.user_id == user.id,
+                BinderPocket.binder_id == binder_id,
+                BinderPocket.user_id == user.id,
                 InventoryCopy.user_id == user.id,
             )
-            .order_by(BoxMembership.position)
+            .order_by(BinderPocket.page, BinderPocket.pocket)
         ).all()
         return _refs(rows), currency or user_currency(session, user)
 
@@ -165,3 +170,56 @@ async def box_value(
     result = await _priced(service.value(_factory(request), refs, chosen, top=0))
     _still_signed_in(request, user)
     return result
+
+
+@router.get("/prices/binders", response_model=BinderValues)
+async def binder_values(
+    request: Request,
+    currency: CurrencyParam = None,
+    user: User = Depends(require_current_user),
+    service: PriceService = Depends(get_price_service),
+) -> BinderValues:
+    """Every owned binder's value from one evaluation (the shelf makes one request)."""
+
+    def load(session):
+        binders = session.scalars(
+            select(Binder.id)
+            .where(Binder.user_id == user.id)
+            .order_by(Binder.display_order, Binder.id)
+        ).all()
+        rows = session.execute(
+            select(BinderPocket.binder_id, *_COPY_COLUMNS)
+            .join(InventoryCopy, InventoryCopy.id == BinderPocket.copy_id)
+            .where(BinderPocket.user_id == user.id, InventoryCopy.user_id == user.id)
+            .order_by(BinderPocket.binder_id, BinderPocket.page, BinderPocket.pocket)
+        ).all()
+        groups = {binder_id: [] for binder_id in binders}
+        for binder_id, *copy in rows:
+            groups[binder_id].extend(_refs([copy]))
+        return groups, currency or user_currency(session, user)
+
+    groups, chosen = _read(request, load)
+    values, rates = await _priced(
+        service.values_by_group(_factory(request), groups, chosen)
+    )
+    _still_signed_in(request, user)
+    return BinderValues(
+        currency=chosen,
+        results=[
+            BinderValue(
+                binder_id=binder_id,
+                **value.model_dump(
+                    include={
+                        "total",
+                        "original_totals",
+                        "copy_count",
+                        "priced_count",
+                        "pending_count",
+                        "stale_count",
+                    }
+                ),
+            )
+            for binder_id, value in values.items()
+        ],
+        rates=rates.info(),
+    )

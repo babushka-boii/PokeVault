@@ -1,7 +1,7 @@
 # Reference prices (Iteration 7)
 
 PokéVault shows a **reference market price** for each physical copy and adds those
-prices into collection, profile and personal-box totals. A price is an observation from
+prices into collection, profile and binder totals. A price is an observation from
 a named source on a named date. It is never an appraisal, never adjusted for condition
 and never invented when the source has no value for the copy's exact variant.
 
@@ -63,7 +63,7 @@ four decimals so sub-cent prices such as 0.004 survive storage.
 - At most 40 snapshots are refreshed per request (missing first, then oldest), within a
   10-second deadline. The rest are `pending`; unfinished refreshes keep running and serve
   the next request. After a TCGdex failure, refreshes pause for 60 seconds.
-- Inventory, boxes and set completion never call the price service. Price endpoints only
+- Inventory, binders and set completion never call the price service. Price endpoints only
   answer 503 when the database itself is unavailable.
 
 ## API
@@ -73,7 +73,8 @@ four decimals so sub-cent prices such as 0.004 survive storage.
 | `GET /api/v1/prices/cards/{card_id}?currency=` | Public | Price or reason for `normal`, `reverse`, `holo` |
 | `GET /api/v1/prices/copies?copy_id=…&currency=` | Session, ≤100 ids | Owned copies only, in request order |
 | `GET /api/v1/prices/collection?currency=` | Session | Total, counts by reason/source, stale/pending, top 5 |
-| `GET /api/v1/boxes/{box_id}/value?currency=` | Session | Same totals for one owned box; foreign box → 404 |
+| `GET /api/v1/binders/{binder_id}/value?currency=` | Session | Same totals for one owned binder; foreign binder → 404 (8C; replaces the box value) |
+| `GET /api/v1/prices/binders?currency=` | Session | Every owned binder's totals from one evaluation (shelf) |
 | `GET`/`PUT /api/v1/me/settings` | Session (PUT + CSRF) | `{preferred_currency}` |
 | `GET /api/v1/inventory?variant=` | Session | Existing list, new optional filter |
 
@@ -82,7 +83,7 @@ are `no-store` and re-check the session after provider work.
 
 ## Isolation
 
-Totals, top copies, copy batches and box values are computed only from the session
+Totals, top copies, copy batches and binder values are computed only from the session
 owner's copies. Duplicates add value (each is a physical copy), unlike completion
 percentage. Snapshots are shared catalog data: two users owning the same printing share
 one snapshot and one provider request, never totals. PostgreSQL integration tests cover

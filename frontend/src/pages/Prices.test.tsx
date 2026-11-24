@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { App } from "../app/App";
 import { AuthContext } from "../auth/context";
-import { BoxValue } from "../components/prices/BoxValue";
+import { BinderValue } from "../components/prices/BinderValue";
 import { CurrencyContext } from "../components/prices/currency";
 import { LocaleProvider } from "../i18n/LocaleProvider";
 import { cardPrices, copyId, copyPrice, noRates, quote, valuation } from "../test/priceFixtures";
@@ -207,27 +207,27 @@ test("price texts and amounts follow the English locale", async () => {
   expect(within(card).getByText(/Market reference price, the same for Spanish and English cards/)).toBeVisible();
 });
 
-// --- Personal box ---
+// --- Binder value ---
 
-function renderBoxValue(boxId: string, version: string) {
+function renderBinderValue(binderId: string, version: string) {
   const auth = { status: "authenticated" as const, user: { ...profile }, error: null, loggingOut: false, retrySession: vi.fn(), logout: vi.fn(), getCsrfToken: () => "csrf-test" };
   const currency = { currency: "CLP" as const, ready: true, saveFailed: false, setCurrency: vi.fn() };
   const tree = (v: string) => <LocaleProvider><AuthContext.Provider value={auth}><CurrencyContext.Provider value={currency}>
-    <BoxValue boxId={boxId} version={v} /></CurrencyContext.Provider></AuthContext.Provider></LocaleProvider>;
+    <BinderValue binderId={binderId} version={v} /></CurrencyContext.Provider></AuthContext.Provider></LocaleProvider>;
   const view = render(tree(version));
   return { rerender: (v: string) => view.rerender(tree(v)) };
 }
 
-test("a personal box shows its own total and refreshes when its contents change", async () => {
-  const box = "11111111-1111-4111-8111-111111111111";
+test("a binder shows its own total and refreshes when its contents change", async () => {
+  const binder = "11111111-1111-4111-8111-111111111111";
   let empty = false;
   const request = vi.fn(async (input: string) => {
-    expect(new URL(input).pathname).toBe(`/api/v1/boxes/${box}/value`);
+    expect(new URL(input).pathname).toBe(`/api/v1/binders/${binder}/value`);
     return json(empty ? valuation({ total: "0", copy_count: 0, priced_count: 0, unpriced_count: 0, unpriced_by_reason: {}, top: [], original_totals: {}, sources: {} })
       : valuation({ total: "1075", copy_count: 2, priced_count: 2, unpriced_count: 0, unpriced_by_reason: {}, top: [] }));
   });
   vi.stubGlobal("fetch", request);
-  const view = renderBoxValue(box, "0:a,1:b");
+  const view = renderBinderValue(binder, "0:a,1:b");
   expect(await screen.findByText("$1.075")).toBeVisible();
   expect(screen.getByText("2 de 2 copias con precio")).toBeVisible();
   expect(screen.getByRole("link", { name: "Rates By Exchange Rate API" })).toBeVisible();

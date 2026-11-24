@@ -15,7 +15,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - Frontend: React + TypeScript + Vite + CSS plano con variables (sin Tailwind) + React Router, ES/EN (`frontend/src/i18n`).
 - Backend: Python + FastAPI + SQLAlchemy + Alembic + PostgreSQL. Login con Google (OIDC).
 - Integraciones: PokéAPI, TCGdex, Tesseract + Pillow + pillow-heif (OCR).
-- Migración actual: `0006` (fondo de caja "Unova Noir" predeterminado, Iteración 8A; antes `0005` precios).
+- Migración actual: `0007` (carpetas, Iteración 8C; deja congeladas las tablas de cajas personales). Antes: `0006` fondo "noir", `0005` precios.
 
 ## Comandos (en el Mac de Naim)
 - Validación completa: `bash scripts/check.sh` (unittest, pytest, ruff, vitest, eslint, tsc, build, git diff --check).
@@ -26,7 +26,8 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 
 ## Reglas de dominio (no mezclar)
 - Distinguir siempre: carta oficial del catálogo (TCGdex) ≠ copia física del usuario ≠ ubicación en una caja personal.
-- Cajas del catálogo (visual, por especie) ≠ cajas personales (organizan copias físicas). Grilla 6×5.
+- Cajas del catálogo (visual, por especie, grilla 6×5) ≠ carpetas (organizan copias físicas en páginas de 3×3, desde la 8C). Una copia está en a lo más una carpeta; un bolsillo tiene a lo más una copia.
+- Nunca mostrar ni anunciar UUID de copias en la interfaz: usar nombre de carta y expansión (pruebas anti-UUID).
 - Datos del inventario aislados por usuario; proteger toda operación de escritura.
 - Copias duplicadas no suben el % de completitud de una expansión.
 - El escáner preserva la incertidumbre: nunca inventa identificaciones ni registra solo; exige confirmación explícita.
@@ -36,8 +37,9 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - Iteración 7 (precios de referencia) mezclada en `main` (PR #5). Aceptación manual en Safari OK el 2026-11-23 (detalle de carta, copia reverse, Perfil, CLP/USD con y sin sesión, caja). Pendiente: revisar el enlace de atribución y el comportamiento sin red.
 - Precios: TCGdex Cardmarket `trend` EUR (respaldo TCGplayer `marketPrice` USD) por variante de la copia; tasas de ExchangeRate-API (mindicador.cl no respondió). Atribución obligatoria "Rates By Exchange Rate API" y no redistribuir tasas. Detalle en docs/PRICES.md.
 - Prueba local del OCR: la sesión de Claude puede copiar `backend/app` y fotos a su entorno y correr `recognize_file` con Tesseract (Python 3.13 necesita paréntesis en `except A, B:`; no tocar el repo por eso).
-- Iteración 8A (rediseño "Unova Noir": tokens, shell y Inicio) implementada en `feat/iteration-8a-unova-noir`, sin push ni PR; `check.sh` exit 0. Incluye la migración `0006` (fondo `noir` por defecto; las cajas existentes conservan su fondo), que Naim debe aplicar con `alembic upgrade head`. Pendiente: una revisión visual en Safari (lista en docs/ROADMAP.md), push y PR. Estilos: CSS con variables en `frontend/src/styles/tokens.css` (único lugar con colores; lo vigila una prueba de contrato). Fases siguientes: 8B guardar rápido + escáner animado, 8C Mi PC fácil, 8D favoritas + carrusel, 8E carpeta 3×3 + master set, 8F perfil con entrenador. Deuda: endpoint de "expansiones que tengo" (necesario en 8E).
+- Iteración 8A (rediseño "Unova Noir": tokens, shell e Inicio, migración `0006`) mezclada en `main` (PR #6). Estilos: CSS con variables en `frontend/src/styles/tokens.css` (único lugar con colores; lo vigila una prueba de contrato).
+- Iteración 8C (carpetas, reemplaza a las cajas personales) implementada en `feat/iteration-8c-binders`, sin push ni PR; `check.sh` exit 0. Naim debe aplicar `0007` (`alembic upgrade head`) y hacer la revisión en Safari (lista en docs/ROADMAP.md). Detalle en docs/BINDERS.md. Deuda: una migración posterior que borre las tablas de cajas congeladas. Siguiente: 8D portadas y stickers; luego favoritas, master set y perfil con entrenador.
 - Futuro: wishlist/intercambios.
 
 ## Documentación
-`docs/` (ARCHITECTURE, DATA_MODEL, INVENTORY, BOXES, SET_COMPLETION, SCANNER, PRICES, UX_UI, DEVELOPMENT, ROADMAP), `Bitacora.md` (log semanal), `Autoria.md` (uso de IA).
+`docs/` (ARCHITECTURE, DATA_MODEL, INVENTORY, BOXES, BINDERS, SET_COMPLETION, SCANNER, PRICES, UX_UI, DEVELOPMENT, ROADMAP), `Bitacora.md` (log semanal), `Autoria.md` (uso de IA).

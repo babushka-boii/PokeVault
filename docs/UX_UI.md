@@ -421,3 +421,31 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
 - Automated tests cover tokens (contrast, no raw colors, motion, pixel size), the shell in
   both layouts and Home states; they do not certify real-device appearance. Manual Safari
   acceptance is listed in `docs/ROADMAP.md`.
+
+## Iteration 8C — Binders ("Mis carpetas")
+
+- Personal storage is now album-like binders: 3×3 pages, two-page spreads on desktop
+  (one page on phones), and the official card image in a plastic sleeve with the card
+  name and the copy price in gold. Each binder has the "Unova Noir" cover; cover and
+  sticker editing is 8D.
+- Every action works by keyboard and touch, with no drag & drop:
+  - Tapping a "Sin carpeta" tray card stores it in the next free pocket.
+  - An empty pocket can be filled from the tray.
+  - A stored card can be moved to an empty pocket, another binder or the next free pocket.
+  - A stored card can be taken out (it returns to the tray).
+- Feedback:
+  - A polite status message says where the card went, including where it moved from.
+  - Conflicts (occupied pocket, full binder) use an alert and refresh the binder.
+- Pocket and tray names carry card, expansion, page and pocket. They never contain a
+  UUID, and tests guard this.
+- Motion: storing or moving a card flies a floating clone (300 ms, FLIP) from the tray
+  thumbnail or source pocket to the destination, then the pocket plays a 600 ms drop with
+  bounce and sleeve shine (about 900 ms in total). A destination on another page turns the
+  page first (280 ms); one out of view is scrolled into view. Reduced motion removes the
+  flight, the drop and the turn.
+- Navigation:
+  - Desktop "Mis carpetas".
+  - Mobile tab "Carpetas" (replacing "Cajas"), with "Cajas PC" under Explorar.
+  - Home "Mis carpetas" is a mini shelf of binder covers (name, card count and gold
+    value), each linked to its binder, plus "N cartas sin carpeta · guardar".
+  - The copy detail answers "¿Dónde está esta carta?".

@@ -11,6 +11,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Numeric,
+    SmallInteger,
     String,
     UniqueConstraint,
     Uuid,
@@ -156,24 +157,24 @@ class InventoryCopy(Base):
     )
 
 
-class PersonalBox(Base):
-    """A user's manual arrangement; deleting it never deletes inventory copies."""
+# personal_boxes and box_memberships (0004/0006) are frozen since 0007: they stay in
+# the database for an exact downgrade, but no code reads or writes them. A later
+# migration drops them.
 
-    __tablename__ = "personal_boxes"
+
+class Binder(Base):
+    """A user's album of 9-pocket pages; deleting it never deletes inventory copies."""
+
+    __tablename__ = "binders"
     __table_args__ = (
-        UniqueConstraint("user_id", "id", name="uq_personal_boxes_owner_id"),
-        UniqueConstraint(
-            "user_id", "display_order", name="uq_personal_boxes_owner_order"
-        ),
+        UniqueConstraint("user_id", "id", name="uq_binders_owner_id"),
+        UniqueConstraint("user_id", "display_order", name="uq_binders_owner_order"),
         CheckConstraint(
             "length(name) BETWEEN 1 AND 80 AND name = trim(name)",
-            name="ck_personal_boxes_name",
+            name="ck_binders_name",
         ),
-        CheckConstraint("display_order >= 0", name="ck_personal_boxes_order"),
-        CheckConstraint(
-            "wallpaper IN ('noir','classic','forest','ocean','night')",
-            name="ck_personal_boxes_wallpaper",
-        ),
+        CheckConstraint("display_order >= 0", name="ck_binders_order"),
+        CheckConstraint("cover IN ('noir')", name="ck_binders_cover"),
     )
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
@@ -182,7 +183,7 @@ class PersonalBox(Base):
     )
     name: Mapped[str] = mapped_column(String(80), nullable=False)
     display_order: Mapped[int] = mapped_column(nullable=False)
-    wallpaper: Mapped[str] = mapped_column(
+    cover: Mapped[str] = mapped_column(
         String(16), nullable=False, default="noir", server_default="noir"
     )
     created_at: Mapped[datetime] = mapped_column(
@@ -196,32 +197,37 @@ class PersonalBox(Base):
     )
 
 
-class BoxMembership(Base):
-    """One placement of an authentic physical copy, with owner-checked parents."""
+class BinderPocket(Base):
+    """One pocket (page 1-40, pocket 1-9) holding one owned copy."""
 
-    __tablename__ = "box_memberships"
+    __tablename__ = "binder_pockets"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["user_id", "box_id"],
-            ["personal_boxes.user_id", "personal_boxes.id"],
+            ["user_id", "binder_id"],
+            ["binders.user_id", "binders.id"],
             ondelete="CASCADE",
-            name="fk_box_membership_owned_box",
+            name="fk_binder_pocket_owned_binder",
         ),
         ForeignKeyConstraint(
             ["user_id", "copy_id"],
             ["inventory_copies.user_id", "inventory_copies.id"],
             ondelete="CASCADE",
-            name="fk_box_membership_owned_copy",
+            name="fk_binder_pocket_owned_copy",
         ),
-        UniqueConstraint("copy_id", name="uq_box_membership_copy"),
-        CheckConstraint("position BETWEEN 0 AND 29", name="ck_box_membership_position"),
-        Index("ix_box_membership_owner", "user_id"),
+        UniqueConstraint("copy_id", name="uq_binder_pockets_copy"),
+        CheckConstraint("page BETWEEN 1 AND 40", name="ck_binder_pockets_page"),
+        CheckConstraint("pocket BETWEEN 1 AND 9", name="ck_binder_pockets_pocket"),
+        Index("ix_binder_pockets_owner", "user_id"),
     )
 
     user_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
-    box_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
-    position: Mapped[int] = mapped_column(primary_key=True)
+    binder_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    page: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
+    pocket: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
     copy_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    placed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
 
 
 _PRICE_COLUMNS = (

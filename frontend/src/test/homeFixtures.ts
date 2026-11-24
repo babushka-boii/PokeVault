@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import { copyId, copyPrice, noRates, quote, valuation } from "./priceFixtures";
+import { copyId, copyPrice, noRates, quote, rates, valuation } from "./priceFixtures";
 import { setProgress } from "./setFixtures";
 import { jsonResponse as json, pikachuCard } from "./tcgFixtures";
 import type { Valuation } from "../services/prices";
@@ -18,7 +18,10 @@ export const physicalCopy = (index: number, extra: Record<string, unknown> = {})
   id: copyId(100 + index), card_id: homeCards[index].id, condition: "near_mint", language: "en", variant: "holo", acquired_on: "2026-10-01",
   notes: "", created_at: "2026-11-07T12:00:00Z", updated_at: "2026-11-07T12:00:00Z", ...extra,
 });
-export const box = { id: copyId(1), name: "Favoritas", display_order: 0, wallpaper: "forest", copy_count: 2, created_at: "2026-11-07T12:00:00Z", updated_at: "2026-11-07T12:00:00Z" };
+const stamp = "2026-11-07T12:00:00Z";
+export const binder = (n: number, name: string, extra: Record<string, unknown> = {}) => ({ id: copyId(n), name, display_order: n - 1, cover: "noir", copy_count: 2, page_count: 4, last_placed_at: stamp, created_at: stamp, updated_at: stamp, ...extra });
+export type HomePocket = { page: number; pocket: number; copy: ReturnType<typeof physicalCopy>; placed_at: string };
+export const pocketAt = (page: number, pocket: number, copy: ReturnType<typeof physicalCopy>, placed_at = stamp): HomePocket => ({ page, pocket, copy, placed_at });
 
 /** Valuation whose top five point at the first five cards, in price order. */
 export function homeValuation(extra: Partial<Valuation> = {}): Valuation {
@@ -30,8 +33,8 @@ export const ratesDown = { rates: noRates, total: null, priced_count: 0, top: []
 
 type Handler = (url: URL, options?: RequestInit) => Response | Promise<Response> | undefined;
 export type HomeData = {
-  user?: typeof userA; guest?: boolean; valuation?: Valuation | (() => Response | Promise<Response>); boxes?: unknown[];
-  slots?: { position: number; copy: ReturnType<typeof physicalCopy> }[]; unassigned?: number; recent?: ReturnType<typeof physicalCopy>[];
+  user?: typeof userA; guest?: boolean; valuation?: Valuation | (() => Response | Promise<Response>); binders?: unknown[];
+  pockets?: HomePocket[]; unassigned?: number; recent?: ReturnType<typeof physicalCopy>[];
   progress?: (setIds: string[]) => unknown[]; override?: Handler;
 };
 
@@ -47,10 +50,20 @@ export function stubHome(data: HomeData = {}) {
       const value = data.valuation ?? homeValuation();
       return Promise.resolve(typeof value === "function" ? value() : json({ ...value, currency: url.searchParams.get("currency") ?? "CLP" }));
     }
-    if (path === "/api/v1/boxes") { const boxes = data.boxes ?? [box]; return Promise.resolve(json({ results: boxes, total: boxes.length })); }
-    if (path === "/api/v1/boxes/views/unassigned") return Promise.resolve(json({ results: [], total: data.unassigned ?? 0, offset: 0, limit: 30 }));
-    if (path === "/api/v1/boxes/views/recent") { const recent = data.recent ?? [physicalCopy(0), physicalCopy(1)]; return Promise.resolve(json({ results: recent, total: recent.length, offset: 0, limit: 30 })); }
-    if (path.startsWith("/api/v1/boxes/")) return Promise.resolve(json({ ...box, slots: data.slots ?? [{ position: 2, copy: physicalCopy(0) }, { position: 3, copy: physicalCopy(1) }] }));
+    if (path === "/api/v1/binders") { const binders = data.binders ?? [binder(1, "Favoritas")]; return Promise.resolve(json({ results: binders, total: binders.length })); }
+    if (path === "/api/v1/prices/binders") {
+      const binders = (data.binders ?? [binder(1, "Favoritas")]) as { id: string; copy_count: number }[];
+      return Promise.resolve(json({ currency: url.searchParams.get("currency") ?? "CLP", rates, results: binders.map((b) => ({
+        binder_id: b.id, total: String(b.copy_count * 1500), original_totals: { EUR: "1.2" }, copy_count: b.copy_count, priced_count: b.copy_count, pending_count: 0, stale_count: 0 })) }));
+    }
+    if (path === "/api/v1/binders/views/unassigned") return Promise.resolve(json({ results: [], total: data.unassigned ?? 0, offset: 0, limit: 30 }));
+    if (path === "/api/v1/binders/views/recent") { const recent = data.recent ?? [physicalCopy(0), physicalCopy(1)]; return Promise.resolve(json({ results: recent, total: recent.length, offset: 0, limit: 30 })); }
+    if (path.startsWith("/api/v1/binders/")) {
+      const id = path.split("/").pop();
+      const known = ((data.binders ?? [binder(1, "Favoritas")]) as { id: string }[]).find((b) => b.id === id) ?? binder(1, "Favoritas");
+      const pockets = data.pockets ?? [pocketAt(1, 3, physicalCopy(0)), pocketAt(1, 4, physicalCopy(1))];
+      return Promise.resolve(json({ ...known, copy_count: pockets.length, pockets }));
+    }
     if (path.startsWith("/api/v1/cards/")) { const card = cardById[decodeURIComponent(path.split("/").pop()!)]; return Promise.resolve(card ? json(card) : json({}, 404)); }
     if (path === "/api/v1/sets/progress") {
       const ids = url.searchParams.getAll("set_id");

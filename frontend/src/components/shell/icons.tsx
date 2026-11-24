@@ -32,3 +32,7 @@ export function UserIcon() {
 export function ExploreIcon() {
   return <svg {...common}><path d="M4 6h16M4 12h16M4 18h10" /></svg>;
 }
+
+export function BinderIcon() {
+  return <svg {...common}><path d="M6 3h13v18H6zM6 3v18M3 7h3M3 12h3M3 17h3M10 7h6M10 11h6" /></svg>;
+}

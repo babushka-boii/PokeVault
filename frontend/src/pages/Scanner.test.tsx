@@ -245,8 +245,12 @@ test("requires explicit candidate selection and physical-copy save with exact de
   await user.type(screen.getByLabelText("Notas personales"), "Physical card verified");
   await user.click(screen.getByRole("button", { name: "Guardar copia" }));
   expect(await screen.findByText("Copia añadida a tu colección.")).toBeVisible();
-  expect(screen.getByText(scannedCopy.id)).toBeVisible();
+  // 8C: the success screen never shows or announces the copy UUID.
+  const success = screen.getByRole("region", { name: "Copia añadida a tu colección." });
+  expect(success.textContent).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+  for (const element of success.querySelectorAll("[aria-label]")) expect(element.getAttribute("aria-label")).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-/i);
   expect(screen.getByRole("link", { name: "Ver copia guardada" })).toHaveAttribute("href", `/collection/${scannedCopy.id}`);
+  expect(screen.getByRole("link", { name: "Guardar en una carpeta" })).toHaveAttribute("href", "/binders");
   expect(screen.getByRole("link", { name: "Ver carta guardada" })).toHaveAttribute("href", "/cards/sm9-33?returnTo=%2Fscanner");
   expect(screen.getByRole("link", { name: "Ver expansión y finalización" })).toHaveAttribute("href", "/sets/sm9");
   expect(JSON.parse(writes(request)[0][1]!.body as string)).toEqual({ card_id: "sm9-33", condition: "near_mint", language: "ja", variant: "reverse", acquired_on: "2026-11-01", notes: "Physical card verified" });

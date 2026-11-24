@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 
 from app.api.scans import get_matcher
 from app.cards.provider import CardsUnavailable
-from app.db.models import BoxMembership, InventoryCopy, PersonalBox
+from app.db.models import Binder, BinderPocket, InventoryCopy
 from app.scanner.schemas import MatchResult, OCRResult, ScanClues
 
 from . import test_auth_postgres
@@ -94,33 +94,32 @@ def test_concurrent_conflicting_confirmation_never_overwrites(scanner_database):
             assert client.get(f"/api/v1/inventory/{created['id']}").json() == created
 
 
-def test_intentional_duplicates_update_quantity_once_without_moving_boxes(
+def test_intentional_duplicates_update_quantity_once_without_moving_binders(
     scanner_database,
 ):
     factory, _ = scanner_database
     owner = seed_owner(factory, ["base1-1"])
     with factory.begin() as session:
-        box = PersonalBox(
-            user_id=owner["user_id"], name="Keep", display_order=0, wallpaper="classic"
-        )
-        session.add(box)
+        binder = Binder(user_id=owner["user_id"], name="Keep", display_order=0)
+        session.add(binder)
         session.flush()
         session.add(
-            BoxMembership(
+            BinderPocket(
                 user_id=owner["user_id"],
-                box_id=box.id,
-                position=2,
+                binder_id=binder.id,
+                page=1,
+                pocket=3,
                 copy_id=owner["copies"][0],
             )
         )
-        box_id = box.id
+        binder_id = binder.id
     with application(factory) as app, client_for(app, owner) as client:
 
         async def catalog(*args):
             return object()
 
         app.state.card_provider.get_card = catalog
-        before = client.get(f"/api/v1/boxes/{box_id}").json()
+        before = client.get(f"/api/v1/binders/{binder_id}").json()
         intent = {**headers(owner), "Idempotency-Key": str(uuid4())}
         first = client.post("/api/v1/inventory", json=COPY, headers=intent)
         retry = client.post("/api/v1/inventory", json=COPY, headers=intent)
@@ -139,7 +138,7 @@ def test_intentional_duplicates_update_quantity_once_without_moving_boxes(
             progress["physical_copies"],
             progress["percentage"],
         ) == (2, 3, 2.0)
-        assert client.get(f"/api/v1/boxes/{box_id}").json() == before
+        assert client.get(f"/api/v1/binders/{binder_id}").json() == before
         assert (
             client.get(f"/api/v1/inventory/{first.json()['id']}").json()["notes"]
             == COPY["notes"]
@@ -170,7 +169,7 @@ def test_retry_identity_survives_app_restart_and_provider_outage(scanner_databas
         assert client.get("/api/v1/inventory").json()["total"] == 1
 
 
-def test_recognition_and_manual_search_never_mutate_inventory_or_boxes(
+def test_recognition_and_manual_search_never_mutate_inventory_or_binders(
     scanner_database,
 ):
     factory, _ = scanner_database
@@ -191,7 +190,7 @@ def test_recognition_and_manual_search_never_mutate_inventory_or_boxes(
         app.dependency_overrides[get_matcher] = lambda: matcher
         inventory_before = client.get("/api/v1/inventory").json()
         progress_before = client.get("/api/v1/sets/base1/progress").json()
-        boxes_before = client.get("/api/v1/boxes").json()
+        binders_before = client.get("/api/v1/binders").json()
         recognized = client.post(
             "/api/v1/scans/recognize",
             content=b"test boundary",
@@ -209,7 +208,7 @@ def test_recognition_and_manual_search_never_mutate_inventory_or_boxes(
         assert_private(manual)
         assert client.get("/api/v1/inventory").json() == inventory_before
         assert client.get("/api/v1/sets/base1/progress").json() == progress_before
-        assert client.get("/api/v1/boxes").json() == boxes_before
+        assert client.get("/api/v1/binders").json() == binders_before
 
 
 @pytest.mark.parametrize(
