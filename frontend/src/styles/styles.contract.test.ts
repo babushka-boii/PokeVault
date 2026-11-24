@@ -175,6 +175,10 @@ describe("retired PC boxes (8C.1)", () => {
     expect(app.filter(([, text]) => /components\/boxes\/|from\s+["']\.{1,2}\/boxes\//.test(text)).map(([file]) => file)).toEqual([]);
   });
 
+  test("no source mentions a /boxes path (the redirect is a route, not a link)", () => {
+    expect(app.filter(([, text]) => /["'`]\/boxes\b/.test(text)).map(([file]) => file)).toEqual([]);
+  });
+
   test("no leftover box, wallpaper, retro-audio or menu-icon code or styles", () => {
     const leftovers = app.filter(([file, text]) => file !== "/src/pages/BoxesRedirect.tsx"
       && /retroAudio|useRetroAudio|spriteMode|useSpriteMode|menuIcon|MenuIcon|useCatalogBox|StorageGrid|\.pc-[a-z]|pc-wallpaper|wallpapers/.test(text)).map(([file]) => file);

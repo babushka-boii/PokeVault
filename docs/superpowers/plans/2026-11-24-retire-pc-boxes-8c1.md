@@ -238,12 +238,26 @@ path.
   `CardJourney` (spec §9.1 and §9.2).
 
 **Steps:**
-- [ ] Write the failing tests: `safeReturnTo` rejects `/boxes`; a stale `returnTo=/boxes…`
+- [x] Write the failing tests: `safeReturnTo` rejects `/boxes`; a stale `returnTo=/boxes…`
   falls back to `/pokedex`; the card detail shows only the Pokédex origin link; the sprite
   fallback keeps its marker.
-- [ ] Implement, adapt the listed tests with the same assertions on a `/pokedex` origin,
+- [x] Implement, adapt the listed tests with the same assertions on a `/pokedex` origin,
   and delete the leftover `components/boxes/` directory.
-- [ ] Commit.
+- [x] Commit.
+- Evidence:
+  - The shared pieces had already moved to `components/pokemon/` in Task 3 (they were moved
+    together with the removal so the tree compiled).
+  - `safeReturnTo` no longer allows `/boxes`, the card detail has only the Pokédex origin
+    link, and the `backBoxes` string is gone. A stale `returnTo=/boxes…` falls back to
+    `/pokedex` (tested at the service and at the page).
+  - Small addition inside D1 = B: the Pokédex card passes its own page as `returnTo`
+    (`/pokedex?page=N`), so coming back from a gallery returns to the same Pokédex page
+    instead of page 1. Tested on a page-2 card, on the gallery's back link and on the
+    card detail's origin link.
+  - Adapted with the same assertions on a Pokédex origin: 2 `TcgCatalog` tests, 3
+    `TcgRefinement` tests, `services/cards.test` (`/boxes…` moved from allowed to rejected).
+  - New contract: no source mentions a `/boxes` path.
+  - Frontend: 35 files / 515 tests green; lint and typecheck clean.
 
 ### Task 5: Orphan local preferences (D3)
 

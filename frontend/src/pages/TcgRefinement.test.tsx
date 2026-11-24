@@ -27,7 +27,7 @@ function gallery() {
 test("searchable expansion picker uses the full set pool and independently selects sets without logos", async () => {
   const request = gallery();
   const user = userEvent.setup();
-  render(<App initialEntries={["/pokemon/25/cards?page=3&returnTo=%2Fboxes%3Fbox%3D1%26pokemon%3D25"]} />);
+  render(<App initialEntries={["/pokemon/25/cards?page=3&returnTo=%2Fpokedex%3Fpage%3D2"]} />);
   await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" });
   await user.click(screen.getByRole("button", { name: /Expansión/ }));
   const dialog = screen.getByRole("dialog", { name: "Elegir expansión" });
@@ -85,12 +85,12 @@ test("expansion picker supports keyboard selection, Escape and outside dismissal
 test("chronological controls request a new complete server order and retain navigation context", async () => {
   const request = gallery();
   const user = userEvent.setup();
-  render(<App initialEntries={["/pokemon/25/cards?page=3&returnTo=%2Fboxes%3Fwallpaper%3Docean"]} />);
+  render(<App initialEntries={["/pokemon/25/cards?page=3&returnTo=%2Fpokedex%3Fpage%3D3"]} />);
   await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" });
   await user.selectOptions(screen.getByRole("combobox", { name: "Ordenar por" }), "newest");
   await waitFor(() => expect(request).toHaveBeenCalledWith(expect.stringContaining("page=1&page_size=12&sort=newest"), expect.anything()));
   await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" });
-  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/boxes?wallpaper=ocean");
+  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/pokedex?page=3");
   await user.selectOptions(screen.getByRole("combobox", { name: "Ordenar por" }), "oldest");
   await waitFor(() => expect(request).toHaveBeenCalledWith(expect.stringContaining("sort=oldest"), expect.anything()));
 });
@@ -101,7 +101,7 @@ test("detail presents TCG defensive metadata and two independently validated ret
     weaknesses: [{ type: "Fighting", value: "×2" }], resistances: [{ type: "Metal", value: "-30" }], retreat: 3, regulation_mark: "F",
     abilities: [{ name: "TCG Power", type: "Ability", effect: "An official card effect." }],
   })))));
-  const origin = "/boxes?box=19&pokemon=559&wallpaper=ocean";
+  const origin = "/pokedex?page=19";
   const returnTo = `/pokemon/25/cards?sort=newest&page=2&${new URLSearchParams({ returnTo: origin })}`;
   render(<App initialEntries={[`/cards/sm9-33?${new URLSearchParams({ returnTo })}`]} />);
   await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" });
@@ -111,7 +111,7 @@ test("detail presents TCG defensive metadata and two independently validated ret
   expect(screen.getByText("Marca de regulación").nextElementSibling).toHaveTextContent("F");
   expect(screen.getByRole("heading", { name: "TCG Power" })).toBeVisible();
   expect(screen.getByRole("link", { name: "Volver a la galería" })).toHaveAttribute("href", returnTo);
-  expect(screen.getByRole("link", { name: "Volver a Cajas" })).toHaveAttribute("href", origin);
+  expect(screen.getByRole("link", { name: "Volver a Pokédex" })).toHaveAttribute("href", origin);
   await user.click(screen.getByRole("button", { name: "English" }));
   await screen.findByRole("link", { name: "Back to gallery" });
   expect(await screen.findByText("Weaknesses")).toBeVisible();
@@ -123,4 +123,14 @@ test("a nested external return destination never creates an external link", asyn
   render(<App initialEntries={[`/cards/sm9-33?${new URLSearchParams({ returnTo })}`]} />);
   await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" });
   expect(screen.getByRole("link", { name: "Volver a Pokédex" })).toHaveAttribute("href", "/pokedex");
+});
+
+test("a stale return destination that still points at the retired /boxes falls back to the Pokédex", async () => {
+  vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn().mockImplementation(() => Promise.resolve(jsonResponse({ ...pikachuCard, set: teamUp })))));
+  const stale = "/boxes?box=19&pokemon=559&wallpaper=ocean";
+  const returnTo = `/pokemon/25/cards?${new URLSearchParams({ returnTo: stale })}`;
+  render(<App initialEntries={[`/cards/sm9-33?${new URLSearchParams({ returnTo })}`]} />);
+  await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" });
+  expect(screen.getByRole("link", { name: "Volver a Pokédex" })).toHaveAttribute("href", "/pokedex");
+  expect(screen.queryByRole("link", { name: /Cajas/ })).not.toBeInTheDocument();
 });

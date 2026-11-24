@@ -45,7 +45,7 @@ export function PokedexPage() {
         ) : (
           <ul className="pokedex-grid" aria-label={text.title}>
             {state.data.results.map((pokemon) => (
-              <PokemonCard key={pokemon.national_dex_number} pokemon={pokemon} />
+              <PokemonCard key={pokemon.national_dex_number} pokemon={pokemon} returnTo={pageLink(page)} />
             ))}
           </ul>
         )

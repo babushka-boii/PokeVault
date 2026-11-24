@@ -131,7 +131,8 @@ test("every species card keeps its TCG gallery action", async () => {
   await screen.findByRole("heading", { name: "Mon31" });
   const links = screen.getAllByRole("link", { name: "Ver cartas TCG" });
   expect(links).toHaveLength(30);
-  expect(links[0]).toHaveAttribute("href", "/pokemon/31/cards?returnTo=%2Fpokedex");
+  // Going back from a gallery returns to the same Pokédex page.
+  expect(links[0]).toHaveAttribute("href", "/pokemon/31/cards?returnTo=%2Fpokedex%3Fpage%3D2");
 });
 
 const matches = (...numbers: number[]) => new Response(JSON.stringify({ results: numbers.map((number) => ({ national_dex_number: number, name: `mon${number}` })) }));

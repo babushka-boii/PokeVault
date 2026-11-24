@@ -18,7 +18,7 @@ function serveGallery(results: unknown[] = [pikachuCard], options: Record<string
 
 test("loads real card-shaped JSON with species context, full card preview, and content fallback", async () => {
   const request = serveGallery();
-  render(<App initialEntries={["/pokemon/25/cards?returnTo=%2Fboxes%3Fbox%3D19%26pokemon%3D559%26wallpaper%3Docean"]} />);
+  render(<App initialEntries={["/pokemon/25/cards?returnTo=%2Fpokedex%3Fpage%3D19"]} />);
   expect(screen.getByText("Cargando cartas…")).toBeVisible();
   expect(await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" })).toBeVisible();
   expect(screen.getByRole("heading", { name: "Pikachu" })).toBeVisible();
@@ -27,7 +27,7 @@ test("loads real card-shaped JSON with species context, full card preview, and c
   expect(artwork).toHaveAttribute("src", "https://assets.tcgdex.net/en/sm/sm9/33/low.webp");
   expect(artwork).toHaveAttribute("loading", "lazy");
   expect(screen.getByText("Contenido de la carta disponible en inglés.")).toBeVisible();
-  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/boxes?box=19&pokemon=559&wallpaper=ocean");
+  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/pokedex?page=19");
   expect(screen.getByText(/Catálogo inglés de TCGdex/)).toBeVisible();
   expect(request).toHaveBeenCalledWith("http://localhost:8000/api/v1/pokemon/25/cards?language=es&page=1&page_size=12&sort=name", expect.objectContaining({ signal: expect.any(AbortSignal) }));
 });
@@ -45,7 +45,7 @@ test("keeps gallery available when independent species details fail", async () =
 test("applies expansion and sort, resets pagination, and preserves the full gallery link on detail return", async () => {
   const request = serveGallery([pikachuCard], { page: 3, has_more: true });
   const user = userEvent.setup();
-  render(<App initialEntries={["/pokemon/25/cards?page=3&returnTo=%2Fboxes%3Fbox%3D1%26pokemon%3D25"]} />);
+  render(<App initialEntries={["/pokemon/25/cards?page=3&returnTo=%2Fpokedex%3Fpage%3D7"]} />);
   await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" });
   expect(screen.getByRole("link", { name: "Página siguiente" })).toHaveAttribute("href", expect.stringContaining("page=4"));
   await user.click(screen.getByRole("button", { name: /Expansión/ }));
@@ -57,7 +57,7 @@ test("applies expansion and sort, resets pagination, and preserves the full gall
   const gallery = new URL(cardLink.getAttribute("href")!, "http://localhost").searchParams.get("returnTo");
   expect(gallery).toContain("sort=id");
   expect(gallery).toContain("set_id=sm9");
-  expect(gallery).toContain("returnTo=%2Fboxes%3Fbox%3D1%26pokemon%3D25");
+  expect(gallery).toContain("returnTo=%2Fpokedex%3Fpage%3D7");
   request.mockImplementation((input: string) => Promise.resolve(input.includes("/api/v1/cards/") ? jsonResponse(pikachuCard) : input.includes("/cards?") ? jsonResponse(tcgPage()) : jsonResponse(speciesDetails())));
   await user.click(cardLink);
   expect(await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" })).toBeVisible();
