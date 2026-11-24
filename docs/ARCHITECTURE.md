@@ -478,3 +478,25 @@ completion do not depend on it.
 Frontend: `CurrencyProvider` (inside `AuthProvider`) owns CLP/USD; price components
 fetch after the page's own data and degrade to "no price" or a retry without blocking
 it. Details and contracts: [PRICES.md](PRICES.md).
+
+## Iteration 8A — Styles layer, shell and Home
+
+Frontend only; no backend, endpoint or database change.
+
+- `frontend/src/styles/tokens.css` (only file with palette hex values) and
+  `styles/base.css` (element defaults with zero specificity, focus ring, reduced motion,
+  `.pv-*` utilities) load before every component stylesheet. The frontend stays plain CSS
+  with custom properties; Tailwind is not installed. A contract test
+  (`styles/styles.contract.test.ts`) guards contrast, raw colors, motion and pixel size.
+- Fonts: `@fontsource-variable/inter`, `@fontsource-variable/space-grotesk` and
+  `@fontsource/silkscreen`, exact-pinned (5.3.0, OFL-1.1) and bundled by Vite.
+- `components/ui/` (CutPanel, Button/ButtonLink, PixelLabel, Chip, Skeleton/LoadingStatus,
+  InlineError), `components/shell/` (headers, tab bar, explore menu, toggles, avatar) and
+  `components/home/` (hero, scanner card, top cards, Mi PC preview, expansion progress,
+  guest/empty states, status footer).
+- `AppShell` picks one layout with `useMediaQuery("(max-width: 767px)")`; without
+  `matchMedia` it renders the desktop layout.
+- Shared pieces extracted without behavior change: `hooks/useMediaQuery`,
+  `components/prices/useCollectionValuation`, `components/shell/Avatar`.
+- Home derives its expansions from the 30 most recent copies; an "owned sets" endpoint is
+  recorded as technical debt in the ROADMAP (needed by 8E).

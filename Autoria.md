@@ -435,3 +435,15 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 - Redacción del spec, del plan, de esta documentación y de la evidencia en `research/prices/`.
 - Implementación completa del backend y del frontend de precios con sus pruebas, y una revisión final que encontró y corrigió un problema de seguridad (filas por ids inventados).
 - El código fue escrito por la IA y revisado por el estudiante por tareas; debe ser entendido por él antes de la entrega.
+
+## Iteración 8A — Rediseño visual "Unova Noir" (2026-11-23)
+
+### Decisiones del estudiante
+
+- Definió la dirección visual (paleta, roles de color, tipografías, formas, movimiento, shell e Inicio), aprobó el spec y el plan con las siete decisiones recomendadas y dos ajustes (deuda técnica del endpoint de expansiones; pie de estado solo con sesión y cerrado).
+- Fijó la regla de trabajo: un commit por tarea si pasan pruebas y lint, sin push, una única revisión visual en Safari al final de la 8A.
+
+### Uso de IA (Claude Code)
+
+- Auditoría del frontend, spec, plan, tokens, componentes, migración de estilos, Inicio, pruebas y documentación.
+- El código fue escrito por la IA; la aceptación visual la hace el estudiante en su navegador, y debe entender el código antes de la entrega.

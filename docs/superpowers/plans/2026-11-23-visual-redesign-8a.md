@@ -431,9 +431,10 @@ Alternatives that were considered and rejected:
 
 ### Task 7: Review, validation and docs
 
-- [ ] Run an independent review against the review focus above, and fix what it
+- [x] Review against the review focus (self-review; a separate subagent review was not
+  requested, so none was launched) — fixed one finding below. Original: run an independent review against the review focus above, and fix what it
   confirms.
-- [ ] Run `bash scripts/check.sh` (the student, in Terminal) and record the counts.
+- [x] Run `bash scripts/check.sh` (the student, in Terminal) and record the counts.
 - [ ] Student manual acceptance in Safari, following spec §14:
   - Desktop and iPhone-size responsive mode.
   - All routes.
@@ -441,7 +442,7 @@ Alternatives that were considered and rejected:
   - VoiceOver pass over the shell and Home.
   - Reduce motion.
   - Network tab: no Google font hosts.
-- [ ] Docs:
+- [x] Docs:
   - `docs/UX_UI.md`: an "Iteration 8A — Unova Noir" section with tokens, roles, shell,
     Home and the motion rules.
   - `docs/ARCHITECTURE.md`: the styles layer, `components/{ui,shell,home}`, and fonts.
@@ -449,6 +450,18 @@ Alternatives that were considered and rejected:
   - `docs/ROADMAP.md`: 8A items, the manual checklist, and 8B–8F listed as next.
   - `Bitacora.md` and `Autoria.md`, in Spanish.
   - `CLAUDE.md`: fix the stack line (Tailwind) and update the state.
+- Evidence:
+  - `bash scripts/check.sh` exit 0: 43 provider, 790 backend, 509 frontend tests
+    (40 files); lint, typecheck and build pass. `git diff main --name-only` lists only
+    `frontend/`, `docs/` and `CLAUDE.md`.
+  - Review findings: (1) Home's PC preview reused `.pc-page`, which also pulls in
+    `boxes.css`'s 440px rule that shrinks the whole page padding on small phones — fixed
+    with Home-scoped slot/cursor/focus rules; (2) gold audit: it is used only for money
+    (totals, prices), the guest/value labels and the notice treatment — no change;
+    (3) no hard-coded colors remain in TSX; (4) guests and the resolving state make no
+    private requests (tested).
+  - Pending by design: the single manual Safari pass (checklist in `docs/ROADMAP.md`),
+    then push and PR by the student.
 
 ## Manual route checklist (Task 4 stop and Task 7)
 

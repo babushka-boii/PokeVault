@@ -373,3 +373,45 @@ The final visual redesign and personal-box scrolling remain outside this iterati
 - Converted amounts always carry a discreet "Rates By Exchange Rate API" link and the
   rate date. Missing prices are explained in text, never by color alone; price
   loading/errors use no alert roles so they do not interrupt the page's own messages.
+
+## Iteration 8A — "Unova Noir": visual system, shell and Home
+
+First phase of the visual redesign (8B quick save and animated scanner, 8C easy Mi PC,
+8D favorites carousel, 8E 3×3 binder and master set, 8F profile with trainer). Spec:
+`docs/superpowers/specs/2026-11-23-visual-redesign-8a-design.md`.
+
+- **Tokens.** All palette values live in `frontend/src/styles/tokens.css`; every other
+  stylesheet uses `var(--pv-*)`. Dark only (`color-scheme: dark`). Cyan means actions and
+  anything interactive (primary buttons, focus, selection, the box cursor). Gold means
+  money/value and favorites only; the notice treatment is gold text on the warn border.
+  Pokémon type colors stay as small details. Decorative borders (`--pv-border`,
+  `--pv-border-soft`) never carry meaning alone; form controls use `--pv-border-strong`
+  (≥ 3:1).
+- **Type.** Space Grotesk for titles, numbers and prices; Inter for text; Silkscreen only
+  for short uppercase labels, never below 12px (`--pv-text-pixel`). Fonts are self-hosted
+  with Fontsource, so no request goes to Google.
+- **Shape.** Cut diagonal corner only on featured panels (value hero, scanner, guest) and
+  the primary button; everything else uses straight edges or 2–4px radii. The cut is drawn
+  with two pseudo-element layers so focus outlines are never clipped.
+- **Focus and targets.** A global cyan 3px ring on `:focus-visible`; interactive targets are
+  at least 44px.
+- **Motion.** 150–250 ms transitions. The skeleton pulse stops after three cycles; the
+  scanner card sweep (600 ms) only plays on hover/focus and is removed for reduced motion.
+  `prefers-reduced-motion` is also applied globally. Nothing moves on its own for more
+  than 5 s (a pause control becomes mandatory from 8D).
+- **Shell.** Desktop (≥ 768px): header with the PV monogram, nav (Inicio, Pokédex,
+  Cajas PC, Expansiones, Mi colección), an "Escanear" action, a CLP/USD segmented control,
+  ES/EN and the account avatar. Mobile: reduced header with an "Explorar" menu (Pokédex,
+  Expansiones) and a fixed bottom bar (Inicio, Cajas, ESCANEAR, Colección, Perfil). Only
+  one primary navigation exists at a time; a skip link jumps to the main content.
+- **Home.** Value hero (total, copy counts, copies without variant, pending prices, the
+  reference note and the exchange-rate attribution), scanner card, most valuable cards
+  (interactive cards), a read-only Mi PC preview of the first box, and expansion progress
+  from the most recent copies. Guests see a public hero and make no private requests.
+  Each section has its own skeleton, error and retry; an empty collection shows "Tu primera
+  caja te espera". "Estado del sistema" is a closed footer, signed-in only.
+- **Existing pages** inherit the tokens without structural changes. The retro PC wallpapers
+  remain light screens inside a dark frame (user-chosen content).
+- Automated tests cover tokens (contrast, no raw colors, motion, pixel size), the shell in
+  both layouts and Home states; they do not certify real-device appearance. Manual Safari
+  acceptance is listed in `docs/ROADMAP.md`.

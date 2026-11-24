@@ -731,3 +731,18 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Validación
 
 `bash scripts/check.sh` terminó con código 0: 43 pruebas de proveedores, 790 de backend (incluidas las de PostgreSQL, sin saltos) y 421 de frontend, además de Ruff, ESLint, TypeScript, build y espacios. Queda pendiente la aceptación manual en el navegador (lista en `docs/ROADMAP.md`). Sin push.
+
+## Iteración 8A — Rediseño visual "Unova Noir": sistema, shell e Inicio (2026-11-23)
+
+- Se escribieron y aprobaron el spec y el plan (`docs/superpowers/specs|plans/2026-11-23-visual-redesign-8a*`). Decisiones D1–D7 con dos ajustes del estudiante: la deuda del endpoint de "expansiones que tengo" quedó en el ROADMAP, y el pie "Estado del sistema" solo se ve con sesión y viene cerrado.
+- Hallazgo: Tailwind no estaba instalado (solo CSS plano, 12 archivos con colores escritos a mano). Se decidió no agregarlo y usar variables CSS; se corrigió `CLAUDE.md`.
+- Sistema visual: tokens en un solo archivo, capa base (foco cian, movimiento reducido, utilidades), fuentes Inter, Space Grotesk y Silkscreen servidas desde el proyecto (@fontsource, sin Google) y pruebas de contrato (contraste AA, sin colores sueltos, movimiento, tamaño de la fuente pixel).
+- Shell: header de escritorio (logo PV original, navegación, "Escanear", CLP/USD, ES/EN, avatar) y, bajo 768px, header reducido con menú "Explorar" y barra inferior con ESCANEAR al centro. Siempre hay una sola navegación y un enlace para saltar al contenido.
+- Las 12 hojas de estilo existentes pasaron a tokens sin cambiar clases ni estructura; las páginas no rediseñadas heredan el nuevo look.
+- Inicio: valor de la colección, tarjeta del escáner, cartas más valiosas, vista previa de Mi PC (solo lectura) y avance de expansiones; estados de invitado, carga con skeletons, vacío y error con reintento por sección. Sin cambios de backend.
+- Pruebas: 509 de frontend (88 nuevas) y `check.sh` con código 0 (43 de proveedores, 790 de backend). Las pruebas existentes que cambiaron fueron solo por nombres del shell ("Cajas PC", título del Inicio, botón "Escanear").
+- Pendiente: una pasada de revisión visual en Safari (escritorio y modo iPhone, lista en `docs/ROADMAP.md`), luego push y PR.
+
+### Uso de IA (Claude Code)
+
+- Redacción del spec, del plan y de la documentación; implementación y pruebas del frontend por tareas con un commit cada una. El estudiante revisa y debe entender el código antes de la entrega.
