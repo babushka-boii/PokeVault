@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/context";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
-import { fetchBoxView, BoxesError } from "../../services/boxes";
+import { BindersError, fetchCopyView } from "../../services/binders";
 import { CardRequestError } from "../../services/cards";
 import { fetchSetProgress } from "../../services/sets";
 import { usePersonalMetadata } from "../boxes/personalMetadata";
@@ -24,8 +24,8 @@ export function SetsProgress() {
   const { dictionary, locale } = useLocale();
   const text = dictionary.home;
   const { retrySession } = useAuth();
-  const recentRequest = useCallback((signal: AbortSignal) => fetchBoxView("recent", 0, signal).catch((error: unknown) => {
-    if (!signal.aborted && error instanceof BoxesError && error.status === 401) retrySession();
+  const recentRequest = useCallback((signal: AbortSignal) => fetchCopyView("recent", 0, signal).catch((error: unknown) => {
+    if (!signal.aborted && error instanceof BindersError && error.status === 401) retrySession();
     throw error;
   }), [retrySession]);
   const recent = useTcgResource("recent", recentRequest);

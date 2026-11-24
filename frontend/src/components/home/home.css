@@ -78,3 +78,8 @@
 @media (min-width: 640px) and (max-width: 1023px) {
   .pv-home-pc__layout { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
 }
+
+/* Home "Mis carpetas": one read-only 3×3 page of the most recent binder. */
+.pv-home-binders__page { display: grid; gap: var(--pv-space-2); grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; margin: var(--pv-space-2) 0 0; max-width: 26rem; padding: 0; }
+.pv-home-binders__pocket { display: grid; gap: 2px; min-width: 0; }
+.pv-home-binders__pocket .pv-pocket__name { color: var(--pv-text-2); font-size: var(--pv-text-xs); }

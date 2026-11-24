@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
+import { CopyLocation } from "../components/binders/CopyLocation";
 import { OwnedCopy } from "../components/inventory/OwnedCopy";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
@@ -33,6 +34,7 @@ function PersonalCopy({ id }: { id: string }) {
       <h2><Link to={`/cards/${encodeURIComponent(state.data.card_id)}`}>{state.data.card_id}</Link></h2>
       <p><code>{state.data.id}</code></p>
       <p>{text.physicalNote}</p>
+      <CopyLocation copyId={state.data.id} />
       <ul className="inventory-copies"><OwnedCopy key={state.data.updated_at} copy={state.data} locked={false}
         onActiveChange={() => {}} onChanged={(next) => { setMessage(next); if (next === "updated") retry(); }} /></ul>
     </> : <p role="alert">{text.missing}</p>)}
@@ -48,6 +50,6 @@ export function InventoryCopyPage() {
     <SessionNotice />
     {auth.status === "unauthenticated" && <Link to="/login">{dictionary.auth.signIn}</Link>}
     {auth.status === "authenticated" && !auth.loggingOut && !auth.validating && <PersonalCopy key={`${auth.user.id}:${copyId}`} id={copyId} />}
-    <p><Link to="/collection">{dictionary.inventory.title}</Link> · <Link to="/boxes?mode=personal">{dictionary.nav.boxes}</Link></p>
+    <p><Link to="/collection">{dictionary.inventory.title}</Link> · <Link to="/binders">{dictionary.binders.title}</Link></p>
   </section>;
 }
