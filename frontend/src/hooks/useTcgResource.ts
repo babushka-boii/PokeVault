@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { CardRequestError } from "../services/cards";
 
+/** Any client error carrying HTTP 404 (catalog, binders, prices) means "not found". */
+function notFound(error: unknown) {
+  return error instanceof CardRequestError ? error.status === 404
+    : typeof error === "object" && error !== null && "status" in error && (error as { status: unknown }).status === 404;
+}
+
 type ResourceState<T> = { kind: "loading" } | { kind: "loaded"; data: T } | { kind: "error"; notFound: boolean };
 
 export function useTcgResource<T>(key: string | undefined, request: (signal: AbortSignal) => Promise<T>) {
@@ -14,7 +20,7 @@ export function useTcgResource<T>(key: string | undefined, request: (signal: Abo
       if (!controller.signal.aborted) setResult({ key, attempt, state: { kind: "loaded", data } });
     }, (error: unknown) => {
       if (!controller.signal.aborted) setResult({ key, attempt, state: {
-        kind: "error", notFound: error instanceof CardRequestError && error.status === 404,
+        kind: "error", notFound: notFound(error),
       } });
     });
     return () => controller.abort();

@@ -1,0 +1,153 @@
+/* Binders (Iteration 8C) on "Unova Noir" tokens. Colors only from tokens. */
+
+.pv-binders, .pv-binder { display: grid; gap: var(--pv-space-4); min-width: 0; }
+.pv-binder__hint { color: var(--pv-text-2); font-size: var(--pv-text-sm); margin: var(--pv-space-1) 0; }
+.pv-binder__status:empty { display: none; }
+.pv-binder__status { border-left: 3px solid var(--pv-cyan); color: var(--pv-text); margin: 0; padding: var(--pv-space-2) var(--pv-space-3); background: var(--pv-cyan-soft); }
+.pv-binder__problem { border-left: 3px solid var(--pv-danger); color: var(--pv-danger); margin: 0; padding: var(--pv-space-2) var(--pv-space-3); }
+.pv-field { color: var(--pv-text-2); display: grid; font-size: var(--pv-text-sm); gap: var(--pv-space-1); }
+.pv-field input, .pv-field select { min-height: var(--pv-touch); padding: var(--pv-space-2); }
+
+/* Shelf */
+.pv-shelf { display: grid; gap: var(--pv-space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); list-style: none; margin: 0; padding: 0; }
+.pv-shelf__binder { background: var(--pv-panel); border: 1px solid var(--pv-border); display: grid; gap: var(--pv-space-3); padding: var(--pv-space-4); }
+.pv-shelf__facts h2 { font-size: var(--pv-text-lg); margin: 0; overflow-wrap: anywhere; }
+.pv-shelf__facts h2 a { color: var(--pv-text); text-decoration: none; }
+.pv-shelf__facts h2 a:hover { color: var(--pv-cyan); text-decoration: underline; }
+.pv-shelf__value { font-size: var(--pv-text-lg); margin: 0; }
+.pv-shelf__manage summary, .pv-shelf__create summary { color: var(--pv-cyan); cursor: pointer; display: flex; align-items: center; min-height: var(--pv-touch); }
+.pv-shelf__manage[open] { display: flex; flex-wrap: wrap; gap: var(--pv-space-2); }
+.pv-shelf__manage[open] summary { flex-basis: 100%; }
+.pv-shelf__form { align-items: end; display: flex; flex-wrap: wrap; gap: var(--pv-space-2); }
+.pv-shelf__confirm { border: 1px solid var(--pv-danger); flex-basis: 100%; padding: var(--pv-space-3); }
+.pv-shelf__empty { display: grid; gap: var(--pv-space-3); }
+
+/* "Unova Noir" cover: dark gradient, subtle dot grid, cyan spine, cut corner. */
+.pv-cover {
+  --pv-cut-size: var(--pv-cut);
+  aspect-ratio: 3 / 4;
+  background-color: var(--pv-bar);
+  background-image: radial-gradient(var(--pv-border) 1px, transparent 1.5px), linear-gradient(160deg, var(--pv-panel-raised), var(--pv-bg));
+  background-size: 14px 14px, 100% 100%;
+  border: 1px solid var(--pv-border);
+  clip-path: polygon(0 0, calc(100% - var(--pv-cut-size)) 0, 100% var(--pv-cut-size), 100% 100%, 0 100%);
+  display: block;
+  position: relative;
+  transition: transform var(--pv-dur) var(--pv-ease);
+}
+.pv-cover:hover { transform: translateY(-2px); }
+.pv-cover__spine { background: var(--pv-cyan); bottom: 0; left: 0; position: absolute; top: 0; width: 6px; }
+.pv-cover__label { bottom: var(--pv-space-3); color: var(--pv-text-2); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); position: absolute; right: var(--pv-space-3); }
+
+/* Binder view */
+.pv-binder__head { align-items: start; display: flex; flex-wrap: wrap; gap: var(--pv-space-4); justify-content: space-between; }
+.pv-binder__head h1 { margin: var(--pv-space-1) 0; overflow-wrap: anywhere; }
+.pv-binder__back { align-items: center; display: inline-flex; min-height: var(--pv-touch); }
+.pv-binder__layout { align-items: start; display: grid; gap: var(--pv-space-4); grid-template-columns: minmax(0, 1fr); }
+.pv-binder__main { display: grid; gap: var(--pv-space-3); min-width: 0; }
+.pv-binder__pager { align-items: center; display: flex; flex-wrap: wrap; gap: var(--pv-space-2); justify-content: space-between; }
+.pv-binder__pages { color: var(--pv-text-2); font-family: var(--pv-font-display); font-variant-numeric: tabular-nums; }
+
+.pv-spread { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); perspective: 1600px; }
+.pv-page { background: var(--pv-panel); border: 1px solid var(--pv-border); padding: var(--pv-space-3); }
+.pv-page__grid { display: grid; gap: var(--pv-space-2); }
+.pv-page__row { display: grid; gap: var(--pv-space-2); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.pv-pocket {
+  align-items: stretch;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--pv-radius-1);
+  color: var(--pv-text);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pv-space-1);
+  min-height: var(--pv-touch);
+  padding: 2px;
+  position: relative;
+  width: 100%;
+}
+.pv-pocket:hover { border-color: var(--pv-border-strong); }
+.pv-page__grid [aria-selected="true"] .pv-pocket { border-color: var(--pv-cyan); box-shadow: inset 0 0 0 1px var(--pv-cyan); }
+.pv-pocket:focus-visible { outline: 3px solid var(--pv-focus); outline-offset: -1px; z-index: 1; }
+.pv-pocket--target { border-style: dashed; border-color: var(--pv-cyan); }
+
+/* The sleeve: inset border, glossy gradient and a corner reflection. */
+.pv-pocket__sleeve {
+  align-items: center;
+  aspect-ratio: 245 / 337;
+  background: linear-gradient(135deg, var(--pv-panel-raised), var(--pv-bg));
+  border: 1px solid var(--pv-border-strong);
+  box-shadow: inset 0 0 0 2px var(--pv-bg);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.pv-pocket--empty .pv-pocket__sleeve { border-style: dashed; border-color: var(--pv-border); }
+.pv-pocket__sleeve .tcg-artwork-frame, .pv-pocket__sleeve .tcg-artwork { height: 100%; width: 100%; }
+.pv-pocket__sleeve .tcg-artwork { border-radius: 0; }
+.pv-pocket__shine {
+  background: linear-gradient(120deg, transparent 30%, color-mix(in srgb, var(--pv-text) 14%, transparent) 45%, transparent 60%);
+  inset: 0;
+  opacity: 0.35;
+  pointer-events: none;
+  position: absolute;
+}
+.pv-pocket__number { color: var(--pv-text-3); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); }
+.pv-pocket__fallback { color: var(--pv-text-2); font-size: var(--pv-text-xs); overflow-wrap: anywhere; padding: var(--pv-space-1); text-align: center; }
+.pv-pocket__caption { display: grid; font-size: var(--pv-text-xs); gap: 2px; min-width: 0; text-align: left; }
+.pv-pocket__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-pocket__price { font-size: var(--pv-text-xs); }
+
+/* Store: the card drops in from above, settles with a small bounce, and the sleeve shines. */
+.pv-pocket[data-arrived="true"] .pv-pocket__sleeve > :first-child { animation: pv-pocket-drop 600ms var(--pv-ease) 1; }
+.pv-pocket[data-arrived="true"] .pv-pocket__shine { animation: pv-sleeve-shine 600ms ease-out 1; }
+@keyframes pv-pocket-drop {
+  0% { opacity: 0; transform: translateY(-120%); }
+  60% { opacity: 1; transform: translateY(6%); }
+  80% { transform: translateY(-2%); }
+  100% { transform: translateY(0); }
+}
+@keyframes pv-sleeve-shine {
+  0%, 66% { opacity: 0.35; transform: translateX(-60%); }
+  100% { opacity: 0.9; transform: translateX(60%); }
+}
+
+/* Page turn: a short leaf turn around the spine. */
+.pv-spread[data-turn="next"] .pv-page { animation: pv-page-turn-next 280ms var(--pv-ease) 1; transform-origin: left center; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.pv-spread[data-turn="prev"] .pv-page { animation: pv-page-turn-prev 280ms var(--pv-ease) 1; transform-origin: right center; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+@keyframes pv-page-turn-next { from { opacity: 0.4; transform: rotateY(-24deg); } to { opacity: 1; transform: rotateY(0); } }
+@keyframes pv-page-turn-prev { from { opacity: 0.4; transform: rotateY(24deg); } to { opacity: 1; transform: rotateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-pocket[data-arrived="true"] .pv-pocket__sleeve > :first-child, .pv-pocket[data-arrived="true"] .pv-pocket__shine,
+  .pv-spread[data-turn] .pv-page { animation: none; }
+  .pv-cover { transition: none; }
+}
+
+/* Selection panel and tray */
+.pv-selection, .pv-tray { background: var(--pv-panel); border: 1px solid var(--pv-border); display: grid; gap: var(--pv-space-2); padding: var(--pv-space-4); min-width: 0; }
+.pv-selection h2, .pv-tray h2 { font-size: var(--pv-text-lg); margin: 0; }
+.pv-selection__name { font-family: var(--pv-font-display); font-weight: 600; margin: 0; overflow-wrap: anywhere; }
+.pv-selection__actions { display: flex; flex-wrap: wrap; gap: var(--pv-space-2); }
+.pv-tray__head { align-items: baseline; display: flex; flex-wrap: wrap; gap: var(--pv-space-2); justify-content: space-between; }
+.pv-tray__count { color: var(--pv-text-2); font-size: var(--pv-text-sm); }
+.pv-tray__list { display: grid; gap: var(--pv-space-2); list-style: none; margin: 0; max-height: 32rem; overflow-y: auto; padding: 0; }
+.pv-tray__item { align-items: center; display: grid; gap: var(--pv-space-3); grid-template-columns: 3rem minmax(0, 1fr); text-align: left; width: 100%; }
+.pv-tray__item:hover:not(:disabled) { background: var(--pv-cyan-soft); }
+.pv-tray__thumb { aspect-ratio: 245 / 337; display: block; overflow: hidden; width: 3rem; }
+.pv-tray__facts { display: grid; font-size: var(--pv-text-sm); gap: 2px; min-width: 0; }
+.pv-tray__facts strong { overflow-wrap: anywhere; }
+.pv-tray__facts span { color: var(--pv-text-2); font-size: var(--pv-text-xs); }
+.pv-tray__pages { display: flex; gap: var(--pv-space-2); justify-content: space-between; }
+
+@media (min-width: 1024px) {
+  .pv-binder__layout { grid-template-columns: minmax(0, 1fr) 18rem; }
+  .pv-tray { grid-column: 1 / -1; }
+}
+@media (min-width: 1280px) {
+  .pv-binder__layout { grid-template-columns: minmax(0, 1fr) 16rem 18rem; }
+  .pv-tray { grid-column: auto; }
+}
