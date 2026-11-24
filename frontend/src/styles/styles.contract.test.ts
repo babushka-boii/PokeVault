@@ -158,6 +158,7 @@ describe("stylesheets", () => {
     const reduced = /@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*?)\}\s*\}/.exec(css)?.[1] ?? "";
     expect(reduced).toMatch(/\[data-arrived="true"\][\s\S]*\[data-turn\][^{]*\{\s*animation:\s*none/);
     expect(css).toMatch(/-webkit-backface-visibility:\s*hidden/);
+    expect(reduced).toMatch(/\.pv-flight\s*\{\s*display:\s*none/);
   });
 
   test("focus is drawn with the focus token in the base layer", () => {

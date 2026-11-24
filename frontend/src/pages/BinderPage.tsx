@@ -12,7 +12,8 @@ import { Button, ButtonLink } from "../components/ui/Button";
 import { InlineError } from "../components/ui/InlineError";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useBinderMutations, type BinderErrorKey } from "../hooks/useBinderMutations";
-import { MOBILE_QUERY, useMediaQuery } from "../hooks/useMediaQuery";
+import { MOBILE_QUERY, REDUCED_MOTION_QUERY, useMediaQuery } from "../hooks/useMediaQuery";
+import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, SCROLL_WAIT_MS, wait, type FlightOrigin } from "../components/binders/flight";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import {
@@ -38,7 +39,7 @@ function useGuard() {
 
 function Tray({ mode, binderId, busy, onStore, version, onCancel }: {
   mode: Mode; binderId: string; busy: boolean; version: number;
-  onStore: (copy: InventoryCopy) => void; onCancel: () => void;
+  onStore: (copy: InventoryCopy, origin: FlightOrigin | null) => void; onCancel: () => void;
 }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.binders;
@@ -65,7 +66,8 @@ function Tray({ mode, binderId, busy, onStore, version, onCancel }: {
         const identity = cardIdentity(copy, card);
         const label = fillTarget ? fill(text.storeHere, { card: identity, ...fillTarget }) : fill(text.storeNext, { card: identity });
         return <li key={copy.id}>
-          <button type="button" className="pv-tray__item" disabled={busy} aria-label={label} onClick={() => onStore(copy)}>
+          <button type="button" className="pv-tray__item" disabled={busy} aria-label={label}
+            onClick={(event) => onStore(copy, captureOrigin(event.currentTarget.querySelector(".pv-tray__thumb")))}>
             <span className="pv-tray__thumb" aria-hidden="true">{card ? <CardArtwork card={card} /> : <span className="pv-pocket__fallback">{copy.card_id}</span>}</span>
             <span className="pv-tray__facts">
               <strong>{identity}</strong>
@@ -102,6 +104,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   const { currency, ready } = useCurrency();
   const [params, setParams] = useSearchParams();
   const mobile = useMediaQuery(MOBILE_QUERY);
+  const reduced = useMediaQuery(REDUCED_MOTION_QUERY);
   const guard = useGuard();
   const { busy, run } = useBinderMutations();
   const request = useCallback((signal: AbortSignal) => fetchBinder(binderId, signal).catch((e: unknown) => guard(e, signal)), [binderId, guard]);
@@ -120,6 +123,11 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   });
   const [mode, setMode] = useState<Mode>({ kind: "idle" });
   const [arrived, setArrived] = useState<PocketRef | null>(null);
+  const [incoming, setIncoming] = useState<PocketRef | null>(null);
+  const alive = useRef(true);
+  // Each new action bumps this, so a late arrival never steals focus or state.
+  const arrival = useRef(0);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   const [turn, setTurn] = useState<"next" | "prev" | null>(null);
   const [status, setStatus] = useState("");
   const [problem, setProblem] = useState<BinderErrorKey | null>(null);
@@ -168,6 +176,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     const focus = { page: target, pocket: 1 }; setSelected(focus); setFocusRequest(focus);
   }
   function select(target: PocketRef) {
+    cancelArrival();
     setSelected(target); setFocusRequest(target); setArrived(null); setProblem(null);
     if (mode.kind === "move" && mode.binderId === binderId && !binder?.pockets.some((p) => p.page === target.page && p.pocket === target.pocket)) {
       void moveTo(target);
@@ -180,14 +189,47 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     else if (result.moved_from.binder_id === result.binder.id) setStatus(fill(text.movedWithin, where));
     else setStatus(fill(text.movedFrom, { ...where, from: result.moved_from.binder_name }));
   }
-  function landed(result: StoreResult) {
+  /**
+   * Arrival choreography: turn the page if needed, scroll the pocket into view, fly the
+   * captured card there (FLIP), then let the pocket play its drop, bounce and shine.
+   * With reduced motion (or nothing to fly) the change is direct.
+   */
+  async function arrive(target: PocketRef, origin: FlightOrigin | null) {
+    const token = ++arrival.current;
+    const current = () => alive.current && arrival.current === token;
+    const fly = !reduced && origin !== null;
+    if (fly) setIncoming(target);
+    if (!visible.includes(target.page)) {
+      goTo(target.page);
+      if (fly) await wait(PAGE_TURN_WAIT_MS);
+    }
+    if (fly) {
+      let sleeve: Element | null | undefined = null;
+      for (let attempt = 0; attempt < 20 && current() && !sleeve; attempt++) {
+        await wait(16);
+        sleeve = buttons.current.get(key(target))?.querySelector(".pv-pocket__sleeve");
+      }
+      if (sleeve && current()) {
+        if (!inViewport(sleeve) && typeof sleeve.scrollIntoView === "function") {
+          sleeve.scrollIntoView({ block: "center", behavior: "smooth" });
+          await wait(SCROLL_WAIT_MS);
+        }
+        if (current()) await flyCard(origin, sleeve);
+      }
+      if (!alive.current) return;
+      setIncoming((value) => value && value.page === target.page && value.pocket === target.pocket ? null : value);
+      if (!current()) return;
+    }
+    if (!current()) return;
+    setArrived(target); setSelected(target); setFocusRequest(target);
+  }
+  function cancelArrival() { arrival.current++; setIncoming(null); }
+  function landed(result: StoreResult, origin: FlightOrigin | null = null) {
     announce(result);
     setMode({ kind: "idle" }); setProblem(null);
     if (result.binder.id === binderId) {
       if (loaded) setLocal({ base: loaded, value: result.binder });
-      const target = { page: result.page, pocket: result.pocket };
-      setArrived(target); setSelected(target); setFocusRequest(target);
-      if (!visible.includes(result.page)) goTo(result.page);
+      void arrive({ page: result.page, pocket: result.pocket }, origin);
     } else if (binder && loaded && result.moved_from) {
       // Moved out of this binder: drop it here without refetching the whole binder.
       const from = result.moved_from;
@@ -202,20 +244,24 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     if (error === "missing") setTrayVersion((v) => v + 1);
   }
 
-  async function store(copy: InventoryCopy) {
+  async function store(copy: InventoryCopy, origin: FlightOrigin | null) {
+    cancelArrival();
     const target = mode.kind === "fill" ? mode.target : null;
     const outcome = await run((csrf, signal) => target ? placeInPocket(binderId, target, copy.id, csrf, signal) : storeNext(binderId, copy.id, csrf, signal));
     if (!outcome) return;
-    if (outcome.ok) landed(outcome.value); else failed(outcome.error);
+    if (outcome.ok) landed(outcome.value, origin); else failed(outcome.error);
   }
   async function moveTo(target: PocketRef | "next") {
     if (mode.kind !== "move") return;
-    const { copy, binderId: destination } = mode;
+    const { copy, binderId: destination, from } = mode;
+    // Capture the card in its current pocket before the binder re-renders without it.
+    const origin = destination === binderId ? captureOrigin(buttons.current.get(key(from))?.querySelector(".pv-pocket__sleeve")) : null;
     const outcome = await run((csrf, signal) => target === "next" ? storeNext(destination, copy.id, csrf, signal) : placeInPocket(destination, target, copy.id, csrf, signal));
     if (!outcome) return;
-    if (outcome.ok) landed(outcome.value); else failed(outcome.error);
+    if (outcome.ok) landed(outcome.value, origin); else failed(outcome.error);
   }
   async function takeOut(target: PocketRef, copy: InventoryCopy) {
+    cancelArrival();
     const outcome = await run((csrf, signal) => removeFromPocket(binderId, target, copy.id, csrf, signal));
     if (!outcome) return;
     if (!outcome.ok) { failed(outcome.error); return; }
@@ -252,7 +298,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
         </nav>
         <div className="pv-spread" data-turn={turn ?? undefined}>
           {visible.map((page) => <PageGrid key={page} page={page} pockets={binder.pockets} cards={metadata.cards} prices={priceById}
-            selected={selected} arrived={arrived} targetable={mode.kind === "move" && mode.binderId === binderId}
+            selected={selected} arrived={arrived} incoming={incoming} targetable={mode.kind === "move" && mode.binderId === binderId}
             select={select} onTurn={turnPage} register={register} />)}
         </div>
         <p className="pv-binder__hint">{text.keyboard}</p>
@@ -283,7 +329,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           <Button disabled={busy} onClick={() => setMode({ kind: "fill", target: selected })}>{text.fillFromTray}</Button>
         </>}
       </aside>
-      <Tray mode={mode} binderId={binderId} busy={busy} version={trayVersion} onStore={(copy) => void store(copy)} onCancel={() => setMode({ kind: "idle" })} />
+      <Tray mode={mode} binderId={binderId} busy={busy} version={trayVersion} onStore={(copy, origin) => void store(copy, origin)} onCancel={() => setMode({ kind: "idle" })} />
     </div>
   </>;
 }

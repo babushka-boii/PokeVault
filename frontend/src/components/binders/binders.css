@@ -121,7 +121,12 @@
 @keyframes pv-page-turn-next { from { opacity: 0.4; transform: rotateY(-24deg); } to { opacity: 1; transform: rotateY(0); } }
 @keyframes pv-page-turn-prev { from { opacity: 0.4; transform: rotateY(24deg); } to { opacity: 1; transform: rotateY(0); } }
 
+/* FLIP flight: the floating clone; the destination stays empty until it lands. */
+.pv-flight { box-shadow: var(--pv-shadow-1); overflow: hidden; will-change: transform; }
+.pv-pocket[data-incoming="true"] .pv-pocket__sleeve > :first-child { visibility: hidden; }
+
 @media (prefers-reduced-motion: reduce) {
+  .pv-flight { display: none; }
   .pv-pocket[data-arrived="true"] .pv-pocket__sleeve > :first-child, .pv-pocket[data-arrived="true"] .pv-pocket__shine,
   .pv-spread[data-turn] .pv-page { animation: none; }
   .pv-cover { transition: none; }

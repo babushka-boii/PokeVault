@@ -23,9 +23,9 @@ function PocketPrice({ price }: { price?: CopyPrice }) {
  * page, Page Up / Page Down ask the binder view to turn the page. Names carry card,
  * expansion, page and pocket, never a UUID. Card images are decorative.
  */
-export function PageGrid({ page, pockets, cards, prices, selected, arrived, targetable, select, onTurn, register }: {
+export function PageGrid({ page, pockets, cards, prices, selected, arrived, incoming, targetable, select, onTurn, register }: {
   page: number; pockets: BinderPocket[]; cards: Record<string, TcgCard>; prices: Record<string, CopyPrice>;
-  selected: PocketRef | null; arrived: PocketRef | null; targetable: boolean;
+  selected: PocketRef | null; arrived: PocketRef | null; incoming: PocketRef | null; targetable: boolean;
   select: (target: PocketRef) => void; onTurn: (direction: 1 | -1) => void;
   register: (target: PocketRef) => RefCallback<HTMLButtonElement>;
 }) {
@@ -57,6 +57,7 @@ export function PageGrid({ page, pockets, cards, prices, selected, arrived, targ
             <button type="button" ref={register(target)} className={`pv-pocket${held ? "" : " pv-pocket--empty"}${targetable && !held ? " pv-pocket--target" : ""}`}
               aria-label={label} tabIndex={focusPocket === pocket ? 0 : -1}
               data-arrived={same(arrived, target) ? "true" : undefined}
+              data-incoming={same(incoming, target) ? "true" : undefined}
               onClick={() => select(target)} onKeyDown={(event) => keyDown(event, pocket)}>
               <span className="pv-pocket__sleeve" aria-hidden="true">
                 {held ? card ? <CardArtwork card={card} /> : <span className="pv-pocket__fallback">{held.copy.card_id}</span>
