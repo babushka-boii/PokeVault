@@ -77,7 +77,7 @@ export function safeReturnTo(value: string | null | undefined): string {
   if (!value || value.length > 2048 || /[\\#\s]/.test(value) ||
     Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return fallback;
   const path = value.split("?")[0];
-  if (path === "/boxes" || path === "/pokedex" || path === "/sets" || path === "/scanner") return value;
+  if (path === "/pokedex" || path === "/sets" || path === "/scanner") return value;
   const expansion = /^\/sets\/([^/]+)$/.exec(path);
   if (expansion && isSetId(expansion[1])) return value;
   const match = /^\/pokemon\/([^/]+)\/cards$/.exec(path);

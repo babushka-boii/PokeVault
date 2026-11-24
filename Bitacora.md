@@ -760,3 +760,16 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Revisión del modelo y la API actuales, spec, plan, implementación por tareas con un commit cada una, pruebas y documentación. El estudiante revisa y debe entender el código antes de la entrega.
+
+## Iteración 8C.1 — Retirar las Cajas PC (2026-11-24)
+
+- Se escribieron y aprobaron el spec y el plan (`docs/superpowers/specs|plans/2026-11-24-retire-pc-boxes-8c1*`). Decisiones: Pokédex paginada con búsqueda (D1 = B), `/boxes?pokemon=N` abre la galería de esa especie, y la rama parte de la 8C porque `origin/main` todavía no la contenía.
+- Hallazgo: la Pokédex solo mostraba las primeras 20 especies y las cajas eran la única forma de llegar a las otras 1005. Por eso la Pokédex se paginó (30 por página, 35 páginas) y ganó búsqueda por nombre o número antes de retirar las cajas.
+- Migración `0008`: borra las tablas de cajas personales; su downgrade las recrea con el esquema de la 0006 y reconstruye las cajas desde las carpetas (cajas de 30 bolsillos, la primera conserva el id de la carpeta). No toca `uq_inventory_owner_id`, que las carpetas necesitan.
+- Frontend: se retiraron el grid de sprites, los fondos, el sonido, los iconos de menú, el panel de especie y la búsqueda de cajas, además de "Cajas PC" en la navegación. Las rutas viejas redirigen. `PokemonSprite` y `pokemonLabels` se movieron porque la galería los usa. Se limpian al iniciar las preferencias locales huérfanas.
+- Pruebas: se eliminaron o adaptaron las de cajas con su razón (tabla en el plan). Pruebas de contrato impiden que vuelvan código, estilos o enlaces `/boxes`. `check.sh` con código 0.
+- Pendiente: respaldo y aplicar `0007`/`0008`, revisión en Safari, push y PR, y el rediseño visual de la Pokédex.
+
+### Uso de IA (Claude Code)
+
+- Revisión, spec, plan, migración, frontend, pruebas y documentación. El estudiante revisa y debe entender el código antes de la entrega.

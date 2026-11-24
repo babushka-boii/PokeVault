@@ -5,7 +5,8 @@ import { TypeBadge } from "./TypeBadge";
 import { useLocale } from "../i18n/LocaleProvider";
 import type { Pokemon } from "../services/pokemon";
 
-export function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
+/** `returnTo` is where the gallery's back link goes: the Pokédex page this card is on. */
+export function PokemonCard({ pokemon, returnTo = "/pokedex" }: { pokemon: Pokemon; returnTo?: string }) {
   const { dictionary } = useLocale();
   const [failedSprite, setFailedSprite] = useState<string | null>(null);
   const name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
@@ -36,7 +37,7 @@ export function PokemonCard({ pokemon }: { pokemon: Pokemon }) {
           <li key={type}><TypeBadge type={type} /></li>
         ))}
       </ul>
-      <Link className="tcg-action" to={`/pokemon/${pokemon.national_dex_number}/cards?returnTo=%2Fpokedex`}>
+      <Link className="tcg-action" to={`/pokemon/${pokemon.national_dex_number}/cards?returnTo=${encodeURIComponent(returnTo)}`}>
         {dictionary.cards.view}
       </Link>
     </li>

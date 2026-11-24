@@ -458,3 +458,13 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Spec, plan, migración, backend, frontend, pruebas y documentación. La aceptación visual la hace el estudiante en su navegador; debe entender el código antes de la entrega.
+
+## Iteración 8C.1 — Retirar las Cajas PC (2026-11-24)
+
+### Decisiones del estudiante
+
+- Pidió retirar las Cajas PC y la migración reversible que borra las tablas congeladas; aprobó la Pokédex paginada con búsqueda (D1 = B), la redirección `/boxes?pokemon=N` y partir de la rama de la 8C. Pidió registrar el rediseño visual de la Pokédex como iteración pendiente.
+
+### Uso de IA (Claude Code)
+
+- Spec, plan, migración, frontend, pruebas y documentación. La aceptación visual la hace el estudiante en su navegador.

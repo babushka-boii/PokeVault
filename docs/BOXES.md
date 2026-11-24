@@ -1,10 +1,13 @@
-# Personal PC Boxes — Iteration 5C (retired in 8C)
+# PC Boxes — Iteration 4 catalog boxes and 5C personal boxes (both retired)
 
-> **Retired in Iteration 8C.** Binders replace personal boxes (`docs/BINDERS.md`). Migration
-> `0007` copied every box into a binder. The box tables stay frozen (no API or code reads
-> or writes them) until a later migration drops them. Catalog boxes, the species
-> discovery feature described first below, are unchanged. The rest of this document is
-> historical.
+> **Both box features are retired; this document is historical.**
+> - **Personal boxes** were replaced by binders in 8C (`docs/BINDERS.md`). Migration `0007`
+>   copied every box into a binder.
+> - **The catalog boxes** (the 6×5 species grid, wallpapers, sound, menu icons) were
+>   removed in 8C.1, together with migration `0008`, which drops the personal-box tables.
+>   `/boxes?pokemon=N` now opens that species' TCG gallery, `/boxes?mode=personal` opens the
+>   binders and any other `/boxes` opens the Pokédex. The Pokédex pages through all 1025
+>   species and searches by name or number instead.
 
 Catalog Boxes remain public species discovery (#1–1025, 35 groups). My Boxes store
 placements of the authenticated user's existing physical `InventoryCopy` records.

@@ -16,7 +16,7 @@ def register_heif() -> bool:
             aux_images=False,
         )
         return True
-    except (ImportError, OSError):
+    except ImportError, OSError:
         # Common image formats/manual matching remain available without the
         # optional native binary on an unsupported deployment platform.
         return False

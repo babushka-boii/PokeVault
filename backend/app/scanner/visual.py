@@ -85,9 +85,7 @@ def compare(query: Image.Image, reference: Image.Image) -> VisualEvidence | None
     matches = list(unique.values())
     if len(matches) < 12:
         return None
-    source = np.float32(
-        [reference_points[match.queryIdx].pt for match in matches]
-    )
+    source = np.float32([reference_points[match.queryIdx].pt for match in matches])
     destination = np.float32([query_points[match.trainIdx].pt for match in matches])
     matrix, inlier_mask = cv2.findHomography(
         source,

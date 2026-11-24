@@ -522,4 +522,24 @@ Frontend, plus one small migration added at the student's request: `0006` adds t
 - Home `BinderShelf` (mini shelf of covers) and the FLIP flight (`components/binders/flight.ts`).
 - `components/cards/cardMetadata.ts` (`useCardMetadata`, formerly the personal-box
   metadata hook).
-- `/boxes` is catalog-only.
+- `/boxes` was catalog-only here; 8C.1 turned it into a redirect.
+
+## Iteration 8C.1 — PC boxes retired
+
+Sections above about the catalog boxes (5B/Iteration 4 UI state, wallpapers, audio, menu
+icons) and the personal boxes (5C) are **historical**: that code and its tables are gone.
+
+- **Frontend:** `BoxesPage`, the sprite grid, menu icons, species panel, box search, retro
+  audio, wallpapers, sprite mode and their hooks, services and styles were removed.
+  `BoxesRedirect` keeps old links alive: `?mode=personal` → `/binders`, `?pokemon=N` (1–1025)
+  → `/pokemon/N/cards?returnTo=%2Fpokedex`, anything else → `/pokedex`.
+- **Kept and moved:** `components/pokemon/` (`PokemonSprite`, `pokemonLabels`) serve the
+  species gallery; the sprite's missing marker is `pv-sprite-missing`.
+- **Pokédex:** 30 species per page (`?page=1..35`) through `/api/v1/pokemon?offset&limit`,
+  and search by name or number through `/api/v1/pokemon/search`. Cards pass their own page as
+  `returnTo`, so a gallery's back link returns to that Pokédex page.
+- **Database:** migration `0008` drops `box_memberships` and `personal_boxes`. Its downgrade
+  recreates the 0006 schema and rebuilds boxes from binders. `uq_inventory_owner_id` stays:
+  the binder tables need it.
+- `pokevault.audio` and `pokevault.spriteMode` are removed from the browser at start.
+- Backend `/api/v1/pokemon*` endpoints are unchanged.

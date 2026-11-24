@@ -216,3 +216,20 @@ and the column without touching inventory or boxes.
   tables and is exact. A later migration drops `personal_boxes` and `box_memberships`.
 - Stickers and other covers are not modeled yet (8D). Head: `0007`. Details are in
   `docs/BINDERS.md`.
+
+## Iteration 8C.1 — Drop the personal-box tables (migration `0008`)
+
+- **Upgrade:** `DROP TABLE box_memberships; DROP TABLE personal_boxes`. Inventory, binders
+  and `uq_inventory_owner_id` (created by 0004, required by `binder_pockets`) are untouched.
+  Nothing is copied: binders hold every placement.
+- **Downgrade:** recreates both tables exactly as 0006 left them and rebuilds the boxes from
+  the binders:
+  - Pockets map to a flat index `(page − 1) × 9 + (pocket − 1)`, split into boxes of 30
+    (box `index // 30`, position `index % 30`).
+  - The first box keeps the binder's id and name; the others get new ids and `"<name> (N)"`
+    (truncated to 80 characters, no trailing space).
+  - Wallpaper is `noir`, `display_order` is sequential per owner, and an empty binder
+    yields one empty box.
+- **Not preserved going backward:** the binder cover, and a binder of more than 30 pockets
+  comes back as several boxes (and, if 0007 runs again, as several binders). Which copy is
+  placed where is preserved. Head: `0008`.

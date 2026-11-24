@@ -16,7 +16,6 @@ afterEach(() => vi.unstubAllGlobals());
 describe("PokéVault application shell", () => {
   test.each([
     ["/", "Inicio"],
-    ["/boxes", "Cajas"],
     ["/pokedex", "Pokédex"],
     ["/profile", "Perfil"],
     ["/login", "Tu cuenta de PokéVault"],
@@ -34,24 +33,24 @@ describe("PokéVault application shell", () => {
     render(<App initialEntries={["/"]} />);
 
     expect(screen.getByRole("link", { name: "Inicio" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Cajas PC" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Mis carpetas" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "English" }));
 
     expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "PC Boxes" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "My binders" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Profile" })).toBeInTheDocument();
     expect(localStorage.getItem("pokevault.locale")).toBe("en");
     expect(document.documentElement.lang).toBe("en");
   });
 
-  test("old personal-box links open the binders, and /boxes is the catalog only", async () => {
-    const { unmount } = render(<App initialEntries={["/boxes?mode=personal"]} />);
+  test("old /boxes links land on the binders, a species gallery or the Pokédex", async () => {
+    const first = render(<App initialEntries={["/boxes?mode=personal"]} />);
     expect(await screen.findByRole("heading", { level: 1, name: "Mis carpetas" })).toBeInTheDocument();
-    unmount();
+    first.unmount();
     render(<App initialEntries={["/boxes"]} />);
-    expect(screen.queryByRole("group", { name: "Cajas" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Mis cajas" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Pokédex" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Cajas/ })).not.toBeInTheDocument();
   });
 
   test("falls back to Spanish for an unsupported persisted locale", () => {

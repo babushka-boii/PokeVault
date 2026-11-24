@@ -93,7 +93,7 @@ def verify_file(upload: Path, mime: str, manifest: Path) -> dict:
     for card_id, path in references:
         try:
             reference = _reference(path)
-        except (OSError, ValueError, SyntaxError, Image.DecompressionBombWarning):
+        except OSError, ValueError, SyntaxError, Image.DecompressionBombWarning:
             continue
         evidence = compare(prepared.image, reference)
         if evidence is None and prepared.rectified:

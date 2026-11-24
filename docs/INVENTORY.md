@@ -2,8 +2,8 @@
 
 Each record represents one physical card, owned by the authenticated internal user.
 The same stable TCGdex card ID may appear many times with independent properties.
-Catalog Boxes remain public species discovery. Iteration 5C adds separate My Boxes
-for placements of these same physical records; see [BOXES.md](BOXES.md).
+Physical copies are organized in binders (Iteration 8C, see [BINDERS.md](BINDERS.md)). The
+earlier catalog and personal boxes were retired (see [BOXES.md](BOXES.md), now historical).
 
 ## API contract
 

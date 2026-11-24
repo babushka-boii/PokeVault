@@ -157,11 +157,6 @@ class InventoryCopy(Base):
     )
 
 
-# personal_boxes and box_memberships (0004/0006) are frozen since 0007: they stay in
-# the database for an exact downgrade, but no code reads or writes them. A later
-# migration drops them.
-
-
 class Binder(Base):
     """A user's album of 9-pocket pages; deleting it never deletes inventory copies."""
 

@@ -48,8 +48,9 @@ def wallpapers(factory):
 def test_0006_follows_0005_and_defaults_new_boxes_to_noir(wallpaper_database):
     factory, config = wallpaper_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0007"
     assert scripts.get_revision("0006").down_revision == "0005"
+    # The box tables exist at revision 0006 (0008 later drops them).
+    command.downgrade(config, "0006")
     owner = seed_owner(factory)
     with factory.begin() as session:
         insert_box(session, owner, "Unset", 0)
@@ -59,7 +60,8 @@ def test_0006_follows_0005_and_defaults_new_boxes_to_noir(wallpaper_database):
 
 
 def test_postgres_rejects_unknown_wallpapers(wallpaper_database):
-    factory, _ = wallpaper_database
+    factory, config = wallpaper_database
+    command.downgrade(config, "0006")
     owner = seed_owner(factory)
     with pytest.raises(IntegrityError), factory.begin() as session:
         insert_box(session, owner, "Sepia", 0, "sepia")
@@ -77,7 +79,7 @@ def test_upgrade_keeps_stored_wallpapers_and_downgrade_maps_noir_to_classic(
     with pytest.raises(IntegrityError), factory.begin() as session:
         insert_box(session, owner, "Too early", 2, "noir")
 
-    command.upgrade(config, "head")
+    command.upgrade(config, "0006")
     # Existing boxes keep their value: a chosen "classic" looks like the old default.
     assert wallpapers(factory) == {"Old default": "classic", "Forest": "forest"}
     with factory.begin() as session:
@@ -94,4 +96,4 @@ def test_upgrade_keeps_stored_wallpapers_and_downgrade_maps_noir_to_classic(
         assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0005"
     command.upgrade(config, "head")
     with factory() as session:
-        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0007"
+        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0008"

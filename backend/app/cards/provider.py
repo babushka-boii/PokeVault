@@ -488,9 +488,11 @@ class CardProvider:
                 self._client() as client,
                 client.stream("GET", url, headers={"Accept": "image/webp"}) as response,
             ):
-                if response.status_code != 200 or response.headers.get(
-                    "content-type", ""
-                ).split(";")[0].lower() != "image/webp":
+                if (
+                    response.status_code != 200
+                    or response.headers.get("content-type", "").split(";")[0].lower()
+                    != "image/webp"
+                ):
                     raise ValueError("Invalid artwork response")
                 length = response.headers.get("content-length")
                 if length is not None and (
@@ -510,7 +512,7 @@ class CardProvider:
             data = bytes(body)
             self._store(self._scanner_art, url, data, 16)
             return data
-        except (ValueError, httpx.HTTPError, TimeoutError):
+        except ValueError, httpx.HTTPError, TimeoutError:
             raise CardsUnavailable from None
 
     def _client(self) -> httpx.AsyncClient:

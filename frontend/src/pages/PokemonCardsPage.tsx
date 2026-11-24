@@ -3,8 +3,8 @@ import { Link, useLocation, useParams, useSearchParams } from "react-router-dom"
 import { ExpansionSelector } from "../components/cards/ExpansionSelector";
 import { CardPreview } from "../components/cards/CardPreview";
 import { TypeBadge } from "../components/TypeBadge";
-import { PokemonSprite } from "../components/boxes/PokemonSprite";
-import { pokemonName } from "../components/boxes/pokemonLabels";
+import { PokemonSprite } from "../components/pokemon/PokemonSprite";
+import { pokemonName } from "../components/pokemon/pokemonLabels";
 import { usePokemonDetails } from "../hooks/usePokemonDetails";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";

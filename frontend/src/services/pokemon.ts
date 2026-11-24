@@ -20,10 +20,6 @@ const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000"
   "",
 );
 
-export async function fetchPokemon(signal?: AbortSignal): Promise<PokemonList> {
-  return requestPokemon("", signal);
-}
-
 export async function fetchPokemonPage(offset: number, signal?: AbortSignal): Promise<PokemonList> {
   return requestPokemon(`?offset=${offset}&limit=${BOX_SIZE}`, signal);
 }
@@ -79,13 +75,6 @@ function isHttpsUrl(value: string): boolean {
 
 
 export type SpeciesMatch = Pick<Pokemon, "national_dex_number" | "name">;
-
-export function locatePokemon(nationalDexNumber: number) {
-  return {
-    page: Math.floor((nationalDexNumber - 1) / BOX_SIZE),
-    slot: (nationalDexNumber - 1) % BOX_SIZE,
-  };
-}
 
 export async function searchPokemon(query: string, signal?: AbortSignal): Promise<SpeciesMatch[]> {
   const response = await fetch(`${apiBaseUrl}/api/v1/pokemon/search?q=${encodeURIComponent(query)}`, {

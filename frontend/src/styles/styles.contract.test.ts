@@ -81,7 +81,7 @@ describe("design tokens", () => {
 
 describe("stylesheets", () => {
   test("the contract sees the tokens, the base layer and the feature stylesheets", () => {
-    expect(Object.keys(sheets)).toEqual(expect.arrayContaining([TOKENS, BASE, "/src/styles.css", "/src/components/boxes/boxes.css"]));
+    expect(Object.keys(sheets)).toEqual(expect.arrayContaining([TOKENS, BASE, "/src/styles.css", "/src/components/binders/binders.css"]));
   });
 
   test("every stylesheet has been migrated to tokens", () => {
@@ -148,10 +148,25 @@ describe("stylesheets", () => {
     expect(reduced?.[1]).toMatch(/\.pv-home-scanner__sweep\s*\{\s*display:\s*none/);
   });
 
-  test("binder motion: a ~600 ms drop and a short page turn, both removed for reduced motion", () => {
+  test("binder motion: the card slides into the sleeve behind its front plastic, then shines; a short page turn; all removed for reduced motion", () => {
     const css = stripComments(sheets["/src/components/binders/binders.css"]);
-    const drop = /\[data-arrived="true"\][^{]*\{[^}]*animation:\s*pv-pocket-drop\s+(\d+)ms[^;]*\b1\b/.exec(css);
-    expect(Number(drop?.[1])).toBe(600);
+    const enter = /\[data-arrived="true"\] \.pv-pocket__card \{ animation: pv-pocket-enter (\d+)ms cubic-bezier\(\.22, \.61, \.36, 1\) 1 both/.exec(css);
+    expect(Number(enter?.[1])).toBe(500);
+    // It starts one card above the opening, tilted −2°, and settles minimally (≤ 1% overshoot).
+    const entry = /@keyframes pv-pocket-enter\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    expect(entry).toMatch(/0% \{ transform: translateY\(-100%\) rotate\(-2deg\); \}/);
+    expect(entry).toMatch(/100% \{ transform: translateY\(0\) rotate\(0\); \}/);
+    const shifts = [...entry.matchAll(/translateY\((-?[\d.]+)%?\)/g)].map((match) => Number(match[1]));
+    expect(shifts.length).toBeGreaterThanOrEqual(3);
+    expect(Math.max(...shifts)).toBeLessThanOrEqual(1);
+    // The front plastic covers the card (and does not let the shine out); the sleeve itself never clips.
+    const z = (selector: string) => Number(/z-index:\s*(\d+)/.exec(rules(css).find((rule) => rule.selector === selector)?.body ?? "")?.[1]);
+    expect(z(".pv-pocket__front")).toBeGreaterThan(z(".pv-pocket__card"));
+    expect(rules(css).find((rule) => rule.selector === ".pv-pocket__front")?.body).toMatch(/border-top:[^;]+;[\s\S]*overflow:\s*hidden/);
+    expect(rules(css).find((rule) => rule.selector === ".pv-pocket__sleeve")?.body).not.toMatch(/overflow/);
+    // The shine comes after the 500 ms entry.
+    const shine = /\[data-arrived="true"\] \.pv-pocket__shine \{ animation: pv-sleeve-shine 300ms ease-out (\d+)ms/.exec(css);
+    expect(Number(shine?.[1])).toBeGreaterThanOrEqual(450);
     const turns = [...css.matchAll(/animation:\s*pv-page-turn-(?:next|prev)\s+(\d+)ms[^;]*\b1\b/g)].map((match) => Number(match[1]));
     expect(turns).toHaveLength(2);
     turns.forEach((duration) => { expect(duration).toBeGreaterThanOrEqual(250); expect(duration).toBeLessThanOrEqual(300); });
@@ -164,5 +179,25 @@ describe("stylesheets", () => {
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);
+  });
+});
+
+describe("retired PC boxes (8C.1)", () => {
+  const sources = import.meta.glob("/src/**/*.{ts,tsx,css}", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
+  const app = Object.entries(sources).filter(([file]) => !/\.test\.tsx?$/.test(file) && !file.endsWith("/styles.contract.test.ts"));
+
+  test("no module imports from the removed components/boxes folder", () => {
+    expect(app.filter(([, text]) => /components\/boxes\/|from\s+["']\.{1,2}\/boxes\//.test(text)).map(([file]) => file)).toEqual([]);
+  });
+
+  test("no source mentions a /boxes path (the redirect is a route, not a link)", () => {
+    expect(app.filter(([, text]) => /["'`]\/boxes\b/.test(text)).map(([file]) => file)).toEqual([]);
+  });
+
+  test("no leftover box, wallpaper, retro-audio or menu-icon code or styles", () => {
+    // The retired-preferences cleaner is the one place that must name the old storage keys.
+    const leftovers = app.filter(([file, text]) => file !== "/src/services/retiredPreferences.ts"
+      && /retroAudio|useRetroAudio|spriteMode|useSpriteMode|menuIcon|MenuIcon|useCatalogBox|StorageGrid|\.pc-[a-z]|pc-wallpaper|wallpapers/.test(text)).map(([file]) => file);
+    expect(leftovers).toEqual([]);
   });
 });

@@ -825,3 +825,21 @@ ESLint, TypeScript, production build and whitespace passed. See [PRICES.md](PRIC
   `src/test/homeFixtures.ts`.
 - Automated tests cannot judge the cut corners, spacing or colors on a real screen. Use the
   manual checklist in `docs/ROADMAP.md` (Safari, desktop and iPhone-size responsive mode).
+
+## Iteration 8C.1 — PC boxes retired
+
+The manual checklists above that open `/boxes` (catalog boxes: wallpapers, sound, sprite
+modes, box search, the box journey) are **historical**; the feature was removed.
+
+- **Applying migration 0008** (drops the personal-box tables). Make a backup first, with your
+  own connection data (the session never reads `backend/.env`):
+  ```bash
+  pg_dump "postgresql://USER@HOST:PORT/DBNAME" -Fc -f ~/pokevault-before-0008.dump
+  cd backend && .venv/bin/alembic upgrade head
+  .venv/bin/alembic current   # 0008 (head)
+  ```
+  Restore with `pg_restore -d "postgresql://USER@HOST:PORT/NEWDBNAME" ~/pokevault-before-0008.dump`
+  into an empty database. To go back one step: `.venv/bin/alembic downgrade 0007`.
+- **Manual check:** `/boxes` opens the Pokédex; `/boxes?pokemon=559` opens Scraggy's gallery;
+  `/boxes?mode=personal` opens the binders; the Pokédex pages 1–35 and finds species by name
+  and number; no nav or Explorar entry says "Cajas PC".

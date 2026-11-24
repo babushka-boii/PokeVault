@@ -18,8 +18,8 @@ test("allows the backend's maximum expansion identifier length", () => {
 });
 
 test.each([
-  "/boxes?box=19&pokemon=559&wallpaper=ocean",
   "/pokedex",
+  "/pokedex?page=19",
   "/pokemon/25/cards?page=2&sort=id&set_id=sm9&returnTo=%2Fpokedex",
   "/sets?q=base&sort=oldest&page=2",
   "/sets/sv03.5?ownership=missing&page=3",
@@ -28,7 +28,7 @@ test.each([
   expect(safeReturnTo(destination)).toBe(destination);
 });
 
-test.each([null, "https://evil.example", "//evil.example", "/\\evil.example", "/profile", "/pokemon/0/cards", "/pokemon/1026/cards", "/pokemon/25/cards/extra", "/sets/invalid_id", "/sets/sm9/cards", "/sets//evil", "/boxes#oops", "/boxes?x=\n", `/boxes?x=${"a".repeat(2048)}`])("rejects unsafe or unsupported return destination: %s", (destination) => {
+test.each([null, "/boxes", "/boxes?box=19&pokemon=559&wallpaper=ocean", "https://evil.example", "//evil.example", "/\\evil.example", "/profile", "/pokemon/0/cards", "/pokemon/1026/cards", "/pokemon/25/cards/extra", "/sets/invalid_id", "/sets/sm9/cards", "/sets//evil", "/boxes#oops", "/boxes?x=\n", `/boxes?x=${"a".repeat(2048)}`])("rejects unsafe or unsupported return destination: %s", (destination) => {
   expect(safeReturnTo(destination)).toBe("/pokedex");
 });
 
