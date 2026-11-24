@@ -9,7 +9,7 @@ import { BoxSearch } from "../components/boxes/BoxSearch";
 import { AudioControls } from "../components/boxes/AudioControls";
 import { SelectedPokemon } from "../components/boxes/SelectedPokemon";
 import { StorageGrid } from "../components/boxes/StorageGrid";
-import { wallpapers, type Wallpaper } from "../components/boxes/wallpapers";
+import { DEFAULT_WALLPAPER, wallpapers, type Wallpaper } from "../components/boxes/wallpapers";
 import "../components/boxes/boxes.css";
 import { PersonalBoxesPage } from "./PersonalBoxesPage";
 
@@ -21,7 +21,7 @@ function readBoxLocation(params: URLSearchParams) {
   const first = page * BOX_SIZE + 1;
   const last = Math.min(first + BOX_SIZE - 1, NATIONAL_DEX_TOTAL);
   const selected = Number.isInteger(number) && number >= first && number <= last ? number - first : 0;
-  const wallpaper = wallpapers.find((preset) => preset === params.get("wallpaper")) ?? "classic";
+  const wallpaper = wallpapers.find((preset) => preset === params.get("wallpaper")) ?? DEFAULT_WALLPAPER;
   return { page, selected, wallpaper };
 }
 

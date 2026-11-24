@@ -15,7 +15,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - Frontend: React + TypeScript + Vite + CSS plano con variables (sin Tailwind) + React Router, ES/EN (`frontend/src/i18n`).
 - Backend: Python + FastAPI + SQLAlchemy + Alembic + PostgreSQL. Login con Google (OIDC).
 - Integraciones: PokéAPI, TCGdex, Tesseract + Pillow + pillow-heif (OCR).
-- Migración actual: `0005` (precios de referencia, Iteración 7).
+- Migración actual: `0006` (fondo de caja "Unova Noir" predeterminado, Iteración 8A; antes `0005` precios).
 
 ## Comandos (en el Mac de Naim)
 - Validación completa: `bash scripts/check.sh` (unittest, pytest, ruff, vitest, eslint, tsc, build, git diff --check).
@@ -36,7 +36,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - Iteración 7 (precios de referencia) mezclada en `main` (PR #5). Aceptación manual en Safari OK el 2026-11-23 (detalle de carta, copia reverse, Perfil, CLP/USD con y sin sesión, caja). Pendiente: revisar el enlace de atribución y el comportamiento sin red.
 - Precios: TCGdex Cardmarket `trend` EUR (respaldo TCGplayer `marketPrice` USD) por variante de la copia; tasas de ExchangeRate-API (mindicador.cl no respondió). Atribución obligatoria "Rates By Exchange Rate API" y no redistribuir tasas. Detalle en docs/PRICES.md.
 - Prueba local del OCR: la sesión de Claude puede copiar `backend/app` y fotos a su entorno y correr `recognize_file` con Tesseract (Python 3.13 necesita paréntesis en `except A, B:`; no tocar el repo por eso).
-- Iteración 8A (rediseño "Unova Noir": tokens, shell y Inicio) implementada en `feat/iteration-8a-unova-noir`, sin push ni PR; `check.sh` exit 0. Pendiente: una revisión visual en Safari (lista en docs/ROADMAP.md), push y PR. Estilos: CSS con variables en `frontend/src/styles/tokens.css` (único lugar con colores; lo vigila una prueba de contrato). Fases siguientes: 8B guardar rápido + escáner animado, 8C Mi PC fácil, 8D favoritas + carrusel, 8E carpeta 3×3 + master set, 8F perfil con entrenador. Deuda: endpoint de "expansiones que tengo" (necesario en 8E).
+- Iteración 8A (rediseño "Unova Noir": tokens, shell y Inicio) implementada en `feat/iteration-8a-unova-noir`, sin push ni PR; `check.sh` exit 0. Incluye la migración `0006` (fondo `noir` por defecto; las cajas existentes conservan su fondo), que Naim debe aplicar con `alembic upgrade head`. Pendiente: una revisión visual en Safari (lista en docs/ROADMAP.md), push y PR. Estilos: CSS con variables en `frontend/src/styles/tokens.css` (único lugar con colores; lo vigila una prueba de contrato). Fases siguientes: 8B guardar rápido + escáner animado, 8C Mi PC fácil, 8D favoritas + carrusel, 8E carpeta 3×3 + master set, 8F perfil con entrenador. Deuda: endpoint de "expansiones que tengo" (necesario en 8E).
 - Futuro: wishlist/intercambios.
 
 ## Documentación

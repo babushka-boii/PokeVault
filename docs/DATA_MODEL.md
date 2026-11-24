@@ -120,7 +120,8 @@ never on populated development data.
 
 Alembic `0004` adds `PersonalBox` / `personal_boxes` and `BoxMembership` /
 `box_memberships`, reusing `InventoryCopy`. Box UUIDs are stable. Names are trimmed
-1–80 characters; wallpapers are constrained to classic/forest/ocean/night. Box
+1–80 characters; wallpapers are constrained to noir/classic/forest/ocean/night (`noir` added and made
+the default by migration `0006`). Box
 `display_order` is nonnegative and unique per owner, separate from slot `position`.
 Timezone-aware created/updated timestamps describe the persisted box.
 
@@ -188,4 +189,13 @@ transaction ledger. Existing attributes, constraints and box ownership remain in
 
 No price is stored per copy: copy, collection and box values are derived at read time
 from the owner's copies and the shared snapshots. Downgrade to `0004` drops both tables
-and the column without touching inventory or boxes. Head: `0005`.
+and the column without touching inventory or boxes.
+
+## Iteration 8A — Default box wallpaper (migration `0006`)
+
+- `ck_personal_boxes_wallpaper` accepts `noir`, `classic`, `forest`, `ocean` and `night`;
+  `personal_boxes.wallpaper` defaults to `noir` (server default and API default).
+- Existing boxes keep their stored wallpaper: a chosen `classic` cannot be told apart from
+  the old default, so nothing is rewritten.
+- Downgrade to `0005` maps `noir` to `classic` and restores the four-value check and the
+  `classic` default. Head: `0006`.

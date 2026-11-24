@@ -92,6 +92,11 @@
 .pc-page .pc-screen .pc-slot:hover { background: #fff8df44; }
 /* pv-allow-colors-end */
 
+/* "Unova Noir" wallpaper (default): dark screen with a subtle dot grid, tokens only. */
+.pc-wallpaper--noir .pc-screen { background-color: var(--pv-bg); background-image: radial-gradient(var(--pv-border) 1px, transparent 1.5px); background-size: 16px 16px; box-shadow: inset 0 0 0 1px var(--pv-border-soft); }
+.pc-wallpaper--noir .pc-screen .pc-slot--empty, .pc-wallpaper--noir .pc-screen .pc-missing { color: var(--pv-text-3); }
+.pc-page .pc-wallpaper--noir .pc-screen .pc-slot:hover { background: var(--pv-cyan-soft); }
+
 @media (max-width: 760px) {
   .pc-intro { display: block; }
   .pc-preview { max-width: none; }

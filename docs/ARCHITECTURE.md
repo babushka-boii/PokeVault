@@ -481,7 +481,8 @@ it. Details and contracts: [PRICES.md](PRICES.md).
 
 ## Iteration 8A — Styles layer, shell and Home
 
-Frontend only; no backend, endpoint or database change.
+Frontend, plus one small migration added at the student's request: `0006` adds the
+`noir` box wallpaper and makes it the default (see DATA_MODEL).
 
 - `frontend/src/styles/tokens.css` (only file with palette hex values) and
   `styles/base.css` (element defaults with zero specificity, focus ring, reduced motion,

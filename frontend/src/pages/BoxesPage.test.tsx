@@ -97,7 +97,7 @@ test("menu icon mode changes without resetting selection, reloading catalog or p
   render(<App initialEntries={["/boxes"]} />);
   const first = await screen.findByRole("button", { name: /#001/ });
   expect(first.querySelector('img')?.getAttribute('src')).toContain('/generation-v/icons/1.png');
-  expect(screen.getByRole('button', { name: 'Clásico' })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByRole('button', { name: 'Unova Noir' })).toHaveAttribute('aria-pressed', 'true');
   await user.click(screen.getByRole('button', { name: /#002/ }));
   await user.click(screen.getByRole('checkbox', { name: 'Sonido' }));
   await user.click(screen.getByRole('radio', { name: 'Animados' }));

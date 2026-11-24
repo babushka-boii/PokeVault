@@ -486,3 +486,19 @@ For each one, confirm:
 ## Execution evidence
 
 (Filled in during implementation.)
+
+### Student fixes before closing 8A (2026-11-23)
+
+- Picker: the place button showed the copy UUID. It now reads "Colocar aquí" / "Place here";
+  the accessible name adds card name, expansion and slot. A test fails if a UUID appears as
+  visible text or in a picker button name.
+- "Unova Noir" box wallpaper: the student chose migration `0006` (an approved exception to
+  "no backend change"): `noir` joins the CHECK and the API `Literal`, and becomes the server
+  and API default. Existing rows keep their value. The frontend lists Noir first, uses it
+  for new boxes and as the catalog default. Tests: backend default and every wallpaper
+  selectable, a PostgreSQL migration test (default, unknown value rejected, upgrade keeps
+  stored values, downgrade maps `noir` to `classic`), and frontend default/options/create.
+  Expectations that encoded the old default (`classic`) were updated: `CardEntrypoints`,
+  `BoxesPage`, `test_boxes.py`; head assertions moved to `0006`.
+- `bash scripts/check.sh` exit 0: 43 provider, 793 backend (3 new migration tests), 512
+  frontend tests.

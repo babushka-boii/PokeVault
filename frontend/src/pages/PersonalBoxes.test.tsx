@@ -74,6 +74,8 @@ test("creates, renames, reorders and confirms box deletion while retaining inven
   await waitFor(() => expect(screen.queryByRole("option", { name: "Treasures" })).not.toBeInTheDocument());
   expect(calls.find((c) => c.path.endsWith("/order"))?.body).toEqual({ box_ids: [second, id] });
   expect(calls.every((c) => !c.path.includes("inventory"))).toBe(true);
+  // New boxes start with the dark "Unova Noir" wallpaper.
+  expect(calls.find((c) => c.method === "POST")?.body).toEqual({ name: "New box", wallpaper: "noir" });
 });
 
 test("places only an unassigned owned copy and uses expected UUID on removal", async () => {

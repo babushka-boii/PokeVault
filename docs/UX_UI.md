@@ -410,8 +410,11 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
   from the most recent copies. Guests see a public hero and make no private requests.
   Each section has its own skeleton, error and retry; an empty collection shows "Tu primera
   caja te espera". "Estado del sistema" is a closed footer, signed-in only.
-- **Existing pages** inherit the tokens without structural changes. The retro PC wallpapers
-  remain light screens inside a dark frame (user-chosen content).
+- **Existing pages** inherit the tokens without structural changes. Boxes default to the
+  dark "Unova Noir" wallpaper (tokens, subtle dot grid); the four retro wallpapers remain
+  selectable light screens inside a dark frame (user-chosen content).
+- The unassigned-copy picker shows "Colocar aquí"; its accessible name adds the card name,
+  expansion and slot. Copy UUIDs are never shown or announced there.
 - Automated tests cover tokens (contrast, no raw colors, motion, pixel size), the shell in
   both layouts and Home states; they do not certify real-device appearance. Manual Safari
   acceptance is listed in `docs/ROADMAP.md`.
