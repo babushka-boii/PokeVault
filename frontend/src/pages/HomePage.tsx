@@ -1,16 +1,31 @@
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
+import { useCollectionValuation } from "../components/prices/useCollectionValuation";
+import { EmptyHome } from "../components/home/EmptyHome";
 import { GuestHome } from "../components/home/GuestHome";
+import { PcPreview } from "../components/home/PcPreview";
 import { ScannerCard } from "../components/home/ScannerCard";
+import { SetsProgress } from "../components/home/SetsProgress";
 import { SystemStatusFooter } from "../components/home/SystemStatusFooter";
+import { TopCards } from "../components/home/TopCards";
+import { ValueHero } from "../components/home/ValueHero";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useLocale } from "../i18n/LocaleProvider";
 import "../components/home/home.css";
 
+/** Each section owns its request, skeleton and error; only the valuation is shared by the hero and the top cards. */
 function SignedInHome() {
+  const valuation = useCollectionValuation();
+  const empty = valuation.state.kind === "loaded" && valuation.state.data.copy_count === 0;
   return <>
     <div className="pv-home__grid">
+      {empty ? <EmptyHome /> : <ValueHero resource={valuation} />}
       <div className="pv-home__side"><ScannerCard /></div>
+      {!empty && <>
+        <TopCards resource={valuation} />
+        <PcPreview />
+        <SetsProgress />
+      </>}
     </div>
     <SystemStatusFooter />
   </>;

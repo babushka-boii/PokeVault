@@ -141,6 +141,13 @@ describe("stylesheets", () => {
     expect(offenders).toEqual([]);
   });
 
+  test("the scanner sweep only plays on hover or focus and is removed for reduced-motion users", () => {
+    const css = stripComments(sheets["/src/components/home/home.css"]);
+    expect(css).toMatch(/\.pv-home-scanner:hover \.pv-home-scanner__sweep,\s*\.pv-home-scanner:focus-within \.pv-home-scanner__sweep\s*\{[^}]*animation:[^;}]*\b1\b/);
+    const reduced = /@media \(prefers-reduced-motion: reduce\)\s*\{([^}]*)\}/.exec(css);
+    expect(reduced?.[1]).toMatch(/\.pv-home-scanner__sweep\s*\{\s*display:\s*none/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);

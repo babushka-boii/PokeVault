@@ -386,7 +386,7 @@ Alternatives that were considered and rejected:
   `test/homeFixtures.ts` for boxes and recent copies.
 
 **Steps:**
-- [ ] Write failing tests for every authenticated case in spec §13:
+- [x] Write failing tests for every authenticated case in spec §13:
   - Hero total, chips, the variant link and the attribution link.
   - Rates unavailable.
   - Top 5 order and links.
@@ -399,7 +399,7 @@ Alternatives that were considered and rejected:
   - Switching user.
   - Loading shows `aria-busy` and no spinner.
   - Reduced motion: no tilt and no sweep.
-- [ ] Implement:
+- [x] Implement:
   - **`ValueHero` + `TopCards`:** one shared `useCollectionValuation`. Reuse
     `PriceText`, `RatesAttribution` and `ReferenceNote`, and the existing
     `ValueTotal` formatting rules.
@@ -408,11 +408,26 @@ Alternatives that were considered and rejected:
     `.pv-home-pc` scoped restyle (dots and cyan cursor).
   - **`SetsProgress`:** `fetchBoxView("recent")` → `usePersonalMetadata` → set ids
     (first 6 distinct) → `fetchSetProgress`. Reuse `SetProgress compact`.
-- [ ] Keep request counts bounded:
+- [x] Keep request counts bounded:
   - Guests make no private requests.
   - Signed-in users make 1 valuation request + 2 box requests + 1 unassigned + 1
     recent + 1 progress request.
   - Card metadata comes through `usePersonalMetadata`, 4 at a time.
+- Evidence:
+  - 40 files / 509 tests green (17 new data tests in `HomeData.test.tsx`, 1 new
+    contract test); lint, typecheck and build pass.
+  - `BoxSearch.test` failed twice in one run because of timing under load (5 s timeout);
+    it passed alone and in the next full run. It is unrelated to 8A, so it is noted
+    here instead of changed.
+  - The hero and the top cards share one valuation request. On failure only the hero
+    shows the alert and retry; the top cards show a quiet message, so the page never has
+    two identical retry buttons.
+  - The top-card artwork link is `aria-hidden` with `tabIndex=-1`: the card name link is
+    the single accessible link per card, and the artwork stays a pointer/touch shortcut.
+  - The data sections mount while the valuation is loading. For an empty collection they
+    unmount (aborting their requests) once the valuation arrives.
+  - Requests for a signed-in Home: 1 valuation, 1 box list, 1 box detail, 1 unassigned
+    view, 1 recent view, 1 set progress, plus public card metadata (4 at a time).
 
 ### Task 7: Review, validation and docs
 
