@@ -98,7 +98,7 @@ Approved answers to spec §11 (2026-11-24).
   `test_prices_postgres.py`, `test_set_completion_postgres.py`.
 
 **Steps:**
-- [ ] Write the failing PostgreSQL tests from spec §9.4:
+- [x] Write the failing PostgreSQL tests from spec §9.4:
   - `0008` follows `0007` and is the head.
   - Upgrade drops both tables, keeps `uq_inventory_owner_id`, leaves inventory and binders
     byte-identical, and a binder foreign key to inventory still works.
@@ -115,14 +115,35 @@ Approved answers to spec §11 (2026-11-24).
     foreign keys, checks and indexes as 0006 (this is the ported box-table suite).
   - `upgrade → downgrade → upgrade` leaves the binders identical.
   - `downgrade 0006 → upgrade head` keeps every copy in its pocket.
-- [ ] Pin the tests that assumed the box tables exist at head:
+- [x] Pin the tests that assumed the box tables exist at head:
   - `test_box_wallpaper_postgres.py` to revision `0006`.
   - `test_binders_migration_postgres.py` to revision `0007`.
   - Head assertions `0007` → `0008`.
   - The table list in `test_set_completion_postgres.py` drops the two box tables.
-- [ ] Implement the migration until green; Ruff clean; the full backend suite passes,
+- [x] Implement the migration until green; Ruff clean; the full backend suite passes,
   including the existing full-chain test down to `0003` and back.
-- [ ] Commit.
+- [x] Commit.
+- Evidence:
+  - `0008_drop_personal_boxes.py`: upgrade drops `box_memberships` and `personal_boxes` only;
+    downgrade recreates both exactly as 0006 left them and rebuilds the boxes in Python.
+  - `test_drop_box_tables_postgres.py` (7 tests): head and parent, upgrade keeps
+    `uq_inventory_owner_id`, inventory and binders byte-identical and the binder foreign key
+    still rejects forged owners, 30-pocket splitting (indexes 0, 29, 30, 100, 359 → boxes
+    1, 2, 4, 12), the first box reuses the binder id, an empty binder yields one empty box,
+    name truncation with and without a trailing space, per-owner isolation and sequential
+    order, `upgrade → downgrade → upgrade`, and a trip back to 0006.
+  - Planted bugs were all caught: a fresh id for the first box, no space trimming, and
+    positions shifted by one.
+  - `test_box_tables_rebuild_postgres.py` (22 cases): the old frozen-table constraint tests
+    now run against the rebuilt tables, plus a new test that names, checks, uniques, foreign
+    keys, the index, the `noir` default and primary keys match 0006.
+  - Pinned to a revision (they assumed the box tables exist at head):
+    `test_box_wallpaper_postgres.py` → 0006, `test_binders_migration_postgres.py` → 0007.
+    Heads moved to 0008 in the prices and set-completion tests, and the set-completion table
+    list lost the two box tables.
+  - Backend: 839 passed; Ruff clean.
+  - The student said 8C was merged into `main`, but `origin/main` still ended at PR #6, so
+    this branch starts from the 8C tip (`af7760b`).
 
 ### Task 2: Pokédex reachability (D1 = B)
 

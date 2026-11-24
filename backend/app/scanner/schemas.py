@@ -10,7 +10,11 @@ from app.cards.set_schemas import SetCard, SetSummary
 MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 EngineLanguage = Literal["eng", "spa"]
 Evidence = Literal[
-    "name_exact", "name_similar", "number_exact", "set_exact", "printed_total",
+    "name_exact",
+    "name_similar",
+    "number_exact",
+    "set_exact",
+    "printed_total",
     "visual_features",
 ]
 

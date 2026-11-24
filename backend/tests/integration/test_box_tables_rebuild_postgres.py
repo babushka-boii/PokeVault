@@ -1,8 +1,9 @@
-"""Frozen personal-box tables (0004/0006) keep their constraints until a later drop.
+"""The personal-box tables rebuilt by the 0008 downgrade keep every 0006 constraint.
 
-The boxes API was retired in 8C (binders replace it; see test_binders_postgres.py).
-These raw-SQL tests prove the frozen tables still enforce ownership and integrity.
-Real constraints run in disposable PostgreSQL schemas.
+Migration 0008 drops the box tables (binders replaced them in 8C). Its downgrade must
+recreate them exactly as 0006 left them. These raw-SQL tests run against the tables that
+the downgrade rebuilds, so a missing key, check or cascade fails here. Everything
+runs in disposable PostgreSQL schemas.
 
 The existing auth fixture guards the configured test database and creates a fresh
 schema for every test. No test migrates or writes the populated application schema.
@@ -25,8 +26,16 @@ from app.main import create_app
 
 from . import test_auth_postgres
 
-boxes_database = test_auth_postgres.auth_database
+rebuilt_base = test_auth_postgres.auth_database
 ORIGIN = "http://localhost:5173"
+
+
+@pytest.fixture
+def boxes_database(rebuilt_base):
+    """The disposable schema at 0007, whose box tables 0008's downgrade just rebuilt."""
+    factory, config = rebuilt_base
+    command.downgrade(config, "0007")
+    return factory, config
 
 
 def seed_owner(factory, subject=None, copies=2, boxes=2):
@@ -138,7 +147,7 @@ def client_for(app, owner):
 def test_migration_has_owner_foreign_keys_and_exact_unique_keys(boxes_database):
     factory, config = boxes_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0007"
+    assert scripts.get_current_head() == "0008"
     assert scripts.get_revision("0004").down_revision == "0003"
     with factory() as session:
         inspector = inspect(session.get_bind())
@@ -170,6 +179,56 @@ def test_migration_has_owner_foreign_keys_and_exact_unique_keys(boxes_database):
             assert columns in [
                 key["column_names"] for key in inspector.get_unique_constraints(table)
             ]
+
+
+def test_rebuilt_tables_keep_the_0006_names_defaults_and_indexes(boxes_database):
+    factory, _ = boxes_database
+    with factory() as session:
+        inspector = inspect(session.get_bind())
+        assert {
+            c["name"] for c in inspector.get_check_constraints("personal_boxes")
+        } == {
+            "ck_personal_boxes_name",
+            "ck_personal_boxes_order",
+            "ck_personal_boxes_wallpaper",
+        }
+        wallpaper_check = next(
+            c["sqltext"]
+            for c in inspector.get_check_constraints("personal_boxes")
+            if c["name"] == "ck_personal_boxes_wallpaper"
+        )
+        assert "noir" in wallpaper_check
+        assert {
+            c["name"] for c in inspector.get_check_constraints("box_memberships")
+        } == {"ck_box_membership_position"}
+        assert {
+            k["name"] for k in inspector.get_unique_constraints("personal_boxes")
+        } == {
+            "uq_personal_boxes_owner_id",
+            "uq_personal_boxes_owner_order",
+        }
+        assert {
+            k["name"] for k in inspector.get_unique_constraints("box_memberships")
+        } == {"uq_box_membership_copy"}
+        assert {k["name"] for k in inspector.get_foreign_keys("box_memberships")} == {
+            "fk_box_membership_owned_box",
+            "fk_box_membership_owned_copy",
+        }
+        assert "ix_box_membership_owner" in {
+            i["name"] for i in inspector.get_indexes("box_memberships")
+        }
+        columns = {c["name"]: c for c in inspector.get_columns("personal_boxes")}
+        assert "noir" in str(columns["wallpaper"]["default"])
+        assert [c["nullable"] for c in columns.values()] == [False] * len(columns)
+        assert inspector.get_pk_constraint("personal_boxes")["constrained_columns"] == [
+            "id"
+        ]
+        assert inspector.get_pk_constraint("box_memberships")[
+            "constrained_columns"
+        ] == [
+            "box_id",
+            "position",
+        ]
 
 
 @pytest.mark.parametrize(
@@ -318,5 +377,9 @@ def test_upgrade_and_downgrade_preserve_existing_0003_inventory(boxes_database):
         )
     assert {row["id"]: dict(row) for row in rows(factory, "inventory_copies")} == before
     command.upgrade(config, "head")
-    assert rows(factory, "box_memberships") == []
+    # At head 0008 has dropped the box tables again; the inventory is intact.
+    with factory() as session:
+        assert not {"personal_boxes", "box_memberships"} & set(
+            inspect(session.get_bind()).get_table_names()
+        )
     assert {row["id"]: dict(row) for row in rows(factory, "inventory_copies")} == before

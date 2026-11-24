@@ -1,4 +1,7 @@
-"""Migration 0007: personal boxes become binders; the box tables stay frozen."""
+"""Migration 0007: personal boxes become binders; the box tables stay frozen.
+
+Each test pins revision 0007 explicitly: 0008 later drops the box tables.
+"""
 
 from datetime import UTC, datetime
 from uuid import uuid4
@@ -95,8 +98,9 @@ def snapshot_boxes(factory):
 def test_0007_follows_0006(binders_database):
     factory, config = binders_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0007"
     assert scripts.get_revision("0007").down_revision == "0006"
+    # The box tables are frozen at 0007 (0008 later drops them).
+    command.downgrade(config, "0007")
     tables = set(inspect(factory().get_bind()).get_table_names())
     assert {"binders", "binder_pockets", "personal_boxes", "box_memberships"} <= tables
 
@@ -109,7 +113,7 @@ def test_upgrade_maps_every_box_and_slot_and_downgrade_restores_0006(
     seeded = seed_boxes(factory)
     before = snapshot_boxes(factory)
 
-    command.upgrade(config, "head")
+    command.upgrade(config, "0007")
     binders = {
         row.id: row
         for row in rows(
@@ -151,10 +155,10 @@ def test_upgrade_maps_every_box_and_slot_and_downgrade_restores_0006(
         assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0006"
 
     # A second full cycle is clean and maps the same data again.
-    command.upgrade(config, "head")
+    command.upgrade(config, "0007")
     assert rows(factory, "SELECT count(*) FROM binder_pockets")[0][0] == 8
     command.downgrade(config, "0006")
-    command.upgrade(config, "head")
+    command.upgrade(config, "0007")
 
 
 @pytest.mark.parametrize(
@@ -194,7 +198,7 @@ def test_postgres_enforces_binder_constraints(binders_database, statement):
     factory, config = binders_database
     command.downgrade(config, "0006")
     seeded = seed_boxes(factory)
-    command.upgrade(config, "head")
+    command.upgrade(config, "0007")
     ash, misty = seeded["ash"], seeded["misty"]
     params = {
         "user": ash["user"],
@@ -214,7 +218,7 @@ def test_new_binders_default_to_the_noir_cover_and_cascade_only_pockets(
     factory, config = binders_database
     command.downgrade(config, "0006")
     seeded = seed_boxes(factory)
-    command.upgrade(config, "head")
+    command.upgrade(config, "0007")
     ash = seeded["ash"]
     with factory.begin() as session:
         session.execute(

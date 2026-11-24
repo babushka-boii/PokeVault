@@ -221,6 +221,11 @@ DROP TABLE personal_boxes;
   inherent to going backward from a larger model, and the data is not lost.
 - `upgrade → downgrade → upgrade` leaves the binders identical, because nothing in the
   binder tables is touched by 0008.
+- Going all the way back to `0006` and forward again keeps every copy placed. A binder
+  whose pockets all fall within its first 30 comes back to **exactly the same pockets**.
+  A larger binder returns as several binders (`Name`, `Name (2)`, …) because each rebuilt
+  box becomes its own binder when 0007 runs again; the copies are the same, but they no
+  longer share a binder.
 
 ### Student safety (D7)
 
@@ -319,7 +324,8 @@ Every removed or changed test is listed with its reason.
   no trailing space; `display_order` is sequential and unique per owner; two owners stay
   isolated; wallpaper `noir`.
 - Full cycle `upgrade → downgrade → upgrade` leaves the binders identical, and `downgrade
-  to 0006 → upgrade head` keeps every copy in its pocket.
+  to 0006 → upgrade head` keeps every copy placed: exact pockets for a binder within its
+  first 30, and the split binders described above for a larger one.
 - Full chain down to `0003` and back to head (existing test) passes.
 
 ### 9.5 Full validation
