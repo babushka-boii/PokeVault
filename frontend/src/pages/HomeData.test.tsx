@@ -118,6 +118,18 @@ describe("Mi PC", () => {
     expect(within(pc).getByRole("link", { name: "Abrir Mi PC" })).toHaveAttribute("href", "/boxes?mode=personal");
   });
 
+  test("never shows or announces a copy UUID in the grid or the selected copy panel", async () => {
+    stubHome();
+    render(<App initialEntries={["/"]} />);
+    const pc = await screen.findByRole("region", { name: "Mi PC" });
+    const grid = await within(pc).findByRole("grid");
+    await within(pc).findByRole("heading", { name: "Card 1" });
+    const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+    expect(pc.textContent).not.toMatch(uuid);
+    for (const element of pc.querySelectorAll("[aria-label]")) expect(element.getAttribute("aria-label")).not.toMatch(uuid);
+    expect(within(grid).getAllByRole("button")[2]).toHaveAccessibleName(/^Espacio 3: Card 1 · Expansion 1;/);
+  });
+
   test("hides the unassigned shortcut when every card has a box and is read-only", async () => {
     const request = stubHome({ unassigned: 0 });
     render(<App initialEntries={["/"]} />);

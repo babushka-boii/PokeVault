@@ -413,8 +413,11 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
 - **Existing pages** inherit the tokens without structural changes. Boxes default to the
   dark "Unova Noir" wallpaper (tokens, subtle dot grid); the four retro wallpapers remain
   selectable light screens inside a dark frame (user-chosen content).
-- The unassigned-copy picker shows "Colocar aquí"; its accessible name adds the card name,
-  expansion and slot. Copy UUIDs are never shown or announced there.
+- Copy UUIDs are never shown or announced in the personal-box views: the unassigned-copy
+  picker shows "Colocar aquí" (accessible name: card, expansion and slot), the selected-copy
+  panel has no UUID row, and grid slot names read "Espacio N: carta · expansión; idioma,
+  variante, estado". The same grid is used by the Home Mi PC preview. Tests fail if a UUID
+  appears as visible text or in an `aria-label` there.
 - Automated tests cover tokens (contrast, no raw colors, motion, pixel size), the shell in
   both layouts and Home states; they do not certify real-device appearance. Manual Safari
   acceptance is listed in `docs/ROADMAP.md`.

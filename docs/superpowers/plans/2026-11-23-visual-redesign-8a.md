@@ -502,3 +502,10 @@ For each one, confirm:
   `BoxesPage`, `test_boxes.py`; head assertions moved to `0006`.
 - `bash scripts/check.sh` exit 0: 43 provider, 793 backend (3 new migration tests), 512
   frontend tests.
+- Follow-up fix: the selected-copy panel no longer has a "UUID de copia" row, and grid slot
+  names no longer include the card id or the copy UUID (they read "Espacio N: carta ·
+  expansión; idioma, variante, estado"). Anti-UUID tests cover the picker, the grid, the
+  panel and the Home Mi PC preview. The scanner success screen still shows the saved copy
+  id; it was outside this request.
+- `bash scripts/check.sh` exit 0 after this follow-up: 43 provider, 793 backend, 514 frontend
+  tests.

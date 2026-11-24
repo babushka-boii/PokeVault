@@ -413,8 +413,8 @@ Spec and plan: `docs/superpowers/specs|plans/2026-11-23-visual-redesign-8a*`.
 - [x] Task 7: self-review against the plan's review focus, documentation and the manual
   checklist below. The independent subagent review was not launched (no request for it).
 - [x] `bash scripts/check.sh` exit 0 (latest counts in the plan's execution evidence).
-- [x] Student fixes before closing 8A: the picker shows "Colocar aquí" (no UUID, guarded by a
-  test), and a dark "Unova Noir" box wallpaper is the default for new boxes and the public
+- [x] Student fixes before closing 8A: no copy UUID in the personal-box picker, selected-copy
+  panel or grid slot names (also the Home preview), guarded by tests; and a dark "Unova Noir" box wallpaper is the default for new boxes and the public
   catalog box (migration `0006`; existing boxes keep theirs; the 4 retro wallpapers remain).
 - [ ] Student applies migration `0006` (`cd backend && .venv/bin/alembic upgrade head`).
 - [ ] Manual acceptance in Safari (single pass, before push and PR).

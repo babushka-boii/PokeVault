@@ -39,7 +39,9 @@ test("renders 30 navigable positions and physical identity with direct copy and 
   expect(within(grid).getAllByRole("gridcell")).toHaveLength(30);
   expect(screen.getByRole("link", { name: "Editar copia" })).toHaveAttribute("href", `/collection/${copyId}`);
   expect(screen.getByRole("link", { name: "Ver impresión" })).toHaveAttribute("href", `/cards/${copy.card_id}`);
-  expect(screen.getByText(copyId)).toBeVisible();
+  // The physical copy is identified by card name and expansion, never by its UUID.
+  expect(screen.queryByText(copyId)).not.toBeInTheDocument();
+  expect(within(grid).getAllByRole("button")[0]).toHaveAccessibleName("Espacio 1: Bulbasaur · Base Set; Japonés, Holográfica, Casi impecable");
   const slot = within(grid).getAllByRole("button")[0]; slot.focus(); await user.keyboard("{ArrowDown}");
   expect(within(grid).getAllByRole("button")[6]).toHaveFocus();
   expect(screen.getByText("Espacio vacío 7")).toBeVisible();
@@ -97,6 +99,22 @@ test("places only an unassigned owned copy and uses expected UUID on removal", a
 
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
+/** No UUID in visible text or in any accessible name (aria-label) inside the element. */
+function expectNoUuid(root: HTMLElement) {
+  expect(root.textContent).not.toMatch(UUID);
+  for (const element of root.querySelectorAll("[aria-label], [aria-labelledby]")) {
+    expect(element.getAttribute("aria-label") ?? "").not.toMatch(UUID);
+  }
+}
+
+test("the personal box grid and the selected copy panel never show or announce a UUID", async () => {
+  setup(); render(<App initialEntries={["/boxes?mode=personal"]} />);
+  const grid = await screen.findByRole("grid");
+  await screen.findByText("Birthday gift");
+  expectNoUuid(grid); expectNoUuid(screen.getByRole("complementary", { name: "Copia seleccionada" }));
+  expect(screen.getByRole("complementary", { name: "Copia seleccionada" })).not.toHaveTextContent("UUID");
+});
+
 test("the unassigned-copy picker never shows a UUID as visible text or in button names", async () => {
   setup((url) => url.pathname.endsWith(id) ? json({ ...box, copy_count: 0, slots: [] }) : undefined);
   const user = userEvent.setup(); render(<App initialEntries={["/boxes?mode=personal"]} />);
@@ -122,7 +140,8 @@ test("shows conflict and refetches persisted placement, preserving physical iden
   await user.click(screen.getByRole("button", { name: "Mover copia" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("La caja cambió");
   await waitFor(() => expect(detailReads).toBeGreaterThan(1));
-  expect(screen.getByText(copyId)).toBeVisible();
+  expect(within(screen.getByRole("complementary", { name: "Copia seleccionada" })).getAllByText(copy.card_id).length).toBeGreaterThan(0);
+  expect(screen.queryByText(copyId)).not.toBeInTheDocument();
 });
 
 test("read-only views group the current page without inventing a primary species or generation", async () => {
@@ -156,14 +175,14 @@ test("keeps duplicate physical copies independently selectable and requests each
   const user = userEvent.setup(); render(<App initialEntries={["/boxes?mode=personal"]} />);
   await screen.findByRole("heading", { name: "Bulbasaur" });
   const grid = screen.getByRole("grid");
-  await user.click(within(grid).getByRole("button", { name: new RegExp(duplicate.id) }));
+  await user.click(within(grid).getByRole("button", { name: /^Espacio 30: Bulbasaur · Base Set; Inglés/ }));
   expect(screen.getByText("Second physical copy")).toBeVisible();
-  expect(screen.getByText(duplicate.id)).toBeVisible();
+  expect(screen.queryByText(duplicate.id)).not.toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Editar copia" })).toHaveAttribute("href", `/collection/${duplicate.id}`);
   expect(request.mock.calls.filter(([url]) => String(url).includes("/cards/"))).toHaveLength(1);
   await user.click(screen.getByRole("button", { name: "English" }));
   expect(screen.getByRole("button", { name: "Move copy" })).toBeVisible();
-  expect(screen.getByText("Copy UUID")).toBeVisible();
+  expect(screen.getByRole("complementary", { name: "Selected copy" })).not.toHaveTextContent("UUID");
 });
 
 test("represents Trainer and Energy explicitly without assigning species or generation", async () => {
