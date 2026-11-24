@@ -2,8 +2,9 @@ import { useCallback, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
+import { binderAmount } from "../components/binders/amount";
+import { Cover } from "../components/binders/Cover";
 import { fill, plural } from "../components/binders/labels";
-import { formatMoney } from "../components/prices/format";
 import { useCurrency } from "../components/prices/currency";
 import { RatesAttribution } from "../components/prices/PriceDisplay";
 import { Button, ButtonLink } from "../components/ui/Button";
@@ -29,19 +30,14 @@ function BinderCard({ binder, value, valuesLoading, index, total, busy, onRename
   const [confirming, setConfirming] = useState(false);
   const [name, setName] = useState(binder.name);
   const titleId = `binder-${binder.id}-title`;
-  const amount = value?.total != null ? formatMoney(value.total, currency, locale)
-    : value ? Object.entries(value.original_totals).map(([code, total]) => formatMoney(total, code as "EUR" | "USD", locale, true)).join(" + ") : null;
+  const amount = binderAmount(value, currency, locale);
   async function save(event: FormEvent) {
     event.preventDefault();
     if (await onRename(name)) setEditing(false);
   }
   return <li className="pv-shelf__item">
     <article className="pv-shelf__binder" aria-labelledby={titleId}>
-      {/* The cover is a pointer/touch shortcut; the name link below is the accessible one. */}
-      <Link className="pv-cover" to={`/binders/${encodeURIComponent(binder.id)}`} aria-hidden="true" tabIndex={-1}>
-        <span className="pv-cover__spine" aria-hidden="true" />
-        <span className="pv-cover__label" aria-hidden="true">PV</span>
-      </Link>
+      <Cover binderId={binder.id} />
       <div className="pv-shelf__facts">
         <h2 id={titleId}><Link to={`/binders/${encodeURIComponent(binder.id)}`}>{binder.name}</Link></h2>
         <p className="pv-binder__hint">{plural(text.cards, binder.copy_count)}</p>

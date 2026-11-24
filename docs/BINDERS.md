@@ -103,10 +103,16 @@ prices.
   - "Sacar de la carpeta" returns the card to the tray.
   - Results are announced in a polite status region, and conflicts in an alert.
 - **Motion:**
-  - On store, a 600 ms drop with a bounce and a sleeve shine.
-  - On page change, a 280 ms leaf turn.
-  - Both are removed with `prefers-reduced-motion`.
+  - On store or move, the card flies (FLIP) as a floating `position: fixed` clone, animated
+    with the Web Animations API (300 ms) from its tray thumbnail or source pocket to just
+    above the destination. Then the pocket plays its 600 ms drop with a bounce and a
+    sleeve shine (about 900 ms in total).
+  - A destination on another page turns the page first (280 ms leaf turn). A destination
+    out of view is scrolled into view before the flight.
+  - The clone is always removed, and a newer action cancels a pending arrival.
+  - With `prefers-reduced-motion` there is no flight, drop or turn: the change is direct.
 - **Elsewhere:**
   - The copy detail answers "¿Dónde está esta carta?".
-  - Home shows "Mis carpetas" (the latest page of the most recent binder).
+  - Home shows "Mis carpetas": a mini shelf of the first six covers (name, card count,
+    gold value), each linked to its binder, plus "N cartas sin carpeta · guardar".
   - The scanner success screen links to binders.

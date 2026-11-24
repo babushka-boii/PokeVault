@@ -519,7 +519,7 @@ Frontend, plus one small migration added at the student's request: `0006` adds t
 - `pages/{BindersPage,BinderPage}.tsx`.
 - `components/binders/` (page grid, labels, copy location, styles).
 - `hooks/useBinderMutations.ts`.
-- Home `BinderPreview`.
+- Home `BinderShelf` (mini shelf of covers) and the FLIP flight (`components/binders/flight.ts`).
 - `components/cards/cardMetadata.ts` (`useCardMetadata`, formerly the personal-box
   metadata hook).
 - `/boxes` is catalog-only.

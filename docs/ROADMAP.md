@@ -509,11 +509,15 @@ Spec and plan: `docs/superpowers/specs|plans/2026-11-23-binders-8c*`. Reference:
     M") and to the next free pocket.
   - "Sacar de la carpeta" returns the card to the tray.
   - All of it works by keyboard alone.
-- [ ] With "Reduce motion" on, there is no drop or turn animation and changes are
+- [ ] Storing from the tray: the card visibly flies from its tray position to the pocket,
+  then drops into the sleeve with the bounce and shine. A pocket on another page turns the
+  page first; one out of view scrolls into view. Moving between pockets flies from the
+  source pocket.
+- [ ] With "Reduce motion" on, there is no flight, drop or turn animation and changes are
   immediate.
 - [ ] Copy detail: "¿Dónde está esta carta?" opens the right page and focuses the pocket.
-- [ ] Home "Mis carpetas" shows the most recent binder's latest page and "N cartas sin
-  carpeta · guardar".
+- [ ] Home "Mis carpetas" shows a mini shelf of covers (name, count, gold value) linking to
+  each binder, and "N cartas sin carpeta · guardar".
 - [ ] Scanner success: no UUID; "Guardar en una carpeta" opens the binders.
 - [ ] Navigation: desktop "Mis carpetas"; mobile "Carpetas"; "Cajas PC" under Explorar;
   catalog boxes unchanged; old `/boxes?mode=personal` links open the binders.

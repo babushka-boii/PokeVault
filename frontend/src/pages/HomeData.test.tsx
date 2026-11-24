@@ -2,7 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../app/App";
-import { binder, callsTo, homeCards, homeValuation, physicalCopy, pocketAt, ratesDown, stubHome, userA, userB } from "../test/homeFixtures";
+import { binder, callsTo, homeCards, homeValuation, physicalCopy, ratesDown, stubHome, userA, userB } from "../test/homeFixtures";
 import { stubMedia } from "../test/media";
 import { copyId, noRates, valuation } from "../test/priceFixtures";
 import { jsonResponse as json } from "../test/tcgFixtures";
@@ -95,33 +95,59 @@ describe("most valuable cards", () => {
 });
 
 describe("Mis carpetas", () => {
-  test("previews the page of the latest placement in the most recent binder", async () => {
-    stubHome({
-      unassigned: 3,
-      binders: [binder(1, "Kanto", { last_placed_at: "2026-11-01T10:00:00Z" }), binder(2, "Tesoros", { last_placed_at: "2026-11-20T10:00:00Z" })],
-      pockets: [pocketAt(1, 1, physicalCopy(0), "2026-11-10T10:00:00Z"), pocketAt(2, 5, physicalCopy(1), "2026-11-20T10:00:00Z")],
-    });
+  test("shows a mini shelf with each binder's name, count and gold value, linked to the binder", async () => {
+    const request = stubHome({ unassigned: 3, binders: [binder(1, "Kanto", { copy_count: 2 }), binder(2, "Tesoros", { copy_count: 1 }), binder(3, "Vacía", { copy_count: 0 })] });
     render(<App initialEntries={["/"]} />);
     const section = await screen.findByRole("region", { name: "Mis carpetas" });
-    const page = await within(section).findByRole("list", { name: "Vista previa de Tesoros, página 2" });
-    expect(within(page).getAllByRole("listitem")).toHaveLength(9);
-    expect(await within(page).findByText("Card 2 · Expansion 2")).toBeVisible();
-    expect(within(section).getByRole("link", { name: "Abrir carpeta" })).toHaveAttribute("href", `/binders/${copyId(2)}?page=2`);
-    expect(within(section).getByRole("link", { name: "3 cartas sin carpeta · guardar" })).toHaveAttribute("href", `/binders/${copyId(2)}?page=2`);
+    const kanto = await within(section).findByRole("link", { name: "Kanto" });
+    expect(kanto).toHaveAttribute("href", `/binders/${copyId(1)}`);
+    expect(within(section).getByRole("link", { name: "Tesoros" })).toHaveAttribute("href", `/binders/${copyId(2)}`);
+    const items = within(section).getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+    expect(within(items[0]).getByText("2 cartas")).toBeVisible();
+    expect(await within(items[0]).findByLabelText("Valor: $3.000")).toBeVisible();
+    expect(within(items[1]).getByText("1 carta")).toBeVisible();
+    expect(await within(items[1]).findByLabelText("Valor: $1.500")).toBeVisible();
+    expect(within(items[2]).getByText("0 cartas")).toBeVisible();
+    expect(within(section).getByRole("link", { name: "3 cartas sin carpeta · guardar" })).toHaveAttribute("href", `/binders/${copyId(1)}`);
+    expect(within(section).getByRole("link", { name: "Ver todas las carpetas" })).toHaveAttribute("href", "/binders");
     expect(within(section).getByRole("link", { name: "+ Nueva carpeta" })).toHaveAttribute("href", "/binders");
+    expect(callsTo(request, "/api/v1/prices/binders")).toHaveLength(1);
+    // The shelf needs no binder detail (pockets); card metadata comes only from other sections.
+    const detailPaths = request.mock.calls.map(([input]) => new URL(input as string).pathname).filter((path) => /^\/api\/v1\/binders\/[0-9a-f-]{36}$/.test(path));
+    expect(detailPaths).toEqual([]);
   });
 
   test("never shows or announces a copy UUID, never writes, and hides the tray link when empty", async () => {
     const request = stubHome({ unassigned: 0 });
     render(<App initialEntries={["/"]} />);
     const section = await screen.findByRole("region", { name: "Mis carpetas" });
-    await within(section).findByText("Card 1 · Expansion 1");
+    await within(section).findByRole("link", { name: "Favoritas" });
     const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
     expect(section.textContent).not.toMatch(uuid);
     for (const element of section.querySelectorAll("[aria-label]")) expect(element.getAttribute("aria-label")).not.toMatch(uuid);
     expect(within(section).queryByRole("link", { name: /sin carpeta/ })).not.toBeInTheDocument();
     expect(within(section).queryAllByRole("button")).toHaveLength(0);
     expect(request.mock.calls.every(([, options]) => !(options as RequestInit | undefined)?.method || (options as RequestInit).method === "GET")).toBe(true);
+  });
+
+  test("shows at most six covers and says how many more there are", async () => {
+    stubHome({ binders: Array.from({ length: 8 }, (_, index) => binder(index + 1, `Carpeta ${index + 1}`)) });
+    render(<App initialEntries={["/"]} />);
+    const section = await screen.findByRole("region", { name: "Mis carpetas" });
+    await within(section).findByRole("link", { name: "Carpeta 1" });
+    expect(within(section).getAllByRole("listitem")).toHaveLength(6);
+    expect(within(section).queryByRole("link", { name: "Carpeta 7" })).not.toBeInTheDocument();
+    expect(within(section).getByText("+ 2 más")).toBeVisible();
+  });
+
+  test("a value outage keeps the covers and links, only hiding the values", async () => {
+    stubHome({ override: (url) => url.pathname === "/api/v1/prices/binders" ? json({}, 503) : undefined });
+    render(<App initialEntries={["/"]} />);
+    const section = await screen.findByRole("region", { name: "Mis carpetas" });
+    expect(await within(section).findByRole("link", { name: "Favoritas" })).toBeVisible();
+    await waitFor(() => expect(within(section).queryByLabelText(/^Valor:/)).not.toBeInTheDocument());
+    expect(within(section).getByText("2 cartas")).toBeVisible();
   });
 
   test("invites the first binder when none exists", async () => {
@@ -177,7 +203,7 @@ describe("failures and sessions", () => {
     const user = userEvent.setup();
     render(<App initialEntries={["/"]} />);
     expect(await main().findByText("No se pudo cargar el valor de tu colección.")).toBeVisible();
-    expect(await screen.findByRole("list", { name: /^Vista previa de Favoritas/ })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Favoritas" })).toBeVisible();
     expect(await screen.findByRole("region", { name: "Expansiones" })).toBeVisible();
     expect(main().getByRole("region", { name: "Tus cartas más valiosas" })).toBeVisible();
     fail = false;

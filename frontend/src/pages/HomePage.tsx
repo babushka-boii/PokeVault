@@ -3,7 +3,7 @@ import { SessionNotice } from "../auth/SessionNotice";
 import { useCollectionValuation } from "../components/prices/useCollectionValuation";
 import { EmptyHome } from "../components/home/EmptyHome";
 import { GuestHome } from "../components/home/GuestHome";
-import { BinderPreview } from "../components/home/BinderPreview";
+import { BinderShelf } from "../components/home/BinderShelf";
 import { ScannerCard } from "../components/home/ScannerCard";
 import { SetsProgress } from "../components/home/SetsProgress";
 import { SystemStatusFooter } from "../components/home/SystemStatusFooter";
@@ -23,7 +23,7 @@ function SignedInHome() {
       <div className="pv-home__side"><ScannerCard /></div>
       {!empty && <>
         <TopCards resource={valuation} />
-        <BinderPreview />
+        <BinderShelf />
         <SetsProgress />
       </>}
     </div>

@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import { copyId, copyPrice, noRates, quote, valuation } from "./priceFixtures";
+import { copyId, copyPrice, noRates, quote, rates, valuation } from "./priceFixtures";
 import { setProgress } from "./setFixtures";
 import { jsonResponse as json, pikachuCard } from "./tcgFixtures";
 import type { Valuation } from "../services/prices";
@@ -51,6 +51,11 @@ export function stubHome(data: HomeData = {}) {
       return Promise.resolve(typeof value === "function" ? value() : json({ ...value, currency: url.searchParams.get("currency") ?? "CLP" }));
     }
     if (path === "/api/v1/binders") { const binders = data.binders ?? [binder(1, "Favoritas")]; return Promise.resolve(json({ results: binders, total: binders.length })); }
+    if (path === "/api/v1/prices/binders") {
+      const binders = (data.binders ?? [binder(1, "Favoritas")]) as { id: string; copy_count: number }[];
+      return Promise.resolve(json({ currency: url.searchParams.get("currency") ?? "CLP", rates, results: binders.map((b) => ({
+        binder_id: b.id, total: String(b.copy_count * 1500), original_totals: { EUR: "1.2" }, copy_count: b.copy_count, priced_count: b.copy_count, pending_count: 0, stale_count: 0 })) }));
+    }
     if (path === "/api/v1/binders/views/unassigned") return Promise.resolve(json({ results: [], total: data.unassigned ?? 0, offset: 0, limit: 30 }));
     if (path === "/api/v1/binders/views/recent") { const recent = data.recent ?? [physicalCopy(0), physicalCopy(1)]; return Promise.resolve(json({ results: recent, total: recent.length, offset: 0, limit: 30 })); }
     if (path.startsWith("/api/v1/binders/")) {

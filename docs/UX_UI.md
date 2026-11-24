@@ -438,10 +438,14 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
   - Conflicts (occupied pocket, full binder) use an alert and refresh the binder.
 - Pocket and tray names carry card, expansion, page and pocket. They never contain a
   UUID, and tests guard this.
-- Motion: a 600 ms drop with bounce and sleeve shine on store, and a 280 ms leaf turn on
-  page change. Both are removed with reduced motion.
+- Motion: storing or moving a card flies a floating clone (300 ms, FLIP) from the tray
+  thumbnail or source pocket to the destination, then the pocket plays a 600 ms drop with
+  bounce and sleeve shine (about 900 ms in total). A destination on another page turns the
+  page first (280 ms); one out of view is scrolled into view. Reduced motion removes the
+  flight, the drop and the turn.
 - Navigation:
   - Desktop "Mis carpetas".
   - Mobile tab "Carpetas" (replacing "Cajas"), with "Cajas PC" under Explorar.
-  - Home "Mis carpetas" previews the latest page of the most recent binder.
+  - Home "Mis carpetas" is a mini shelf of binder covers (name, card count and gold
+    value), each linked to its binder, plus "N cartas sin carpeta · guardar".
   - The copy detail answers "¿Dónde está esta carta?".
