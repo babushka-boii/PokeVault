@@ -263,10 +263,17 @@ path.
 
 **Files:** `frontend/src/main.tsx` or `AppShell`, plus a small module and test.
 
-- [ ] Write failing tests: a one-time cleanup removes `pokevault.audio` and
+- [x] Write failing tests: a one-time cleanup removes `pokevault.audio` and
   `pokevault.spriteMode`, leaves `pokevault.locale` and `pokevault.currency`, and survives
   blocked storage.
-- [ ] Implement and commit.
+- [x] Implement and commit.
+- Evidence:
+  - `services/retiredPreferences.ts` removes `pokevault.audio` and `pokevault.spriteMode`
+    when the application starts (`App`), ignores blocked storage, and never touches
+    `pokevault.locale` or `pokevault.currency`. 3 tests (keys, blocked storage, and the
+    application cleaning them at start).
+  - The "no leftover code" contract now allows this one file to name the old keys.
+  - Frontend: 36 files / 518 tests green; lint and typecheck clean.
 
 ### Task 6: Review, validation and docs
 

@@ -180,7 +180,8 @@ describe("retired PC boxes (8C.1)", () => {
   });
 
   test("no leftover box, wallpaper, retro-audio or menu-icon code or styles", () => {
-    const leftovers = app.filter(([file, text]) => file !== "/src/pages/BoxesRedirect.tsx"
+    // The retired-preferences cleaner is the one place that must name the old storage keys.
+    const leftovers = app.filter(([file, text]) => file !== "/src/services/retiredPreferences.ts"
       && /retroAudio|useRetroAudio|spriteMode|useSpriteMode|menuIcon|MenuIcon|useCatalogBox|StorageGrid|\.pc-[a-z]|pc-wallpaper|wallpapers/.test(text)).map(([file]) => file);
     expect(leftovers).toEqual([]);
   });
