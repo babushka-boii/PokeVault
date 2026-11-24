@@ -438,12 +438,15 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
   - Conflicts (occupied pocket, full binder) use an alert and refresh the binder.
 - Pocket and tray names carry card, expansion, page and pocket. They never contain a
   UUID, and tests guard this.
-- Motion: storing or moving a card flies a floating clone like a hand carrying it: a 150 ms
-  lift (scale 1.06, bigger shadow), a 550 ms curved flight with a slight tilt that ends
-  decelerating, and a 150 ms descent, then a 450 ms soft entry into the sleeve and its
-  shine (about 1.3 s). The original stays in place but invisible while the clone flies. A
-  destination on another page turns the page first (280 ms); one out of view is scrolled
-  into view. Reduced motion removes the flight, the entry and the turn.
+- Motion: storing or moving a card flies a floating clone like a hand carrying it, from
+  where the user clicked: a 150 ms lift (scale 1.06, bigger shadow), a 550 ms curved
+  flight with a slight tilt that ends decelerating just over the sleeve's opening, and a
+  150 ms descent to the opening (tilted −2°). The real card then takes over in the same
+  frame and slides into the sleeve in 500 ms, behind its see-through front plastic,
+  straightening as it goes in; then the sleeve shines (about 1.35 s). The original stays
+  in place but invisible while the clone flies. A destination on another page turns the
+  page first (280 ms); one out of view is scrolled into view first. Reduced motion removes
+  the flight, the entry and the turn.
 - Navigation:
   - Desktop "Mis carpetas".
   - Mobile tab "Carpetas" (replacing "Cajas"), with "Cajas PC" under Explorar.

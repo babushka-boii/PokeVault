@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
@@ -13,7 +14,7 @@ import { InlineError } from "../components/ui/InlineError";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useBinderMutations, type BinderErrorKey } from "../hooks/useBinderMutations";
 import { MOBILE_QUERY, REDUCED_MOTION_QUERY, useMediaQuery } from "../hooks/useMediaQuery";
-import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, SCROLL_WAIT_MS, wait, type FlightOrigin, type FlightResult } from "../components/binders/flight";
+import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, settled, wait, type FlightOrigin, type FlightResult } from "../components/binders/flight";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import {
@@ -142,12 +143,12 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   const register = useCallback((target: PocketRef) => (node: HTMLButtonElement | null) => {
     if (node) buttons.current.set(key(target), node); else buttons.current.delete(key(target));
   }, []);
-  // Motion marks clear just after their animation (600 ms drop, 280 ms turn). A timer
-  // also works when reduced motion removes the animation and no animationend fires.
+  // Motion marks clear just after their animation (sleeve entry and shine, 280 ms turn). A
+  // timer also works when reduced motion removes the animation and no animationend fires.
   useEffect(() => {
     if (!arrived) return;
-    // 450 ms entry plus the sleeve shine, then the mark clears.
-    const timer = window.setTimeout(() => setArrived(null), 650);
+    // 500 ms entry into the sleeve, then its 300 ms shine; then the mark clears.
+    const timer = window.setTimeout(() => setArrived(null), 850);
     return () => window.clearTimeout(timer);
   }, [arrived]);
   useEffect(() => {
@@ -181,11 +182,17 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     goTo(target, direction === 1 ? "next" : "prev");
     const focus = { page: target, pocket: 1 }; setSelected(focus); setFocusRequest(focus);
   }
+  /** The card in its source pocket, measured now (at the click), before anything re-renders. */
+  function pickFromSource() {
+    if (mode.kind !== "move" || mode.binderId !== binderId) return null;
+    return captureOrigin(buttons.current.get(key(mode.from))?.querySelector(".pv-pocket__card"));
+  }
   function select(target: PocketRef) {
+    const origin = pickFromSource();
     cancelArrival();
     setSelected(target); setFocusRequest(target); setArrived(null); setProblem(null);
     if (mode.kind === "move" && mode.binderId === binderId && !binder?.pockets.some((p) => p.page === target.page && p.pocket === target.pocket)) {
-      void moveTo(target);
+      void moveTo(target, origin);
     } else if (mode.kind === "fill") setMode({ kind: "idle" });
   }
 
@@ -197,9 +204,12 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   }
   /**
    * Arrival choreography, in this order: turn the page if the pocket is on another one,
-   * scroll it into view, fly the captured card there (lift, curved flight, descent: see
-   * flight.ts) with the original hidden, then let the pocket play its entry and shine.
-   * With reduced motion (or nothing to fly) the change is direct. A new action cancels it.
+   * scroll it into view and wait for the scroll to end, fly the captured card over the
+   * sleeve's opening (lift, curved flight, descent: see flight.ts) with the original
+   * hidden, then hand over to the real card, which slides into the sleeve behind its front
+   * plastic and shines. The hand-off is flushed synchronously in the task that removes the
+   * clone, so no frame shows both cards or neither. With reduced motion (or nothing to
+   * fly) the change is direct. A new action cancels it.
    */
   async function arrive(target: PocketRef, origin: FlightOrigin | null, fromTray?: string) {
     const token = ++arrival.current;
@@ -207,7 +217,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     const controller = new AbortController();
     flight.current = controller;
     const fly = !reduced && origin !== null;
-    if (fly) setIncoming(target);
+    if (fly) { setIncoming(target); setArrived(null); }
     if (!visible.includes(target.page)) {
       goTo(target.page);
       if (fly) await wait(PAGE_TURN_WAIT_MS);
@@ -215,26 +225,31 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     let result: FlightResult = "skipped";
     if (fly) {
       // Look first, wait only if the pocket is not rendered yet (page just turned).
-      let sleeve: Element | null | undefined = buttons.current.get(key(target))?.querySelector(".pv-pocket__sleeve");
-      for (let attempt = 0; attempt < 20 && current() && !sleeve; attempt++) {
+      const find = () => buttons.current.get(key(target))?.querySelector(".pv-pocket__card");
+      let card: Element | null | undefined = find();
+      for (let attempt = 0; attempt < 20 && current() && !card; attempt++) {
         await wait(16);
-        sleeve = buttons.current.get(key(target))?.querySelector(".pv-pocket__sleeve");
+        card = find();
       }
-      if (sleeve && current()) {
-        if (!inViewport(sleeve) && typeof sleeve.scrollIntoView === "function") {
-          sleeve.scrollIntoView({ block: "center", behavior: "smooth" });
-          await wait(SCROLL_WAIT_MS);
+      if (card && current()) {
+        if (!inViewport(card) && typeof card.scrollIntoView === "function") {
+          card.scrollIntoView({ block: "center", behavior: "smooth" });
+          await settled(card, current);
         }
-        if (current()) result = await flyCard(origin, sleeve, controller.signal);
+        // On landing, in one commit: the real card shows at the clone's last frame and starts
+        // its entry, and the tray drops the stored card. Then the clone is removed.
+        if (current()) result = await flyCard(origin, card, { signal: controller.signal, onLand: () => flushSync(() => {
+          setIncoming(null); setArrived(target);
+          if (fromTray) setConsumed((ids) => new Set(ids).add(fromTray));
+        }) });
       }
       if (!alive.current) return;
-      setIncoming((value) => value && value.page === target.page && value.pocket === target.pocket ? null : value);
-      // A completed flight leaves the card in its pocket: drop it from the tray at the same moment.
-      if (result === "completed" && fromTray) setConsumed((ids) => new Set(ids).add(fromTray));
+      if (result !== "completed") setIncoming((value) => value && value.page === target.page && value.pocket === target.pocket ? null : value);
       if (!current()) return;
     }
     if (!current()) return;
-    setArrived(target); setSelected(target); setFocusRequest(target);
+    if (result !== "completed") setArrived(target);
+    setSelected(target); setFocusRequest(target);
   }
   function cancelArrival() { arrival.current++; flight.current?.abort(); flight.current = null; setIncoming(null); }
   function landed(result: StoreResult, origin: FlightOrigin | null = null, fromTray?: string) {
@@ -266,11 +281,9 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     if (!outcome) return;
     if (outcome.ok) landed(outcome.value, origin, copy.id); else failed(outcome.error);
   }
-  async function moveTo(target: PocketRef | "next") {
+  async function moveTo(target: PocketRef | "next", origin: FlightOrigin | null) {
     if (mode.kind !== "move") return;
-    const { copy, binderId: destination, from } = mode;
-    // Capture the card in its current pocket before the binder re-renders without it.
-    const origin = destination === binderId ? captureOrigin(buttons.current.get(key(from))?.querySelector(".pv-pocket__sleeve")) : null;
+    const { copy, binderId: destination } = mode;
     const outcome = await run((csrf, signal) => target === "next" ? storeNext(destination, copy.id, csrf, signal) : placeInPocket(destination, target, copy.id, csrf, signal));
     if (!outcome) return;
     if (outcome.ok) landed(outcome.value, origin); else failed(outcome.error);
@@ -336,7 +349,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           <p className="pv-binder__hint">{text.moveHint}</p>
           <MoveTargets current={binderId} value={mode.binderId} onChange={(id) => setMode({ ...mode, binderId: id })} />
           <div className="pv-selection__actions">
-            <Button variant="primary" disabled={busy} onClick={() => void moveTo("next")}>{text.moveNext}</Button>
+            <Button variant="primary" disabled={busy} onClick={() => void moveTo("next", pickFromSource())}>{text.moveNext}</Button>
             <Button disabled={busy} onClick={() => setMode({ kind: "idle" })}>{text.cancel}</Button>
           </div>
         </div>}

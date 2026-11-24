@@ -103,21 +103,34 @@ prices.
   - "Sacar de la carpeta" returns the card to the tray.
   - Results are announced in a polite status region, and conflicts in an alert.
 - **Motion:**
+  - Each pocket is a real sleeve: the card (`.pv-pocket__card`) sits behind a see-through
+    front plastic (`.pv-pocket__front`, with a marked top edge) that carries the shine. The
+    sleeve does not clip, so an arriving card can start above its opening.
   - On store or move, the card moves like a hand carrying it (FLIP): a floating
     `position: fixed` clone, one Web Animations API animation with keyframe offsets, from
-    its tray thumbnail or source pocket to just above the destination:
-    1. **Lift** (150 ms): it rises a little (scale 1 → 1.06) and its shadow grows.
+    where the user picked it (tray thumbnail, "Choose from the tray" item or source pocket,
+    measured at the click, before anything closes, and kept in document coordinates so a
+    scroll since then does not move its start) to the sleeve's opening:
+    1. **Lift** (150 ms): it rises a little (scale × 1.06) and its shadow grows.
     2. **Flight** (550 ms): a curved path elevated above the straight line in proportion to
-       the distance, a slight tilt toward the direction of travel that returns to 0, and
-       a deceleration at the end (`cubic-bezier(.22, .61, .36, 1)`).
-    3. **Descent** (150 ms): back to scale 1 over the pocket, with a smaller shadow.
-    4. **Entry** (about 450 ms, CSS): the card slides into the sleeve from above and settles
-       softly (no hard bounce), then the sleeve shines. About 1.3 s in total.
+       the distance, a slight tilt toward the direction of travel, and a deceleration at
+       the end (`cubic-bezier(.22, .61, .36, 1)`). It ends hovering just over the opening,
+       in line with the pocket.
+    3. **Descent** (150 ms): down to the opening at the real card's size, tilted −2°,
+       without shadow: exactly the first frame of the real card's entry (one card height
+       above its place, `translateY(-100%) rotate(-2deg)` around its bottom centre).
+    4. **Hand-off**: in the same task the clone is removed and the real card shows (a
+       synchronous React commit), so no frame has two cards or none.
+    5. **Entry** (500 ms, CSS): the real card slides down behind the front plastic,
+       decelerating, straightens and settles minimally; then the sleeve shines (300 ms).
+       About 1.35 s in total.
   - While it flies the original (the tray thumbnail or the source pocket) is invisible
     (`visibility: hidden`) but keeps its place in the layout, so there is never a second
-    card and nothing shifts. The tray reloads when the flight ends.
+    card and nothing shifts. The tray drops the stored card at the hand-off and reloads
+    when the flight ends.
   - A destination on another page turns the page first (280 ms leaf turn). A destination
-    out of view is scrolled into view before the flight.
+    out of view is scrolled into view, and the flight waits until the scroll has stopped
+    (Safari's smooth scroll is longer than a fixed wait).
   - A newer action, or leaving the page, cancels the flight: the clone is removed and the
     original is visible again.
   - With `prefers-reduced-motion` there is no flight, drop or turn: the change is direct.

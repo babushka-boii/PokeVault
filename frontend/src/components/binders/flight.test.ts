@@ -1,22 +1,34 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
-  buildFlightKeyframes, captureOrigin, cubicBezier, DESCENT_MS, FLIGHT_EASING, FLIGHT_MS, flyCard, HOVER_RATIO, LIFT_MS, LIFT_SCALE, TOTAL_FLIGHT_MS,
-  type Box,
+  buildFlightKeyframes, captureOrigin, cubicBezier, DESCENT_MS, ENTRY_TILT_DEG, entryStart, FLIGHT_EASING, FLIGHT_MS, flyCard, LIFT_MS, LIFT_SCALE,
+  settled, TOTAL_FLIGHT_MS, type Box,
 } from "./flight";
 
-afterEach(() => { document.body.innerHTML = ""; delete (HTMLElement.prototype as Partial<HTMLElement>).animate; });
+afterEach(() => {
+  document.body.innerHTML = "";
+  delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+  Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+  Object.defineProperty(window, "scrollX", { configurable: true, value: 0 });
+});
 
 const box = (left: number, top: number, width = 60, height = 84): Box => ({ left, top, width, height });
-const translateOf = (frame: Keyframe) => {
-  const match = /translate\((-?[\d.e-]+)px, (-?[\d.e-]+)px\)/.exec(String(frame.transform))!;
-  return { x: Number(match[1]), y: Number(match[2]) };
+const parse = (frame: Keyframe) => {
+  const text = String(frame.transform);
+  const translate = /translate\((-?[\d.e-]+)px, (-?[\d.e-]+)px\)/.exec(text)!;
+  const scale = /scale\((-?[\d.e-]+), (-?[\d.e-]+)\)/.exec(text)!;
+  return { x: Number(translate[1]), y: Number(translate[2]), rotate: Number(/rotate\((-?[\d.e-]+)deg\)/.exec(text)![1]), sx: Number(scale[1]), sy: Number(scale[2]) };
 };
-const rotationOf = (frame: Keyframe) => Number(/rotate\((-?[\d.e-]+)deg\)/.exec(String(frame.transform))![1]);
-const scaleOf = (frame: Keyframe) => Number(/scale\((-?[\d.e-]+),/.exec(String(frame.transform))![1]);
+/** Where a point (px, py) of the clone (laid out at `from` with the card's size, origin top left) ends up on screen. */
+const mapPoint = (frame: Keyframe, from: Box, px: number, py: number) => {
+  const { x, y, rotate, sx, sy } = parse(frame);
+  const angle = (rotate * Math.PI) / 180; const qx = px * sx; const qy = py * sy;
+  return { x: from.left + x + qx * Math.cos(angle) - qy * Math.sin(angle), y: from.top + y + qx * Math.sin(angle) + qy * Math.cos(angle) };
+};
 
 describe("flight keyframes", () => {
-  const from = box(700, 600); const to = box(100, 100, 180, 252);
-  const { keyframes, duration } = buildFlightKeyframes(from, to);
+  const from = box(700, 600, 48, 66); const card = box(100, 300, 180, 248);
+  const { keyframes, duration } = buildFlightKeyframes(from, card);
+  const centre = (frame: Keyframe) => mapPoint(frame, from, card.width / 2, card.height / 2);
 
   test("one animation of about 850 ms: 150 ms lift, 550 ms curved flight, 150 ms descent", () => {
     expect([LIFT_MS, FLIGHT_MS, DESCENT_MS]).toEqual([150, 550, 150]);
@@ -31,66 +43,101 @@ describe("flight keyframes", () => {
     expect(offsets).toContainEqual((LIFT_MS + FLIGHT_MS) / duration);
   });
 
-  test("lift: the card rises a little to 1.06 and the shadow grows", () => {
+  test("it starts exactly on the picked card", () => {
+    const first = keyframes[0];
+    expect(mapPoint(first, from, 0, 0)).toEqual({ x: from.left, y: from.top });
+    const corner = mapPoint(first, from, card.width, card.height);
+    expect(corner.x).toBeCloseTo(from.left + from.width, 5);
+    expect(corner.y).toBeCloseTo(from.top + from.height, 5);
+    expect(String(first.boxShadow)).toMatch(/^0 0 0 .* 0%/);
+  });
+
+  test("lift: the card rises a little to 1.06 around its centre and the shadow grows", () => {
     const [rest, lifted] = keyframes;
-    expect(scaleOf(rest)).toBe(1);
-    expect(scaleOf(lifted)).toBeCloseTo(LIFT_SCALE, 5);
-    expect(translateOf(lifted).y).toBeLessThan(0);
+    expect(parse(lifted).sx / parse(rest).sx).toBeCloseTo(LIFT_SCALE, 5);
     expect(lifted.offset).toBeCloseTo(LIFT_MS / duration, 5);
-    expect(String(lifted.boxShadow)).not.toBe(String(rest.boxShadow));
+    expect(centre(lifted).x).toBeCloseTo(centre(rest).x, 5);
+    expect(centre(lifted).y).toBeLessThan(centre(rest).y);
     expect(String(lifted.boxShadow)).toMatch(/18px 32px/);
-    expect(String(rest.boxShadow)).toMatch(/2px 6px/);
   });
 
   test("flight: the path is a curve elevated above the straight line, in proportion to the distance", () => {
-    const flight = keyframes.slice(2, -1);
-    const start = translateOf(keyframes[1]); const end = translateOf(keyframes.at(-1)!);
-    const elevation = (frames: Keyframe[], a: { x: number; y: number }, b: { x: number; y: number }) => Math.max(...frames.map((frame) => {
-      const p = translateOf(frame);
-      const t = (p.x - a.x) / (b.x - a.x || 1);
-      return (a.y + (b.y - a.y) * t) - p.y;  // positive = above the straight line
-    }));
-    const high = elevation(flight, start, end);
+    const elevation = (frames: Keyframe[], at: (frame: Keyframe) => { x: number; y: number }) => {
+      const a = at(frames[0]); const b = at(frames.at(-1)!);
+      return Math.max(...frames.slice(1, -1).map((frame) => {
+        const p = at(frame); const t = (p.x - a.x) / (b.x - a.x || 1);
+        return (a.y + (b.y - a.y) * t) - p.y;  // positive = above the straight line
+      }));
+    };
+    const flight = keyframes.slice(1, -1);
+    const high = elevation(flight, centre);
     expect(high).toBeGreaterThan(20);
     // A shorter trip arcs less.
-    const short = buildFlightKeyframes(from, box(560, 560, 60, 84)).keyframes;
-    const shortHigh = elevation(short.slice(2, -1), translateOf(short[1]), translateOf(short.at(-1)!));
+    const nearCard = box(560, 650, 180, 248);
+    const short = buildFlightKeyframes(from, nearCard).keyframes;
+    const shortHigh = elevation(short.slice(1, -1), (frame) => mapPoint(frame, from, nearCard.width / 2, nearCard.height / 2));
     expect(shortHigh).toBeGreaterThan(0);
     expect(shortHigh).toBeLessThan(high);
     // The apex is mid-way, not at the ends.
-    const apex = flight.map((frame) => translateOf(frame).y).indexOf(Math.min(...flight.map((frame) => translateOf(frame).y)));
+    const ys = flight.map((frame) => centre(frame).y);
+    const apex = ys.indexOf(Math.min(...ys));
     expect(apex).toBeGreaterThan(1);
     expect(apex).toBeLessThan(flight.length - 2);
   });
 
-  test("flight: a slight tilt toward the direction of travel that returns to 0 on arrival", () => {
-    const tilts = keyframes.map(rotationOf);
+  test("flight: a slight tilt toward the direction of travel, ending on the −2° entry tilt", () => {
+    const tilts = keyframes.map((frame) => parse(frame).rotate);
     expect(tilts[0]).toBe(0);
-    expect(tilts.at(-1)).toBe(0);
-    expect(Math.min(...tilts)).toBeLessThan(0);          // travels left → tilts left (negative)
-    expect(Math.min(...tilts)).toBeGreaterThanOrEqual(-9);
-    expect(Math.max(...tilts)).toBe(0);
-    const rightwards = buildFlightKeyframes(box(100, 600), box(700, 100)).keyframes.map(rotationOf);
-    expect(Math.max(...rightwards)).toBeGreaterThan(0);
-    expect(rightwards.at(-1)).toBe(0);
+    expect(tilts.at(-1)).toBe(ENTRY_TILT_DEG);
+    expect(ENTRY_TILT_DEG).toBe(-2);
+    expect(Math.min(...tilts)).toBeLessThan(-3);          // travels left → tilts left (negative)
+    expect(Math.min(...tilts)).toBeGreaterThanOrEqual(-11);
+    const rightwards = buildFlightKeyframes(box(100, 600), box(700, 100, 180, 248)).keyframes.map((frame) => parse(frame).rotate);
+    expect(Math.max(...rightwards)).toBeGreaterThan(1);
+    expect(rightwards.at(-1)).toBe(ENTRY_TILT_DEG);
   });
 
-  test("flight: it decelerates toward the pocket", () => {
-    const horizontal = buildFlightKeyframes(box(0, 300), box(800, 300)).keyframes;
+  test("flight: it decelerates toward the opening", () => {
+    const flat = buildFlightKeyframes(box(0, 600), box(800, 600, 60, 84)).keyframes;
     const liftEnd = LIFT_MS / duration; const landing = (LIFT_MS + FLIGHT_MS) / duration;
-    const at = (fraction: number) => translateOf(horizontal.reduce((best, frame) =>
-      Math.abs((frame.offset as number) - (liftEnd + (landing - liftEnd) * fraction)) < Math.abs((best.offset as number) - (liftEnd + (landing - liftEnd) * fraction)) ? frame : best)).x;
+    const at = (fraction: number) => mapPoint(flat.reduce((best, frame) =>
+      Math.abs((frame.offset as number) - (liftEnd + (landing - liftEnd) * fraction)) < Math.abs((best.offset as number) - (liftEnd + (landing - liftEnd) * fraction)) ? frame : best), box(0, 600), 30, 42).x;
     expect(at(0.25) - at(0)).toBeGreaterThan(at(1) - at(0.75));
     expect(FLIGHT_EASING).toEqual([0.22, 0.61, 0.36, 1]);
   });
 
-  test("descent: over the pocket it returns to the target scale, no tilt, a smaller shadow, hovering above the sleeve", () => {
-    const landing = keyframes.at(-2)!; const final = keyframes.at(-1)!;
-    expect(scaleOf(landing)).toBeCloseTo(scaleOf(final) * LIFT_SCALE, 5);
-    expect(scaleOf(final)).toBeCloseTo(to.width / from.width, 5);
-    expect(rotationOf(final)).toBe(0);
-    expect(String(final.boxShadow)).toMatch(/2px 6px/);
-    expect(translateOf(final)).toEqual({ x: to.left - from.left, y: to.top - from.top - to.height * HOVER_RATIO });
+  test("the flight ends hovering just over the sleeve's opening, in line with the pocket", () => {
+    const hover = keyframes.at(-2)!;
+    expect(hover.offset).toBeCloseTo((LIFT_MS + FLIGHT_MS) / duration, 5);
+    expect(centre(hover).x).toBeCloseTo(card.left + card.width / 2, 5);
+    const bottom = Math.max(...[[0, 0], [card.width, 0], [0, card.height], [card.width, card.height]].map(([px, py]) => mapPoint(hover, from, px, py).y));
+    expect(bottom).toBeLessThan(card.top);           // even its lowest (tilted) corner is above the opening…
+    expect(bottom).toBeGreaterThan(card.top - 20);   // …and only just
+    expect(parse(hover).sx).toBeCloseTo(LIFT_SCALE, 5);
+  });
+
+  test("descent: it ends exactly on the real card's first entry frame (one card above its place, −2°, no shadow)", () => {
+    const final = keyframes.at(-1)!;
+    expect(parse(final)).toMatchObject({ sx: 1, sy: 1, rotate: ENTRY_TILT_DEG });
+    expect({ x: parse(final).x, y: parse(final).y }).toEqual(entryStart(from, card));
+    // `translateY(-100%) rotate(-2deg)` around the card's bottom centre, checked point by point.
+    const angle = (ENTRY_TILT_DEG * Math.PI) / 180;
+    const entry = (px: number, py: number) => {
+      const ox = card.width / 2; const oy = card.height;
+      return { x: card.left + ox + (px - ox) * Math.cos(angle) - (py - oy) * Math.sin(angle), y: card.top - card.height + oy + (px - ox) * Math.sin(angle) + (py - oy) * Math.cos(angle) };
+    };
+    for (const [px, py] of [[0, 0], [card.width, 0], [0, card.height], [card.width, card.height], [card.width / 2, card.height]]) {
+      const clone = mapPoint(final, from, px, py); const real = entry(px, py);
+      expect(clone.x).toBeCloseTo(real.x, 6);
+      expect(clone.y).toBeCloseTo(real.y, 6);
+    }
+    // Its bottom centre sits on the opening.
+    expect(mapPoint(final, from, card.width / 2, card.height).y).toBeCloseTo(card.top, 6);
+    expect(String(final.boxShadow)).toMatch(/^0 0 0 .* 0%/);
+  });
+
+  test("every frame has the same transform list, so each function interpolates on its own", () => {
+    for (const frame of keyframes) expect(String(frame.transform)).toMatch(/^translate\(\S+px, \S+px\) rotate\(\S+deg\) scale\(\S+, \S+\)$/);
   });
 
   test("the bezier helper matches the CSS curve", () => {
@@ -102,22 +149,24 @@ describe("flight keyframes", () => {
 });
 
 describe("flyCard", () => {
+  const rect = (left: number, top: number, width: number, height: number) =>
+    ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top, toJSON: () => ({}) }) as DOMRect;
   function setup() {
     const original = document.createElement("div");
     original.style.visibility = "visible";
     document.body.appendChild(original);
     const destination = document.createElement("div");
     document.body.appendChild(destination);
-    const origin = captureOrigin(original)!;
     let finish!: () => void; let reject!: (error: unknown) => void;
     const finished = new Promise<void>((resolve, fail) => { finish = resolve; reject = fail; });
     const animate = vi.fn(() => ({ finished, cancel: () => reject(new DOMException("cancelled", "AbortError")) }));
     Object.defineProperty(HTMLElement.prototype, "animate", { configurable: true, writable: true, value: animate });
-    return { original, destination, origin, animate, finish };
+    return { original, destination, animate, finish };
   }
 
   test("hides the original (kept in the layout) while the clone flies, then restores it and removes the clone", async () => {
-    const { original, destination, origin, animate, finish } = setup();
+    const { original, destination, animate, finish } = setup();
+    const origin = captureOrigin(original)!;
     const done = flyCard(origin, destination);
     expect(document.body.querySelectorAll(".pv-flight")).toHaveLength(1);
     expect(origin.ghost.style.position).toBe("fixed");
@@ -131,10 +180,40 @@ describe("flyCard", () => {
     expect(original.style.visibility).toBe("visible");
   });
 
+  test("the clone starts where the card was clicked even if the page scrolled since, laid out at the destination's size", async () => {
+    const { original, destination } = setup();
+    vi.spyOn(original, "getBoundingClientRect").mockReturnValue(rect(40, 700, 48, 66));
+    vi.spyOn(destination, "getBoundingClientRect").mockReturnValue(rect(300, 120, 180, 248));
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 100 });
+    const origin = captureOrigin(original)!;
+    expect(origin.rect).toEqual({ left: 40, top: 800, width: 48, height: 66 });   // document coordinates
+    // The view scrolls 500 px down to the pocket before the flight.
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 600 });
+    void flyCard(origin, destination);
+    expect(origin.ghost.style.left).toBe("40px");
+    expect(origin.ghost.style.top).toBe("200px");    // 700 − 500: where the card now is on screen
+    expect(origin.ghost.style.width).toBe("180px");
+    expect(origin.ghost.style.height).toBe("248px");
+  });
+
+  test("on landing, onLand runs before the clone is removed; never when cancelled", async () => {
+    const { original, destination, finish } = setup();
+    const seen: number[] = [];
+    const done = flyCard(captureOrigin(original)!, destination, { onLand: () => seen.push(document.body.querySelectorAll(".pv-flight").length) });
+    finish();
+    expect(await done).toBe("completed");
+    expect(seen).toEqual([1]);                       // the clone was still there: both change in one task
+    const again = setup(); const control = new AbortController(); const onLand = vi.fn();
+    const cancelled = flyCard(captureOrigin(again.original)!, again.destination, { signal: control.signal, onLand });
+    control.abort();
+    expect(await cancelled).toBe("cancelled");
+    expect(onLand).not.toHaveBeenCalled();
+  });
+
   test("a cancelled flight removes the clone and makes the original visible again", async () => {
-    const { original, destination, origin } = setup();
+    const { original, destination } = setup();
     const control = new AbortController();
-    const done = flyCard(origin, destination, control.signal);
+    const done = flyCard(captureOrigin(original)!, destination, { signal: control.signal });
     expect(original.style.visibility).toBe("hidden");
     control.abort();
     expect(await done).toBe("cancelled");
@@ -143,9 +222,9 @@ describe("flyCard", () => {
   });
 
   test("an already cancelled signal never creates a clone or hides the original", async () => {
-    const { original, destination, origin, animate } = setup();
+    const { original, destination, animate } = setup();
     const control = new AbortController(); control.abort();
-    expect(await flyCard(origin, destination, control.signal)).toBe("cancelled");
+    expect(await flyCard(captureOrigin(original)!, destination, { signal: control.signal })).toBe("cancelled");
     expect(animate).not.toHaveBeenCalled();
     expect(document.body.querySelector(".pv-flight")).toBeNull();
     expect(original.style.visibility).toBe("visible");
@@ -153,9 +232,17 @@ describe("flyCard", () => {
 
   test("without the Web Animations API nothing is hidden or added", async () => {
     const original = document.createElement("div"); document.body.appendChild(original);
-    const origin = captureOrigin(original)!;
-    expect(await flyCard(origin, document.createElement("div"))).toBe("skipped");
+    expect(await flyCard(captureOrigin(original)!, document.createElement("div"))).toBe("skipped");
     expect(original.style.visibility).toBe("");
     expect(document.body.querySelector(".pv-flight")).toBeNull();
+  });
+
+  test("settled waits for a smooth scroll to end before the flight measures the pocket", async () => {
+    const element = document.createElement("div");
+    const tops = [400, 300, 200, 120, 120, 120, 120, 120];
+    const spy = vi.spyOn(element, "getBoundingClientRect").mockImplementation(() => rect(0, tops[Math.min(spy.mock.calls.length - 1, tops.length - 1)], 10, 10));
+    await settled(element);
+    expect(spy.mock.calls.length).toBeGreaterThanOrEqual(7);   // kept checking until three still reads
+    expect(element.getBoundingClientRect().top).toBe(120);
   });
 });

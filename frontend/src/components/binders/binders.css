@@ -72,7 +72,11 @@
 .pv-pocket:focus-visible { outline: 3px solid var(--pv-focus); outline-offset: -1px; z-index: 1; }
 .pv-pocket--target { border-style: dashed; border-color: var(--pv-cyan); }
 
-/* The sleeve: inset border, glossy gradient and a corner reflection. */
+/*
+ * The sleeve works like a real one: the card (z 1) sits behind a front plastic (z 2,
+ * see-through, with a marked top edge) that carries the shine. The sleeve does not clip,
+ * so an arriving card can start above its opening and slide in behind the plastic.
+ */
 .pv-pocket__sleeve {
   align-items: center;
   aspect-ratio: 245 / 337;
@@ -81,13 +85,32 @@
   box-shadow: inset 0 0 0 2px var(--pv-bg);
   display: flex;
   justify-content: center;
-  overflow: hidden;
   position: relative;
   width: 100%;
 }
+.pv-pocket__card {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  transform-origin: 50% 100%;
+  width: 100%;
+  z-index: 1;
+}
+.pv-pocket__front {
+  background: linear-gradient(170deg, color-mix(in srgb, var(--pv-text) 10%, transparent), transparent 38%, transparent 72%, color-mix(in srgb, var(--pv-text) 5%, transparent));
+  border-top: 2px solid color-mix(in srgb, var(--pv-text) 32%, transparent);
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
 .pv-pocket--empty .pv-pocket__sleeve { border-style: dashed; border-color: var(--pv-border); }
-.pv-pocket__sleeve .tcg-artwork-frame, .pv-pocket__sleeve .tcg-artwork { height: 100%; width: 100%; }
-.pv-pocket__sleeve .tcg-artwork { border-radius: 0; }
+.pv-pocket__card .tcg-artwork-frame, .pv-pocket__card .tcg-artwork, .pv-flight .tcg-artwork-frame, .pv-flight .tcg-artwork { height: 100%; width: 100%; }
+.pv-pocket__card .tcg-artwork, .pv-flight .tcg-artwork { border-radius: 0; }
 .pv-pocket__shine {
   background: linear-gradient(120deg, transparent 30%, color-mix(in srgb, var(--pv-text) 14%, transparent) 45%, transparent 60%);
   inset: 0;
@@ -102,16 +125,19 @@
 .pv-pocket__price { font-size: var(--pv-text-xs); }
 
 /*
- * Entry into the sleeve (about 450 ms) after the flight: the card slides in from above and
- * settles softly (no hard bounce), then the sleeve shines. It starts where the flying clone
- * ended (30% of the card above the sleeve, see HOVER_RATIO in flight.ts).
+ * Entry into the sleeve (500 ms) after the flight: the card starts one card height above
+ * its place, exactly where the flying clone ended (see entryStart in flight.ts), tilted
+ * −2°. It slides down behind the front plastic, decelerating, straightens and settles
+ * minimally; then the sleeve shines. The arriving pocket is raised so the card shows above
+ * its neighbours while it is still outside the sleeve.
  */
-.pv-pocket[data-arrived="true"] .pv-pocket__sleeve > :first-child { animation: pv-pocket-drop 450ms cubic-bezier(.22, .61, .36, 1) 1; }
-.pv-pocket[data-arrived="true"] .pv-pocket__shine { animation: pv-sleeve-shine 300ms ease-out 200ms 1 both; }
-@keyframes pv-pocket-drop {
-  0% { transform: translateY(-30%); }
-  70% { transform: translateY(1.5%); }
-  100% { transform: translateY(0); }
+.pv-pocket[data-arrived="true"], .pv-pocket[data-incoming="true"] { z-index: 2; }
+.pv-pocket[data-arrived="true"] .pv-pocket__card { animation: pv-pocket-enter 500ms cubic-bezier(.22, .61, .36, 1) 1 both; }
+.pv-pocket[data-arrived="true"] .pv-pocket__shine { animation: pv-sleeve-shine 300ms ease-out 480ms 1 both; }
+@keyframes pv-pocket-enter {
+  0% { transform: translateY(-100%) rotate(-2deg); }
+  85% { transform: translateY(0.6%) rotate(0.2deg); }
+  100% { transform: translateY(0) rotate(0); }
 }
 @keyframes pv-sleeve-shine {
   0% { opacity: 0.2; transform: translateX(-70%); }
@@ -125,13 +151,13 @@
 @keyframes pv-page-turn-next { from { opacity: 0.4; transform: rotateY(-24deg); } to { opacity: 1; transform: rotateY(0); } }
 @keyframes pv-page-turn-prev { from { opacity: 0.4; transform: rotateY(24deg); } to { opacity: 1; transform: rotateY(0); } }
 
-/* FLIP flight: the floating clone (its motion is the Web Animations keyframes in flight.ts); the destination stays empty until it lands. */
-.pv-flight { box-shadow: var(--pv-shadow-1); overflow: hidden; will-change: transform; }
-.pv-pocket[data-incoming="true"] .pv-pocket__sleeve > :first-child { visibility: hidden; }
+/* FLIP flight: the floating clone (its motion and shadow are the Web Animations keyframes in flight.ts); the real card stays hidden until it lands. */
+.pv-flight { overflow: hidden; will-change: transform; }
+.pv-pocket[data-incoming="true"] .pv-pocket__card { visibility: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .pv-flight { display: none; }
-  .pv-pocket[data-arrived="true"] .pv-pocket__sleeve > :first-child, .pv-pocket[data-arrived="true"] .pv-pocket__shine,
+  .pv-pocket[data-arrived="true"] .pv-pocket__card, .pv-pocket[data-arrived="true"] .pv-pocket__shine,
   .pv-spread[data-turn] .pv-page { animation: none; }
   .pv-cover { transition: none; }
 }

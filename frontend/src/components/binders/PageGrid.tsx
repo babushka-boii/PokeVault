@@ -59,10 +59,12 @@ export function PageGrid({ page, pockets, cards, prices, selected, arrived, inco
               data-arrived={same(arrived, target) ? "true" : undefined}
               data-incoming={same(incoming, target) ? "true" : undefined}
               onClick={() => select(target)} onKeyDown={(event) => keyDown(event, pocket)}>
+              {/* A real sleeve: the card sits behind a front plastic (with its top edge) that shines. */}
               <span className="pv-pocket__sleeve" aria-hidden="true">
-                {held ? card ? <CardArtwork card={card} /> : <span className="pv-pocket__fallback">{held.copy.card_id}</span>
-                  : <span className="pv-pocket__number">{pocket}</span>}
-                <span className="pv-pocket__shine" />
+                {held ? <span className="pv-pocket__card">
+                  {card ? <CardArtwork card={card} /> : <span className="pv-pocket__fallback">{held.copy.card_id}</span>}
+                </span> : <span className="pv-pocket__number">{pocket}</span>}
+                <span className="pv-pocket__front"><span className="pv-pocket__shine" /></span>
               </span>
               {held && <span className="pv-pocket__caption" aria-hidden="true">
                 <span className="pv-pocket__name">{card?.name ?? held.copy.card_id}</span>

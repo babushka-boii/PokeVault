@@ -407,3 +407,31 @@ JavaScript):
 - The new tests found a real bug: leaving the page mid-flight left the clone floating. The
   flight is now cancelled on unmount.
 - The style contract now expects the 450 ms entry, a soft settle and the shine.
+
+### Follow-up: the card goes into the sleeve (2026-11-24)
+
+Safari review of the first rework: the card did not leave from where it was clicked, and it
+landed on top of the pocket and animated there, which looked fake.
+- **Start**: the click-time box is kept in document coordinates. Before, a scroll to the
+  pocket after the click (the tray is below the binder on narrower screens) moved the start
+  to wherever the thumbnail used to be on screen. The flight also waits until the smooth
+  scroll has stopped, instead of a fixed 250 ms. Moves measure the source pocket at the
+  click too, before the selection changes.
+- **Sleeve**: the card now sits behind a see-through front plastic with a marked top edge
+  (which carries the shine), and the sleeve no longer clips, so a card can enter from above.
+- **Landing**: the flight hovers just over the opening, in line with the pocket, then
+  descends to the exact first frame of the real card's entry (one card height above its
+  place, tilted −2° around its bottom centre). The clone is laid out at the destination's
+  size and scaled down at the start, so it is crisp when it lands.
+- **Hand-off**: `flyCard` calls `onLand` before removing the clone, and the binder view
+  commits the real card (and drops it from the tray) with `flushSync`, so both happen in
+  one frame. Before, the real card appeared one React render later.
+- **Entry**: 500 ms, decelerating, minimal settle (0.6%), straightening; then the shine.
+- Tests: flight keyframes checked point by point against the CSS entry's first frame, the
+  hover just over the opening, scroll compensation, `onLand` before removal, the stable
+  wait for the scroll; in the binder view the hand-off (at the clone's removal the real
+  card already shows and the tray card is gone) and the "Choose from the tray" start
+  measured before the tray closes. Planted bugs (hand-off one render later, viewport
+  coordinates, measuring at flight time, landing on the pocket) each failed tests.
+- Also: `test_hard_worker_deadline_stops_native_descendants_and_cleans_temp` now uses a
+  3.0 s deadline (0.4 s was shorter than the worker's Pillow/OpenCV import on a busy Mac).

@@ -186,12 +186,20 @@ describe("FLIP flight", () => {
       const pocket = within(grid(1)).getByRole("button", { name: /^Página 1, bolsillo 1: Card 1/ });
       expect(pocket).toHaveAttribute("data-incoming", "true");
       expect(pocket).not.toHaveAttribute("data-arrived");
+      // The flight aims at the real card inside the sleeve (hidden until it lands).
+      expect(pocket.querySelector(".pv-pocket__card")).toBeInTheDocument();
+      // Invisible hand-off: when the clone is removed, the real card already shows and is
+      // entering the sleeve, and the tray no longer has the stored card (same task, same frame).
+      const atRemoval: { incoming: string | null; arrived: string | null; inTray: boolean }[] = [];
+      const remove = clone.remove.bind(clone);
+      clone.remove = () => {
+        atRemoval.push({ incoming: pocket.getAttribute("data-incoming"), arrived: pocket.getAttribute("data-arrived"), inTray: original.isConnected });
+        remove();
+      };
       await act(async () => motion.flights[0].finish());
-      await waitFor(() => expect(clones()).toHaveLength(0));
-      // The entry plays after the flight, and the tray drops the stored card at the same moment.
-      expect(pocket).not.toHaveAttribute("data-incoming");
-      await waitFor(() => expect(pocket).toHaveAttribute("data-arrived", "true"));
-      await waitFor(() => expect(screen.queryByRole("button", { name: /^Guardar Card 1/ })).not.toBeInTheDocument());
+      expect(atRemoval).toEqual([{ incoming: null, arrived: "true", inTray: false }]);
+      expect(clones()).toHaveLength(0);
+      expect(screen.queryByRole("button", { name: /^Guardar Card 1/ })).not.toBeInTheDocument();
     } finally { motion.restore(); }
   });
 
@@ -271,17 +279,48 @@ describe("FLIP flight", () => {
       const user = userEvent.setup();
       render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
       const source = within(await findGrid(1)).getByRole("button", { name: /^Página 1, bolsillo 1:/ });
-      const sleeve = source.querySelector(".pv-pocket__sleeve") as HTMLElement;
+      const held = source.querySelector(".pv-pocket__card") as HTMLElement;
       await user.click(source);
       await user.click(screen.getByRole("button", { name: "Mover" }));
       await user.click(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 9: vacío" }));
       await waitFor(() => expect(motion.flights).toHaveLength(1));
-      expect(motion.flights[0].element).toHaveClass("pv-pocket__sleeve", "pv-flight");
-      expect(sleeve.isConnected).toBe(true);
-      expect(sleeve.style.visibility).toBe("hidden");
+      // The card itself flies (not the sleeve and its plastic).
+      expect(motion.flights[0].element).toHaveClass("pv-pocket__card", "pv-flight");
+      expect(motion.flights[0].element.querySelector(".pv-pocket__front")).toBeNull();
+      expect(held.isConnected).toBe(true);
+      expect(held.style.visibility).toBe("hidden");
+      const destination = within(grid(2)).getByRole("button", { name: /^Página 2, bolsillo 9: Card 1/ });
       await act(async () => motion.flights[0].finish());
-      await waitFor(() => expect(clones()).toHaveLength(0));
-      expect(sleeve.style.visibility).toBe("");
+      expect(clones()).toHaveLength(0);
+      expect(destination).toHaveAttribute("data-arrived", "true");
+      expect(held.style.visibility).toBe("");
+    } finally { motion.restore(); }
+  });
+
+  test("choosing from the tray for a pocket: the card flies from where it was clicked, measured before the tray closes", async () => {
+    const motion = stubAnimate();
+    try {
+      binderWorld({ binders: [{ name: "Tesoros", pockets: [] }], tray: [physical(0)] });
+      const user = userEvent.setup();
+      render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+      await user.click(within(await findGrid(1)).getByRole("button", { name: "Página 1, bolsillo 5: vacío" }));
+      await user.click(screen.getByRole("button", { name: "Elegir de la bandeja" }));
+      const item = await screen.findByRole("button", { name: /^Guardar Card 1 · Expansion 1 en página 1, bolsillo 5/ });
+      const original = item.querySelector(".pv-tray__thumb") as HTMLElement;
+      // While choosing, the tray shows its cancel button above the list; once stored it closes
+      // and the list moves up. The flight must start where the user clicked.
+      const box = (top: number) => ({ left: 900, top, width: 48, height: 66, right: 948, bottom: top + 66, x: 900, y: top, toJSON: () => ({}) }) as DOMRect;
+      vi.spyOn(original, "getBoundingClientRect").mockImplementation(() => box(screen.queryByRole("button", { name: "Cancelar elección" }) ? 520 : 470));
+      await user.click(item);
+      await waitFor(() => expect(motion.flights).toHaveLength(1));
+      expect(screen.queryByRole("button", { name: "Cancelar elección" })).not.toBeInTheDocument();
+      const clone = motion.flights[0].element;
+      expect([clone.style.left, clone.style.top]).toEqual(["900px", "520px"]);
+      expect(original.style.visibility).toBe("hidden");
+      const pocket = within(grid(1)).getByRole("button", { name: /^Página 1, bolsillo 5: Card 1/ });
+      await act(async () => motion.flights[0].finish());
+      expect(pocket).toHaveAttribute("data-arrived", "true");
+      expect(clones()).toHaveLength(0);
     } finally { motion.restore(); }
   });
 
