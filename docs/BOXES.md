@@ -43,7 +43,7 @@ client-writable owner field. Responses, including errors, are no-store/no-cache.
 
 Summary fields: `id`, `name`, `display_order`, `wallpaper`, `created_at`, `updated_at`,
 `copy_count`. `copy` uses the existing inventory response unchanged. Wallpapers:
-`classic`, `forest`, `ocean`, `night`. Slots use zero-based API positions; the UI
+`noir` (default since migration `0006`), `classic`, `forest`, `ocean`, `night`. Slots use zero-based API positions; the UI
 labels them 1–30. Derived-view pagination accepts offset 0–1,000,000 and limit 1–100
 (default 30); the PC client requests 30.
 

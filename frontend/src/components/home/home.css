@@ -1,0 +1,80 @@
+/* Home on "Unova Noir" tokens (Iteration 8A). Colors only from tokens. */
+.pv-home { display: grid; gap: var(--pv-space-5); }
+.pv-home__grid { display: grid; gap: var(--pv-space-4); grid-template-columns: minmax(0, 1fr); }
+.pv-home__hero, .pv-home__side, .pv-home__wide { min-width: 0; }
+.pv-home__guest-title { font-size: var(--pv-text-xl); margin: var(--pv-space-3) 0; }
+.pv-home__lead { color: var(--pv-text-2); margin: 0 0 var(--pv-space-4); max-width: 40rem; }
+.pv-home__public { display: grid; gap: var(--pv-space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+.pv-home__link-panel { align-items: center; display: flex; justify-content: center; }
+
+.pv-home-scanner { display: grid; gap: var(--pv-space-3); overflow: hidden; }
+.pv-home-scanner__text { margin: 0; max-width: 28rem; }
+/* One 600 ms sweep on hover/focus; nothing moves on its own. */
+.pv-home-scanner__sweep { background: linear-gradient(180deg, transparent, var(--pv-cyan-soft), transparent); height: 40%; left: 0; opacity: 0; pointer-events: none; position: absolute; right: 0; top: -40%; }
+.pv-home-scanner:hover .pv-home-scanner__sweep, .pv-home-scanner:focus-within .pv-home-scanner__sweep { animation: pv-scan-sweep 600ms var(--pv-ease) 1; }
+@keyframes pv-scan-sweep { 0% { opacity: 1; top: -40%; } 100% { opacity: 0; top: 100%; } }
+@media (prefers-reduced-motion: reduce) { .pv-home-scanner__sweep { display: none; } }
+
+.pv-home__status { color: var(--pv-text-2); font-size: var(--pv-text-sm); }
+.pv-home__status summary { cursor: pointer; display: flex; align-items: center; min-height: var(--pv-touch); }
+.pv-home__status[open] summary { color: var(--pv-text); }
+
+@media (min-width: 1024px) {
+  .pv-home__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .pv-home__hero { grid-column: span 8; }
+  .pv-home__side { grid-column: span 4; }
+  .pv-home__wide { grid-column: 1 / -1; }
+}
+
+.pv-home__actions { align-items: center; display: flex; flex-wrap: wrap; gap: var(--pv-space-3); margin-top: var(--pv-space-4); }
+.pv-home__meta { color: var(--pv-text-2); font-size: var(--pv-text-sm); margin: var(--pv-space-1) 0; overflow-wrap: anywhere; }
+.pv-home__total { color: var(--pv-gold); font-family: var(--pv-font-display); font-size: var(--pv-text-hero); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin: var(--pv-space-3) 0; overflow-wrap: anywhere; }
+.pv-home__chips { display: flex; flex-wrap: wrap; gap: var(--pv-space-2); list-style: none; margin: 0 0 var(--pv-space-3); padding: 0; }
+.pv-chip--button { cursor: pointer; font: inherit; }
+.pv-home__hero .price-note, .pv-home__hero .price-attribution { margin: var(--pv-space-1) 0; }
+
+.pv-home__section, .pv-home__pc, .pv-home__sets { min-width: 0; }
+.pv-home__section-head { align-items: baseline; display: flex; flex-wrap: wrap; gap: var(--pv-space-2) var(--pv-space-4); justify-content: space-between; margin-bottom: var(--pv-space-3); }
+.pv-home__section-head h2 { font-size: var(--pv-text-lg); margin: 0; }
+.pv-home__section-head a { align-items: center; display: inline-flex; min-height: var(--pv-touch); }
+
+.pv-home__top { display: grid; gap: var(--pv-space-4); grid-template-columns: repeat(5, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; }
+.pv-home__top-item { min-width: 0; }
+.pv-home__top-art { display: block; }
+.pv-home__top-missing { align-items: center; aspect-ratio: 245 / 337; background: var(--pv-panel-raised); color: var(--pv-text-3); display: flex; font-size: 2rem; justify-content: center; }
+.pv-home__top-name { font-size: var(--pv-text-md); margin: var(--pv-space-3) 0 var(--pv-space-1); overflow-wrap: anywhere; }
+.pv-home__top-name a { color: var(--pv-text); text-decoration: none; }
+.pv-home__top-name a:hover { color: var(--pv-cyan); text-decoration: underline; }
+.pv-home__price .price-amount { font-size: var(--pv-text-lg); }
+@media (max-width: 767px) {
+  .pv-home__top { grid-auto-columns: minmax(9.5rem, 40%); grid-auto-flow: column; grid-template-columns: none; overflow-x: auto; padding-bottom: var(--pv-space-2); scroll-snap-type: x proximity; }
+  .pv-home__top-item { scroll-snap-align: start; }
+}
+
+/* Mi PC preview: dark dotted screen, cyan cursor (selection styling comes from boxes.css under .pc-page). */
+.pv-home-pc__layout { display: grid; gap: var(--pv-space-4); grid-template-columns: minmax(0, 1fr); }
+.pv-home-pc__screen { background-color: var(--pv-bg); background-image: radial-gradient(var(--pv-border) 1px, transparent 1.5px); background-size: 16px 16px; border: 1px solid var(--pv-border); padding: var(--pv-space-2); }
+.pv-home-pc .pc-slot { background: transparent; border: 2px solid transparent; border-radius: 0; color: var(--pv-text-3); cursor: pointer; padding: 0; transition: background-color var(--pv-dur-fast) var(--pv-ease), border-color var(--pv-dur-fast) var(--pv-ease); }
+.pv-home-pc .pc-slot:hover { background: var(--pv-cyan-soft); }
+/* Cyan cursor; the dark inset ring keeps it readable and leaves the focus outline alone. */
+.pv-home-pc .pc-grid [aria-selected="true"] .pc-slot { background: var(--pv-cyan-soft); border-color: var(--pv-cyan); box-shadow: inset 0 0 0 2px var(--pv-bg); }
+.pv-home-pc .pc-slot:focus-visible { outline: 3px solid var(--pv-focus); outline-offset: -3px; z-index: 1; }
+.pv-home-pc__panel { background: var(--pv-panel-raised); border: 1px solid var(--pv-border); min-width: 0; padding: var(--pv-space-4); }
+.pv-home-pc__panel h3 { font-size: var(--pv-text-lg); margin: 0 0 var(--pv-space-1); overflow-wrap: anywhere; }
+.pv-home-pc__facts { display: grid; gap: var(--pv-space-2); margin: var(--pv-space-3) 0; }
+.pv-home-pc__facts dt { color: var(--pv-text-2); font-size: var(--pv-text-xs); }
+.pv-home-pc__facts dd { margin: 0; }
+.pv-home__pc-empty h3 { font-size: var(--pv-text-lg); margin: 0; }
+.pv-home__pc-empty { padding: var(--pv-space-4) 0; }
+
+.pv-home__sets-list { display: grid; gap: var(--pv-space-3); list-style: none; margin: var(--pv-space-3) 0 0; padding: 0; }
+.pv-home__sets-list li { min-width: 0; }
+.pv-home__sets-list a { overflow-wrap: anywhere; }
+
+@media (min-width: 1024px) {
+  .pv-home__pc { grid-column: span 7; }
+  .pv-home__sets { grid-column: span 5; }
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  .pv-home-pc__layout { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+}

@@ -81,6 +81,14 @@ test("box changes replace box and selection together while preserving the wallpa
   expect(screen.getByTestId("location")).toHaveTextContent("/boxes?box=20&pokemon=571&wallpaper=forest");
 });
 
+test("the catalog box defaults to Unova Noir and keeps the four retro wallpapers selectable", async () => {
+  renderRoute("/boxes");
+  expect(await screen.findByRole("region", { name: "Caja 01" })).toHaveClass("pc-wallpaper--noir");
+  const options = within(screen.getByRole("group", { name: "Fondo" })).getAllByRole("button");
+  expect(options.map((option) => option.textContent)).toEqual(["Unova Noir", "Clásico", "Bosque", "Océano", "Cielo nocturno"]);
+  expect(screen.getByRole("button", { name: "Unova Noir" })).toHaveAttribute("aria-pressed", "true");
+});
+
 test("search arrival focuses the selected species after its URL transition and box load", async () => {
   renderRoute("/boxes");
   const user = userEvent.setup();
@@ -94,7 +102,9 @@ test("search arrival focuses the selected species after its URL transition and b
 });
 
 test.each([
-  ["box=99&pokemon=1.2&wallpaper=invalid", "Caja 01", "#001 Pokemon-1", "classic", "box=1&pokemon=1&wallpaper=classic", 30],
+  // An invalid or missing wallpaper falls back to the dark "Unova Noir" default (8A).
+  ["box=99&pokemon=1.2&wallpaper=invalid", "Caja 01", "#001 Pokemon-1", "noir", "box=1&pokemon=1&wallpaper=noir", 30],
+  ["box=2&pokemon=31&wallpaper=classic", "Caja 02", "#031 Pokemon-31", "classic", "box=2&pokemon=31&wallpaper=classic", 30],
   ["box=19&pokemon=25&wallpaper=night", "Caja 19", "#541 Pokemon-541", "night", "box=19&pokemon=541&wallpaper=night", 30],
   ["box=35&pokemon=1025&wallpaper=forest", "Caja 35", "#1025 Pokemon-1025", "forest", "box=35&pokemon=1025&wallpaper=forest", 5],
 ])("validates box query state %s", async (query, box, selected, wallpaper, restoredQuery, count) => {

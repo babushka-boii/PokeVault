@@ -1,0 +1,132 @@
+/*
+ * Base layer for "Unova Noir": element defaults, focus, reduced motion and the
+ * small set of .pv-* utilities shared by the shell, Home and UI primitives.
+ * Colors come only from tokens.css.
+ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background: var(--pv-bg); }
+
+body {
+  background: var(--pv-bg);
+  color: var(--pv-text);
+  font-family: var(--pv-font-body);
+  font-synthesis: none;
+  line-height: 1.5;
+  margin: 0;
+  min-height: 100vh;
+  min-width: 320px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:where(h1, h2, h3, h4) { font-family: var(--pv-font-display); letter-spacing: -0.01em; line-height: 1.2; }
+
+:where(a) { color: var(--pv-cyan); text-underline-offset: 0.2em; }
+
+/* Element defaults use :where() (zero specificity) so any class in feature CSS wins. */
+:where(button, input, select, textarea) { color: inherit; font: inherit; }
+
+:where(input, select, textarea) {
+  background: var(--pv-panel);
+  border: 1px solid var(--pv-border-strong);
+  border-radius: var(--pv-radius-1);
+  color: var(--pv-text);
+}
+
+:where(button) {
+  background: var(--pv-panel-raised);
+  border: 1px solid var(--pv-border-strong);
+  border-radius: var(--pv-radius-1);
+  color: var(--pv-text);
+  cursor: pointer;
+  min-height: var(--pv-touch);
+  padding: var(--pv-space-2) var(--pv-space-3);
+  transition: background-color var(--pv-dur-fast) var(--pv-ease), border-color var(--pv-dur-fast) var(--pv-ease);
+}
+:where(button:hover:not(:disabled)) { border-color: var(--pv-cyan); }
+:where(button:disabled) { cursor: default; opacity: 0.55; }
+
+::selection { background: var(--pv-cyan); color: var(--pv-on-cyan); }
+
+:focus-visible { outline: 3px solid var(--pv-focus); outline-offset: 3px; }
+
+/* Utilities */
+.pv-sr-only {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.pv-pixel {
+  font-family: var(--pv-font-pixel);
+  font-size: var(--pv-text-pixel);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.pv-tabular { font-variant-numeric: tabular-nums; }
+
+/*
+ * Diagonal cut corner (gen 5 menus). The cut is drawn on two pseudo-element layers,
+ * never on the element itself, so the focus outline and the diagonal border are not
+ * clipped. ::before = border color, ::after = fill inset by 1px.
+ */
+.pv-cut {
+  --pv-cut-size: var(--pv-cut);
+  --pv-cut-border: var(--pv-border);
+  --pv-cut-fill: var(--pv-panel);
+  background: none;
+  border: 0;
+  isolation: isolate;
+  position: relative;
+}
+.pv-cut::before, .pv-cut::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+.pv-cut::before {
+  background: var(--pv-cut-border);
+  clip-path: polygon(0 0, calc(100% - var(--pv-cut-size)) 0, 100% var(--pv-cut-size), 100% 100%, 0 100%);
+  inset: 0;
+  transition: background-color var(--pv-dur-fast) var(--pv-ease);
+}
+.pv-cut::after {
+  background: var(--pv-cut-fill);
+  clip-path: polygon(0 0, calc(100% - var(--pv-cut-size) + 0.41px) 0, 100% calc(var(--pv-cut-size) - 0.41px), 100% 100%, 0 100%);
+  inset: 1px;
+  transition: background-color var(--pv-dur-fast) var(--pv-ease);
+}
+.pv-cut--sm { --pv-cut-size: var(--pv-cut-sm); }
+
+.pv-skeleton {
+  animation-direction: alternate;
+  animation-duration: 1.2s;
+  animation-iteration-count: 3;
+  animation-name: pv-pulse;
+  animation-timing-function: var(--pv-ease);
+  background: var(--pv-panel-raised);
+  border-radius: var(--pv-radius-1);
+  display: block;
+}
+
+@keyframes pv-pulse { from { opacity: 1; } to { opacity: 0.55; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

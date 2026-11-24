@@ -116,7 +116,8 @@ def test_crud_order_and_private_summary(boxes):
     first = create_box(client, headers, "  Favorite cards  ")
     assert first["name"] == "Favorite cards"
     assert first["display_order"] == 0
-    assert first["wallpaper"] == "classic"
+    # Iteration 8A: new boxes default to the dark "Unova Noir" wallpaper.
+    assert first["wallpaper"] == "noir"
     assert first["copy_count"] == 0
     assert set(first) == {
         "id",
@@ -137,6 +138,13 @@ def test_crud_order_and_private_summary(boxes):
     assert renamed.status_code == 200
     assert renamed.json()["name"] == "Favorites"
     assert renamed.json()["wallpaper"] == "night"
+    # Every retro wallpaper stays selectable, and Noir can be chosen back.
+    for wallpaper in ("classic", "forest", "ocean", "night", "noir"):
+        chosen = client.put(
+            f"{PATH}/{first['id']}", headers=headers, json={"wallpaper": wallpaper}
+        )
+        assert chosen.status_code == 200
+        assert chosen.json()["wallpaper"] == wallpaper
     reordered = client.put(
         f"{PATH}/order",
         json={"box_ids": [third["id"], first["id"], second["id"]]},

@@ -171,7 +171,7 @@ class PersonalBox(Base):
         ),
         CheckConstraint("display_order >= 0", name="ck_personal_boxes_order"),
         CheckConstraint(
-            "wallpaper IN ('classic','forest','ocean','night')",
+            "wallpaper IN ('noir','classic','forest','ocean','night')",
             name="ck_personal_boxes_wallpaper",
         ),
     )
@@ -183,7 +183,7 @@ class PersonalBox(Base):
     name: Mapped[str] = mapped_column(String(80), nullable=False)
     display_order: Mapped[int] = mapped_column(nullable=False)
     wallpaper: Mapped[str] = mapped_column(
-        String(16), nullable=False, default="classic", server_default="classic"
+        String(16), nullable=False, default="noir", server_default="noir"
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()

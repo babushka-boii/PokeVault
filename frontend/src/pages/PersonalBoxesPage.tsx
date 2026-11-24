@@ -6,7 +6,7 @@ import { AudioControls } from "../components/boxes/AudioControls";
 import { PersonalDetails } from "../components/boxes/personalDetails";
 import { PersonalGrid } from "../components/boxes/personalGrid";
 import { generationGroup, usePersonalMetadata } from "../components/boxes/personalMetadata";
-import { wallpapers, type Wallpaper } from "../components/boxes/wallpapers";
+import { DEFAULT_WALLPAPER, wallpapers, type Wallpaper } from "../components/boxes/wallpapers";
 import { BoxValue } from "../components/prices/BoxValue";
 import { useRetroAudio } from "../hooks/useRetroAudio";
 import { useSpriteMode } from "../hooks/useSpriteMode";
@@ -133,7 +133,7 @@ function PersonalWorkspace() {
     {loading && <p role="status">{text.loading}</p>}
     {view === "manual" && <>
       <form className="pc-create-box" onSubmit={(event) => { event.preventDefault(); void mutate(async (csrf, signal) => {
-        const created = await createBox(newName, "classic", csrf, signal);
+        const created = await createBox(newName, DEFAULT_WALLPAPER, csrf, signal);
         if (!signal.aborted) { setChosenId(created.id); setSelected(0); setNewName(""); setPicker(false); }
       }); }}><fieldset disabled={busy || list.state.kind !== "loaded" || boxes.length >= 100}>
         <legend>{text.create}</legend><label>{text.newName}<input value={newName} maxLength={80} required onChange={(event) => setNewName(event.target.value)} /></label>
@@ -146,7 +146,7 @@ function PersonalWorkspace() {
     {(box || page) && <>
       <div className="pc-console">
         <PersonalDetails copy={copy} card={copy && metadata.cards[copy.card_id]} position={selected} mode={sprites.effectiveMode} />
-        <section className={`pc-storage pc-wallpaper--${box?.wallpaper ?? "classic"}`} aria-labelledby="personal-box-title">
+        <section className={`pc-storage pc-wallpaper--${box?.wallpaper ?? DEFAULT_WALLPAPER}`} aria-labelledby="personal-box-title">
           <header className="pc-box-header pc-personal-header">
             <button type="button" aria-label={view === "manual" ? dictionary.boxes.previous : dictionary.inventory.previous} disabled={busy || (view === "manual" ? index <= 0 : offset === 0)} onClick={() => {
               if (view === "manual") chooseBox(boxes[index - 1].id); else { setOffset(Math.max(0, offset - 30)); setSelected(0); audio.play("switch"); }
@@ -178,11 +178,17 @@ function PersonalWorkspace() {
             {unassigned.state.kind === "error" && <><p role="alert">{text.loadError}</p><button type="button" onClick={unassigned.retry}>{dictionary.status.retry}</button></>}
             {candidates && <><p>{text.total.replace("{count}", String(candidates.total))}</p>
               {!candidates.results.length && <p>{text.noCopies}</p>}
-              <ul>{candidates.results.map((candidate) => <li key={candidate.id}>
-                <span>{metadata.cards[candidate.card_id]?.name ?? candidate.card_id} · {candidate.card_id}</span>
+              <ul>{candidates.results.map((candidate) => {
+                const card = metadata.cards[candidate.card_id];
+                // Card name and expansion identify the copy for people; the UUID is never shown or announced.
+                const identity = card ? `${card.name} · ${card.set.name}` : candidate.card_id;
+                return <li key={candidate.id}>
+                <span>{card?.name ?? candidate.card_id} · {candidate.card_id}</span>
                 <span>{dictionary.inventory.languages[candidate.language]} · {dictionary.inventory.variants[candidate.variant]} · {dictionary.inventory.conditions[candidate.condition]}</span>
-                <button type="button" disabled={busy} onClick={() => void mutate((csrf, signal) => placeCopy(box.id, selected, candidate.id, csrf, signal), () => setPicker(false))}>{text.place} {candidate.id}</button>
-              </li>)}</ul>
+                <button type="button" disabled={busy} aria-label={text.placeLabel.replace("{card}", identity).replace("{position}", String(selected + 1))}
+                  onClick={() => void mutate((csrf, signal) => placeCopy(box.id, selected, candidate.id, csrf, signal), () => setPicker(false))}>{text.place}</button>
+              </li>;
+              })}</ul>
               <div className="pc-pagination"><button type="button" disabled={busy || pickerOffset === 0} onClick={() => setPickerOffset(Math.max(0, pickerOffset - 30))}>{dictionary.inventory.previous}</button>
                 <button type="button" disabled={busy || pickerOffset + 30 >= candidates.total} onClick={() => setPickerOffset(pickerOffset + 30)}>{dictionary.inventory.next}</button></div>
             </>}

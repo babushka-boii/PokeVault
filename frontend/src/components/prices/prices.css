@@ -1,11 +1,12 @@
+/* Reference prices (Iteration 7) on "Unova Noir" tokens: gold is reserved for money. */
 .price { display: inline-flex; flex-direction: column; gap: 0.1rem; }
-.price-amount { font-variant-numeric: tabular-nums; }
-.price-meta, .price-note, .price-attribution { font-size: 0.85em; opacity: 0.85; margin: 0.25rem 0; overflow-wrap: anywhere; }
-.price-missing { font-style: italic; }
-.price-stale { font-weight: 600; }
-.price-attribution a { color: inherit; }
+.price-amount { color: var(--pv-gold); font-family: var(--pv-font-display); font-variant-numeric: tabular-nums; font-weight: 600; }
+.price-meta, .price-note, .price-attribution { color: var(--pv-text-2); font-size: 0.85em; margin: 0.25rem 0; overflow-wrap: anywhere; }
+.price-missing { color: var(--pv-text-2); font-style: italic; }
+.price-stale { color: var(--pv-text); font-weight: 600; }
+.price-attribution a { color: var(--pv-cyan); }
 .price-currency label { display: inline-flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
 .price-panel ul, .price-value ul { list-style: none; padding: 0; margin: 0.5rem 0; display: grid; gap: 0.5rem; }
 .price-panel li, .price-value li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
-.price-total { font-size: 1.5rem; margin: 0.25rem 0; }
+.price-total { color: var(--pv-gold); font-family: var(--pv-font-display); font-size: 1.5rem; font-variant-numeric: tabular-nums; font-weight: 700; margin: 0.25rem 0; }
 .price-value { margin-top: 1rem; }

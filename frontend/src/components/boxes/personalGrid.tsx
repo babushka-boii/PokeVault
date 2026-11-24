@@ -38,7 +38,7 @@ export function PersonalGrid({ slots, selected, select, cards, mode, disabled, f
       {Array.from({ length: 6 }, (_, col) => {
         const position = row * 6 + col; const copy = slots.find((s) => s.position === position)?.copy;
         const card = copy && cards[copy.card_id];
-        const label = copy ? `${text.position} ${position + 1}: ${card?.name ?? copy.card_id}; ${copy.card_id}; ${copy.id}; ${dictionary.inventory.languages[copy.language]}, ${dictionary.inventory.variants[copy.variant]}, ${dictionary.inventory.conditions[copy.condition]}` : `${dictionary.boxes.emptySlot} ${position + 1}`;
+        const label = copy ? `${text.position} ${position + 1}: ${card ? `${card.name} · ${card.set.name}` : copy.card_id}; ${dictionary.inventory.languages[copy.language]}, ${dictionary.inventory.variants[copy.variant]}, ${dictionary.inventory.conditions[copy.condition]}` : `${dictionary.boxes.emptySlot} ${position + 1}`;
         return <div key={position} role="gridcell" aria-selected={selected === position}>
           <button type="button" className={`pc-slot${copy ? "" : " pc-slot--empty"}`} aria-label={label} disabled={disabled}
             tabIndex={selected === position ? 0 : -1} ref={(node) => { buttons.current[position] = node; }}

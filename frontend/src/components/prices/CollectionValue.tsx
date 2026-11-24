@@ -1,13 +1,10 @@
-import { useCallback } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../../auth/context";
-import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
-import { fetchCollectionValue, PricesError, type Valuation } from "../../services/prices";
+import type { Valuation } from "../../services/prices";
 import { usePersonalMetadata } from "../boxes/personalMetadata";
-import { useCurrency } from "./currency";
 import { formatMoney } from "./format";
 import { CurrencySwitch, PriceText, RatesAttribution, ReferenceNote } from "./PriceDisplay";
+import { useCollectionValuation } from "./useCollectionValuation";
 
 export function ValueTotal({ value }: { value: Valuation }) {
   const { dictionary, locale } = useLocale();
@@ -26,13 +23,7 @@ export function ValueTotal({ value }: { value: Valuation }) {
 export function CollectionValue() {
   const { dictionary, locale } = useLocale();
   const text = dictionary.prices;
-  const { retrySession } = useAuth();
-  const { currency, ready } = useCurrency();
-  const request = useCallback((signal: AbortSignal) => fetchCollectionValue(currency, signal).catch((error: unknown) => {
-    if (!signal.aborted && error instanceof PricesError && error.status === 401) retrySession();
-    throw error;
-  }), [currency, retrySession]);
-  const { state, retry } = useTcgResource(ready ? currency : undefined, request);
+  const { state, retry } = useCollectionValuation();
   const value = state.kind === "loaded" ? state.data : null;
   const names = usePersonalMetadata(value?.top.map((item) => item.card_id) ?? [], locale);
   const withoutVariant = value?.unpriced_by_reason.variant_unknown ?? 0;

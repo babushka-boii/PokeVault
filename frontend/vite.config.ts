@@ -6,5 +6,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
+    // Only `?raw` stylesheet imports (read by the style contract tests) keep their text;
+    // component stylesheets stay stubbed so jsdom visibility checks are unaffected.
+    css: { include: [/\.css\?raw$/] },
   },
 });

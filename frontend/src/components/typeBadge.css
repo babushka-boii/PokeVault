@@ -1,7 +1,8 @@
-.type-badge { --type-color: #8f999f; display: inline-flex; align-items: stretch; width: 146px; max-width: 100%; height: 32px; flex-shrink: 0; border-radius: 0; background: #41473e; color: #fff; line-height: 1; vertical-align: middle; }
+.type-badge { --type-color: var(--pv-border-strong); display: inline-flex; align-items: stretch; width: 146px; max-width: 100%; height: 32px; flex-shrink: 0; border-radius: 0; background: var(--pv-panel-raised); border: 1px solid var(--pv-border); color: var(--pv-text); line-height: 1; vertical-align: middle; }
 .type-badge-symbol { display: grid; place-items: center; width: 40px; padding-right: 5px; flex-shrink: 0; background: var(--type-color); clip-path: polygon(0 0, 100% 0, 76% 100%, 0 100%); }
-.type-badge-symbol svg { width: 23px; height: 23px; fill: #fff; }
-.type-badge-label { display: grid; place-items: center; flex: 1; padding: 0 7px 0 1px; font-family: ui-sans-serif, system-ui, sans-serif; font-size: .75rem; font-weight: 850; letter-spacing: .025em; text-transform: uppercase; white-space: nowrap; }
+.type-badge-symbol svg { width: 23px; height: 23px; fill: var(--pv-text); }
+.type-badge-label { display: grid; place-items: center; flex: 1; padding: 0 7px 0 1px; font-family: var(--pv-font-display); font-size: .75rem; font-weight: 700; letter-spacing: .025em; text-transform: uppercase; white-space: nowrap; }
+/* pv-allow-colors: Pokémon type colors are content (small type details only, never large backgrounds). */
 .type-badge--normal { --type-color: #929aa2; }
 .type-badge--fire { --type-color: #ed803c; }
 .type-badge--water { --type-color: #4f91d4; }
@@ -20,3 +21,4 @@
 .type-badge--dark { --type-color: #66626c; }
 .type-badge--steel { --type-color: #6293a2; }
 .type-badge--fairy { --type-color: #d78bbc; }
+/* pv-allow-colors-end */

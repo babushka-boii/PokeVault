@@ -15,7 +15,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("PokéVault application shell", () => {
   test.each([
-    ["/", "Estado del sistema"],
+    ["/", "Inicio"],
     ["/boxes", "Cajas"],
     ["/pokedex", "Pokédex"],
     ["/profile", "Perfil"],
@@ -34,14 +34,15 @@ describe("PokéVault application shell", () => {
     render(<App initialEntries={["/"]} />);
 
     expect(screen.getByRole("link", { name: "Inicio" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Cajas" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Cajas PC" })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "English" }));
 
     expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Boxes" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "PC Boxes" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Profile" })).toBeInTheDocument();
     expect(localStorage.getItem("pokevault.locale")).toBe("en");
+    expect(document.documentElement.lang).toBe("en");
   });
 
   test("falls back to Spanish for an unsupported persisted locale", () => {

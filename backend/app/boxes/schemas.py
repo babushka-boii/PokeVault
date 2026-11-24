@@ -14,7 +14,8 @@ from pydantic import (
 
 from app.inventory.schemas import InventoryCopy
 
-Wallpaper = Literal["classic", "forest", "ocean", "night"]
+# "noir" (Unova Noir, 8A) is the default; the four retro screens stay selectable.
+Wallpaper = Literal["noir", "classic", "forest", "ocean", "night"]
 BoxName = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)
 ]
@@ -24,7 +25,7 @@ class CreateBox(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: BoxName
-    wallpaper: Wallpaper = "classic"
+    wallpaper: Wallpaper = "noir"
 
 
 class UpdateBox(BaseModel):

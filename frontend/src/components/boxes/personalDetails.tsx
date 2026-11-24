@@ -19,7 +19,6 @@ export function PersonalDetails({ copy, card, position, mode }: { copy?: Invento
       </>}
       <dl className="pc-copy-facts">
         <div><dt>{inventory.cardId}</dt><dd>{copy.card_id}</dd></div>
-        <div><dt>{text.copyId}</dt><dd>{copy.id}</dd></div>
         <div><dt>{inventory.condition}</dt><dd>{inventory.conditions[copy.condition]}</dd></div>
         <div><dt>{inventory.language}</dt><dd>{inventory.languages[copy.language]}</dd></div>
         <div><dt>{inventory.variant}</dt><dd>{inventory.variants[copy.variant]}</dd></div>

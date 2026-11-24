@@ -159,7 +159,7 @@ test("keeps the public Pokédex accessible while session restoration is pending"
   vi.stubGlobal("fetch", vi.fn((input: string) => input.endsWith("/auth/me") ? new Promise<Response>(() => undefined) : Promise.resolve(json({ results: [{ national_dex_number: 1, name: "bulbasaur", types: ["grass"], sprite_url: null }] }))));
   render(<App initialEntries={["/pokedex"]} />);
   expect(await screen.findByRole("heading", { name: "Bulbasaur" })).toBeVisible();
-  expect(screen.getByRole("link", { name: "Cajas" })).toHaveAttribute("href", "/boxes");
+  expect(screen.getByRole("link", { name: "Cajas PC" })).toHaveAttribute("href", "/boxes");
   expect(screen.getByRole("link", { name: "Ver cartas TCG" })).toHaveAttribute("href", "/pokemon/1/cards?returnTo=%2Fpokedex");
 });
 

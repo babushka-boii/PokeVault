@@ -31,6 +31,7 @@
   transition: opacity 220ms ease;
 }
 
+/* pv-allow-colors: simulated holo glare and iridescence are card-art content, not UI color. */
 .tcg-card-glare {
   background: radial-gradient(ellipse at var(--card-light-x, 50%) var(--card-light-y, 50%),
     rgb(255 255 244 / .6), rgb(255 255 255 / .12) 24%, transparent 65%);
@@ -42,6 +43,7 @@
   background-size: 240% 240%;
   background-position: var(--card-light-x, 50%) var(--card-light-y, 50%);
 }
+/* pv-allow-colors-end */
 
 .tcg-interactive-surface[data-active="true"] > .tcg-card-glare { opacity: .2; }
 .tcg-interactive-surface[data-active="true"] > .tcg-card-iridescence { opacity: .22; }
@@ -53,22 +55,20 @@
   min-height: 44px;
   margin: .65rem auto 0;
   padding: .45rem .85rem;
-  border: 1px solid #8a9db0;
-  border-radius: 999px;
-  color: #173f70;
-  background: #fffdf7;
+  border: 1px solid var(--pv-border-strong);
+  border-radius: var(--pv-radius-1);
+  color: var(--pv-cyan);
+  background: transparent;
   font: inherit;
   font-size: .78rem;
   cursor: pointer;
 }
 
 .tcg-interactive-card > .tcg-card-touch-toggle[aria-pressed="true"] {
-  border-color: #5684ad;
-  background: #e8f1fa;
-  color: #173f70;
+  border-color: var(--pv-cyan);
+  background: var(--pv-cyan-soft);
+  color: var(--pv-cyan);
 }
-
-.tcg-interactive-card > .tcg-card-touch-toggle:focus-visible { outline: 3px solid #317ec5; outline-offset: 4px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tcg-interactive-surface,

@@ -808,3 +808,20 @@ blocks the client for 20 minutes).
 Final gate: `bash scripts/check.sh` exit 0 — 43 provider fixtures, 790 backend tests
 (PostgreSQL integration included, no skips), 421 frontend tests in 34 files; Ruff,
 ESLint, TypeScript, production build and whitespace passed. See [PRICES.md](PRICES.md).
+
+## Visual tokens and style contracts (Iteration 8A)
+
+- Add or change a color only in `frontend/src/styles/tokens.css`. Feature stylesheets use
+  `var(--pv-*)`; a hex, `rgb()` or `hsl()` literal anywhere else fails
+  `npm test --prefix frontend` (`styles/styles.contract.test.ts`). Colors that are content
+  (Pokémon types, PC wallpapers, holo effects) go between `/* pv-allow-colors: reason */`
+  and `/* pv-allow-colors-end */`.
+- A new text token needs contrast pairs added to the contract (≥ 4.5:1 on every surface;
+  ≥ 3:1 for borders and focus). Pixel-font rules must use at least `--pv-text-pixel`.
+- Animations must not be `infinite`; keep durations within 150–250 ms except skeletons
+  (≤ 3 iterations). `base.css` already neutralizes motion for reduced-motion users.
+- Component tests that need a viewport or media preference use `src/test/media.ts`
+  (`stubMedia({ mobile, reducedMotion })`); Home tests route requests with
+  `src/test/homeFixtures.ts`.
+- Automated tests cannot judge the cut corners, spacing or colors on a real screen. Use the
+  manual checklist in `docs/ROADMAP.md` (Safari, desktop and iPhone-size responsive mode).

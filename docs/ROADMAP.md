@@ -391,3 +391,82 @@ Wishlist, trades, transactions and missing-card cost stay deferred.
 - [ ] Network off (or API down): collection, boxes and expansions still work; prices
   show the last saved value or "no price" (not checked manually; covered by automated
   tests).
+
+## Iteration 8A — "Unova Noir" visual system, shell and Home (planned 2026-11-23)
+
+First phase of the visual redesign:
+- 8A: tokens, shell and Home.
+- 8B: quick save and animated scanner.
+- 8C: easy Mi PC.
+- 8D: favorites and carousel.
+- 8E: 3×3 binder and master set.
+- 8F: profile with trainer and team.
+
+Spec and plan: `docs/superpowers/specs|plans/2026-11-23-visual-redesign-8a*`.
+
+- [x] Spec and plan approved by the student (2026-11-23), with the recommended decisions
+  D1–D7. Adjustments: the D4 debt note below, and the system status footer shown only
+  to signed-in users and closed by default.
+- [x] Tasks 0–6 implemented on `feat/iteration-8a-unova-noir` (fonts and tokens, UI
+  primitives, shell, token migration of the 12 stylesheets, Home structure and Home data
+  sections), one commit per task or group.
+- [x] Task 7: self-review against the plan's review focus, documentation and the manual
+  checklist below. The independent subagent review was not launched (no request for it).
+- [x] `bash scripts/check.sh` exit 0 (latest counts in the plan's execution evidence).
+- [x] Student fixes before closing 8A: no copy UUID in the personal-box picker, selected-copy
+  panel or grid slot names (also the Home preview), guarded by tests; and a dark "Unova Noir" box wallpaper is the default for new boxes and the public
+  catalog box (migration `0006`; existing boxes keep theirs; the 4 retro wallpapers remain).
+- [ ] Student applies migration `0006` (`cd backend && .venv/bin/alembic upgrade head`).
+- [ ] Manual acceptance in Safari (single pass, before push and PR).
+- [ ] Student reviews the branch, pushes it and opens the PR.
+
+### Manual acceptance checklist (pending — one pass, desktop and iPhone-size responsive mode)
+
+Global, on every route:
+- [ ] Text is legible and controls have a visible boundary; nothing looks like a light panel
+  with light text.
+- [ ] Tab shows a cyan focus ring on every link, button and field.
+- [ ] Gold appears only on money/value and notices; cyan marks actions and selection.
+- [ ] iPhone size: the bottom bar never hides content, the page has a side margin, and
+  there is no horizontal page scroll.
+- [ ] Network (Web Inspector): no request to `fonts.googleapis.com` or `fonts.gstatic.com`.
+- [ ] macOS "Reduce motion" on: no card tilt, no scanner sweep, no pulsing.
+
+Shell:
+- [ ] ≥ 768px: header with logo, nav in order (Inicio, Pokédex, Cajas PC, Expansiones,
+  Mi colección), "Escanear", CLP|USD, EN/ES and avatar; the active item is cyan with an
+  underline, also on `/collection/:id`.
+- [ ] < 768px: reduced header (logo, Explorar, CLP|USD, EN/ES) and a bottom bar
+  (INICIO, CAJAS, ESCANEAR raised in the middle, COLECCIÓN, PERFIL). Never both navs.
+- [ ] "Explorar" opens Pokédex and Expansiones; Escape and choosing a link close it.
+- [ ] The first Tab stop is "Saltar al contenido" and it moves focus to the content.
+- [ ] CLP|USD works signed out and signed in; ES/EN switches every label.
+
+Routes (look at each one; the first is the redesigned page):
+- [ ] `/` guest: "TU BÓVEDA TCG", sign-in, scanner card, public links; no private requests.
+- [ ] `/` signed in: value hero (total, chips, "sin variante · indicar" link, attribution
+  link opens exchangerate-api.com in a new tab), scanner card (scanline, one sweep on
+  hover), most valuable cards (tilt/foil, prices in gold; horizontal scroll on iPhone),
+  Mi PC (dotted screen, cyan cursor, arrows move it, side panel follows), expansions
+  (cyan bars, "De tus copias más recientes"), closed "Estado del sistema" footer.
+- [ ] `/` states: empty collection ("Tu primera caja te espera"), no boxes, price outage
+  (stop the backend prices or network: the value section shows its retry while Mi PC and
+  expansions keep working), loading skeletons without spinners.
+- [ ] `/pokedex`, `/pokemon/:n/cards`, `/cards/:id` (card stage, price panel, tilt).
+- [ ] `/boxes` catalog: opens with "Unova Noir" (dark dots, cyan cursor, empty slots
+  visible); the 4 retro wallpapers keep their look inside the dark frame.
+- [ ] `/boxes?mode=personal`: a new box starts in "Unova Noir"; existing boxes keep their
+  wallpaper; the picker buttons read "Colocar aquí" with no UUID; grid, derived views,
+  box value.
+- [ ] `/sets`, `/sets/:id` (progress bars, owned/missing filters).
+- [ ] `/collection` (filters, `?variant=unknown`, prices), `/collection/:id` (form).
+- [ ] `/scanner` (upload, candidates, notices, confirmation) and the guest message.
+- [ ] `/login`, `/profile` (guest and signed in, currency switch, value card).
+- [ ] VoiceOver quick pass over the shell and Home (landmarks, link names, section names).
+
+### Technical debt
+
+- [ ] **Owned-sets endpoint.** A private endpoint should list the expansions in which
+  the signed-in user owns at least one copy. In 8A, Home derives them from the 30 most
+  recent copies (decision D4), which is honest but incomplete. 8E (3×3 binder and
+  master set) needs the complete list.
