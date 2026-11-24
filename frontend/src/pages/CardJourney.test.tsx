@@ -1,5 +1,5 @@
 import { withUnauthenticatedSession } from "../test/authSession";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { App } from "../app/App";
@@ -35,24 +35,17 @@ function mockBackend() {
   return request;
 }
 
-test('Boxes → species gallery → card → gallery → original selected box and wallpaper', async () => {
+test('an old box link → species gallery → card → gallery → back to the Pokédex', async () => {
   const request = mockBackend();
-  localStorage.setItem('pokevault.spriteMode', 'animated');
   const user = userEvent.setup();
   render(<App initialEntries={['/boxes?box=19&pokemon=559&wallpaper=ocean']} />);
-  await screen.findByRole('heading', { name: 'Scraggy' });
-  await user.click(screen.getByRole('link', { name: 'Ver cartas TCG' }));
+  // The retired box URL names species #559, so it opens that gallery directly.
   await user.click(await screen.findByRole('link', { name: /Scraggy/ }));
   expect(await screen.findByText('bw1-68')).toBeVisible();
   await user.click(screen.getByRole('link', { name: 'Volver a la galería' }));
   await screen.findByRole('link', { name: /Scraggy/ });
   await user.click(screen.getByRole('link', { name: 'Volver' }));
-  expect(await screen.findByRole('heading', { name: 'Caja 19' })).toBeVisible();
-  const grid = screen.getByRole('grid');
-  await screen.findByRole('button', { name: '#559 Scraggy' });
-  expect(within(grid).getAllByRole('gridcell')[18]).toHaveAttribute('aria-selected', 'true');
-  expect(screen.getByRole('button', { name: 'Océano' })).toHaveAttribute('aria-pressed', 'true');
-  expect(screen.getByRole('radio', { name: 'Animados' })).toBeChecked();
+  expect(await screen.findByRole('heading', { name: 'Pokédex' })).toBeVisible();
   expect(request.mock.calls.every(([url]) => url.startsWith('http://localhost:8000/api/v1/'))).toBe(true);
 });
 

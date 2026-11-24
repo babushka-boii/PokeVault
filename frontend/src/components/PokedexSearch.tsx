@@ -2,7 +2,7 @@ import { useEffect, useId, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLocale } from "../i18n/LocaleProvider";
 import { searchPokemon, type SpeciesMatch } from "../services/pokemon";
-import { dexNumber, pokemonName } from "./boxes/pokemonLabels";
+import { dexNumber, pokemonName } from "./pokemon/pokemonLabels";
 
 type SearchState = { kind: "error" } | { kind: "loaded"; matches: SpeciesMatch[] };
 

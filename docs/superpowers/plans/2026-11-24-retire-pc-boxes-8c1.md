@@ -193,15 +193,38 @@ path.
 - Tests: delete the files and blocks in spec §9.1, adapt those in §9.2.
 
 **Steps:**
-- [ ] Write failing tests: the redirects (`/boxes` → `/pokedex`; `?mode=personal` →
+- [x] Write failing tests: the redirects (`/boxes` → `/pokedex`; `?mode=personal` →
   `/binders`, also with `pokemon`; `?pokemon=N` → the gallery for 1–1025; invalid, empty,
   repeated or out-of-range `pokemon` → `/pokedex`), the router has no other `/boxes` route,
   nav and Explorar have no PC-boxes link in ES and EN, and a source-level contract test
   (no import from `components/boxes/`, no `/boxes` outside the redirect).
-- [ ] Remove the code and tests. For each removed test file or block, tick it off against
+- [x] Remove the code and tests. For each removed test file or block, tick it off against
   spec §9.1.
-- [ ] Adapt the tests in spec §9.2 (`App`, `AppShell`, `Auth` and the style contract).
-- [ ] Commit.
+- [x] Adapt the tests in spec §9.2 (`App`, `AppShell`, `Auth` and the style contract).
+- [x] Commit.
+- Evidence:
+  - `BoxesRedirect` (22 test cases): `?mode=personal` → `/binders` (it wins over `pokemon`),
+    `?pokemon=N` for 1–1025 → `/pokemon/N/cards?returnTo=%2Fpokedex`, and everything else
+    (`0`, `1026`, `-1`, `1.5`, `abc`, empty, `01`, `25abc`, repeated, `box`, `wallpaper`) →
+    `/pokedex`.
+  - Removed: `BoxesPage`, `StorageGrid`, `MenuIcon`, `SelectedPokemon`, `BoxSearch`,
+    `AudioControls`, `wallpapers`, `boxes.css`, `useCatalogBox`, `useRetroAudio`,
+    `useSpriteMode`, `audio/retroAudio`, `menuIcons`, `menuIconBounds`, the `pokemonDetails`
+    test helper, `locatePokemon`, the `boxes` and `boxSearch` dictionary sections, the
+    "Cajas PC" nav entries, and the dead Home "Mi PC" CSS left by 8C.
+  - Moved to `components/pokemon/` (the species gallery uses them): `PokemonSprite` (its
+    marker class is now `pv-sprite-missing`, styled in `cards.css`) and `pokemonLabels`.
+    `components/boxes/` no longer exists.
+  - The auth page and profile note no longer promise "Cajas" ("expansiones" instead).
+  - Tests removed or adapted exactly as in spec §9.1 and §9.2 (the full table is in the
+    execution evidence at the end). The old box journey became "an old box link → species
+    gallery → card → gallery → back to the Pokédex".
+  - New contract tests: no module imports from `components/boxes/`, and no leftover box,
+    wallpaper, retro-audio or menu-icon code or styles. They caught real leftovers (the dead
+    Home CSS) on their first run.
+  - Frontend: 35 files / 511 tests green; lint, typecheck and build clean.
+  - Order change: the `/boxes` mention contract moves to Task 4, where the two remaining
+    mentions (`safeReturnTo`, the card detail origin link) are removed.
 
 ### Task 4: Shared pieces, return paths and strings
 

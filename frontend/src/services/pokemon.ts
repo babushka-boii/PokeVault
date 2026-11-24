@@ -76,13 +76,6 @@ function isHttpsUrl(value: string): boolean {
 
 export type SpeciesMatch = Pick<Pokemon, "national_dex_number" | "name">;
 
-export function locatePokemon(nationalDexNumber: number) {
-  return {
-    page: Math.floor((nationalDexNumber - 1) / BOX_SIZE),
-    slot: (nationalDexNumber - 1) % BOX_SIZE,
-  };
-}
-
 export async function searchPokemon(query: string, signal?: AbortSignal): Promise<SpeciesMatch[]> {
   const response = await fetch(`${apiBaseUrl}/api/v1/pokemon/search?q=${encodeURIComponent(query)}`, {
     headers: { Accept: "application/json" }, signal,

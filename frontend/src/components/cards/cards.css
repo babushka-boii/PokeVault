@@ -110,3 +110,4 @@
 }
 @media (max-width: 390px) { .tcg-detail-navigation { gap: .8rem; } .tcg-back { font-size: .8rem; } .tcg-origin { font-size: .7rem; } .tcg-artwork-stage { padding: .85rem; } }
 @media (prefers-reduced-motion: reduce) { .tcg-artwork--loading { animation: none; } }
+.pv-sprite-missing { color: var(--pv-text-3); display: grid; font-size: 1.5rem; place-items: center; }

@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { CollectionPage } from "../pages/CollectionPage";
 import { InventoryCopyPage } from "../pages/InventoryCopyPage";
-import { BoxesPage } from "../pages/BoxesPage";
+import { BoxesRedirect } from "../pages/BoxesRedirect";
 import { BinderPage } from "../pages/BinderPage";
 import { BindersPage } from "../pages/BindersPage";
 import { LoginPage } from "../pages/LoginPage";
@@ -22,7 +22,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
-        <Route path="boxes" element={<BoxesPage />} />
+        <Route path="boxes" element={<BoxesRedirect />} />
         <Route path="binders" element={<BindersPage />} />
         <Route path="binders/:binderId" element={<BinderPage />} />
         <Route path="pokedex" element={<PokedexPage />} />

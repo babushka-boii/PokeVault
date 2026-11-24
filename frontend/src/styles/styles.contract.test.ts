@@ -81,7 +81,7 @@ describe("design tokens", () => {
 
 describe("stylesheets", () => {
   test("the contract sees the tokens, the base layer and the feature stylesheets", () => {
-    expect(Object.keys(sheets)).toEqual(expect.arrayContaining([TOKENS, BASE, "/src/styles.css", "/src/components/boxes/boxes.css"]));
+    expect(Object.keys(sheets)).toEqual(expect.arrayContaining([TOKENS, BASE, "/src/styles.css", "/src/components/binders/binders.css"]));
   });
 
   test("every stylesheet has been migrated to tokens", () => {
@@ -164,5 +164,20 @@ describe("stylesheets", () => {
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);
+  });
+});
+
+describe("retired PC boxes (8C.1)", () => {
+  const sources = import.meta.glob("/src/**/*.{ts,tsx,css}", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
+  const app = Object.entries(sources).filter(([file]) => !/\.test\.tsx?$/.test(file) && !file.endsWith("/styles.contract.test.ts"));
+
+  test("no module imports from the removed components/boxes folder", () => {
+    expect(app.filter(([, text]) => /components\/boxes\/|from\s+["']\.{1,2}\/boxes\//.test(text)).map(([file]) => file)).toEqual([]);
+  });
+
+  test("no leftover box, wallpaper, retro-audio or menu-icon code or styles", () => {
+    const leftovers = app.filter(([file, text]) => file !== "/src/pages/BoxesRedirect.tsx"
+      && /retroAudio|useRetroAudio|spriteMode|useSpriteMode|menuIcon|MenuIcon|useCatalogBox|StorageGrid|\.pc-[a-z]|pc-wallpaper|wallpapers/.test(text)).map(([file]) => file);
+    expect(leftovers).toEqual([]);
   });
 });
