@@ -143,10 +143,14 @@ Alternatives that were considered and rejected:
 
 ### Task 0: Branch and baseline
 
-- [ ] Run `git switch main && git pull`, then
-  `git switch -c feat/iteration-8a-unova-noir`.
-- [ ] Record the baseline: the frontend test count (421 at the end of Iteration 7) and
+- [x] Run `git switch main && git pull`, then
+  `git switch -c feat/iteration-8a-unova-noir`. (Spec and plan committed as `ec4973b`.)
+- [x] Record the baseline: the frontend test count (421 at the end of Iteration 7) and
   the list of hard-coded colors per CSS file (for the migration checklist).
+  (34 files / 421 tests green. Color literals: `cards.css` 72, `boxes.css` 63,
+  `scanner.css` 29, `styles.css` 24, `typeBadge.css` 22, `personal.css` 16,
+  `auth.css` 15, `interactive-card.css` 13, `inventory.css` 11, `sets.css` 11,
+  `artwork.css` 5, `prices.css` 0; 281 in total.)
 - [ ] Student (optional): take "before" screenshots of the routes in spec §14 for
   comparison.
 
@@ -163,18 +167,18 @@ Alternatives that were considered and rejected:
 - `frontend/src/styles/styles.contract.test.ts`
 
 **Steps:**
-- [ ] Write the failing contract tests (spec §13):
+- [x] Write the failing contract tests (spec §13):
   - Token contrast pairs.
   - No raw colors outside `tokens.css` and allow-listed blocks, with a `LEGACY_FILES`
     list that starts with all 12 current files.
   - A global reduced-motion block.
   - Skeleton iterations ≤ 3.
   - Pixel font size ≥ 11px.
-- [ ] Install the fonts with
+- [x] Install the fonts with
   `npm install --save-exact @fontsource-variable/inter@5.3.0 @fontsource-variable/space-grotesk@5.3.0 @fontsource/silkscreen@5.3.0`.
   Import only the needed weights: variable `wght` for Inter and Space Grotesk, and 400
   for Silkscreen.
-- [ ] Write `tokens.css` (spec §5) and `base.css`:
+- [x] Write `tokens.css` (spec §5) and `base.css`:
   - Body background, text and font.
   - Headings in Space Grotesk.
   - Links in cyan.
@@ -184,11 +188,23 @@ Alternatives that were considered and rejected:
     `.pv-skeleton` utilities.
   - The global reduced-motion block.
   - `color-scheme: dark`.
-- [ ] Verify that Silkscreen renders "COLECCIÓN", "ESCÁNER" and "BÓVEDA", using the
+- [x] Verify that Silkscreen renders "COLECCIÓN", "ESCÁNER" and "BÓVEDA", using the
   latin and latin-ext subsets. If an accented glyph is missing, use Space Grotesk
   uppercase for that label and note it.
-- [ ] Get the contracts green. `LEGACY_FILES` still lists all 12 files. Then run
+- [x] Get the contracts green. `LEGACY_FILES` still lists all 12 files. Then run
   `npm test -- --run`, lint and typecheck.
+- Evidence:
+  - 35 files / 467 tests green, including 46 contract tests. Lint, typecheck and build
+    pass.
+  - Vitest stubs stylesheets, so `vite.config.ts` now keeps only `?raw` imports
+    (`css.include: [/\.css\?raw$/]`). Component CSS stays stubbed, so jsdom visibility
+    checks are unchanged.
+  - Silkscreen glyph coverage was checked by reading the woff `cmap`: Á É Í Ó Ú Ñ Ü ¿ ¡
+    · are all present, so no fallback is needed.
+  - The build emits every subset, but `unicode-range` limits downloads to latin and
+    latin-ext: Inter 48 KB, Space Grotesk 22 KB and Silkscreen 8 KB for latin.
+  - Until Task 4, legacy light panels inherit the dark body, so intermediate commits
+    are not visually reviewable.
 
 ### Task 2: UI primitives and shared hooks
 

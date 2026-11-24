@@ -1,0 +1,87 @@
+/*
+ * "Unova Noir" design tokens (Iteration 8A).
+ * This is the only stylesheet allowed to contain palette hex values; every other
+ * stylesheet uses these variables (enforced by styles.contract.test.ts).
+ * Color roles: cyan = actions/interaction, gold = money/value and favorites only,
+ * Pokémon type colors = small details only.
+ */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --pv-bg: #0B0D10;
+  --pv-panel: #14181D;
+  --pv-panel-raised: #1B2128;
+  --pv-bar: #0E1115;
+
+  /* Borders (border and border-soft are decorative; controls use border-strong, >= 3:1) */
+  --pv-border: #2A323C;
+  --pv-border-soft: #222A33;
+  --pv-border-strong: #64717F;
+
+  /* Text */
+  --pv-text: #F2F5F7;
+  --pv-text-2: #9AA6B2;
+  --pv-text-3: #8592A0;
+
+  /* Roles */
+  --pv-cyan: #3FD0E0;
+  --pv-on-cyan: #0B0D10;
+  --pv-gold: #F2C94C;
+  --pv-warn-border: #5A4A1E;
+  --pv-danger: #FF7A7A;
+  --pv-success: #5BD69A;
+  --pv-focus: var(--pv-cyan);
+  --pv-shadow-color: #000000;
+
+  /* Translucent helpers */
+  --pv-cyan-soft: color-mix(in srgb, var(--pv-cyan) 14%, transparent);
+  --pv-gold-soft: color-mix(in srgb, var(--pv-gold) 12%, transparent);
+  --pv-overlay: color-mix(in srgb, var(--pv-bg) 82%, transparent);
+
+  /* Type */
+  --pv-font-display: "Space Grotesk Variable", "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pv-font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pv-font-pixel: "Silkscreen", ui-monospace, "SF Mono", Menlo, monospace;
+  --pv-text-xs: 0.75rem;
+  --pv-text-sm: 0.875rem;
+  --pv-text-md: 1rem;
+  --pv-text-lg: 1.25rem;
+  --pv-text-xl: 1.75rem;
+  --pv-text-hero: clamp(2.5rem, 8vw, 4rem);
+  --pv-text-pixel: 0.75rem;
+
+  /* Spacing */
+  --pv-space-1: 0.25rem;
+  --pv-space-2: 0.5rem;
+  --pv-space-3: 0.75rem;
+  --pv-space-4: 1rem;
+  --pv-space-5: 1.5rem;
+  --pv-space-6: 2rem;
+  --pv-space-7: 2.5rem;
+  --pv-space-8: 3rem;
+
+  /* Shape */
+  --pv-radius-0: 0;
+  --pv-radius-1: 2px;
+  --pv-radius-2: 4px;
+  --pv-cut: 14px;
+  --pv-cut-sm: 10px;
+
+  /* Elevation */
+  --pv-shadow-1: inset 0 1px 0 color-mix(in srgb, var(--pv-text) 4%, transparent),
+    0 8px 24px color-mix(in srgb, var(--pv-shadow-color) 35%, transparent);
+
+  /* Layout */
+  --pv-content-max: 72rem;
+  --pv-header-h: 64px;
+  --pv-header-h-mobile: 56px;
+  --pv-tabbar-h: 64px;
+  --pv-touch: 44px;
+
+  /* Motion */
+  --pv-dur-fast: 150ms;
+  --pv-dur: 200ms;
+  --pv-dur-slow: 250ms;
+  --pv-ease: cubic-bezier(.2, .7, .2, 1);
+}
