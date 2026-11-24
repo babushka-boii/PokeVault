@@ -746,3 +746,17 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Redacción del spec, del plan y de la documentación; implementación y pruebas del frontend por tareas con un commit cada una. El estudiante revisa y debe entender el código antes de la entrega.
+
+## Iteración 8C — Carpetas ("Mis carpetas") (2026-11-24)
+
+- Se escribieron y aprobaron el spec y el plan (`docs/superpowers/specs|plans/2026-11-23-binders-8c*`) con las decisiones D1–D8. Ajuste del estudiante: al mover una copia desde otra carpeta, el aviso dice de dónde viene.
+- Migración `0007`: cada caja personal pasó a ser una carpeta con el mismo nombre y orden; la posición 1–30 se convierte en página y bolsillo. Las tablas de cajas quedan congeladas para que el downgrade sea exacto; se borran en una migración posterior.
+- Backend: API de carpetas (guardar en el siguiente bolsillo libre bajo bloqueo del usuario, colocar, mover con `moved_from`, sacar, bandeja, recientes y ubicaciones), valor por carpeta y de toda la estantería en una sola evaluación. Se retiró la API de cajas personales.
+- Frontend: estantería, vista de carpeta con dos páginas (una en celular), bolsillos con la imagen oficial en funda, bandeja "Sin carpeta", mover y sacar sin drag & drop, avisos accesibles, animaciones de guardado y de página que respetan "reducir movimiento", ubicación de la copia, "Mis carpetas" en el Inicio y escáner sin UUID.
+- Las pruebas nuevas encontraron un error real: la marca de paso de página no se limpiaba porque el `animationend` llega desde las páginas hijas; ahora se limpia con un temporizador.
+- Pruebas: `check.sh` con código 0. Las pruebas de cajas personales se reemplazaron por equivalentes de carpetas (tabla en el plan).
+- Pendiente: aplicar `0007`, revisión en Safari (lista en `docs/ROADMAP.md`), push y PR.
+
+### Uso de IA (Claude Code)
+
+- Revisión del modelo y la API actuales, spec, plan, implementación por tareas con un commit cada una, pruebas y documentación. El estudiante revisa y debe entender el código antes de la entrega.

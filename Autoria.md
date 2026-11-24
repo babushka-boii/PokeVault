@@ -447,3 +447,14 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 
 - Auditoría del frontend, spec, plan, tokens, componentes, migración de estilos, Inicio, pruebas y documentación.
 - El código fue escrito por la IA; la aceptación visual la hace el estudiante en su navegador, y debe entender el código antes de la entrega.
+
+## Iteración 8C — Carpetas (2026-11-24)
+
+### Decisiones del estudiante
+
+- Definió el concepto (carpetas tipo álbum real con páginas de 9 bolsillos, bandeja "Sin carpeta", ubicación de cada carta, animaciones) y aprobó D1–D8, con el ajuste de anunciar de dónde se movió una copia.
+- Fijó la regla de trabajo: un commit por tarea si pasan pruebas y lint, sin push, migración aplicada por él al final.
+
+### Uso de IA (Claude Code)
+
+- Spec, plan, migración, backend, frontend, pruebas y documentación. La aceptación visual la hace el estudiante en su navegador; debe entender el código antes de la entrega.

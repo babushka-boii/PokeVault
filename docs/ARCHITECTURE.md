@@ -501,3 +501,25 @@ Frontend, plus one small migration added at the student's request: `0006` adds t
   `components/prices/useCollectionValuation`, `components/shell/Avatar`.
 - Home derives its expansions from the 30 most recent copies; an "owned sets" endpoint is
   recorded as technical debt in the ROADMAP (needed by 8E).
+
+## Iteration 8C — Binders
+
+**Backend:**
+- `app/binders/`: schemas and pure placement rules (`next_free`, `visible_pages`).
+- `app/api/binders.py`: CRUD, order, store/place/move/remove under the owner lock, tray,
+  recent and owned views, and copy locations.
+- `PriceService.values_by_group` values every binder from one evaluation.
+- `GET /api/v1/binders/{id}/value` and `GET /api/v1/prices/binders` replace
+  `/boxes/{id}/value`.
+- The boxes router, its schemas and the `PersonalBox`/`BoxMembership` ORM models are
+  removed; their tables stay frozen until a later migration.
+
+**Frontend:**
+- `services/binders.ts` (strict validators, conflict codes).
+- `pages/{BindersPage,BinderPage}.tsx`.
+- `components/binders/` (page grid, labels, copy location, styles).
+- `hooks/useBinderMutations.ts`.
+- Home `BinderPreview`.
+- `components/cards/cardMetadata.ts` (`useCardMetadata`, formerly the personal-box
+  metadata hook).
+- `/boxes` is catalog-only.
