@@ -534,3 +534,11 @@ Spec and plan: `docs/superpowers/specs|plans/2026-11-23-binders-8c*`. Reference:
   this request; the same anti-UUID rule could apply.
 - [ ] 8D: covers and stickers (the proposed `binder_stickers` shape is in the 8C spec,
   §5.5).
+
+## Pending iteration — Pokédex visual redesign (Unova Noir)
+
+- [ ] Redesign the Pokédex in the "Unova Noir" style. The look will be defined with a
+  mockup before any spec is written. Scope to settle then: the species card, the list or
+  grid layout, the search, and the way a species opens its TCG gallery. 8C.1 only adds
+  30-per-page pagination and name/number search with the existing cards, so this redesign
+  starts from that working base.
