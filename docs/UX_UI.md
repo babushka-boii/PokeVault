@@ -449,3 +449,16 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
   - Home "Mis carpetas" is a mini shelf of binder covers (name, card count and gold
     value), each linked to its binder, plus "N cartas sin carpeta · guardar".
   - The copy detail answers "¿Dónde está esta carta?".
+
+## Iteration 8C.1 — PC boxes retired
+
+- The catalog boxes (sprite grid, wallpapers, sound, menu icons, species panel) no longer
+  exist, and the navigation has no "Cajas PC": the desktop nav is Inicio, Pokédex,
+  Expansiones, Mis carpetas and Mi colección; the Explorar menu has the Pokédex and the
+  expansions. Earlier sections of this document that describe them are historical.
+- **Pokédex:** a grid of 30 species per page with previous and next links ("Página N de 35"),
+  and a search by name or number whose results are links to each species' TCG gallery. A
+  gallery's back link returns to the Pokédex page it came from.
+- Old links keep working: `/boxes?pokemon=N` opens species N's gallery, `/boxes?mode=personal`
+  opens the binders, and any other `/boxes` opens the Pokédex.
+- **Pending:** a visual redesign of the Pokédex in the "Unova Noir" style (ROADMAP).

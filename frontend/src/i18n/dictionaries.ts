@@ -117,7 +117,7 @@ export const spanish = {
     setsError: "No se pudo cargar el avance de expansiones.", setsEmpty: "Aún no hay expansiones con cartas tuyas.", setsAll: "Ver todas las expansiones",
     emptyTitle: "Tu primera carpeta te espera", emptyText: "Escanea o busca una carta para empezar tu colección.", emptySearch: "Buscar en expansiones",
     guestLabel: "TU BÓVEDA TCG", guestTitle: "Tu colección, ordenada y valorizada",
-    guestText: "Guarda tus cartas, organízalas en cajas y mira cuánto vale tu colección.", exploreDex: "Explorar Pokédex", exploreSets: "Explorar expansiones",
+    guestText: "Guarda tus cartas, organízalas en carpetas y mira cuánto vale tu colección.", exploreDex: "Explorar Pokédex", exploreSets: "Explorar expansiones",
     resolving: "Comprobando tu sesión…",
   },
   pokedex: {
@@ -455,7 +455,7 @@ export const english: Dictionary = {
     setsError: "Expansion progress could not be loaded.", setsEmpty: "There are no expansions with your cards yet.", setsAll: "See all expansions",
     emptyTitle: "Your first binder is waiting", emptyText: "Scan or search for a card to start your collection.", emptySearch: "Search expansions",
     guestLabel: "YOUR TCG VAULT", guestTitle: "Your collection, organized and valued",
-    guestText: "Save your cards, organize them in boxes and see what your collection is worth.", exploreDex: "Explore Pokédex", exploreSets: "Explore expansions",
+    guestText: "Save your cards, organize them in binders and see what your collection is worth.", exploreDex: "Explore Pokédex", exploreSets: "Explore expansions",
     resolving: "Checking your session…",
   },
   pokedex: {

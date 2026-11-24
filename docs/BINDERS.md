@@ -1,8 +1,8 @@
 # Binders — Iteration 8C
 
 Binders replace personal boxes. A binder is an album of 9-pocket pages that stores the
-signed-in user's physical `InventoryCopy` records. The catalog boxes (Pokédex species,
-sprites, retro wallpapers) are a separate feature and did not change (`docs/BOXES.md`).
+signed-in user's physical `InventoryCopy` records. The catalog boxes (Pokédex species
+grid, sprites, retro wallpapers) were a separate feature, removed in 8C.1 (`docs/BOXES.md`).
 
 Spec: `docs/superpowers/specs/2026-11-23-binders-8c-design.md`.
 Plan and evidence: `docs/superpowers/plans/2026-11-23-binders-8c.md`.
@@ -83,8 +83,8 @@ prices.
 
 - **Navigation:**
   - Desktop: "Mis carpetas".
-  - Mobile tab bar: "Carpetas" (replaces "Cajas"), with "Cajas PC" moved into Explorar.
-  - `/boxes?mode=personal` redirects to `/binders`.
+  - Mobile tab bar: "Carpetas"; the Explorar menu has the Pokédex and the expansions.
+  - `/boxes?mode=personal` redirects to `/binders` (8C.1 removed the "Cajas PC" entries).
 - **Shelf (`/binders`):**
   - Each binder shows its Noir cover, name, card count and value in gold (one request).
   - Create, rename, reorder and delete with confirmation.

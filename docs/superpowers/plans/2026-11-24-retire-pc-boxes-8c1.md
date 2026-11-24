@@ -277,12 +277,68 @@ path.
 
 ### Task 6: Review, validation and docs
 
-- [ ] Review against the review focus; fix what is confirmed. Grep proves no
+- [x] Review against the review focus; fix what is confirmed. Grep proves no
   `components/boxes`, `/boxes` (outside the redirect), `wallpaper`, `retroAudio`,
   `spriteMode`, `menuIcon` or `pc-` leftovers.
-- [ ] Run `bash scripts/check.sh` and record the counts.
-- [ ] Docs per spec §10, plus the removed-test table in the execution evidence below.
-- [ ] Commit.
+- [x] Run `bash scripts/check.sh` and record the counts.
+- [x] Docs per spec §10, plus the removed-test table in the execution evidence below.
+- [x] Commit.
+- Evidence:
+  - `bash scripts/check.sh` exit 0: 43 provider, 839 backend (was 831) and 518 frontend (was
+    526) tests; lint, typecheck, build and `git diff --check` clean.
+  - Review (self-review; no subagent was requested): the new contract tests and a grep found
+    and fixed four leftovers: dead Home "Mi PC" CSS, a `TabBar` comment, the guest text
+    "organízalas en cajas", and the "Cajas" promise in the login/profile note. No import of
+    `components/boxes`, no `/boxes` link, and no wallpaper, retro-audio, sprite-mode or
+    menu-icon reference remains (except the cleaner that names the old storage keys).
+  - Docs: BOXES (both features historical), BINDERS, INVENTORY, ARCHITECTURE, DATA_MODEL
+    (`0008`), UX_UI, DEVELOPMENT (migration commands with a backup), ROADMAP (8C.1 section,
+    checklist, debt), Bitacora, Autoria and CLAUDE.md.
+  - Two additions beyond the spec, both inside D1 = B: a gallery's back link returns to the
+    same Pokédex page, and the pager is a labelled group instead of a second `<nav>`.
+
+#### Removed and adapted tests, with the reason
+
+**Frontend: removed with their feature**
+
+| Removed | Reason |
+| --- | --- |
+| `BoxesPage.test.tsx` (6) | The page, 6×5 grid, sound preferences and sprite modes are gone |
+| `BoxSearch.test.tsx` (5 blocks, 9 cases) | The box search and `locatePokemon` are gone. Generic search behavior (debounce, obsolete responses, errors, retry, no results) returns as Pokédex search tests |
+| `MenuIcon.test.tsx` (6) | The menu-icon component and its fallback chain are gone |
+| `SelectedPokemon.test.tsx` (5) | The selected-species panel is gone; species details stay covered by the gallery tests |
+| `useSpriteMode.test.ts` (5) | The static/animated sprite preference no longer exists |
+| `retroAudio.test.ts` (3) | Retro audio is gone |
+| `menuIcons.test.ts` (3 blocks, 9 cases) | Menu-icon sources are gone |
+| `menuIconBounds.test.ts` (3) | Icon footprint detection is gone |
+| `CardEntrypoints.test.tsx`: 6 blocks (box URL state, slot clicks and history, box changes, Noir default and wallpapers, search arrival, URL table) | Box URL state, wallpapers and arrival focus are gone; the Pokédex block stays |
+| `CardJourney.test.tsx`: Boxes → gallery → card → gallery → box | Replaced by "an old box link → gallery → card → gallery → Pokédex" |
+| `test/pokemonDetails.ts` helper | Only the removed tests used it |
+
+**Frontend: adapted with the same intent**
+
+| Test | Change |
+| --- | --- |
+| `App.test`: route `/boxes` → "Cajas"; "old personal-box links…" | Now "old /boxes links land on the binders, a species gallery or the Pokédex", plus `BoxesRedirect.test` (22 cases) |
+| `AppShell.test` (3 tests) | "Cajas PC" is gone from the nav and Explorar; the layout swap uses "Expansiones" as its marker |
+| `Auth.test`: public Pokédex while the session is pending | Asserts the "Expansiones" link instead of "Cajas PC" |
+| `TcgCatalog.test` (2), `TcgRefinement.test` (3) | `returnTo` values use a Pokédex page instead of `/boxes…`; the "Volver a Cajas" assertion became "Volver a Pokédex" |
+| `services/cards.test` | `/boxes…` moved from allowed to rejected return targets |
+| `PokedexPage.test` first test | The request is now `?offset=0&limit=30` (the intended change from 20 to 30) |
+| `styles.contract.test` | `boxes.css` left the expected list; three "retired PC boxes" contracts were added |
+
+**Backend**
+
+| Test | Change |
+| --- | --- |
+| `test_boxes_postgres.py` → `test_box_tables_rebuild_postgres.py` (7 tests, 22 cases) | Ported: the same constraint assertions now run against the tables the 0008 downgrade rebuilds, plus a names/defaults/indexes fidelity test. The 0003 round trip stays and ends with "box tables absent" |
+| `test_box_wallpaper_postgres.py` (3) | Pinned to revision 0006 (they assumed the box tables exist at head) |
+| `test_binders_migration_postgres.py` (4) | Pinned to revision 0007 |
+| `test_prices_postgres.py`, `test_set_completion_postgres.py` | Head moved to 0008; the table list dropped the two box tables |
+
+**New:** `BoxesRedirect` (22), Pokédex pagination and search (11), `PokemonSprite` (2),
+retired preferences (3), stale `returnTo` (1), contract tests (3), `0008` migration (7) and
+rebuilt-table fidelity (1).
 
 ## Student steps at the end (D7)
 

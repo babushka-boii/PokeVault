@@ -527,8 +527,8 @@ Spec and plan: `docs/superpowers/specs|plans/2026-11-23-binders-8c*`. Reference:
 
 ### Technical debt (8C)
 
-- [ ] **Drop the frozen box tables** (`personal_boxes`, `box_memberships`) in a later
-  migration once 8C passes acceptance. Its downgrade must rebuild boxes from binders:
+- [x] **Drop the frozen box tables** (`personal_boxes`, `box_memberships`) — done by
+  migration `0008` in 8C.1. Its downgrade must rebuild boxes from binders:
   one box per 30 pockets, with name suffixes " (2)", " (3)".
 - [ ] The copy detail page still prints the copy UUID under the card id. It was outside
   this request; the same anti-UUID rule could apply.
@@ -542,3 +542,47 @@ Spec and plan: `docs/superpowers/specs|plans/2026-11-23-binders-8c*`. Reference:
   grid layout, the search, and the way a species opens its TCG gallery. 8C.1 only adds
   30-per-page pagination and name/number search with the existing cards, so this redesign
   starts from that working base.
+
+## Iteration 8C.1 — Retire the PC boxes (2026-11-24)
+
+Spec and plan: `docs/superpowers/specs|plans/2026-11-24-retire-pc-boxes-8c1*`. The student said 8C
+was merged, but `origin/main` did not contain it when checked, so this iteration is stacked on
+`feat/iteration-8c-binders`.
+
+- [x] Spec and plan approved with D1 = B and the `/boxes?pokemon=N` redirect (D5).
+- [x] Migration `0008` drops `box_memberships` and `personal_boxes` (reversible: the downgrade
+  rebuilds boxes from binders in boxes of 30 pockets).
+- [x] Pokédex: 30 per page (`?page=1..35`) and search by name or number, before the boxes left.
+- [x] Catalog boxes removed (grid, wallpapers, sound, menu icons, species panel, search, sprite
+  mode); "Cajas PC" removed from the nav and the Explorar menu.
+- [x] `/boxes?mode=personal` → `/binders`, `/boxes?pokemon=N` → that species' gallery, any other
+  `/boxes` → `/pokedex`.
+- [x] Return paths: `/boxes` no longer allowed; the gallery's back link returns to the same
+  Pokédex page; stale `/boxes` returns fall back to the Pokédex.
+- [x] Retired local preferences (`pokevault.audio`, `pokevault.spriteMode`) removed at start.
+- [x] `bash scripts/check.sh` exit 0 (counts in the plan's execution evidence).
+- [ ] Student backs up the development database and applies `0007`/`0008` (commands in
+  `docs/DEVELOPMENT.md`).
+- [ ] Manual acceptance in Safari (checklist below), then push and PR.
+
+### Manual acceptance checklist (pending — desktop and iPhone-size)
+
+- [ ] `/boxes` opens the Pokédex; `/boxes?box=19&pokemon=559&wallpaper=ocean` opens Scraggy's
+  gallery and its back link returns to the Pokédex; `/boxes?pokemon=0` opens the Pokédex;
+  `/boxes?mode=personal` opens the binders.
+- [ ] Desktop nav: Inicio, Pokédex, Expansiones, Mis carpetas, Mi colección. Explorar menu:
+  Pokédex, Expansiones. Neither says "Cajas PC".
+- [ ] Pokédex: pages 1 to 35 with "Página N de 35", previous/next links, and #1025 on the last
+  page; searching "pika" and "559" lists matches that open each gallery.
+- [ ] Opening a gallery from page 12 and going back returns to page 12.
+- [ ] A species gallery → card → back to the gallery → back to the Pokédex still works.
+- [ ] Binders, shelf, Home "Mis carpetas" and the copy location are exactly as before.
+- [ ] No sound, wallpaper or sprite-mode control exists anywhere.
+- [ ] In the database: no `personal_boxes` or `box_memberships`; the inventory and binder
+  counts are the same as before. Optional: `alembic downgrade 0007` and back up to head.
+
+### Technical debt (8C.1)
+
+- [ ] Redesign the Pokédex in the Unova Noir style (see the pending iteration above).
+- [ ] The Pokédex search shows names and numbers only (the endpoint returns no sprite or
+  types); richer results would need a backend change.

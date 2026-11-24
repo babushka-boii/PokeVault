@@ -4,7 +4,7 @@ import { BinderIcon, CardsIcon, HomeIcon, ScanIcon, UserIcon } from "./icons";
 
 /**
  * Mobile bottom navigation for the user's daily tasks; the scan action is the featured
- * middle button. Catalog boxes are exploration and live in the Explore menu.
+ * middle button. The Pokédex and expansions are exploration and live in the Explore menu.
  */
 export function TabBar() {
   const { dictionary } = useLocale();
