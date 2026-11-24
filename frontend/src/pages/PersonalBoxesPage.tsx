@@ -178,11 +178,17 @@ function PersonalWorkspace() {
             {unassigned.state.kind === "error" && <><p role="alert">{text.loadError}</p><button type="button" onClick={unassigned.retry}>{dictionary.status.retry}</button></>}
             {candidates && <><p>{text.total.replace("{count}", String(candidates.total))}</p>
               {!candidates.results.length && <p>{text.noCopies}</p>}
-              <ul>{candidates.results.map((candidate) => <li key={candidate.id}>
-                <span>{metadata.cards[candidate.card_id]?.name ?? candidate.card_id} · {candidate.card_id}</span>
+              <ul>{candidates.results.map((candidate) => {
+                const card = metadata.cards[candidate.card_id];
+                // Card name and expansion identify the copy for people; the UUID is never shown or announced.
+                const identity = card ? `${card.name} · ${card.set.name}` : candidate.card_id;
+                return <li key={candidate.id}>
+                <span>{card?.name ?? candidate.card_id} · {candidate.card_id}</span>
                 <span>{dictionary.inventory.languages[candidate.language]} · {dictionary.inventory.variants[candidate.variant]} · {dictionary.inventory.conditions[candidate.condition]}</span>
-                <button type="button" disabled={busy} onClick={() => void mutate((csrf, signal) => placeCopy(box.id, selected, candidate.id, csrf, signal), () => setPicker(false))}>{text.place} {candidate.id}</button>
-              </li>)}</ul>
+                <button type="button" disabled={busy} aria-label={text.placeLabel.replace("{card}", identity).replace("{position}", String(selected + 1))}
+                  onClick={() => void mutate((csrf, signal) => placeCopy(box.id, selected, candidate.id, csrf, signal), () => setPicker(false))}>{text.place}</button>
+              </li>;
+              })}</ul>
               <div className="pc-pagination"><button type="button" disabled={busy || pickerOffset === 0} onClick={() => setPickerOffset(Math.max(0, pickerOffset - 30))}>{dictionary.inventory.previous}</button>
                 <button type="button" disabled={busy || pickerOffset + 30 >= candidates.total} onClick={() => setPickerOffset(pickerOffset + 30)}>{dictionary.inventory.next}</button></div>
             </>}

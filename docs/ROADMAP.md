@@ -450,7 +450,7 @@ Routes (look at each one; the first is the redesigned page):
   (stop the backend prices or network: the value section shows its retry while Mi PC and
   expansions keep working), loading skeletons without spinners.
 - [ ] `/pokedex`, `/pokemon/:n/cards`, `/cards/:id` (card stage, price panel, tilt).
-- [ ] `/boxes` catalog (all 5 wallpapers keep their retro look inside the dark frame) and
+- [ ] `/boxes` catalog (all 4 wallpapers keep their retro look inside the dark frame) and
   `/boxes?mode=personal` (grid, picker, derived views, box value).
 - [ ] `/sets`, `/sets/:id` (progress bars, owned/missing filters).
 - [ ] `/collection` (filters, `?variant=unknown`, prices), `/collection/:id` (form).

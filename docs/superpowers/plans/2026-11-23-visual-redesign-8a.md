@@ -468,7 +468,7 @@ Alternatives that were considered and rejected:
 Check each route on desktop and at iPhone size:
 - `/` (guest, loaded, empty, prices down)
 - `/pokedex`
-- `/boxes` (catalog, all 5 wallpapers)
+- `/boxes` (catalog, all 4 wallpapers)
 - `/boxes?mode=personal` (box, picker, derived views)
 - `/sets`, `/sets/:id` (owned/missing filters)
 - `/pokemon/:n/cards`, `/cards/:id` (price panel, interactive card)

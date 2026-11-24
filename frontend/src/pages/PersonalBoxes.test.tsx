@@ -84,13 +84,28 @@ test("places only an unassigned owned copy and uses expected UUID on removal", a
   });
   const user = userEvent.setup(); render(<App initialEntries={["/boxes?mode=personal"]} />);
   await user.click(await screen.findByRole("button", { name: "Colocar copia aquí" }));
-  await user.click(await screen.findByRole("button", { name: /Colocar.*000000000003/ }));
+  await user.click(await screen.findByRole("button", { name: "Colocar aquí: Bulbasaur · Base Set, espacio 1" }));
   await screen.findByText("Birthday gift");
   expect(mutations[0].body).toEqual({ copy_id: copyId });
   expect(within(screen.getByRole("grid")).getAllByRole("button")[0]).toHaveFocus();
   await user.click(screen.getByRole("button", { name: "Quitar de la caja" }));
   await waitFor(() => expect(screen.queryByText("Birthday gift")).not.toBeInTheDocument());
   expect(mutations[1].search).toBe(`?copy_id=${copyId}`);
+});
+
+const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+test("the unassigned-copy picker never shows a UUID as visible text or in button names", async () => {
+  setup((url) => url.pathname.endsWith(id) ? json({ ...box, copy_count: 0, slots: [] }) : undefined);
+  const user = userEvent.setup(); render(<App initialEntries={["/boxes?mode=personal"]} />);
+  await user.click(await screen.findByRole("button", { name: "Colocar copia aquí" }));
+  const picker = (await screen.findByRole("heading", { name: "Elegir copia sin asignar" })).closest("section")!;
+  const place = await within(picker).findByRole("button", { name: /^Colocar aquí: Bulbasaur/ });
+  expect(place).toHaveTextContent(/^Colocar aquí$/);
+  expect(picker.textContent).not.toMatch(UUID);
+  for (const button of within(picker).getAllByRole("button")) expect(button.getAttribute("aria-label") ?? "").not.toMatch(UUID);
+  await user.click(screen.getByRole("button", { name: "English" }));
+  expect(within(picker).getByRole("button", { name: "Place here: Bulbasaur · Base Set, slot 1" })).toHaveTextContent(/^Place here$/);
 });
 
 test("shows conflict and refetches persisted placement, preserving physical identity when metadata fails", async () => {
