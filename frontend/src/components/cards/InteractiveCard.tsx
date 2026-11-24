@@ -1,21 +1,10 @@
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { REDUCED_MOTION_QUERY, useMediaQuery } from "../../hooks/useMediaQuery";
 import type { TcgCard } from "../../services/cards";
 import "./interactive-card.css";
 
 const HOVER_QUERY = "(hover: hover) and (pointer: fine)";
 const TOUCH_QUERY = "(any-pointer: coarse)";
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-function useMediaQuery(query: string) {
-  const snapshot = useCallback(() => typeof window.matchMedia === "function" && window.matchMedia(query).matches, [query]);
-  const subscribe = useCallback((listener: () => void) => {
-    if (typeof window.matchMedia !== "function") return () => {};
-    const media = window.matchMedia(query);
-    media.addEventListener("change", listener);
-    return () => media.removeEventListener("change", listener);
-  }, [query]);
-  return useSyncExternalStore(subscribe, snapshot, () => false);
-}
 
 type InteractiveCardProps = {
   card: TcgCard;

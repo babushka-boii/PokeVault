@@ -20,20 +20,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4 { font-family: var(--pv-font-display); letter-spacing: -0.01em; line-height: 1.2; }
+:where(h1, h2, h3, h4) { font-family: var(--pv-font-display); letter-spacing: -0.01em; line-height: 1.2; }
 
-a { color: var(--pv-cyan); text-underline-offset: 0.2em; }
+:where(a) { color: var(--pv-cyan); text-underline-offset: 0.2em; }
 
-button, input, select, textarea { color: inherit; font: inherit; }
+/* Element defaults use :where() (zero specificity) so any class in feature CSS wins. */
+:where(button, input, select, textarea) { color: inherit; font: inherit; }
 
-input, select, textarea {
+:where(input, select, textarea) {
   background: var(--pv-panel);
   border: 1px solid var(--pv-border-strong);
   border-radius: var(--pv-radius-1);
   color: var(--pv-text);
 }
 
-button {
+:where(button) {
   background: var(--pv-panel-raised);
   border: 1px solid var(--pv-border-strong);
   border-radius: var(--pv-radius-1);
@@ -43,8 +44,8 @@ button {
   padding: var(--pv-space-2) var(--pv-space-3);
   transition: background-color var(--pv-dur-fast) var(--pv-ease), border-color var(--pv-dur-fast) var(--pv-ease);
 }
-button:hover:not(:disabled) { border-color: var(--pv-cyan); }
-button:disabled { cursor: default; opacity: 0.55; }
+:where(button:hover:not(:disabled)) { border-color: var(--pv-cyan); }
+:where(button:disabled) { cursor: default; opacity: 0.55; }
 
 ::selection { background: var(--pv-cyan); color: var(--pv-on-cyan); }
 

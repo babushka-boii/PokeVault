@@ -220,7 +220,7 @@ Alternatives that were considered and rejected:
 - `frontend/src/test/media.ts`
 
 **Steps:**
-- [ ] Write failing tests:
+- [x] Write failing tests:
   - `useMediaQuery`: initial value, `change` events, and no `matchMedia`.
   - Primitives:
     - Accessible names.
@@ -228,8 +228,15 @@ Alternatives that were considered and rejected:
     - `InlineError` has `role="alert"`, and its retry calls the handler.
     - `Skeleton` is `aria-hidden` and the parent has `aria-busy`.
     - `PixelLabel` is text, not an image.
-- [ ] Implement them. The existing `InteractiveCard`, `Prices` and `Auth` suites must
+- [x] Implement them. The existing `InteractiveCard`, `Prices` and `Auth` suites must
   stay green **without edits**, which proves the extractions did not change behavior.
+- Evidence:
+  - 37 files / 476 tests green. The `InteractiveCard`, `Prices` and `Auth` suites
+    passed with no edits. Lint, typecheck and build pass.
+  - `main.tsx` now imports `tokens.css` and `base.css` **before** `App`, so component
+    stylesheets come later in the cascade.
+  - Element defaults in `base.css` use `:where()` (zero specificity), so every
+    existing class rule still wins.
 
 ### Task 3: Shell (desktop + mobile)
 
