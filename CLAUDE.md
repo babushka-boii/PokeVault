@@ -12,7 +12,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - No hacer commit/push sin que lo pida o confirme. Nunca leer ni subir `backend/.env` ni fotos privadas.
 
 ## Stack
-- Frontend: React + TypeScript + Vite + Tailwind + React Router, ES/EN (`frontend/src/i18n`).
+- Frontend: React + TypeScript + Vite + CSS plano con variables (sin Tailwind) + React Router, ES/EN (`frontend/src/i18n`).
 - Backend: Python + FastAPI + SQLAlchemy + Alembic + PostgreSQL. Login con Google (OIDC).
 - Integraciones: PokéAPI, TCGdex, Tesseract + Pillow + pillow-heif (OCR).
 - Migración actual: `0005` (precios de referencia, Iteración 7).

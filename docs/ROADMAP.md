@@ -391,3 +391,27 @@ Wishlist, trades, transactions and missing-card cost stay deferred.
 - [ ] Network off (or API down): collection, boxes and expansions still work; prices
   show the last saved value or "no price" (not checked manually; covered by automated
   tests).
+
+## Iteration 8A — "Unova Noir" visual system, shell and Home (planned 2026-11-23)
+
+First phase of the visual redesign:
+- 8A: tokens, shell and Home.
+- 8B: quick save and animated scanner.
+- 8C: easy Mi PC.
+- 8D: favorites and carousel.
+- 8E: 3×3 binder and master set.
+- 8F: profile with trainer and team.
+
+Spec and plan: `docs/superpowers/specs|plans/2026-11-23-visual-redesign-8a*`.
+
+- [x] Spec and plan approved by the student (2026-11-23), with the recommended decisions
+  D1–D7. Adjustments: the D4 debt note below, and the system status footer shown only
+  to signed-in users and closed by default.
+- [ ] Tasks 0–7 (see plan).
+
+### Technical debt
+
+- [ ] **Owned-sets endpoint.** A private endpoint should list the expansions in which
+  the signed-in user owns at least one copy. In 8A, Home derives them from the 30 most
+  recent copies (decision D4), which is honest but incomplete. 8E (3×3 binder and
+  master set) needs the complete list.
