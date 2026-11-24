@@ -129,6 +129,18 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   const register = useCallback((target: PocketRef) => (node: HTMLButtonElement | null) => {
     if (node) buttons.current.set(key(target), node); else buttons.current.delete(key(target));
   }, []);
+  // Motion marks clear just after their animation (600 ms drop, 280 ms turn). A timer
+  // also works when reduced motion removes the animation and no animationend fires.
+  useEffect(() => {
+    if (!arrived) return;
+    const timer = window.setTimeout(() => setArrived(null), 700);
+    return () => window.clearTimeout(timer);
+  }, [arrived]);
+  useEffect(() => {
+    if (!turn) return;
+    const timer = window.setTimeout(() => setTurn(null), 350);
+    return () => window.clearTimeout(timer);
+  }, [turn, first]);
   useEffect(() => {
     if (!focusRequest || !binder) return;
     buttons.current.get(key(focusRequest))?.focus();
@@ -238,10 +250,10 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           <span className="pv-binder__pages">{label}</span>
           <Button disabled={first + (mobile ? 1 : 2) > pageCount} onClick={() => turnPage(1)}>{text.next} ›</Button>
         </nav>
-        <div className="pv-spread" data-turn={turn ?? undefined} onAnimationEnd={(event) => { if (event.target === event.currentTarget) setTurn(null); }}>
+        <div className="pv-spread" data-turn={turn ?? undefined}>
           {visible.map((page) => <PageGrid key={page} page={page} pockets={binder.pockets} cards={metadata.cards} prices={priceById}
             selected={selected} arrived={arrived} targetable={mode.kind === "move" && mode.binderId === binderId}
-            select={select} onTurn={turnPage} register={register} onArrived={() => setArrived(null)} />)}
+            select={select} onTurn={turnPage} register={register} />)}
         </div>
         <p className="pv-binder__hint">{text.keyboard}</p>
       </div>

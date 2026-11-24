@@ -42,7 +42,9 @@ describe("spread and pockets", () => {
     expect(screen.getByText("pág. 1 de 4")).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Página siguiente ›" }));
     expect(screen.getByRole("grid", { name: "Página 2" })).toBeInTheDocument();
-    expect(document.querySelector(".pv-spread")).toHaveAttribute("data-turn", "next");
+    const spread = document.querySelector(".pv-spread")!;
+    expect(spread).toHaveAttribute("data-turn", "next");
+    await waitFor(() => expect(spread).not.toHaveAttribute("data-turn"), { timeout: 1500 });
     within(grid(2)).getAllByRole("button")[0].focus();
     await user.keyboard("{PageDown}");
     expect(await within(await findGrid(3)).findByRole("button", { name: /^Página 3, bolsillo 2: Card 2/ })).toBeInTheDocument();
@@ -86,6 +88,8 @@ describe("tray and actions", () => {
     const stored = within(grid(1)).getByRole("button", { name: /^Página 1, bolsillo 2: Card 2/ });
     expect(stored).toHaveAttribute("data-arrived", "true");
     await waitFor(() => expect(stored).toHaveFocus());
+    // The arrival mark clears just after its 600 ms animation.
+    await waitFor(() => expect(stored).not.toHaveAttribute("data-arrived"), { timeout: 1500 });
     expect(await within(tray).findByText("Todas tus cartas están en carpetas.")).toBeVisible();
   });
 
