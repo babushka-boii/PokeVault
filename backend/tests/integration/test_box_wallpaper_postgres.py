@@ -48,7 +48,7 @@ def wallpapers(factory):
 def test_0006_follows_0005_and_defaults_new_boxes_to_noir(wallpaper_database):
     factory, config = wallpaper_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0006"
+    assert scripts.get_current_head() == "0007"
     assert scripts.get_revision("0006").down_revision == "0005"
     owner = seed_owner(factory)
     with factory.begin() as session:
@@ -94,4 +94,4 @@ def test_upgrade_keeps_stored_wallpapers_and_downgrade_maps_noir_to_classic(
         assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0005"
     command.upgrade(config, "head")
     with factory() as session:
-        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0006"
+        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0007"

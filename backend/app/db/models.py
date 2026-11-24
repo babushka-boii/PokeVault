@@ -11,6 +11,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Numeric,
+    SmallInteger,
     String,
     UniqueConstraint,
     Uuid,
@@ -222,6 +223,74 @@ class BoxMembership(Base):
     box_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
     position: Mapped[int] = mapped_column(primary_key=True)
     copy_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+
+
+class Binder(Base):
+    """A user's album of 9-pocket pages; deleting it never deletes inventory copies."""
+
+    __tablename__ = "binders"
+    __table_args__ = (
+        UniqueConstraint("user_id", "id", name="uq_binders_owner_id"),
+        UniqueConstraint("user_id", "display_order", name="uq_binders_owner_order"),
+        CheckConstraint(
+            "length(name) BETWEEN 1 AND 80 AND name = trim(name)",
+            name="ck_binders_name",
+        ),
+        CheckConstraint("display_order >= 0", name="ck_binders_order"),
+        CheckConstraint("cover IN ('noir')", name="ck_binders_cover"),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    display_order: Mapped[int] = mapped_column(nullable=False)
+    cover: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="noir", server_default="noir"
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
+class BinderPocket(Base):
+    """One pocket (page 1-40, pocket 1-9) holding one owned copy."""
+
+    __tablename__ = "binder_pockets"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "binder_id"],
+            ["binders.user_id", "binders.id"],
+            ondelete="CASCADE",
+            name="fk_binder_pocket_owned_binder",
+        ),
+        ForeignKeyConstraint(
+            ["user_id", "copy_id"],
+            ["inventory_copies.user_id", "inventory_copies.id"],
+            ondelete="CASCADE",
+            name="fk_binder_pocket_owned_copy",
+        ),
+        UniqueConstraint("copy_id", name="uq_binder_pockets_copy"),
+        CheckConstraint("page BETWEEN 1 AND 40", name="ck_binder_pockets_page"),
+        CheckConstraint("pocket BETWEEN 1 AND 9", name="ck_binder_pockets_pocket"),
+        Index("ix_binder_pockets_owner", "user_id"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    binder_id: Mapped[UUID] = mapped_column(Uuid, primary_key=True)
+    page: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
+    pocket: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
+    copy_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    placed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
 
 
 _PRICE_COLUMNS = (

@@ -673,9 +673,9 @@ def test_progress_is_rederived_after_logout_relogin_and_application_restart(
 
 
 def test_completion_adds_no_storage_of_its_own(set_completion_database):
-    # Later iterations add price tables (0005; 0006 adds none); completion has none.
+    # Later iterations add prices (0005) and binders (0007); completion has none.
     factory, config = set_completion_database
-    assert ScriptDirectory.from_config(config).get_current_head() == "0006"
+    assert ScriptDirectory.from_config(config).get_current_head() == "0007"
     with factory() as session:
         assert set(inspect(session.get_bind()).get_table_names()) == {
             "alembic_version",
@@ -689,8 +689,10 @@ def test_completion_adds_no_storage_of_its_own(set_completion_database):
             "box_memberships",
             "card_price_snapshots",
             "exchange_rates",
+            "binders",
+            "binder_pockets",
         }
-        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0006"
+        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0007"
         assert {
             index["name"]
             for index in inspect(session.get_bind()).get_indexes("inventory_copies")

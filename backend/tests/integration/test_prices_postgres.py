@@ -54,7 +54,7 @@ def table_names(factory):
 def test_0005_follows_0004_and_creates_the_price_tables(prices_database):
     factory, config = prices_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0006"
+    assert scripts.get_current_head() == "0007"
     assert scripts.get_revision("0005").down_revision == "0004"
     assert {"card_price_snapshots", "exchange_rates"} <= table_names(factory)
     with factory() as session:
@@ -90,7 +90,7 @@ def test_downgrade_and_upgrade_keep_inventory_and_default_existing_users_to_clp(
             "reverse",
             "Kept across 0005",
         )
-        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0006"
+        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0007"
 
     # A second full cycle is also clean (constraints are recreated by name).
     command.downgrade(config, "0004")
