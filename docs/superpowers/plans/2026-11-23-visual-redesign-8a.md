@@ -249,25 +249,42 @@ Alternatives that were considered and rejected:
 - Updates to `frontend/src/app/App.test.tsx` and `frontend/src/pages/Scanner.test.tsx`.
 
 **Steps:**
-- [ ] Write the failing shell tests listed in spec §13 for desktop, mobile, skip link
+- [x] Write the failing shell tests listed in spec §13 for desktop, mobile, skip link
   and live layout swap.
-- [ ] Update the existing assertions without weakening them:
+- [x] Update the existing assertions without weakening them:
   - `App.test`: "Cajas" becomes "Cajas PC" (ES) and "PC Boxes" (EN). The locale test
     also asserts `document.documentElement.lang`.
   - `Scanner.test`: "nav contains Escáner de cartas" becomes "the banner contains a
     link 'Escanear' to `/scanner`", plus the nav assertion that the scanner page title
     is still the h1.
-- [ ] Implement the shell (spec §8):
+- [x] Implement the shell (spec §8):
   - The monogram SVG, an original "PV" in a cut hexagon.
   - Header: sticky on desktop, 56px on mobile.
   - Tab bar: safe area, a raised cut-corner ESCANEAR, `<main>` bottom padding.
   - `ExploreMenu`: Escape and outside click close it, and focus returns to the
     trigger.
   - Every target is at least 44px.
-- [ ] Remove the old `.topbar`, `.navigation`, `.brand` and `.locale-button` rules from
+- [x] Remove the old `.topbar`, `.navigation`, `.brand` and `.locale-button` rules from
   `styles.css`, after checking with grep that nothing else uses them.
-- [ ] Run the full frontend suite. Only the files listed above may need edits. Any
+- [x] Run the full frontend suite. Only the files listed above may need edits. Any
   other failing suite means something regressed, so fix the code, not the test.
+- Evidence:
+  - 38 files / 485 tests green, including 9 new shell tests. Lint, typecheck and build
+    pass.
+  - Two more suites needed edits beyond the planned `App.test` and `Scanner.test`,
+    each with a reason:
+    - `Auth.test`: the "Cajas" link is now "Cajas PC", the approved nav label. Only the
+      name changed.
+    - `Sets.test`: two tests build the provider tree by hand and lacked
+      `CurrencyProvider`, which `App` has had since Iteration 7. The shell now reads
+      the currency, so the harness was aligned with `App`. The assertions are
+      unchanged.
+  - The currency-save failure notice in the shell uses its own short text
+    (`shell.currencyLocalOnly`), so it never duplicates the Profile message that
+    `Prices.test` looks for.
+  - On `/boxes`, jsdom also exposes the page's own `<header>` as a banner (browsers do
+    not, inside `<main>`). The mobile test takes the shell header, which comes first,
+    and checks its class.
 
 ### Task 4: Global token migration of existing CSS
 

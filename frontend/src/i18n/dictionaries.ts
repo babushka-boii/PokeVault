@@ -6,6 +6,16 @@ export const spanish = {
     profile: "Perfil",
     label: "Navegación principal",
   },
+  shell: {
+    logo: "PokéVault — Inicio",
+    skip: "Saltar al contenido",
+    scan: "Escanear",
+    explore: "Explorar",
+    currencyGroup: "Moneda de visualización",
+    currencyLocalOnly: "Moneda guardada solo en este navegador.",
+    nav: { home: "Inicio", pokedex: "Pokédex", boxes: "Cajas PC", sets: "Expansiones", collection: "Mi colección" },
+    tabs: { home: "Inicio", boxes: "Cajas", scan: "Escanear", collection: "Colección", profile: "Perfil" },
+  },
   inventory: {
     title: "Mi colección", add: "Añadir a mi colección", save: "Guardar copia", saving: "Guardando…",
     cancel: "Cancelar", edit: "Editar copia", remove: "Eliminar copia", confirm: "Confirmar eliminación",
@@ -341,6 +351,16 @@ export const english: Dictionary = {
     pokedex: "Pokédex",
     profile: "Profile",
     label: "Main navigation",
+  },
+  shell: {
+    logo: "PokéVault — Home",
+    skip: "Skip to content",
+    scan: "Scan",
+    explore: "Explore",
+    currencyGroup: "Display currency",
+    currencyLocalOnly: "Currency saved in this browser only.",
+    nav: { home: "Home", pokedex: "Pokédex", boxes: "PC Boxes", sets: "Expansions", collection: "My collection" },
+    tabs: { home: "Home", boxes: "Boxes", scan: "Scan", collection: "Collection", profile: "Profile" },
   },
   inventory: {
     title: "My collection", add: "Add to my collection", save: "Save copy", saving: "Saving…",

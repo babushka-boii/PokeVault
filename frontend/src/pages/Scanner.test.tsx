@@ -199,7 +199,9 @@ test("offers sign in and public expansion browsing without private scanner reque
   expect(screen.getByRole("link", { name: "Buscar en las expansiones" })).toHaveAttribute("href", "/sets");
   expect(screen.queryByLabelText("Elegir imagen o fototeca")).not.toBeInTheDocument();
   expect(request.mock.calls.some(([input]) => input.includes("/scans/"))).toBe(false);
-  expect(screen.getByRole("navigation", { name: "Navegación principal" })).toHaveTextContent("Escáner de cartas");
+  // 8A: the scanner moved from the nav to the header scan action; the page keeps its title.
+  expect(within(screen.getByRole("banner")).getByRole("link", { name: "Escanear" })).toHaveAttribute("href", "/scanner");
+  expect(screen.getByRole("heading", { level: 1, name: "Escáner de cartas" })).toBeInTheDocument();
 });
 
 test("uses distinct native library and rear-camera inputs and revokes replaced, removed and unmounted previews", async () => {

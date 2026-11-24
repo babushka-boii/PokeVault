@@ -5,6 +5,7 @@ import { MemoryRouter, useLocation, useNavigate } from "react-router-dom";
 import { App } from "../app/App";
 import { AppRoutes } from "../app/router";
 import { AuthProvider } from "../auth/AuthProvider";
+import { CurrencyProvider } from "../components/prices/CurrencyProvider";
 import { LocaleProvider } from "../i18n/LocaleProvider";
 import { jsonResponse as json, pikachuCard } from "../test/tcgFixtures";
 import { setCardPage, setCards, setCollectionPage, setDetail, setPage, setProgress, setSession, setSummary } from "../test/setFixtures";
@@ -129,7 +130,7 @@ test("clears checklist search, sort and ownership in one URL update while preser
     results: [setCards[0]], quantities: {},
   })) : undefined, true);
   const user = userEvent.setup();
-  render(<LocaleProvider><AuthProvider><MemoryRouter initialEntries={["/sets/sm9?ownership=missing&q=33&sort=name&page=2&returnTo=%2Fsets%3Fpage%3D2"]}><AppRoutes /><CurrentLocation /></MemoryRouter></AuthProvider></LocaleProvider>);
+  render(<LocaleProvider><AuthProvider><CurrencyProvider><MemoryRouter initialEntries={["/sets/sm9?ownership=missing&q=33&sort=name&page=2&returnTo=%2Fsets%3Fpage%3D2"]}><AppRoutes /><CurrentLocation /></MemoryRouter></CurrencyProvider></AuthProvider></LocaleProvider>);
   await screen.findByRole("progressbar");
   expect(screen.getByRole("combobox", { name: "Mi colección" })).toHaveValue("missing");
   expect(screen.getByRole("searchbox", { name: "Nombre o número de carta" })).toHaveValue("33");
@@ -225,7 +226,7 @@ test("releases the editor lock after browser history restores a different checkl
     page: Number(url.searchParams.get("page") ?? 1), results: url.searchParams.get("page") === "2" ? [setCards[12]] : [setCards[0]], quantities: {},
   })) : undefined, true);
   const user = userEvent.setup();
-  render(<LocaleProvider><AuthProvider><MemoryRouter initialEntries={["/sets/sm9"]}><AppRoutes /><HistoryBack /></MemoryRouter></AuthProvider></LocaleProvider>);
+  render(<LocaleProvider><AuthProvider><CurrencyProvider><MemoryRouter initialEntries={["/sets/sm9"]}><AppRoutes /><HistoryBack /></MemoryRouter></CurrencyProvider></AuthProvider></LocaleProvider>);
   await screen.findByRole("progressbar");
   await user.click(screen.getByRole("link", { name: "Página siguiente" }));
   await screen.findByRole("link", { name: "Checklist card 13" });
