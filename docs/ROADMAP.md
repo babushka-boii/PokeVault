@@ -611,3 +611,15 @@ until this is approved.
 - [ ] "Ver carta" opens the copy detail with no UUID and "‹ Volver a la carpeta" returns to
   the same pocket.
 - [ ] VoiceOver and keyboard only.
+
+### 8D Part 1 adjustments after the first review
+
+- [ ] The header is one line with the gold value; "Detalles" opens the rest and the
+  "Rates By Exchange Rate API" link is always visible. No keyboard help text under the album.
+- [ ] Pockets are large (at least 140 px wide); on a short window the page scrolls instead.
+- [ ] The tray folds to a thin bar (folded by default when empty).
+- [ ] The ‹ › arrows are tall icon buttons at both sides of the album.
+- [ ] Each pocket shows only the card name, one line, nothing clipped ("Toxtricity", "Eevee").
+- [ ] "Sacar de la carpeta": the card rises out of the sleeve, flies to the tray (or its
+  bar when folded); no duplicate card; another click mid-flight leaves nothing floating.
+- [ ] Google login always asks which account to use.
