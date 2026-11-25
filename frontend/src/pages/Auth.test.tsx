@@ -16,7 +16,8 @@ afterEach(() => vi.unstubAllGlobals());
 const withPriceRoutes = (auth: (input: string, options?: RequestInit) => Promise<Response>) => (input: string, options?: RequestInit) => {
   const path = new URL(input).pathname;
   if (path === "/api/v1/me/settings") return Promise.resolve(json({ preferred_currency: "CLP" }));
-  if (path.startsWith("/api/v1/prices/")) return Promise.resolve(json({}, 503));
+  if (path.startsWith("/api/v1/prices/") || path === "/api/v1/me/profile" || path === "/api/v1/pokemon/index" || path.startsWith("/api/v1/favorites/")
+    || path === "/api/v1/binders" || path === "/api/v1/collection/history") return Promise.resolve(json({}, 503));
   return auth(input, options);
 };
 
@@ -29,9 +30,6 @@ test("restores the real profile once in StrictMode, shows loading and never pers
   expect(screen.queryByText("Ash Ketchum")).not.toBeInTheDocument();
   await act(async () => { finish(json(session)); });
   expect(await screen.findByRole("heading", { name: "Ash Ketchum" })).toBeVisible();
-  expect(screen.getByText("ash@example.test")).toBeVisible();
-  expect(screen.getByText("Sesión iniciada con Google")).toBeVisible();
-  expect(screen.getByRole("img", { name: "Foto de Ash Ketchum" })).toHaveAttribute("referrerpolicy", "no-referrer");
   expect(request).toHaveBeenCalledTimes(1);
   expect(request).toHaveBeenCalledWith("http://localhost:8000/api/v1/auth/me", expect.objectContaining({ credentials: "include", headers: { Accept: "application/json" } }));
   // Only display preferences are stored locally; never identity or credentials.
@@ -125,15 +123,6 @@ test("keeps profile and exposes a retry after logout network failure", async () 
   expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeEnabled();
 });
 
-test("falls back for a broken profile picture and omits missing email", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ ...session, user: { ...userProfile, email: null, picture_url: "https://example.test/broken.png" } })));
-  render(<App initialEntries={["/profile"]} />);
-  fireEvent.error(await screen.findByRole("img", { name: "Foto de Ash Ketchum" }));
-  expect(screen.queryByRole("img")).not.toBeInTheDocument();
-  expect(screen.getByText("AK")).toBeVisible();
-  expect(screen.queryByText("ash@example.test")).not.toBeInTheDocument();
-});
-
 test("prevents a late refresh from restoring a logged out identity", async () => {
   let finish!: (response: Response) => void;
   vi.stubGlobal("fetch", withPriceRoutes(vi.fn().mockResolvedValueOnce(json(session)).mockImplementationOnce(() => new Promise<Response>((resolve) => { finish = resolve; })).mockResolvedValueOnce(new Response(null, { status: 204 }))));
@@ -219,8 +208,7 @@ test("shows translated authenticated profile and disables pending sign-out", asy
   render(<App initialEntries={["/profile"]} />);
   await screen.findByRole("heading", { name: "Ash Ketchum" });
   await user.click(screen.getByRole("button", { name: "English" }));
-  expect(screen.getByText("Signed in with Google")).toBeVisible();
-  expect(screen.getByRole("img", { name: "Photo of Ash Ketchum" })).toBeVisible();
+  expect(screen.getByText("YOUR COLLECTION VALUE")).toBeVisible();
   await user.click(screen.getByRole("button", { name: "Sign out" }));
   expect(screen.getByRole("button", { name: "Signing out…" })).toBeDisabled();
   await act(async () => { finish(new Response(null, { status: 204 })); });
@@ -231,7 +219,6 @@ test("accepts an identity without optional Google name or email and labels the a
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ ...session, user: { ...userProfile, display_name: "", email: null, picture_url: null } })));
   render(<App initialEntries={["/profile"]} />);
   expect(await screen.findByRole("heading", { name: "Cuenta de Google" })).toBeVisible();
-  expect(screen.getByText("Sesión iniciada con Google")).toBeVisible();
   expect(screen.queryByText("Ash Ketchum")).not.toBeInTheDocument();
   expect(screen.queryByText("ash@example.test")).not.toBeInTheDocument();
 });

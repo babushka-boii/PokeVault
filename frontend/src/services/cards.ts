@@ -83,7 +83,7 @@ export function safeReturnTo(value: string | null | undefined): string {
     Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return fallback;
   const path = value.split("?")[0];
   if (value === "/") return value;   // Home, with nothing after it
-  if (path === "/pokedex" || path === "/sets" || path === "/scanner") return value;
+  if (path === "/pokedex" || path === "/sets" || path === "/scanner" || path === "/profile") return value;
   const expansion = /^\/sets\/([^/]+)$/.exec(path);
   if (expansion && isSetId(expansion[1])) return value;
   // A species: its sheet (/pokemon/25) and the old gallery address that redirects to it.
