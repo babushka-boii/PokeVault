@@ -16,7 +16,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - Frontend: React + TypeScript + Vite + CSS plano con variables (sin Tailwind) + React Router, ES/EN (`frontend/src/i18n`).
 - Backend: Python + FastAPI + SQLAlchemy + Alembic + PostgreSQL. Login con Google (OIDC).
 - Integraciones: PokéAPI, TCGdex, Tesseract + Pillow + pillow-heif (OCR).
-- Migración actual: `0010` (caché `card_species`, Iteración 9B; Naim debe aplicarla con respaldo). Antes: `0009` (favoritas, valor diario de la colección y guía cerrada, 9A), `0008` borra las cajas personales, `0007` carpetas, `0006` fondo "noir", `0005` precios. La 8D Parte 2 usará `0011`.
+- Migración actual: `0011` (entrenador y equipo del perfil, Iteración 10; Naim debe aplicarla con respaldo). Antes: `0010` (caché `card_species`, 9B), `0009` (favoritas, valor diario de la colección y guía cerrada, 9A), `0008` borra las cajas personales, `0007` carpetas, `0006` fondo "noir", `0005` precios. La apariencia de carpetas (8D Parte 2) usará `0012`.
 
 ## Comandos (en el Mac de Naim)
 - Validación completa: `bash scripts/check.sh` (unittest, pytest, ruff, vitest, eslint, tsc, build, git diff --check).
@@ -41,9 +41,10 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - Iteración 8A (rediseño "Unova Noir": tokens, shell e Inicio, migración `0006`) mezclada en `main` (PR #6). Estilos: CSS con variables en `frontend/src/styles/tokens.css` (único lugar con colores; lo vigila una prueba de contrato).
 - Iteración 8C (carpetas, reemplaza a las cajas personales) vive en `feat/iteration-8c-binders` (subida a GitHub; el 2026-11-24 `origin/main` aún NO la contenía, verificar antes de asumir que se mezcló). `check.sh` exit 0. Detalle en docs/BINDERS.md.
 - Iteración 8C.1 (retirar las Cajas PC) implementada en `feat/iteration-8c1-retire-pc-boxes`, apilada sobre la 8C, sin push ni PR; `check.sh` exit 0. Naim debe aplicar `0007` y `0008` (con respaldo previo; comandos en docs/DEVELOPMENT.md) y hacer la revisión en Safari (lista en docs/ROADMAP.md). Pokédex paginada (30 por página) con búsqueda por nombre o número. Pendiente: rediseño visual de la Pokédex (Unova Noir, se define en maqueta). Siguiente: 8D portadas y stickers; luego favoritas, master set y perfil con entrenador.
-- Iteración 8D Parte 1 (álbum abierto, acciones en contexto) mezclada en `main` (PR #9). La Parte 2 (portadas/stickers, hojas, migración `0011`) espera la aprobación de Naim.
+- Iteración 8D Parte 1 (álbum abierto, acciones en contexto) mezclada en `main` (PR #9). La Parte 2 (portadas/stickers, hojas, migración `0012`) espera la aprobación de Naim.
 - Iteración 9A (Inicio final) implementada en `feat/iteration-9a-home` (apilada sobre `main`, sin push ni PR; detalle en docs/HOME.md). Naim debe aplicar `0009` con respaldo y hacer la revisión en Safari (lista en docs/ROADMAP.md).
-- Iteración 9B (Pokédex de coleccionista) implementada en `feat/iteration-9b-pokedex` (sin push ni PR): grilla `/pokedex` por generación, ficha `/pokemon/:n` con tu colección y cartas tengo/me faltan, índice fijo `species_index.json` de 1025 especies (regenerar con `backend/scripts/build_species_index.py`). Safari: lista en docs/ROADMAP.md.
+- Iteración 9B (Pokédex de coleccionista) mezclada en `main` (PR #11): grilla `/pokedex` por generación, ficha `/pokemon/:n` con tu colección y cartas tengo/me faltan, índice fijo `species_index.json` de 1025 especies (regenerar con `backend/scripts/build_species_index.py`). Safari: lista en docs/ROADMAP.md.
+- Iteración 10 (Perfil de entrenador, diseño en docs/design/Profile.dc.html) implementada en `feat/iteration-10-profile` (sin push ni PR): entrenador (4 sprites) y equipo de hasta 5, valor con gráfico, favoritas y valor por carpeta/expansión (`GET /prices/sets`). Safari: lista en docs/ROADMAP.md.
 - Futuro: wishlist/intercambios.
 
 ## Documentación
