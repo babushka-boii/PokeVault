@@ -683,3 +683,12 @@ and the price note, rates attribution, currency switch and sign-out sit in a foo
 - [ ] Value card: amount, 7 d / 30 d / 1 año; with fewer than 2 recorded days the message shows and no chart is invented.
 - [ ] 2×2 counts (the gold one opens copies without variant), favourites row opens the card and returns to Perfil.
 - [ ] "Valor por carpeta" and "Valor por expansión" bars; iPhone-size mode stacks the band and cards, and with Reduce Motion the sprites stand still.
+
+## Scanner visual (Safari checklist)
+
+`/scans/recognize` now returns the detected card `corners` (or `null`); the preview shows a cyan scanning beam and then crops to the card (see docs/SCANNER.md). No migration.
+
+- [ ] A well-framed photo: the beam sweeps for at least 1.2 s inside the viewfinder corners, then the photo crops smoothly to the card, flat and 63:88.
+- [ ] A tilted photo: the crop straightens the perspective; the clues and candidates are the same as before.
+- [ ] A photo with no card visible (or a HEIC with no preview): the original photo stays, uncropped (HEIC shows only "Analizando carta…"), and nothing breaks.
+- [ ] With Reduce Motion: no sweep and no transition, a static frame with the same text, and the crop appears at once.
