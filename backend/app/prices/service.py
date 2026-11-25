@@ -13,7 +13,7 @@
 import asyncio
 import logging
 from collections import Counter, OrderedDict
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -336,9 +336,9 @@ class PriceService:
     async def values_by_group(
         self,
         factory,
-        groups: Mapping[UUID, Sequence[CopyRef]],
+        groups: Mapping[Hashable, Sequence[CopyRef]],
         currency: TargetCurrency,
-    ) -> tuple[dict[UUID, Valuation], RatesResult]:
+    ) -> tuple[dict[Hashable, Valuation], RatesResult]:
         """Value several groups (binders) with one evaluation and one refresh budget.
 
         Each copy belongs to at most one group; every group total is summed before
