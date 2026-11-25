@@ -482,3 +482,5 @@ respects reduced motion (no drift, no hover growth, no chart fade). See `docs/HO
 - Space Grotesk counts, token-only surfaces, gold monetary value and the shared currency selector.
 - Counts and valuation fail independently with distinct retry labels; reference/FX disclosures remain visible.
 - Reserved value space and static loading skeletons support mobile layouts and reduced motion; Safari review pending.
+
+Collection filters apply immediately; cyan chips include unknown variant. Search covers loaded names from the first 100 distinct cards among the first 500 copies, with progress, failure and limit notices. Metadata is shared with displayed cards, owner-scoped and aborted on exit.

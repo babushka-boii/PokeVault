@@ -696,5 +696,6 @@ and the price note, rates attribution, currency switch and sign-out sit in a foo
 ## Collection polish — 2026-11-25
 - [x] Point 1: whole-collection copy/distinct-card counts and reference value in the selected currency.
 - Existing inventory/valuation endpoints; no migration or new backend endpoint.
-- Points 2–7 remain pending; global search/order and bounded metadata batching require a backend contract review.
+- [x] Point 2: instant attribute chips and progressive name search over up to 500 copies / 100 distinct cards, four concurrent metadata reads shared with rendering.
+- Pending: point 3 ordering; points 4–7 presentation/pagination/states; backend metadata batch endpoint and highest-value ordering are deferred (no backend changes).
 - Safari acceptance pending: filtered totals, currency switching, price outage and 390 px layout.

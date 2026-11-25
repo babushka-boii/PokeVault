@@ -35,3 +35,8 @@
 .pv-collection-header__counts dd { margin: 4px 0 0; font-family: var(--pv-font-display); font-size: var(--pv-text-xl); font-variant-numeric: tabular-nums; }
 .pv-collection-header__value { min-height: 160px; }
 .pv-collection-header .price-total { font-family: var(--pv-font-display); overflow-wrap: anywhere; }
+
+.pv-collection-filters fieldset { border: 0; min-width: 0; padding: 0; margin-block: 12px; }
+.pv-collection-filters legend { color: var(--pv-text-2); margin-bottom: 8px; }
+.pv-collection-filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pv-collection-filter-chips button[aria-pressed="true"] { border-color: var(--pv-cyan); background: var(--pv-cyan-soft); color: var(--pv-cyan); }
