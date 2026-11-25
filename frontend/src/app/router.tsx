@@ -30,6 +30,7 @@ export function AppRoutes() {
         <Route path="collection" element={<CollectionPage />} />
         <Route path="collection/:copyId" element={<InventoryCopyPage />} />
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="pokemon/:number" element={<PokemonCardsPage />} />
         <Route path="pokemon/:number/cards" element={<PokemonCardsPage />} />
         <Route path="cards/:id" element={<TcgCardPage />} />
         <Route path="sets" element={<SetsPage />} />

@@ -1,0 +1,33 @@
+/* Collector's Pokédex on "Unova Noir" tokens. Type colours only as small dots (from typeBadge.css). */
+.pv-dex { display: grid; gap: var(--pv-space-4); min-width: 0; }
+.pv-dex__head h1 { margin: 0 0 var(--pv-space-2); }
+.pv-dex__bar { background: var(--pv-panel-raised); border: 1px solid var(--pv-border); height: .75rem; margin: var(--pv-space-2) 0; overflow: hidden; }
+.pv-dex__bar > span { background: var(--pv-gold); display: block; height: 100%; }
+.pv-dex__tabs { display: flex; flex-wrap: wrap; gap: var(--pv-space-1); }
+.pv-dex__tabs button, .pv-chipbtn { background: var(--pv-panel); border: 1px solid var(--pv-border); color: var(--pv-text-2); cursor: pointer; font: inherit; min-height: var(--pv-touch); padding: 0 var(--pv-space-3); }
+.pv-dex__tabs button[aria-selected="true"], .pv-chipbtn[aria-pressed="true"], .pv-dex__show button[aria-checked="true"] { background: var(--pv-cyan-soft); border-color: var(--pv-cyan); color: var(--pv-text); }
+.pv-dex__tabs small { color: var(--pv-text-3); display: block; font-size: var(--pv-text-xs); }
+.pv-dex__filters { align-items: end; display: flex; flex-wrap: wrap; gap: var(--pv-space-3); }
+.pv-dex__filters label { color: var(--pv-text-2); display: grid; font-size: var(--pv-text-sm); gap: var(--pv-space-1); }
+.pv-dex__filters input[type="search"] { min-height: var(--pv-touch); min-width: 14rem; padding: 0 var(--pv-space-3); }
+.pv-dex__show { border: 1px solid var(--pv-border-strong); display: inline-flex; }
+.pv-dex__show button { background: transparent; border: 0; color: var(--pv-text-2); cursor: pointer; font: inherit; min-height: var(--pv-touch); padding: 0 var(--pv-space-3); }
+.pv-dex__show button:disabled { cursor: not-allowed; opacity: .5; }
+.pv-dex__types { display: flex; flex-wrap: wrap; gap: var(--pv-space-1); }
+.pv-chipbtn { align-items: center; display: inline-flex; gap: var(--pv-space-2); }
+.pv-typedot { background: var(--type-color, var(--pv-border-strong)); border-radius: 50%; display: inline-block; height: .6rem; width: .6rem; }
+.pv-dex__grid { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); list-style: none; margin: 0; padding: 0; }
+.pv-tile a { align-items: center; background: var(--pv-panel); border: 1px solid var(--pv-border); color: var(--pv-text); display: grid; gap: var(--pv-space-1); justify-items: center; min-height: 11rem; padding: var(--pv-space-3) var(--pv-space-2); position: relative; text-decoration: none; transition: transform var(--pv-dur-fast) var(--pv-ease), border-color var(--pv-dur-fast) var(--pv-ease); }
+.pv-tile a:hover, .pv-tile a:focus-visible { border-color: var(--pv-cyan); transform: translateY(-2px); }
+.pv-tile__number { color: var(--pv-text-2); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); }
+.pv-tile__name { font-weight: 600; overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+.pv-tile__types { display: flex; gap: var(--pv-space-1); min-height: .6rem; }
+.pv-tile__count { background: var(--pv-gold-soft); border: 1px solid var(--pv-gold); color: var(--pv-gold); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); padding: 0 var(--pv-space-2); }
+.pv-tile[data-state="missing"] a { opacity: .45; }
+.pv-tile[data-state="missing"] img { filter: grayscale(1); }
+.pv-sprite { align-items: center; display: inline-flex; height: 96px; justify-content: center; width: 96px; }
+.pv-sprite img { image-rendering: pixelated; }
+.pv-sprite__missing { color: var(--pv-text-3); font-size: 2rem; }
+.pv-dex__skeleton { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); }
+.pv-dex__skeleton > * { min-height: 11rem; }
+@media (prefers-reduced-motion: reduce) { .pv-tile a { transition: none; } .pv-tile a:hover, .pv-tile a:focus-visible { transform: none; } }

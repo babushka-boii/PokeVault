@@ -16,7 +16,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("PokéVault application shell", () => {
   test.each([
     ["/", "Inicio"],
-    ["/pokedex", "Pokédex"],
+    ["/pokedex", "Tu Pokédex"],
     ["/profile", "Perfil"],
     ["/login", "Tu cuenta de PokéVault"],
   ])("renders direct route %s", (path, heading) => {
@@ -49,7 +49,7 @@ describe("PokéVault application shell", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Mis carpetas" })).toBeInTheDocument();
     first.unmount();
     render(<App initialEntries={["/boxes"]} />);
-    expect(await screen.findByRole("heading", { level: 1, name: "Pokédex" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Tu Pokédex" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Cajas/ })).not.toBeInTheDocument();
   });
 
