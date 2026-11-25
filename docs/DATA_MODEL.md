@@ -233,3 +233,15 @@ and the column without touching inventory or boxes.
 - **Not preserved going backward:** the binder cover, and a binder of more than 30 pockets
   comes back as several boxes (and, if 0007 runs again, as several binders). Which copy is
   placed where is preserved. Head: `0008`.
+
+## Iteration 9A — Home data (migration `0009`)
+
+- `card_favorites (user_id, card_id)`: a starred **catalog card** (not a copy). Primary key
+  `(user_id, card_id)`, `card_id` 1–100 characters, `created_at`, index on
+  `(user_id, created_at)`. Cascades with the user. At most 500 per user (enforced by the API).
+- `collection_value_days (user_id, day)`: one recorded value per user and Santiago calendar
+  day: `eur_total` and `usd_original_total` (always), `clp_total`, `usd_total`, `usd_clp` and
+  `eur_per_usd` (all present or all null: no rates that day, no converted point),
+  `copy_count`, `priced_count` (≤ `copy_count`). Never rewritten once stored. Cascades with the user.
+- `user_settings.home_guide_dismissed_at`: set once when the new-user guide is closed or finished.
+- Downgrade drops all three and loses that data; inventory, binders, pockets and prices are untouched.

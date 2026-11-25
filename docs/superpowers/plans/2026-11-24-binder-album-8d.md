@@ -75,7 +75,7 @@ Existing tests are `pages/BinderView.test.tsx`.
 | `services/binderAppearance.ts` (new), `services/binders.ts` | Appearance wire types/validation/requests and enriched summaries |
 | `backend/app/binders/appearance.py` (new) | Owner-scoped snapshot read/replace/revision/replay logic |
 | `backend/app/binders/schemas.py`, `api/binders.py`, `db/models.py` | Contract, routes, persistence |
-| `backend/migrations/versions/0009_binder_appearance.py` (new) | Extend covers, revision and sticker table |
+| `backend/migrations/versions/0010_binder_appearance.py` (new) | Extend covers, revision and sticker table |
 
 Interfaces to settle exactly as the spec before implementation:
 - `PocketRef = {page: number; pocket: number}` stays unchanged.
@@ -187,13 +187,13 @@ docs/BINDERS.md, docs/UX_UI.md, docs/ROADMAP.md, Bitacora.md, Autoria.md.
   `fix(inventory): show card identity and preserve binder return context`.
 - [ ] Hand off spec §10 Part 1 checklist for Safari at http://localhost:5173/binders.
   **STOP. Wait for the student's explicit approval after Safari review.** Fix feedback
-  with focused tests/commits before continuing. Do not apply or create 0009 yet.
+  with focused tests/commits before continuing. Do not apply or create 0010 yet.
 
 ## Tasks — Part 2 (blocked until the Safari approval)
 
 ### Task 5: Appearance schema and reversible migration
 
-**Create:** backend/migrations/versions/0009_binder_appearance.py;
+**Create:** backend/migrations/versions/0010_binder_appearance.py;
 backend/tests/test_binder_appearance_models.py;
 backend/tests/integration/test_binder_appearance_migration_postgres.py.
 **Modify:** backend/app/db/models.py, backend/app/binders/schemas.py.
@@ -201,7 +201,7 @@ backend/tests/integration/test_binder_appearance_migration_postgres.py.
 - [ ] Write SQLite/raw SQL tests for five covers, kind/reference exclusivity, finite
   bounded transforms, order uniqueness/range, two-owner composite FK and cascades.
   With 24 distinct order values all slots are used; a 25th row cannot pass constraints.
-- [ ] Write PostgreSQL migration tests 0008→0009→0008 in disposable schemas: preserve
+- [ ] Write PostgreSQL migration tests 0009→0010→0009 in disposable schemas: preserve
   inventory, pocket placements and binder identity; default revision 0/no stickers;
   downgrade loses only appearance, maps covers to noir, restores check and keeps FKs.
 - [ ] Run tests to observe the absent schema fail; implement migration/model/checks.
@@ -217,10 +217,10 @@ backend/tests/integration/test_binder_appearance_migration_postgres.py.
 
 ### Task 5b: Stored page count (added after the Part 1 Safari review; spec §7.4)
 
-**Create:** a section in migration 0009 (same file as Task 5); backend/tests for the page
+**Create:** a section in migration 0010 (same file as Task 5); backend/tests for the page
 count; frontend "+ Agregar hojas" and "Quitar páginas vacías" with confirmation.
 
-- [ ] Migration 0009 adds `binders.page_count` (even, 2–40); backfill = used pages plus one
+- [ ] Migration 0010 adds `binders.page_count` (even, 2–40); backfill = used pages plus one
   spare, rounded up to even; downgrade drops it. Test up/down on PostgreSQL and SQLite.
 - [ ] API: add pages (+2, max 40) and remove trailing empty pages (409 if a used page
   would go, recomputed under the owner lock); placement grows the count when it must.
@@ -320,15 +320,15 @@ Use real connection parameters locally, never paste credentials into chat or com
 backup files. Following the existing DEVELOPMENT convention (replace placeholders):
 
 1. Stop writes to the development app and record current revision/counts.
-2. `pg_dump "postgresql://USER@HOST:PORT/DBNAME" -Fc -f ~/pokevault-before-0009.dump`
-3. `pg_restore --list ~/pokevault-before-0009.dump` and verify a restore into a separate
+2. `pg_dump "postgresql://USER@HOST:PORT/DBNAME" -Fc -f ~/pokevault-before-0010.dump`
+3. `pg_restore --list ~/pokevault-before-0010.dump` and verify a restore into a separate
    empty scratch database before any destructive rollback. Keep backup outside repo.
 4. `cd backend` then `.venv/bin/alembic current`; if it is not the expected existing
    revision, stop and reconcile. Do not assume prior migrations were applied.
-5. `.venv/bin/alembic upgrade head`, then `.venv/bin/alembic current` → 0009.
+5. `.venv/bin/alembic upgrade head`, then `.venv/bin/alembic current` → 0010.
 6. Check binder/pocket/inventory counts and sample placements unchanged. Restart API and
    use http://localhost:5173/binders for the Part 2 Safari checklist in spec §10.
-7. Optional rollback only after a **new** backup: `.venv/bin/alembic downgrade 0008`.
+7. Optional rollback only after a **new** backup: `.venv/bin/alembic downgrade 0009`.
    This deletes stickers, removes revision and resets non-noir covers; pockets/copies
    remain. Never restore a dump over a populated database without a separate recovery plan.
 
@@ -376,4 +376,12 @@ Planning checks: source audit, main fast-forward pull, spec/plan cross-check and
   activating click and only when the source is mounted and in the viewport, else the sleeve
   entry plays alone. Planted bugs (resize ignored, arrows activating, outside click not
   swallowed) each failed tests. 560 frontend tests, lint and typecheck green.
-- Task 4 complete (2026-11-24): the copy detail names the card and expansion (catalog id as fallback), no UUID in any state; `safeBinderReturn` accepts only `/binders/<uuid>` with an optional valid `?page=&pocket=`; the pocket's "Ver carta" link carries it. Safari approval for Part 1: pending; Part 2 and 0009 not started.
+- Task 4 complete (2026-11-24): the copy detail names the card and expansion (catalog id as fallback), no UUID in any state; `safeBinderReturn` accepts only `/binders/<uuid>` with an optional valid `?page=&pocket=`; the pocket's "Ver carta" link carries it. Safari approval for Part 1: pending; Part 2 and 0010 not started.
+
+### Renumbered — 2026-11-25
+
+Iteration 9A (Home) takes migration `0009_home_favorites_history`. Part 2's migration is now
+`0010_binder_appearance` (down revision `0009`), including the stored `page_count` (Task 5b).
+Its tests run 0009 → 0010 → 0009, and the student's backup file is
+`pokevault-before-0010.dump`. If Part 2 were implemented before 9A, swap the numbers in both
+plans before writing either migration.

@@ -787,3 +787,21 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Implementación por tareas con commit cada una, pruebas (con errores plantados para comprobar que fallan) y documentación. El estudiante revisa y debe entender el código antes de la entrega.
+
+## Iteración 9A — Inicio final (2026-11-25)
+
+- Se aprobaron D1–D16, con dos cambios: el carrusel se desplaza de forma continua y lenta en bucle sin cortes, y el gráfico une con una línea los registros reales aunque falten días.
+- Migración `0009`: favoritas por carta, valor diario de la colección y guía cerrada. El valor se registra al cargar el gráfico, solo con una valoración completa, una vez por día de Santiago; nunca se inventa un punto.
+- Inicio: saludo con espacio para el entrenador, valor con variación a 7 días, una sola nota de precios, "Tus cartas" (más valiosas · favoritas · recientes) con carrusel, librero de dos repisas, gráfico de valor y guía para usuarios nuevos. La ★ está en el detalle de carta y en el menú del bolsillo.
+- La 8D Parte 2 pasa a la migración `0010`.
+- Pendiente: aplicar `0009` con respaldo y la revisión en Safari (lista en `docs/ROADMAP.md`).
+
+### Uso de IA (Claude Code)
+
+- Implementación por tareas con commit cada una, pruebas (con errores plantados para comprobar que fallan) y documentación. El estudiante revisa y debe entender el código antes de la entrega.
+
+### 9A — ajustes tras la primera revisión (2026-11-25)
+
+- Diagnóstico: la base local estaba en `0009` y las rutas nuevas respondían bien; el error del gráfico y de la ★ coincidía con haber cargado el Inicio antes de aplicar la migración (el primer registro diario se creó a las 10:00, justo después). Se comprobó leyendo la base con las mismas herramientas de la app, sin tocar `backend/.env`.
+- Avatar cuadrado con corte diagonal; chips del hero con la misma caja; las cartas del carrusel abren el detalle del catálogo (con "Volver al Inicio"); ★ rápida en el carrusel; favoritas optimistas en el carrusel, el detalle y el menú; errores más amables y sin alarma; la guía muestra un aviso si falla y su último paso lleva al carrusel.
+- Nuevo: `GET /favorites/status` (hasta 50 cartas en una sola petición).

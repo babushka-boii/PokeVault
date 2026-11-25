@@ -18,6 +18,6 @@ export function copyPrice(n: number, price: Quote | null, reason: CopyPrice["rea
 }
 export function valuation(extra: Partial<Valuation> = {}): Valuation {
   return { currency: "CLP", total: "1112", original_totals: { EUR: "0.89" }, copy_count: 5, priced_count: 3, unpriced_count: 2,
-    unpriced_by_reason: { variant_unknown: 2 }, pending_count: 0, stale_count: 0, sources: { cardmarket: 3 },
+    unpriced_by_reason: { variant_unknown: 2 }, pending_count: 0, stale_count: 0, prices_updated_at: "2026-11-25T09:00:00Z", sources: { cardmarket: 3 },
     top: [copyPrice(1, quote("1038", "CLP", "0.83"), null, "holo")], rates, ...extra };
 }

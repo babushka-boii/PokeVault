@@ -66,6 +66,8 @@ class SnapshotResult:
     snapshot: PriceSnapshot | None = None
     stale: bool = False
     reason: NoPriceReason | None = None
+    # When the stored prices were fetched (None for "no data" and for failures).
+    fetched_at: datetime | None = None
 
 
 @dataclass(frozen=True)
@@ -87,6 +89,7 @@ class _Priced:
     quote: PriceQuote
     stale: bool
     converted: Decimal | None
+    fetched_at: datetime | None = None
 
 
 def _plain(value: Decimal) -> str:
@@ -119,6 +122,10 @@ class PriceService:
         self._missing: OrderedDict[str, datetime] = OrderedDict()
         self._rates_lock = asyncio.Lock()
 
+    def now(self) -> datetime:
+        """The service's clock (injected in tests); also used for "today" records."""
+        return self._clock()
+
     # --- Snapshots ---
 
     async def snapshots(
@@ -140,7 +147,9 @@ class PriceService:
             elif found is None:
                 missing.append(card_id)
             elif store.is_fresh(found.fetched_at, now, store.SNAPSHOT_TTL):
-                results[card_id] = SnapshotResult(found.snapshot)
+                results[card_id] = SnapshotResult(
+                    found.snapshot, fetched_at=found.fetched_at
+                )
             else:
                 stale.append(card_id)
         stale.sort(key=lambda card_id: stored[card_id].fetched_at)
@@ -152,9 +161,13 @@ class PriceService:
         for card_id in missing + stale:
             outcome = outcomes.get(card_id)
             if isinstance(outcome, PriceSnapshot):
-                results[card_id] = SnapshotResult(outcome)
+                results[card_id] = SnapshotResult(outcome, fetched_at=now)
             elif card_id in stored:
-                results[card_id] = SnapshotResult(stored[card_id].snapshot, stale=True)
+                results[card_id] = SnapshotResult(
+                    stored[card_id].snapshot,
+                    stale=True,
+                    fetched_at=stored[card_id].fetched_at,
+                )
             elif provider_down or outcome is _FAILED:
                 results[card_id] = SnapshotResult(reason="source_unavailable")
             else:  # over budget or still refreshing in the background
@@ -256,21 +269,21 @@ class PriceService:
     ) -> tuple[list[CopyPrice], list[_Priced], RatesResult]:
         priceable = [ref.card_id for ref in refs if ref.variant in PRICED_VARIANTS]
         snapshots = await self.snapshots(factory, priceable)
-        outcomes: list[tuple[CopyRef, PriceQuote | NoPrice, bool]] = []
+        outcomes: list[tuple[CopyRef, PriceQuote | NoPrice, bool, datetime | None]] = []
         for ref in refs:
             result = snapshots.get(ref.card_id)
             if ref.variant not in PRICED_VARIANTS:
-                outcomes.append((ref, select_price(_NO_DATA, ref.variant), False))
+                outcomes.append((ref, select_price(_NO_DATA, ref.variant), False, None))
             elif result.snapshot is None:
-                outcomes.append((ref, NoPrice(result.reason), False))
+                outcomes.append((ref, NoPrice(result.reason), False, None))
             else:
                 selected = select_price(result.snapshot, ref.variant)
-                outcomes.append((ref, selected, result.stale))
-        needs_rates = any(isinstance(value, PriceQuote) for _, value, _ in outcomes)
+                outcomes.append((ref, selected, result.stale, result.fetched_at))
+        needs_rates = any(isinstance(value, PriceQuote) for _, value, _, _ in outcomes)
         rates = await self.rates(factory) if needs_rates else RatesResult(None)
         prices: list[CopyPrice] = []
         priced: list[_Priced] = []
-        for ref, value, stale in outcomes:
+        for ref, value, stale, fetched in outcomes:
             base = {
                 "copy_id": ref.copy_id,
                 "card_id": ref.card_id,
@@ -284,7 +297,7 @@ class PriceService:
                 if rates.rates is not None
                 else None
             )
-            priced.append(_Priced(ref, value, stale, converted))
+            priced.append(_Priced(ref, value, stale, converted, fetched))
             prices.append(
                 CopyPrice(**base, price=self._quote(value, stale, converted, currency))
             )
@@ -380,6 +393,9 @@ class PriceService:
             unpriced_by_reason=dict(sorted(reasons.items())),
             pending_count=reasons.get("pending", 0),
             stale_count=sum(item.stale for item in priced),
+            prices_updated_at=min(
+                (item.fetched_at for item in priced if item.fetched_at), default=None
+            ),
             sources=dict(sorted(Counter(i.quote.source for i in priced).items())),
             top=[by_id[item.ref.copy_id] for item in ranked[:top]],
             rates=rates.info(),

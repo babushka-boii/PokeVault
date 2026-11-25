@@ -1,0 +1,10 @@
+/* The value chart on "Unova Noir" tokens: a gold line, dots on real records, quiet grid. */
+.pv-chart__body { min-height: 15rem; }
+.pv-chart__svg { display: block; height: auto; max-height: 20rem; width: 100%; }
+.pv-chart__grid { stroke: var(--pv-border); stroke-width: 1; }
+.pv-chart__tick { fill: var(--pv-text-2); font-family: var(--pv-font-display); font-size: 12px; font-variant-numeric: tabular-nums; }
+.pv-chart__line { animation: pv-chart-fade 200ms var(--pv-ease) 1; stroke: var(--pv-gold); stroke-linejoin: round; stroke-width: 2.5; }
+.pv-chart__dot { fill: var(--pv-gold); stroke: var(--pv-bg); stroke-width: 2; }
+.pv-chart__empty { margin: var(--pv-space-3) 0; }
+@keyframes pv-chart-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pv-chart__line { animation: none; } }

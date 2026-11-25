@@ -96,4 +96,6 @@ def test_upgrade_keeps_stored_wallpapers_and_downgrade_maps_noir_to_classic(
         assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0005"
     command.upgrade(config, "head")
     with factory() as session:
-        assert session.scalar(text("SELECT version_num FROM alembic_version")) == "0008"
+        assert session.scalar(text("SELECT version_num FROM alembic_version")) == (
+            ScriptDirectory.from_config(config).get_current_head()
+        )

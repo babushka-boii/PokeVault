@@ -339,6 +339,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
         details: `${dictionary.inventory.variants[menuHeld.copy.variant]} · ${dictionary.inventory.languages[menuHeld.copy.language]} · ${dictionary.inventory.conditions[menuHeld.copy.condition]}`,
         price: menuQuote ? <PocketPrice price={priceById[menuHeld.copy.id]} /> : prices.state.kind === "error" ? text.priceUnavailable : null,
         copyHref: copyDetailPath(menuHeld.copy.id, binderId, menu),
+        cardId: menuHeld.copy.card_id,
       } : undefined}
       onClose={closeMenu}
       onMovePocket={() => { if (menuHeld) { setMode({ kind: "move", copy: menuHeld.copy, from: menu, binderId }); setMenu(null); setFocusRequest({ ...menu }); } }}

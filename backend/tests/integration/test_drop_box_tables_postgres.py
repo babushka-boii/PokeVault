@@ -73,10 +73,9 @@ def positions(factory, box_id):
     )
 
 
-def test_0008_follows_0007_and_is_the_head(drop_database):
+def test_0008_follows_0007(drop_database):
     _, config = drop_database
     scripts = ScriptDirectory.from_config(config)
-    assert scripts.get_current_head() == "0008"
     assert scripts.get_revision("0008").down_revision == "0007"
 
 

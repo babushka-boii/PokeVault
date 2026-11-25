@@ -38,18 +38,8 @@
 .pv-home__section-head h2 { font-size: var(--pv-text-lg); margin: 0; }
 .pv-home__section-head a { align-items: center; display: inline-flex; min-height: var(--pv-touch); }
 
-.pv-home__top { display: grid; gap: var(--pv-space-4); grid-template-columns: repeat(5, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; }
-.pv-home__top-item { min-width: 0; }
 .pv-home__top-art { display: block; }
 .pv-home__top-missing { align-items: center; aspect-ratio: 245 / 337; background: var(--pv-panel-raised); color: var(--pv-text-3); display: flex; font-size: 2rem; justify-content: center; }
-.pv-home__top-name { font-size: var(--pv-text-md); margin: var(--pv-space-3) 0 var(--pv-space-1); overflow-wrap: anywhere; }
-.pv-home__top-name a { color: var(--pv-text); text-decoration: none; }
-.pv-home__top-name a:hover { color: var(--pv-cyan); text-decoration: underline; }
-.pv-home__price .price-amount { font-size: var(--pv-text-lg); }
-@media (max-width: 767px) {
-  .pv-home__top { grid-auto-columns: minmax(9.5rem, 40%); grid-auto-flow: column; grid-template-columns: none; overflow-x: auto; padding-bottom: var(--pv-space-2); scroll-snap-type: x proximity; }
-  .pv-home__top-item { scroll-snap-align: start; }
-}
 
 .pv-home__pc-empty h3 { font-size: var(--pv-text-lg); margin: 0; }
 .pv-home__pc-empty { padding: var(--pv-space-4) 0; }
@@ -70,3 +60,144 @@
 .pv-home-shelf__name a { color: var(--pv-text); text-decoration: none; }
 .pv-home-shelf__name a:hover { color: var(--pv-cyan); text-decoration: underline; }
 .pv-home-shelf__value { font-size: var(--pv-text-md); margin: 0; }
+
+/* Greeting with a reserved trainer slot (Profile fills it later). */
+.pv-home__greeting { align-items: center; display: flex; gap: var(--pv-space-3); margin-bottom: var(--pv-space-2); }
+/* The trainer slot is the avatar's cut-corner square (64 px); Profile will put the trainer here. */
+.pv-home__trainer { display: inline-flex; flex: none; }
+.pv-home__greeting h2 { font-size: var(--pv-text-xl); margin: 0; overflow-wrap: anywhere; }
+
+/* Change against seven days ago: soft colour, plus an arrow and a word. */
+.pv-home__change { font-family: var(--pv-font-display); font-size: var(--pv-text-md); font-variant-numeric: tabular-nums; font-weight: 600; margin: 0; }
+.pv-home__change[data-direction="up"] { color: var(--pv-up); }
+.pv-home__change[data-direction="down"] { color: var(--pv-down); }
+.pv-home__change[data-direction="flat"] { color: var(--pv-text-2); }
+
+/* New-user guide. */
+.pv-home__steps { display: grid; gap: var(--pv-space-2); list-style: none; margin: 0; padding: 0; }
+.pv-home__steps li { align-items: center; display: flex; gap: var(--pv-space-3); min-height: var(--pv-touch); }
+.pv-home__steps li[data-done="true"] a { color: var(--pv-text-2); }
+.pv-home__step-mark { color: var(--pv-cyan); flex: none; width: 1.5rem; text-align: center; }
+.pv-home__steps li[data-done="true"] .pv-home__step-mark { color: var(--pv-success); }
+
+/* "Tus cartas": a segmented control and a slowly drifting, seamless row of sober cards. */
+.pv-segmented { border: 1px solid var(--pv-border-strong); display: inline-flex; }
+.pv-segmented button { background: transparent; border: 0; color: var(--pv-text-2); cursor: pointer; font: inherit; min-height: var(--pv-touch); padding: 0 var(--pv-space-4); }
+.pv-segmented button[aria-selected="true"] { background: var(--pv-cyan-soft); box-shadow: inset 0 -3px 0 var(--pv-cyan); color: var(--pv-text); }
+.pv-segmented button:hover { color: var(--pv-text); }
+.pv-reel { display: grid; gap: var(--pv-space-2); }
+.pv-reel__controls { display: flex; gap: var(--pv-space-2); justify-content: flex-end; }
+.pv-reel__arrow { font-size: 1.5rem; line-height: 1; min-width: var(--pv-touch); }
+.pv-reel__viewport { overflow-x: auto; scrollbar-width: none; scroll-snap-type: none; }
+.pv-reel__viewport::-webkit-scrollbar { display: none; }
+.pv-reel__track { display: flex; width: max-content; }
+.pv-reel__list { display: flex; gap: var(--pv-space-4); list-style: none; margin: 0; padding: var(--pv-space-2) var(--pv-space-4) var(--pv-space-2) 0; }
+.pv-reel__item { flex: none; width: clamp(8.5rem, 16vw, 11rem); }
+.pv-reel__item .tcg-interactive-card { transition: transform 200ms var(--pv-ease); }
+.pv-reel__item:hover .tcg-interactive-card { transform: scale(1.06); z-index: 1; }
+.pv-reel__name { font-size: var(--pv-text-md); margin: var(--pv-space-3) 0 var(--pv-space-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-reel__name a { color: var(--pv-text); text-decoration: none; }
+.pv-reel__name a:hover { color: var(--pv-cyan); text-decoration: underline; }
+.pv-reel__price { font-size: var(--pv-text-lg); margin: 0; }
+.pv-reel__price--none { color: var(--pv-text-2); font-size: var(--pv-text-sm); }
+.pv-reel__skeleton { display: flex; gap: var(--pv-space-4); list-style: none; margin: 0; overflow: hidden; padding: 0; }
+.pv-reel__skeleton li { flex: none; width: clamp(8.5rem, 16vw, 11rem); }
+@media (prefers-reduced-motion: reduce) {
+  .pv-reel__item .tcg-interactive-card { transition: none; }
+  .pv-reel__item:hover .tcg-interactive-card { transform: none; }
+}
+/* A drifting row never snaps; a row that fits (not looping) snaps for swiping on phones. */
+@media (max-width: 767px) { .pv-reel__viewport:not([data-looping]) { scroll-snap-type: x proximity; } .pv-reel__item { scroll-snap-align: start; } }
+
+/* Home bookcase: two dark-wood shelves of three covers; text always sits on the dark back panel. */
+.pv-bookcase {
+  background: linear-gradient(var(--pv-bar), var(--pv-bg));
+  border: 6px solid var(--pv-wood-dark);
+  border-radius: 4px;
+  box-shadow: inset 0 0 18px var(--pv-shadow-color), 0 0 0 1px var(--pv-wood-mid);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: var(--pv-space-2) 0 0;
+  padding: var(--pv-space-2) var(--pv-space-3) 0;
+}
+.pv-bookcase__item { align-content: start; display: grid; gap: 2px; min-height: 9rem; min-width: 0; padding: var(--pv-space-3) var(--pv-space-2) calc(var(--pv-space-4) + 14px); position: relative; }
+/* The plank under each row: every cell draws its piece, so a shelf is one continuous board. */
+.pv-bookcase__item::after {
+  background: linear-gradient(var(--pv-wood-light), var(--pv-wood-mid) 45%, var(--pv-wood-dark));
+  bottom: 0;
+  box-shadow: 0 6px 8px -4px var(--pv-shadow-color);
+  content: "";
+  height: 12px;
+  left: calc(-1 * var(--pv-space-3));
+  pointer-events: none;
+  position: absolute;
+  right: calc(-1 * var(--pv-space-3));
+}
+.pv-bookcase--empty, .pv-bookcase--skeleton { padding-bottom: 0; }
+.pv-bookcase--skeleton .pv-bookcase__item { opacity: .6; }
+.pv-bookcase .pv-cover { max-width: 6.5rem; }
+@media (max-width: 767px) {
+  /* One shelf that scrolls sideways. */
+  .pv-bookcase { grid-auto-columns: minmax(7.5rem, 42%); grid-auto-flow: column; grid-template-columns: none; overflow-x: auto; padding-inline: var(--pv-space-2); }
+  .pv-bookcase__item { min-height: 0; }
+  .pv-bookcase__item--empty { display: none; }
+  .pv-bookcase__item::after { left: 0; right: 0; }
+}
+
+/* Hero chips: one box for all of them (text, link or button), so they line up. */
+.pv-home__chips { align-items: stretch; }
+.pv-home__chips li { display: flex; }
+.pv-home__chips .pv-chip {
+  align-items: center;
+  box-sizing: border-box;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--pv-text-sm);
+  gap: var(--pv-space-1);
+  line-height: 1.2;
+  min-height: var(--pv-touch);
+  padding: var(--pv-space-1) var(--pv-space-3);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pv-home__chips .pv-chip--link:hover, .pv-home__chips .pv-chip--link:focus-visible { border-color: var(--pv-cyan); color: var(--pv-text); text-decoration: underline; }
+
+/* The quick star: appears on hover or keyboard focus (always, and smaller, without hover). */
+.pv-reel__item { position: relative; }
+.pv-reel__star {
+  align-items: center;
+  background: color-mix(in srgb, var(--pv-bg) 78%, transparent);
+  border: 1px solid var(--pv-border-strong);
+  color: var(--pv-text);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1.25rem;
+  height: var(--pv-touch);
+  justify-content: center;
+  line-height: 1;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  right: var(--pv-space-2);
+  top: var(--pv-space-2);
+  transition: opacity 150ms var(--pv-ease);
+  width: var(--pv-touch);
+  z-index: 3;
+}
+.pv-reel__item:hover .pv-reel__star, .pv-reel__item:focus-within .pv-reel__star, .pv-reel__star:focus-visible { opacity: 1; }
+.pv-reel__star[aria-pressed="true"] { border-color: var(--pv-gold); color: var(--pv-gold); }
+.pv-reel__star:disabled { cursor: default; opacity: .55; }
+@media (hover: none) {
+  .pv-reel__star { font-size: 1rem; height: 32px; opacity: 1; width: 32px; }
+  /* A 44 px target around the smaller button. */
+  .pv-reel__star::after { content: ""; inset: -6px; position: absolute; }
+}
+@media (prefers-reduced-motion: reduce) { .pv-reel__star { transition: none; } }
+.pv-reel__note { margin-top: var(--pv-space-2); }
+.pv-home__step-link { background: none; border: 0; color: var(--pv-cyan); cursor: pointer; font: inherit; min-height: var(--pv-touch); padding: 0; text-align: left; text-decoration: underline; }
+.pv-home__step-link:hover { color: var(--pv-text); }
+.pv-home__steps li[data-done="true"] .pv-home__step-link { color: var(--pv-text-2); }
+.pv-home__section-head h2:focus { outline: none; }
+.pv-home__section-head h2:focus-visible { outline: 3px solid var(--pv-focus); outline-offset: 4px; }

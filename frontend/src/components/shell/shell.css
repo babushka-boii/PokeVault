@@ -204,3 +204,8 @@
   width: min(100%, 76px);
 }
 .pv-tabbar__scan a[aria-current="page"] { color: var(--pv-on-cyan); --pv-cut-fill: color-mix(in srgb, var(--pv-cyan) 80%, var(--pv-text)); }
+
+/* The large avatar: a square with the Unova Noir diagonal cut; the picture covers the whole square. */
+.pv-avatar-frame { --pv-cut-fill: var(--pv-panel-raised); --pv-cut-border: var(--pv-border-strong); display: inline-block; flex: none; height: var(--pv-avatar-size, 64px); padding: 1px; width: var(--pv-avatar-size, 64px); }
+.pv-avatar-frame__fill { display: block; height: 100%; object-fit: cover; width: 100%; clip-path: polygon(0 0, calc(100% - var(--pv-cut-size) + 0.41px) 0, 100% calc(var(--pv-cut-size) - 0.41px), 100% 100%, 0 100%); }
+.pv-avatar-frame__fill--fallback { align-items: center; background: var(--pv-panel-raised); color: var(--pv-text); display: flex; font-family: var(--pv-font-display); font-size: calc(var(--pv-avatar-size, 64px) * .36); font-weight: 700; justify-content: center; }

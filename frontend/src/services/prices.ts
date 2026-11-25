@@ -16,6 +16,8 @@ export type Valuation = {
   currency: Currency; total: string | null; original_totals: Partial<Record<"EUR" | "USD", string>>; copy_count: number;
   priced_count: number; unpriced_count: number; unpriced_by_reason: Partial<Record<NoPriceReason, number>>; pending_count: number;
   stale_count: number; sources: Partial<Record<"cardmarket" | "tcgplayer", number>>; top: CopyPrice[]; rates: RatesInfo;
+  /** When the least fresh price used was fetched; null when nothing is priced. */
+  prices_updated_at: string | null;
 };
 export class PricesError extends Error {
   constructor(public readonly status: number) { super("Price request failed"); }
@@ -32,17 +34,17 @@ const timestamp = (v: unknown) => v === null || (typeof v === "string" && Number
 const isCurrency = (v: unknown): v is Currency => currencies.some((c) => c === v);
 const isReason = (v: unknown): v is NoPriceReason => reasons.some((r) => r === v);
 
-function isRates(v: unknown): v is RatesInfo {
+export function isRates(v: unknown): v is RatesInfo {
   return record(v) && typeof v.available === "boolean" && typeof v.stale === "boolean" && timestamp(v.updated_at)
     && v.provider === "exchangerate-api" && v.attribution_url === ATTRIBUTION_URL;
 }
-function isQuote(v: unknown, currency: Currency): v is Quote {
+export function isQuote(v: unknown, currency: Currency): v is Quote {
   return record(v) && (v.amount === null || decimal(v.amount)) && v.currency === currency && decimal(v.original_amount)
     && (v.original_currency === "EUR" || v.original_currency === "USD") && (v.source === "cardmarket" || v.source === "tcgplayer")
     && (v.metric === "trend" || v.metric === "marketPrice") && timestamp(v.updated_at) && typeof v.stale === "boolean";
 }
 /** Exactly one of price or reason: a copy is either priced or explains why not. */
-function priced(v: Record<string, unknown>, currency: Currency) {
+export function priced(v: Record<string, unknown>, currency: Currency) {
   return (v.price === null && isReason(v.reason)) || (v.reason === null && isQuote(v.price, currency));
 }
 function isCopyPrice(v: unknown, currency: Currency): v is CopyPrice {
@@ -88,16 +90,20 @@ export async function fetchCopyPrices(copyIds: string[], currency: Currency, sig
   return v as CopyPrices;
 }
 
+export const DEFAULT_TOP = 5;
+export const MAX_TOP = 20;
 function isValuation(v: unknown, currency: Currency): v is Valuation {
   return record(v) && v.currency === currency && (v.total === null || decimal(v.total)) && amounts(v.original_totals)
     && count(v.copy_count) && count(v.priced_count) && count(v.unpriced_count) && v.priced_count + v.unpriced_count === v.copy_count
     && counts(v.unpriced_by_reason, reasons) && count(v.pending_count) && count(v.stale_count) && counts(v.sources, ["cardmarket", "tcgplayer"] as const)
-    && Array.isArray(v.top) && v.top.length <= 5 && v.top.every((row) => isCopyPrice(row, currency) && (row as CopyPrice).price !== null)
+    && timestamp(v.prices_updated_at) && Array.isArray(v.top) && v.top.length <= MAX_TOP && v.top.every((row) => isCopyPrice(row, currency) && (row as CopyPrice).price !== null)
     && isRates(v.rates);
 }
-export async function fetchCollectionValue(currency: Currency, signal: AbortSignal): Promise<Valuation> {
-  const v = await request(`/prices/collection?${query(currency)}`, signal);
-  if (!isValuation(v, currency)) throw new PricesError(0);
+/** `top` is how many of the most valuable copies come back (1-20; the default of 5 sends nothing extra). */
+export async function fetchCollectionValue(currency: Currency, signal: AbortSignal, top = DEFAULT_TOP): Promise<Valuation> {
+  if (!Number.isInteger(top) || top < 1 || top > MAX_TOP) throw new PricesError(422);
+  const v = await request(`/prices/collection?${query(currency)}${top === DEFAULT_TOP ? "" : `&top=${top}`}`, signal);
+  if (!isValuation(v, currency) || v.top.length > top) throw new PricesError(0);
   return v;
 }
 export async function fetchBinderValue(binderId: string, currency: Currency, signal: AbortSignal): Promise<Valuation> {
@@ -124,6 +130,7 @@ export async function fetchBinderValues(currency: Currency, signal: AbortSignal)
   return v as BinderValues;
 }
 
+export { isCurrency };
 export async function fetchCurrencySetting(signal: AbortSignal): Promise<Currency> {
   const v = await request("/me/settings", signal);
   if (!record(v) || !isCurrency(v.preferred_currency) || Object.keys(v).length !== 1) throw new PricesError(0);

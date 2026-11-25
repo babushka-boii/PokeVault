@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../app/App";
 import { binder, callsTo, homeCards, homeValuation, physicalCopy, ratesDown, stubHome, userA, userB } from "../test/homeFixtures";
-import { stubMedia } from "../test/media";
 import { copyId, noRates, valuation } from "../test/priceFixtures";
 import { jsonResponse as json } from "../test/tcgFixtures";
 
@@ -11,7 +10,7 @@ afterEach(() => vi.unstubAllGlobals());
 const main = () => within(screen.getByRole("main"));
 
 describe("value hero", () => {
-  test("shows the total, counts, the variant shortcut, the reference note and the attribution", async () => {
+  test("shows the total, counts, the variant shortcut, the one price note and the attribution", async () => {
     stubHome();
     render(<App initialEntries={["/"]} />);
     expect(await main().findByText("VALOR DE TU COLECCIÓN")).toBeVisible();
@@ -20,7 +19,7 @@ describe("value hero", () => {
     expect(hero.getByText("5 copias")).toBeVisible();
     expect(hero.getByText("3 con precio")).toBeVisible();
     expect(hero.getByRole("link", { name: "2 sin variante · indicar" })).toHaveAttribute("href", "/collection?variant=unknown");
-    expect(hero.getByText(/Precio de referencia del mercado/)).toBeVisible();
+    expect(hero.getByText(/^Precios de referencia · actualizados hace/)).toBeVisible();
     const attribution = hero.getByRole("link", { name: "Rates By Exchange Rate API" });
     expect(attribution).toHaveAttribute("href", "https://www.exchangerate-api.com");
     expect(attribution).toHaveAttribute("target", "_blank");
@@ -68,29 +67,6 @@ describe("value hero", () => {
     const status = await screen.findByText("Cargando valor…");
     expect(status.parentElement).toHaveAttribute("aria-busy", "true");
     expect(within(status.parentElement!).queryByRole("progressbar")).not.toBeInTheDocument();
-  });
-});
-
-describe("most valuable cards", () => {
-  test("lists the top five in price order with names, prices and copy links", async () => {
-    stubHome();
-    render(<App initialEntries={["/"]} />);
-    const top = await screen.findByRole("region", { name: "Tus cartas más valiosas" });
-    const links = await within(top).findAllByRole("link", { name: /^Card \d/ });
-    expect(links.map((link) => link.getAttribute("href"))).toEqual([0, 1, 2, 3, 4].map((index) => `/collection/${copyId(100 + index)}`));
-    expect(links.map((link) => link.textContent)).toEqual(["Card 1", "Card 2", "Card 3", "Card 4", "Card 5"]);
-    expect(within(top).getAllByText(/Holográfica/)).toHaveLength(5);
-    expect(within(top).getByRole("link", { name: "Ver mi colección" })).toHaveAttribute("href", "/collection");
-  });
-
-  test("drops card tilt and glare under reduced motion", async () => {
-    stubMedia({ reducedMotion: true });
-    stubHome();
-    render(<App initialEntries={["/"]} />);
-    const top = await screen.findByRole("region", { name: "Tus cartas más valiosas" });
-    await within(top).findAllByRole("link", { name: /^Card \d/ });
-    expect(within(top).queryByRole("button", { name: "Inclinar carta" })).not.toBeInTheDocument();
-    expect(top.querySelector(".tcg-card-glare")).toBeNull();
   });
 });
 
@@ -184,15 +160,14 @@ describe("expansions", () => {
 });
 
 describe("empty collection", () => {
-  test("replaces the data sections with a friendly first step", async () => {
-    stubHome({ valuation: valuation({ copy_count: 0, priced_count: 0, unpriced_count: 0, unpriced_by_reason: {}, total: "0", original_totals: {}, top: [], rates: noRates }) });
+  test("keeps every section, each with its own empty state (the hero is covered in HomeHero.test)", async () => {
+    stubHome({ valuation: valuation({ copy_count: 0, priced_count: 0, unpriced_count: 0, unpriced_by_reason: {}, total: "0", original_totals: {}, top: [], rates: noRates, prices_updated_at: null }), binders: [] });
     render(<App initialEntries={["/"]} />);
+    expect(await main().findByText("Agrega tu primera carta")).toBeVisible();
+    expect(await main().findByText("Aún no hay copias con precio para mostrar.")).toBeVisible();
     expect(await main().findByRole("heading", { name: "Tu primera carpeta te espera" })).toBeVisible();
-    expect(main().getByText("Escanea o busca una carta para empezar tu colección.")).toBeVisible();
-    expect(main().getByRole("link", { name: "Buscar en expansiones" })).toHaveAttribute("href", "/sets");
-    expect(main().getAllByRole("link", { name: "Escanear carta" }).length).toBeGreaterThan(0);
-    expect(main().queryByRole("region", { name: "Tus cartas más valiosas" })).not.toBeInTheDocument();
-    expect(main().queryByRole("region", { name: "Mis carpetas" })).not.toBeInTheDocument();
+    expect(main().getByRole("region", { name: "Mis carpetas" })).toBeVisible();
+    expect(main().getByRole("region", { name: "Expansiones" })).toBeVisible();
   });
 });
 
@@ -202,12 +177,15 @@ describe("failures and sessions", () => {
     const request = stubHome({ valuation: () => fail ? json({}, 503) : json(homeValuation()) });
     const user = userEvent.setup();
     render(<App initialEntries={["/"]} />);
-    expect(await main().findByText("No se pudo cargar el valor de tu colección.")).toBeVisible();
+    expect(await main().findByText("No pudimos cargar el valor de tu colección por ahora. Tus cartas están a salvo.")).toBeVisible();
     expect(await screen.findByRole("link", { name: "Favoritas" })).toBeVisible();
     expect(await screen.findByRole("region", { name: "Expansiones" })).toBeVisible();
-    expect(main().getByRole("region", { name: "Tus cartas más valiosas" })).toBeVisible();
+    expect(main().getByRole("region", { name: "Tus cartas" })).toBeVisible();
+    expect(main().getByText("No pudimos cargar tus cartas más valiosas por ahora.")).toBeVisible();   // the carousel explains, the hero retries
     fail = false;
-    await user.click(main().getByRole("button", { name: "Reintentar" }));
+    // The hero and the "most valuable" view both offer a retry for the same request: either one works.
+    expect(main().getAllByRole("button", { name: "Reintentar" })).toHaveLength(2);
+    await user.click(main().getAllByRole("button", { name: "Reintentar" })[0]);
     expect(await main().findByText(/1\.112/)).toBeVisible();
     expect(callsTo(request, "/api/v1/prices/collection")).toHaveLength(2);
     expect(callsTo(request, "/api/v1/binders")).toHaveLength(1);
@@ -216,7 +194,7 @@ describe("failures and sessions", () => {
   test("a binders failure leaves the value and expansions working", async () => {
     stubHome({ override: (url) => url.pathname === "/api/v1/binders" ? json({}, 500) : undefined });
     render(<App initialEntries={["/"]} />);
-    expect(await main().findByText("No se pudieron cargar tus carpetas.")).toBeVisible();
+    expect(await main().findByText("No pudimos cargar tus carpetas por ahora.")).toBeVisible();
     expect(await main().findByText(/1\.112/)).toBeVisible();
     expect(await screen.findByRole("region", { name: "Expansiones" })).toBeVisible();
   });

@@ -71,12 +71,18 @@ export function parsePokemonNumber(value: string | undefined): number | undefine
   return number <= NATIONAL_DEX_TOTAL ? number : undefined;
 }
 
-/** Only local catalog destinations may be used for a return link. */
+/** The catalog card page, remembering where it was opened from (a path that safeReturnTo accepts). */
+export function cardPath(cardId: string, returnTo?: string): string {
+  return `/cards/${encodeURIComponent(cardId)}${returnTo ? `?${new URLSearchParams({ returnTo })}` : ""}`;
+}
+
+/** Only local catalog destinations (and Home) may be used for a return link. */
 export function safeReturnTo(value: string | null | undefined): string {
   const fallback = "/pokedex";
   if (!value || value.length > 2048 || /[\\#\s]/.test(value) ||
     Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return fallback;
   const path = value.split("?")[0];
+  if (value === "/") return value;   // Home, with nothing after it
   if (path === "/pokedex" || path === "/sets" || path === "/scanner") return value;
   const expansion = /^\/sets\/([^/]+)$/.exec(path);
   if (expansion && isSetId(expansion[1])) return value;

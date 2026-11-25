@@ -79,6 +79,10 @@ class UserSettings(Base):
     preferred_currency: Mapped[str] = mapped_column(
         String(3), nullable=False, default="CLP", server_default="CLP"
     )
+    # Set once the student closes the new-user guide, or when its three steps are done.
+    home_guide_dismissed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
 
 
 class AuthSession(Base):
@@ -298,5 +302,73 @@ class ExchangeRate(Base):
     rates_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_attempt_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class CardFavorite(Base):
+    """A catalog card the user starred (per card, not per physical copy)."""
+
+    __tablename__ = "card_favorites"
+    __table_args__ = (
+        CheckConstraint("length(card_id) BETWEEN 1 AND 100", name="ck_favorites_card"),
+        Index("ix_card_favorites_owner_date", "user_id", "created_at"),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    card_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class CollectionValueDay(Base):
+    """One recorded collection value per user and calendar day.
+
+    Original totals are always present; the converted totals and the rates that
+    produced them are all present or all null (no rates that day, no point).
+    """
+
+    __tablename__ = "collection_value_days"
+    __table_args__ = (
+        CheckConstraint("eur_total >= 0", name="ck_value_days_eur"),
+        CheckConstraint("usd_original_total >= 0", name="ck_value_days_usd_original"),
+        CheckConstraint(
+            "clp_total IS NULL OR clp_total >= 0", name="ck_value_days_clp"
+        ),
+        CheckConstraint(
+            "usd_total IS NULL OR usd_total >= 0", name="ck_value_days_usd"
+        ),
+        CheckConstraint("usd_clp IS NULL OR usd_clp > 0", name="ck_value_days_usd_clp"),
+        CheckConstraint(
+            "eur_per_usd IS NULL OR eur_per_usd > 0", name="ck_value_days_eur_per_usd"
+        ),
+        CheckConstraint(
+            "(clp_total IS NULL) = (usd_total IS NULL) "
+            "AND (clp_total IS NULL) = (usd_clp IS NULL) "
+            "AND (clp_total IS NULL) = (eur_per_usd IS NULL)",
+            name="ck_value_days_all_or_none",
+        ),
+        CheckConstraint(
+            "copy_count >= 0 AND priced_count >= 0 AND priced_count <= copy_count",
+            name="ck_value_days_counts",
+        ),
+    )
+
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    eur_total: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+    usd_original_total: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+    clp_total: Mapped[Decimal | None] = mapped_column(Numeric(16, 0))
+    usd_total: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
+    usd_clp: Mapped[Decimal | None] = mapped_column(Numeric(14, 6))
+    eur_per_usd: Mapped[Decimal | None] = mapped_column(Numeric(14, 6))
+    copy_count: Mapped[int] = mapped_column(nullable=False)
+    priced_count: Mapped[int] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

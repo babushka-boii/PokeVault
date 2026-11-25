@@ -74,6 +74,8 @@ class Valuation(BaseModel):
     unpriced_by_reason: dict[str, int]
     pending_count: int
     stale_count: int
+    # The age of the least fresh price used: the oldest fetch time among priced copies.
+    prices_updated_at: datetime | None = None
     sources: dict[str, int]
     top: list[CopyPrice]
     rates: RatesInfo

@@ -31,6 +31,7 @@ const sorted = (pockets: Pocket[]) => [...pockets].sort((a, b) => (a.page - b.pa
 export function binderWorld(initial: { binders: { name: string; pockets: Pocket[] }[]; tray?: ReturnType<typeof physical>[] }) {
   const state = initial.binders.map((binder, index) => ({ id: binderId(index + 1), name: binder.name, order: index, pockets: sorted(binder.pockets) }));
   let tray = [...(initial.tray ?? [])];
+  const favorites = new Set<string>();
   const calls: { method: string; path: string; body: unknown }[] = [];
   const failures: Record<string, () => Response> = {};
   const detail = (b: typeof state[number]) => ({ ...binderSummary(Number(b.id.slice(-12)), b.name, b.pockets, b.order), pockets: b.pockets });
@@ -57,13 +58,18 @@ export function binderWorld(initial: { binders: { name: string; pockets: Pocket[
     calls.push({ method, path, body });
     const failure = failures[`${method} ${path}`]; if (failure) { delete failures[`${method} ${path}`]; return failure(); }
     if (path === "/api/v1/auth/me") return json(binderSession);
+    if (path.startsWith("/api/v1/favorites/")) {
+      const card = decodeURIComponent(path.split("/").pop()!);
+      if (method === "PUT") favorites.add(card); if (method === "DELETE") favorites.delete(card);
+      return json({ card_id: card, favorite: favorites.has(card) });
+    }
     if (path === "/api/v1/me/settings") return json({ preferred_currency: "CLP" });
     if (path.startsWith("/api/v1/cards/")) { const card = binderCards.find((c) => c.id === decodeURIComponent(path.split("/").pop()!)); return card ? json(card) : json({}, 404); }
     if (path === "/api/v1/prices/copies") {
       return json({ currency: "CLP", rates, results: url.searchParams.getAll("copy_id").map((id) => ({ copy_id: id, card_id: "sv1-1", variant: "holo", price: quote("1500", "CLP", "1.20"), reason: null })) });
     }
     if (path === "/api/v1/prices/binders") return json({ currency: "CLP", rates, results: state.map((b) => ({ binder_id: b.id, total: String(b.pockets.length * 1500), original_totals: { EUR: "1.2" }, copy_count: b.pockets.length, priced_count: b.pockets.length, pending_count: 0, stale_count: 0 })) });
-    if (/\/api\/v1\/binders\/[^/]+\/value$/.test(path)) return json({ currency: "CLP", total: "1500", original_totals: { EUR: "1.2" }, copy_count: 1, priced_count: 1, unpriced_count: 0, unpriced_by_reason: {}, pending_count: 0, stale_count: 0, sources: { cardmarket: 1 }, top: [], rates });
+    if (/\/api\/v1\/binders\/[^/]+\/value$/.test(path)) return json({ currency: "CLP", total: "1500", original_totals: { EUR: "1.2" }, copy_count: 1, priced_count: 1, unpriced_count: 0, unpriced_by_reason: {}, pending_count: 0, stale_count: 0, prices_updated_at: "2026-11-25T09:00:00Z", sources: { cardmarket: 1 }, top: [], rates });
     if (path === "/api/v1/binders/views/unassigned") return json({ results: tray.slice(0, 30), total: tray.length, offset: 0, limit: 30 });
     if (path === "/api/v1/binders" && method === "GET") return json({ results: state.map((b) => binderSummary(Number(b.id.slice(-12)), b.name, b.pockets, b.order)), total: state.length });
     if (path === "/api/v1/binders" && method === "POST") { const created = { id: binderId(state.length + 1), name: body.name, order: state.length, pockets: [] }; state.push(created); return json(binderSummary(state.length, created.name, [], created.order), 201); }
@@ -92,6 +98,6 @@ export function binderWorld(initial: { binders: { name: string; pockets: Pocket[
     throw new Error(`Unexpected ${method} ${path}`);
   });
   vi.stubGlobal("fetch", request);
-  return { request, calls, state, fail: (method: string, path: string, response: () => Response) => { failures[`${method} ${path}`] = response; },
+  return { request, calls, state, favorites, fail: (method: string, path: string, response: () => Response) => { failures[`${method} ${path}`] = response; },
     mutations: () => calls.filter((c) => c.method !== "GET") };
 }

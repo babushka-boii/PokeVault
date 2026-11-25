@@ -15,7 +15,7 @@ export type BinderList = { results: BinderSummary[]; total: number };
 export type MovedFrom = { binder_id: string; binder_name: string; page: number; pocket: number };
 export type StoreResult = { page: number; pocket: number; moved_from: MovedFrom | null; binder: Binder };
 export type CopyLocation = { copy_id: string; binder_id: string; binder_name: string; page: number; pocket: number };
-export type CopyView = "owned" | "unassigned" | "recent";
+export type CopyView = "owned" | "unassigned" | "recent" | "added";
 export type CopyViewPage = { results: InventoryCopy[]; total: number; offset: number; limit: number };
 export class BindersError extends Error {
   constructor(public readonly status: number, public readonly detail: string | null = null) { super("Binders request failed"); }

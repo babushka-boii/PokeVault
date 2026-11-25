@@ -478,3 +478,13 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Álbum, acciones en contexto, gestos, detalle de copia, pruebas y documentación. La aceptación visual la hace el estudiante en su navegador.
+
+## Iteración 9A — Inicio final (2026-11-25)
+
+### Decisiones del estudiante
+
+- Aprobó D1–D16, con el carrusel continuo en bucle y el gráfico que une los registros reales sin cortar la línea. Pidió la regla de commits de `CLAUDE.md`.
+
+### Uso de IA (Claude Code)
+
+- Spec, plan, migración, backend, frontend, pruebas y documentación. La aceptación visual la hace el estudiante en su navegador.

@@ -1,13 +1,16 @@
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
+import { useState } from "react";
 import { useCollectionValuation } from "../components/prices/useCollectionValuation";
-import { EmptyHome } from "../components/home/EmptyHome";
+import { useHistory } from "../components/prices/useHistory";
 import { GuestHome } from "../components/home/GuestHome";
+import { HomeGuide } from "../components/home/HomeGuide";
+import { CardCarousel, CAROUSEL_SIZE } from "../components/home/CardCarousel";
+import { ValueChart } from "../components/charts/ValueChart";
 import { BinderShelf } from "../components/home/BinderShelf";
 import { ScannerCard } from "../components/home/ScannerCard";
 import { SetsProgress } from "../components/home/SetsProgress";
 import { SystemStatusFooter } from "../components/home/SystemStatusFooter";
-import { TopCards } from "../components/home/TopCards";
 import { ValueHero } from "../components/home/ValueHero";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useLocale } from "../i18n/LocaleProvider";
@@ -15,17 +18,21 @@ import "../components/home/home.css";
 
 /** Each section owns its request, skeleton and error; only the valuation is shared by the hero and the top cards. */
 function SignedInHome() {
-  const valuation = useCollectionValuation();
-  const empty = valuation.state.kind === "loaded" && valuation.state.data.copy_count === 0;
+  // The hero and the carousel's "most valuable" view share one valuation request (top 12).
+  const valuation = useCollectionValuation(CAROUSEL_SIZE);
+  // One shared history request: the hero reads its 7-day baseline from it, and so will the chart.
+  const history = useHistory("30d");
+  // The guide asks the carousel to come into view (a counter, so asking twice works twice).
+  const [showCards, setShowCards] = useState(0);
   return <>
     <div className="pv-home__grid">
-      {empty ? <EmptyHome /> : <ValueHero resource={valuation} />}
+      <ValueHero resource={valuation} history={history} />
       <div className="pv-home__side"><ScannerCard /></div>
-      {!empty && <>
-        <TopCards resource={valuation} />
-        <BinderShelf />
-        <SetsProgress />
-      </>}
+      <HomeGuide onFavorite={() => setShowCards((count) => count + 1)} />
+      <CardCarousel valuation={valuation} focusRequest={showCards} />
+      <BinderShelf />
+      <SetsProgress />
+      <ValueChart shared={history} />
     </div>
     <SystemStatusFooter />
   </>;

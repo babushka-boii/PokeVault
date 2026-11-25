@@ -207,6 +207,69 @@ describe("stylesheets", () => {
     expect(caption).toMatch(/min-height:\s*20px/);
   });
 
+  test("the Home bookcase uses decorative wood tokens, keeps text off the wood and shows one scrolling shelf on phones", () => {
+    const css = stripComments(sheets["/src/components/home/home.css"]);
+    const values = tokens();
+    for (const name of ["--pv-wood-dark", "--pv-wood-mid", "--pv-wood-light"]) expect(resolve(values, name), name).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    // Wood colours only paint the frame and the planks, never a `color:` (text).
+    const woodRules = rules(css).filter((rule) => rule.body.includes("--pv-wood-"));
+    expect(woodRules.length).toBeGreaterThan(0);
+    for (const rule of woodRules) expect(rule.body, rule.selector).not.toMatch(/(^|;)\s*color:/);
+    // Planks are decoration: they take no pointer events and carry no content.
+    const plank = rules(css).find((rule) => rule.selector === ".pv-bookcase__item::after")?.body ?? "";
+    expect(plank).toMatch(/pointer-events:\s*none/);
+    expect(plank).toMatch(/content:\s*""/);
+    // Wood is used nowhere else in the app's styles.
+    const elsewhere = Object.entries(sheets).filter(([file, text]) => file !== "/src/components/home/home.css" && file !== TOKENS && text.includes("--pv-wood-"));
+    expect(elsewhere.map(([file]) => file)).toEqual([]);
+    // Phones: a single row that scrolls sideways.
+    const phone = rules(css).filter((rule) => rule.selector === ".pv-bookcase").map((rule) => rule.body).find((body) => body.includes("grid-auto-flow")) ?? "";
+    expect(css).toMatch(/@media \(max-width: 767px\)\s*\{[^@]*\.pv-bookcase \{[^}]*grid-auto-flow/);
+    expect(phone).toMatch(/grid-auto-flow:\s*column/);
+    expect(phone).toMatch(/overflow-x:\s*auto/);
+  });
+
+  test("the large avatar is a square with the diagonal cut and a picture that covers it", () => {
+    const css = stripComments(sheets["/src/components/shell/shell.css"]);
+    const frame = rules(css).find((rule) => rule.selector === ".pv-avatar-frame")?.body ?? "";
+    expect(frame).toMatch(/width:\s*var\(--pv-avatar-size/);
+    expect(frame).toMatch(/height:\s*var\(--pv-avatar-size/);
+    expect(frame).not.toMatch(/border-radius/);                       // never a circle
+    const fill = rules(css).find((rule) => rule.selector === ".pv-avatar-frame__fill")?.body ?? "";
+    expect(fill).toMatch(/object-fit:\s*cover/);
+    expect(fill).toMatch(/width:\s*100%/);
+    expect(fill).toMatch(/height:\s*100%/);
+    expect(fill).toMatch(/clip-path:\s*polygon\(/);                  // the corner cut of the system
+    expect(rules(stripComments(sheets["/src/components/home/home.css"])).find((rule) => rule.selector === ".pv-home__trainer")?.body ?? "").not.toMatch(/border|background|overflow/);
+  });
+
+  test("every chip in the Home hero shares one box, whether it is text, a link or a button", () => {
+    const css = stripComments(sheets["/src/components/home/home.css"]);
+    const box = rules(css).find((rule) => rule.selector === ".pv-home__chips .pv-chip")?.body ?? "";
+    for (const property of ["min-height", "padding", "font-size", "line-height", "box-sizing", "display"]) expect(box, property).toMatch(new RegExp(`(^|;)\\s*${property}:`));
+    // The variants may only change colour and decoration on hover: never the box.
+    const variants = rules(css).filter((rule) => /\.pv-home__chips .*pv-chip--/.test(rule.selector)).map((rule) => rule.body).join(";");
+    expect(variants).not.toMatch(/(min-height|padding|font-size|line-height|height|width|border-width):/);
+    expect(variants).toMatch(/text-decoration:\s*underline/);
+  });
+
+  test("the quick star shows on hover or focus, always (smaller) without hover, and respects reduced motion", () => {
+    const css = stripComments(sheets["/src/components/home/home.css"]);
+    const star = rules(css).find((rule) => rule.selector === ".pv-reel__star")?.body ?? "";
+    expect(star).toMatch(/opacity:\s*0/);
+    expect(star).toMatch(/position:\s*absolute/);
+    expect(star).toMatch(/top:/); expect(star).toMatch(/right:/);
+    expect(star).toMatch(/height:\s*var\(--pv-touch\)/);
+    const shown = rules(css).find((rule) => /\.pv-reel__item:hover \.pv-reel__star/.test(rule.selector));
+    expect(shown?.selector).toMatch(/\.pv-reel__item:focus-within \.pv-reel__star/);
+    expect(shown?.selector).toMatch(/\.pv-reel__star:focus-visible/);
+    expect(shown?.body).toMatch(/opacity:\s*1/);
+    const touch = /@media \(hover: none\)\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    expect(touch).toMatch(/\.pv-reel__star \{[^}]*opacity:\s*1/);
+    expect(touch).toMatch(/\.pv-reel__star \{[^}]*height:\s*32px/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.pv-reel__star \{\s*transition:\s*none/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);

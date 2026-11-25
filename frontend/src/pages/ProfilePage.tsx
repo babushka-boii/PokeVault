@@ -16,7 +16,7 @@ export function ProfilePage() {
     <SessionNotice />
     {auth.status === "authenticated" && <>
       {!auth.validating && <div className="auth-profile">
-        <Avatar key={`${auth.user.id}:${auth.user.picture_url}`} user={auth.user} />
+        <Avatar key={`${auth.user.id}:${auth.user.picture_url}`} user={auth.user} className="" size={96} cut />
         <div className="auth-identity">
           <h2>{auth.user.display_name.trim() || dictionary.auth.account}</h2>
           {auth.user.email && <p>{auth.user.email}</p>}

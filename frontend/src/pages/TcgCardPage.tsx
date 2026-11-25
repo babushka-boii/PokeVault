@@ -5,6 +5,7 @@ import { CardArtwork } from "../components/cards/CardArtwork";
 import { CardLanguageNote } from "../components/cards/CardLanguageNote";
 import { InteractiveCard } from "../components/cards/InteractiveCard";
 import { CardPricePanel } from "../components/prices/CardPricePanel";
+import { FavoriteStar } from "../components/cards/FavoriteStar";
 import { SetLogo } from "../components/cards/SetLogo";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
@@ -27,6 +28,7 @@ export function TcgCardPage() {
   const fromGallery = /^\/pokemon\/\d+\/cards(?:\?|$)/.test(returnTo);
   const fromSet = /^\/sets\/[^/?]+(?:\?|$)/.test(returnTo);
   const fromScanner = /^\/scanner(?:\?|$)/.test(returnTo);
+  const fromHome = returnTo === "/";
   const nestedReturn = fromGallery ? new URLSearchParams(returnTo.split("?")[1] ?? "").get("returnTo") : null;
   // Validate the nested destination separately; even a valid gallery URL may contain untrusted query values.
   const candidateOrigin = safeReturnTo(nestedReturn);
@@ -35,7 +37,7 @@ export function TcgCardPage() {
 
   return <section className="panel tcg-page tcg-card-page" aria-labelledby="tcg-card-title">
     <nav className="tcg-detail-navigation" aria-label={text.cardInformation}>
-      <Link className="tcg-back" to={returnTo}><span aria-hidden="true">← </span>{fromScanner ? dictionary.scanner.back : fromSet ? dictionary.sets.backSet : fromGallery ? text.backGallery : text.back}</Link>
+      <Link className="tcg-back" to={returnTo}><span aria-hidden="true">← </span>{fromHome ? text.backHome : fromScanner ? dictionary.scanner.back : fromSet ? dictionary.sets.backSet : fromGallery ? text.backGallery : text.back}</Link>
       {fromGallery && <Link className="tcg-origin" to={origin}>{text.backPokedex}<span aria-hidden="true"> ↗</span></Link>}
     </nav>
     {!card && <h1 id="tcg-card-title" tabIndex={-1} ref={heading}>{text.detailTitle}</h1>}
@@ -68,6 +70,7 @@ export function TcgCardPage() {
               </dl>
               <CardLanguageNote card={card} />
             </header>
+            <FavoriteStar cardId={card.id} />
             <AddToCollection cardId={card.id} />
             <CardPricePanel cardId={card.id} />
             {card.category === "Pokemon" && <section className="tcg-detail-section tcg-pokemon-traits" aria-label={text.cardInformation}>

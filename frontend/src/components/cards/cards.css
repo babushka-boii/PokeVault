@@ -111,3 +111,11 @@
 @media (max-width: 390px) { .tcg-detail-navigation { gap: .8rem; } .tcg-back { font-size: .8rem; } .tcg-origin { font-size: .7rem; } .tcg-artwork-stage { padding: .85rem; } }
 @media (prefers-reduced-motion: reduce) { .tcg-artwork--loading { animation: none; } }
 .pv-sprite-missing { color: var(--pv-text-3); display: grid; font-size: 1.5rem; place-items: center; }
+
+/* The favourite star (a catalog card, not a copy). */
+.pv-favorite { align-items: center; display: flex; flex-wrap: wrap; gap: var(--pv-space-2) var(--pv-space-3); margin: var(--pv-space-2) 0; }
+.pv-favorite__button { align-items: center; background: transparent; border: 1px solid var(--pv-border-strong); color: var(--pv-text); cursor: pointer; display: inline-flex; font: inherit; gap: var(--pv-space-2); min-height: var(--pv-touch); padding: 0 var(--pv-space-4); }
+.pv-favorite__button[aria-pressed="true"] { border-color: var(--pv-gold); color: var(--pv-gold); }
+.pv-favorite__button[aria-pressed="true"] [aria-hidden] { text-shadow: 0 0 6px var(--pv-gold-soft); }
+.pv-favorite__button:disabled { cursor: default; opacity: .6; }
+.pv-favorite__note { color: var(--pv-text-2); font-size: var(--pv-text-sm); margin: 0; }

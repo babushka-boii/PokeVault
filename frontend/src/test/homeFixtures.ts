@@ -4,7 +4,7 @@ import { setProgress } from "./setFixtures";
 import { jsonResponse as json, pikachuCard } from "./tcgFixtures";
 import type { Valuation } from "../services/prices";
 
-export const userA = { id: "4f6a3fab-002c-44e1-b3e8-0247badc013c", display_name: "Ash Ketchum", email: "ash@example.test", email_verified: true, picture_url: null };
+export const userA = { id: "4f6a3fab-002c-44e1-b3e8-0247badc013c", display_name: "Ash Ketchum", email: "ash@example.test", email_verified: true, picture_url: null as string | null };
 export const userB = { ...userA, id: "9b1d5c7e-1111-4222-8333-444455556666", display_name: "Misty Waterflower" };
 
 /** Eight cards, each in its own expansion, so set deduplication and the six-row cap are observable. */
@@ -32,14 +32,24 @@ export function homeValuation(extra: Partial<Valuation> = {}): Valuation {
 export const ratesDown = { rates: noRates, total: null, priced_count: 0, top: [] as Valuation["top"] };
 
 type Handler = (url: URL, options?: RequestInit) => Response | Promise<Response> | undefined;
+export const emptyHistory = { started_on: null as string | null, points: [] as { day: string; total: string }[], baseline: null as { day: string; total: string } | null };
+export const openGuide = { has_copy: true, has_stored: true, has_favorite: false, dismissed: true };   // closed by default: most tests are not about it
+export const noFavorites = { total: 0, results: [] as unknown[] };
 export type HomeData = {
   user?: typeof userA; guest?: boolean; valuation?: Valuation | (() => Response | Promise<Response>); binders?: unknown[];
-  pockets?: HomePocket[]; unassigned?: number; recent?: ReturnType<typeof physicalCopy>[];
+  pockets?: HomePocket[]; unassigned?: number; recent?: ReturnType<typeof physicalCopy>[]; added?: ReturnType<typeof physicalCopy>[];
   progress?: (setIds: string[]) => unknown[]; override?: Handler;
+  /** The recorded history; the range and currency in the URL are echoed back. A function answers by itself. */
+  history?: Partial<typeof emptyHistory> | ((url: URL) => Response | Promise<Response>);
+  guide?: Partial<typeof openGuide> | (() => Response | Promise<Response>);
+  favorites?: { total?: number; results: unknown[] } | (() => Response | Promise<Response>);
+  /** Card ids that start out starred. */
+  starred?: string[];
 };
 
 /** Routes every request by path and fails loudly on anything unplanned. */
 export function stubHome(data: HomeData = {}) {
+  const starred = new Set<string>(data.starred ?? []);
   const request = vi.fn((input: string, options?: RequestInit) => {
     const url = new URL(input); const path = url.pathname;
     const custom = data.override?.(url, options); if (custom) return Promise.resolve(custom);
@@ -50,6 +60,29 @@ export function stubHome(data: HomeData = {}) {
       const value = data.valuation ?? homeValuation();
       return Promise.resolve(typeof value === "function" ? value() : json({ ...value, currency: url.searchParams.get("currency") ?? "CLP" }));
     }
+    if (path === "/api/v1/collection/history") {
+      const history = data.history ?? {};
+      if (typeof history === "function") return Promise.resolve(history(url));
+      return Promise.resolve(json({ currency: url.searchParams.get("currency") ?? "CLP", range: url.searchParams.get("range") ?? "30d", ...emptyHistory, ...history }));
+    }
+    if (path === "/api/v1/home/guide") {
+      const guide = data.guide ?? {};
+      return Promise.resolve(typeof guide === "function" ? guide() : json({ ...openGuide, ...guide }));
+    }
+    if (path === "/api/v1/favorites/status") {
+      const asked = url.searchParams.getAll("card_id");
+      return Promise.resolve(json({ card_ids: asked.filter((id) => starred.has(id)) }));
+    }
+    if (path.startsWith("/api/v1/favorites/") && path !== "/api/v1/favorites/cards") {
+      const card = decodeURIComponent(path.split("/").pop()!); const method = options?.method ?? "GET";
+      if (method === "PUT") starred.add(card); if (method === "DELETE") starred.delete(card);
+      return Promise.resolve(json({ card_id: card, favorite: starred.has(card) }));
+    }
+    if (path === "/api/v1/favorites/cards") {
+      // Unless the test fixes the list, the favourites are whatever is starred now (newest first).
+      const favorites = data.favorites ?? { results: [...starred].reverse().map((id) => ({ card_id: id, favorited_at: "2026-11-25T12:00:00Z", price: quote("2500", "CLP", "2.00"), reason: null })) };
+      return Promise.resolve(typeof favorites === "function" ? favorites() : json({ currency: url.searchParams.get("currency") ?? "CLP", rates, total: favorites.results.length, ...favorites }));
+    }
     if (path === "/api/v1/binders") { const binders = data.binders ?? [binder(1, "Favoritas")]; return Promise.resolve(json({ results: binders, total: binders.length })); }
     if (path === "/api/v1/prices/binders") {
       const binders = (data.binders ?? [binder(1, "Favoritas")]) as { id: string; copy_count: number }[];
@@ -57,6 +90,13 @@ export function stubHome(data: HomeData = {}) {
         binder_id: b.id, total: String(b.copy_count * 1500), original_totals: { EUR: "1.2" }, copy_count: b.copy_count, priced_count: b.copy_count, pending_count: 0, stale_count: 0 })) }));
     }
     if (path === "/api/v1/binders/views/unassigned") return Promise.resolve(json({ results: [], total: data.unassigned ?? 0, offset: 0, limit: 30 }));
+    if (path === "/api/v1/binders/views/added") { const added = data.added ?? data.recent ?? [physicalCopy(0), physicalCopy(1)]; return Promise.resolve(json({ results: added, total: added.length, offset: 0, limit: 30 })); }
+    if (path === "/api/v1/prices/copies") {
+      return Promise.resolve(json({ currency: url.searchParams.get("currency") ?? "CLP", rates, results: url.searchParams.getAll("copy_id").map((id) => {
+        const copy = [...(data.added ?? data.recent ?? [physicalCopy(0), physicalCopy(1)])].find((c) => c.id === id);
+        return { copy_id: id, card_id: copy?.card_id ?? homeCards[0].id, variant: copy?.variant ?? "holo", price: quote("2500", "CLP", "2.00"), reason: null };
+      }) }));
+    }
     if (path === "/api/v1/binders/views/recent") { const recent = data.recent ?? [physicalCopy(0), physicalCopy(1)]; return Promise.resolve(json({ results: recent, total: recent.length, offset: 0, limit: 30 })); }
     if (path.startsWith("/api/v1/binders/")) {
       const id = path.split("/").pop();
@@ -64,6 +104,7 @@ export function stubHome(data: HomeData = {}) {
       const pockets = data.pockets ?? [pocketAt(1, 3, physicalCopy(0)), pocketAt(1, 4, physicalCopy(1))];
       return Promise.resolve(json({ ...known, copy_count: pockets.length, pockets }));
     }
+    if (path.startsWith("/api/v1/prices/cards/")) return Promise.resolve(json({ card_id: path.split("/").pop(), currency: "CLP", language_independent: true, rates, variants: [{ variant: "normal", price: quote("38"), reason: null }, { variant: "reverse", price: null, reason: "no_market_data" }, { variant: "holo", price: null, reason: "no_market_data" }] }));
     if (path.startsWith("/api/v1/cards/")) { const card = cardById[decodeURIComponent(path.split("/").pop()!)]; return Promise.resolve(card ? json(card) : json({}, 404)); }
     if (path === "/api/v1/sets/progress") {
       const ids = url.searchParams.getAll("set_id");
