@@ -692,3 +692,9 @@ and the price note, rates attribution, currency switch and sign-out sit in a foo
 - [ ] A tilted photo: the crop straightens the perspective; the clues and candidates are the same as before.
 - [ ] A photo with no card visible (or a HEIC with no preview): the original photo stays, uncropped (HEIC shows only "Analizando carta…"), and nothing breaks.
 - [ ] With Reduce Motion: no sweep and no transition, a static frame with the same text, and the crop appears at once.
+
+## Collection polish — 2026-11-25
+- [x] Point 1: whole-collection copy/distinct-card counts and reference value in the selected currency.
+- Existing inventory/valuation endpoints; no migration or new backend endpoint.
+- Points 2–7 remain pending; global search/order and bounded metadata batching require a backend contract review.
+- Safari acceptance pending: filtered totals, currency switching, price outage and 390 px layout.

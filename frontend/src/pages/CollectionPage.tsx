@@ -3,9 +3,10 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
 import { CardArtwork } from "../components/cards/CardArtwork";
+import { CollectionHeader } from "../components/inventory/CollectionHeader";
 import { OwnedCopy } from "../components/inventory/OwnedCopy";
 import { useCurrency } from "../components/prices/currency";
-import { CurrencySwitch, PriceOrReason, RatesAttribution } from "../components/prices/PriceDisplay";
+import { PriceOrReason, RatesAttribution } from "../components/prices/PriceDisplay";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import { fetchTcgCard, isCardId } from "../services/cards";
@@ -48,6 +49,7 @@ function PersonalCollection() {
   const linked = searchParams.get("variant");
   const [filters, setFilters] = useState<InventoryFilters>(() => ({ ...initialFilters, variant: isVariant(linked) ? linked : "" }));
   const [draft, setDraft] = useState(filters);
+  const [summaryVersion, setSummaryVersion] = useState(0);
   const [activeCopy, setActiveCopy] = useState<string | null>(null);
   const [message, setMessage] = useState<"updated" | "removed" | null>(null);
   const request = useCallback((signal: AbortSignal) => fetchInventory(filters, signal).catch((error: unknown) => {
@@ -56,6 +58,7 @@ function PersonalCollection() {
   }), [filters, retrySession]);
   const { state, retry } = useTcgResource(JSON.stringify(filters), request);
   const changed = (next: "updated" | "removed") => {
+    setSummaryVersion((version) => version + 1);
     setActiveCopy(null);
     setMessage(next);
     if (filters.offset > 0) setFilters({ ...filters, offset: 0 });
@@ -75,6 +78,7 @@ function PersonalCollection() {
   for (const copy of data?.results ?? []) groups.set(copy.card_id, [...(groups.get(copy.card_id) ?? []), copy]);
   const filtered = !!(filters.card_id || filters.condition || filters.language || filters.variant);
   return <>
+    <CollectionHeader key={summaryVersion} />
     <form className="inventory-filter-form" onSubmit={(event) => { event.preventDefault(); setMessage(null); setFilters({ ...draft, offset: 0 }); }}>
       <fieldset className="inventory-filters" disabled={activeCopy !== null}>
       <label>{text.cardId}<input maxLength={100} value={draft.card_id} onChange={(e) => setDraft({ ...draft, card_id: e.target.value })} /></label>
@@ -97,7 +101,6 @@ function PersonalCollection() {
     {data && <>
       <p>{text.total.replace("{count}", String(data.total))}</p>
       {filters.variant === "unknown" && <p className="inventory-hint">{text.withoutVariantFilter}</p>}
-      {data.total > 0 && <CurrencySwitch />}
       {priceState.state.kind === "error" && <p className="price-meta">{dictionary.prices.error} <button type="button" onClick={priceState.retry}>{dictionary.prices.retry}</button></p>}
       {data.total === 0 ? <p>{filtered ? text.noMatches : text.empty}</p> : <>
         <p className="inventory-hint">{text.physicalNote}</p>
@@ -115,7 +118,7 @@ export function CollectionPage() {
   const auth = useAuth();
   const { dictionary } = useLocale();
   return <section className="panel inventory-page" aria-labelledby="collection-title">
-    <h1 id="collection-title">{dictionary.inventory.title}</h1>
+    {auth.status !== "authenticated" && <h1 id="collection-title">{dictionary.inventory.title}</h1>}
     <SessionNotice />
     {auth.status === "unauthenticated" && <Link to="/login">{dictionary.auth.signIn}</Link>}
     {auth.status === "authenticated" && !auth.loggingOut && <PersonalCollection key={auth.user.id} />}

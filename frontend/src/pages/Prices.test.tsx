@@ -136,7 +136,7 @@ test("the profile link opens the collection filtered to copies without a variant
   expect(await screen.findByText("Mystery copy")).toBeVisible();
   expect(screen.getByText("Mostrando copias sin variante.")).toBeVisible();
   expect(screen.getByLabelText("Variante")).toHaveValue("unknown");
-  expect(priceCalls(calls, "/api/v1/inventory")[0].url.searchParams.get("variant")).toBe("unknown");
+  expect(priceCalls(calls, "/api/v1/inventory").some(({ url }) => url.searchParams.get("variant") === "unknown")).toBe(true);
   expect(screen.queryByRole("link", { name: "Rates By Exchange Rate API" })).not.toBeInTheDocument();
 });
 
