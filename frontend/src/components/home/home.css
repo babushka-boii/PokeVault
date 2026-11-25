@@ -70,3 +70,23 @@
 .pv-home-shelf__name a { color: var(--pv-text); text-decoration: none; }
 .pv-home-shelf__name a:hover { color: var(--pv-cyan); text-decoration: underline; }
 .pv-home-shelf__value { font-size: var(--pv-text-md); margin: 0; }
+
+/* Greeting with a reserved trainer slot (Profile fills it later). */
+.pv-home__greeting { align-items: center; display: flex; gap: var(--pv-space-3); margin-bottom: var(--pv-space-2); }
+.pv-home__trainer { align-items: center; background: var(--pv-panel-raised); border: 1px solid var(--pv-border); display: inline-flex; flex: none; height: 64px; justify-content: center; overflow: hidden; width: 64px; }
+.pv-home__trainer .pv-avatar { height: 100%; object-fit: cover; width: 100%; }
+.pv-home__trainer .pv-avatar--fallback { align-items: center; color: var(--pv-text-2); display: flex; font-family: var(--pv-font-display); font-size: var(--pv-text-lg); justify-content: center; }
+.pv-home__greeting h2 { font-size: var(--pv-text-xl); margin: 0; overflow-wrap: anywhere; }
+
+/* Change against seven days ago: soft colour, plus an arrow and a word. */
+.pv-home__change { font-family: var(--pv-font-display); font-size: var(--pv-text-md); font-variant-numeric: tabular-nums; font-weight: 600; margin: 0; }
+.pv-home__change[data-direction="up"] { color: var(--pv-up); }
+.pv-home__change[data-direction="down"] { color: var(--pv-down); }
+.pv-home__change[data-direction="flat"] { color: var(--pv-text-2); }
+
+/* New-user guide. */
+.pv-home__steps { display: grid; gap: var(--pv-space-2); list-style: none; margin: 0; padding: 0; }
+.pv-home__steps li { align-items: center; display: flex; gap: var(--pv-space-3); min-height: var(--pv-touch); }
+.pv-home__steps li[data-done="true"] a { color: var(--pv-text-2); }
+.pv-home__step-mark { color: var(--pv-cyan); flex: none; width: 1.5rem; text-align: center; }
+.pv-home__steps li[data-done="true"] .pv-home__step-mark { color: var(--pv-success); }

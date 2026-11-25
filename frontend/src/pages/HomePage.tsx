@@ -1,8 +1,9 @@
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
 import { useCollectionValuation } from "../components/prices/useCollectionValuation";
-import { EmptyHome } from "../components/home/EmptyHome";
+import { useHistory } from "../components/prices/useHistory";
 import { GuestHome } from "../components/home/GuestHome";
+import { HomeGuide } from "../components/home/HomeGuide";
 import { BinderShelf } from "../components/home/BinderShelf";
 import { ScannerCard } from "../components/home/ScannerCard";
 import { SetsProgress } from "../components/home/SetsProgress";
@@ -16,16 +17,16 @@ import "../components/home/home.css";
 /** Each section owns its request, skeleton and error; only the valuation is shared by the hero and the top cards. */
 function SignedInHome() {
   const valuation = useCollectionValuation();
-  const empty = valuation.state.kind === "loaded" && valuation.state.data.copy_count === 0;
+  // One shared history request: the hero reads its 7-day baseline from it, and so will the chart.
+  const history = useHistory("30d");
   return <>
     <div className="pv-home__grid">
-      {empty ? <EmptyHome /> : <ValueHero resource={valuation} />}
+      <ValueHero resource={valuation} history={history} />
       <div className="pv-home__side"><ScannerCard /></div>
-      {!empty && <>
-        <TopCards resource={valuation} />
-        <BinderShelf />
-        <SetsProgress />
-      </>}
+      <HomeGuide />
+      <TopCards resource={valuation} />
+      <BinderShelf />
+      <SetsProgress />
     </div>
     <SystemStatusFooter />
   </>;

@@ -11,7 +11,7 @@ afterEach(() => vi.unstubAllGlobals());
 const main = () => within(screen.getByRole("main"));
 
 describe("value hero", () => {
-  test("shows the total, counts, the variant shortcut, the reference note and the attribution", async () => {
+  test("shows the total, counts, the variant shortcut, the one price note and the attribution", async () => {
     stubHome();
     render(<App initialEntries={["/"]} />);
     expect(await main().findByText("VALOR DE TU COLECCIÓN")).toBeVisible();
@@ -20,7 +20,7 @@ describe("value hero", () => {
     expect(hero.getByText("5 copias")).toBeVisible();
     expect(hero.getByText("3 con precio")).toBeVisible();
     expect(hero.getByRole("link", { name: "2 sin variante · indicar" })).toHaveAttribute("href", "/collection?variant=unknown");
-    expect(hero.getByText(/Precio de referencia del mercado/)).toBeVisible();
+    expect(hero.getByText(/^Precios de referencia · actualizados hace/)).toBeVisible();
     const attribution = hero.getByRole("link", { name: "Rates By Exchange Rate API" });
     expect(attribution).toHaveAttribute("href", "https://www.exchangerate-api.com");
     expect(attribution).toHaveAttribute("target", "_blank");
@@ -184,15 +184,14 @@ describe("expansions", () => {
 });
 
 describe("empty collection", () => {
-  test("replaces the data sections with a friendly first step", async () => {
-    stubHome({ valuation: valuation({ copy_count: 0, priced_count: 0, unpriced_count: 0, unpriced_by_reason: {}, total: "0", original_totals: {}, top: [], rates: noRates }) });
+  test("keeps every section, each with its own empty state (the hero is covered in HomeHero.test)", async () => {
+    stubHome({ valuation: valuation({ copy_count: 0, priced_count: 0, unpriced_count: 0, unpriced_by_reason: {}, total: "0", original_totals: {}, top: [], rates: noRates, prices_updated_at: null }), binders: [] });
     render(<App initialEntries={["/"]} />);
+    expect(await main().findByText("Agrega tu primera carta")).toBeVisible();
+    expect(await main().findByText("Aún no hay copias con precio para mostrar.")).toBeVisible();
     expect(await main().findByRole("heading", { name: "Tu primera carpeta te espera" })).toBeVisible();
-    expect(main().getByText("Escanea o busca una carta para empezar tu colección.")).toBeVisible();
-    expect(main().getByRole("link", { name: "Buscar en expansiones" })).toHaveAttribute("href", "/sets");
-    expect(main().getAllByRole("link", { name: "Escanear carta" }).length).toBeGreaterThan(0);
-    expect(main().queryByRole("region", { name: "Tus cartas más valiosas" })).not.toBeInTheDocument();
-    expect(main().queryByRole("region", { name: "Mis carpetas" })).not.toBeInTheDocument();
+    expect(main().getByRole("region", { name: "Mis carpetas" })).toBeVisible();
+    expect(main().getByRole("region", { name: "Expansiones" })).toBeVisible();
   });
 });
 

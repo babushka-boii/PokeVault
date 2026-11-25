@@ -31,6 +31,9 @@
   --pv-warn-border: #5A4A1E;
   --pv-danger: #FF7A7A;
   --pv-success: #5BD69A;
+  /* Value change: soft green and red, always paired with an arrow and a word. */
+  --pv-up: var(--pv-success);
+  --pv-down: var(--pv-danger);
   --pv-focus: var(--pv-cyan);
   --pv-shadow-color: #000000;
 

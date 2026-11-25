@@ -120,6 +120,11 @@ export const spanish = {
     guestLabel: "TU BÓVEDA TCG", guestTitle: "Tu colección, ordenada y valorizada",
     guestText: "Guarda tus cartas, organízalas en carpetas y mira cuánto vale tu colección.", exploreDex: "Explorar Pokédex", exploreSets: "Explorar expansiones",
     resolving: "Comprobando tu sesión…",
+    greeting: "Hola, {name}", greetingAnonymous: "Hola", valueEmpty: "Agrega tu primera carta",
+    changeUp: "Subió", changeDown: "Bajó", changeFlat: "Sin cambios en 7 días", changeSpan: "en 7 días", changeNote: "Incluye las cartas que agregaste o quitaste.",
+    pricesNote: "Precios de referencia", pricesAge: { lessThanHour: "actualizados hace menos de 1 h", hours: "actualizados hace {count} h", days: "actualizados hace {count} d" },
+    guideTitle: "Primeros pasos", guideScan: "Escanea tu primera carta", guideStore: "Guárdala en una carpeta", guideFavorite: "Marca tu favorita ★",
+    guideDone: "(hecho)", guideClose: "Cerrar guía", guideCloseError: "No se pudo cerrar la guía.",
   },
   pokedex: {
     title: "Pokédex",
@@ -459,6 +464,11 @@ export const english: Dictionary = {
     guestLabel: "YOUR TCG VAULT", guestTitle: "Your collection, organized and valued",
     guestText: "Save your cards, organize them in binders and see what your collection is worth.", exploreDex: "Explore Pokédex", exploreSets: "Explore expansions",
     resolving: "Checking your session…",
+    greeting: "Hi, {name}", greetingAnonymous: "Hi", valueEmpty: "Add your first card",
+    changeUp: "Up", changeDown: "Down", changeFlat: "No change in 7 days", changeSpan: "in 7 days", changeNote: "Includes cards you added or removed.",
+    pricesNote: "Reference prices", pricesAge: { lessThanHour: "updated less than 1 h ago", hours: "updated {count} h ago", days: "updated {count} d ago" },
+    guideTitle: "First steps", guideScan: "Scan your first card", guideStore: "Store it in a binder", guideFavorite: "Star your favourite ★",
+    guideDone: "(done)", guideClose: "Close guide", guideCloseError: "The guide could not be closed.",
   },
   pokedex: {
     title: "Pokédex",
