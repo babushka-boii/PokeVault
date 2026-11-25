@@ -3,7 +3,7 @@
 import pytest
 from PIL import Image
 
-from app.scanner import worker
+from app.scanner import foil, worker
 from app.scanner.geometry import PreparedCard
 
 HEADER = b"level\tblock_num\tpar_num\tline_num\tleft\ttop\tconf\ttext\n"
@@ -77,8 +77,9 @@ def test_original_evidence_compared_without_mixing_paths(
     assert result.clues.local_number == want_number
     assert ("localization_conflict" in result.warnings) == conflict
     assert (1000, 1000) in calls
-    # 4 crop orientations, title, 3 footer passes, up to 4 original orientations.
-    assert len(calls) <= 12
+    # 4 crop orientations, title, 3 footer passes, up to 4 original orientations, plus
+    # the bounded dedicated foil reads (footer in 2 orientations, voted title).
+    assert len(calls) <= 12 + foil.MAX_DEDICATED_READS
 
 
 def test_original_fallback_timeout_preserves_crop(tmp_path, monkeypatch):
