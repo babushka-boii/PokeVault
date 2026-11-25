@@ -36,6 +36,32 @@
   transition: transform var(--pv-dur) var(--pv-ease);
 }
 .pv-cover:hover { transform: translateY(-2px); }
+/* Materials (8D Part 2): noir keeps the look above; the others replace its background. Surfaces are tokens, with no animation. */
+.pv-cover[data-cover="brown_leather"] { background-color: transparent; background-image: var(--pv-cover-leather); background-size: 100% 100%; }
+.pv-cover[data-cover="metallic"] { background-color: transparent; background-image: var(--pv-cover-metal); background-size: 100% 100%; }
+.pv-cover[data-cover="holographic"] { background-color: transparent; background-image: var(--pv-cover-holo); background-size: 100% 100%; }
+.pv-cover[data-cover="white"] { background-color: transparent; background-image: var(--pv-cover-white); background-size: 100% 100%; }
+.pv-cover[data-cover="white"] .pv-cover__label { color: var(--pv-bg); }
+.pv-coverart { display: block; inset: 0; overflow: hidden; position: absolute; }
+.pv-coverart__stitch { border: 1px dashed var(--pv-stitch-noir); border-radius: 6px; inset: 6.5% 6% 6.5% 11%; position: absolute; }
+.pv-coverart[data-cover="brown_leather"] .pv-coverart__stitch { border-color: var(--pv-stitch-leather); }
+.pv-coverart[data-cover="metallic"] .pv-coverart__stitch, .pv-coverart[data-cover="holographic"] .pv-coverart__stitch { border-style: solid; border-color: var(--pv-stitch-metal); }
+.pv-coverart[data-cover="white"] .pv-coverart__stitch { border-color: var(--pv-stitch-white); }
+/* Stickers: a die-cut edge from layered shadows; the cover clips what leaves it. */
+.pv-sticker { aspect-ratio: 1; display: block; filter: drop-shadow(0 3px 3px var(--pv-sticker-shadow)); pointer-events: none; position: absolute; }
+.pv-sticker img { display: block; filter: drop-shadow(1px 0 0 var(--pv-sticker-cut)) drop-shadow(-1px 0 0 var(--pv-sticker-cut)) drop-shadow(0 1px 0 var(--pv-sticker-cut)) drop-shadow(0 -1px 0 var(--pv-sticker-cut)); height: 100%; object-fit: contain; width: 100%; }
+.pv-sticker__pixel { display: block; height: 100%; width: 100%; }
+.pv-sticker__pixel--star { fill: var(--pv-gold); }
+.pv-sticker__pixel--bolt { fill: var(--pv-cyan); }
+.pv-sticker__pixel--heart { fill: var(--pv-sticker-heart); }
+.pv-sticker__pixel--creature { fill: var(--pv-sticker-creature); }
+.pv-sticker__pixel--circle { fill: var(--pv-text); }
+.pv-sticker__missing { align-items: center; color: var(--pv-text-3); display: flex; height: 100%; justify-content: center; width: 100%; }
+/* The open album shows the material on its outer cover. */
+.pv-album[data-cover="brown_leather"] .pv-spread { background: var(--pv-cover-leather); }
+.pv-album[data-cover="metallic"] .pv-spread { background: var(--pv-cover-metal); }
+.pv-album[data-cover="holographic"] .pv-spread { background: var(--pv-cover-holo); }
+.pv-album[data-cover="white"] .pv-spread { background: var(--pv-cover-white); }
 .pv-cover__spine { background: var(--pv-cyan); bottom: 0; left: 0; position: absolute; top: 0; width: 6px; }
 .pv-cover__label { bottom: var(--pv-space-3); color: var(--pv-text-2); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); position: absolute; right: var(--pv-space-3); }
 

@@ -68,7 +68,7 @@ export function BinderShelf() {
       {shown.map((binder, index) => {
         const amount = binderAmount(byId[binder.id], currency, locale);
         return <li key={binder.id} className="pv-bookcase__item pv-home-shelf__item" data-shelf={index < SHELF_SIZE ? 1 : 2}>
-          <Cover binderId={binder.id} />
+          <Cover binderId={binder.id} cover={binder.cover} stickers={binder.stickers} />
           <h3 className="pv-home-shelf__name"><Link to={`/binders/${encodeURIComponent(binder.id)}`}>{binder.name}</Link></h3>
           <p className="pv-home__meta">{plural(dictionary.binders.cards, binder.copy_count)}</p>
           {values.state.kind === "loading" ? <Skeleton shape="text" /> : amount && <p className="pv-home-shelf__value price-amount" aria-label={`${dictionary.binders.value}: ${amount}`}>{amount}</p>}

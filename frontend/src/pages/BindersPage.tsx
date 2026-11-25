@@ -37,7 +37,7 @@ function BinderCard({ binder, value, valuesLoading, index, total, busy, onRename
   }
   return <li className="pv-shelf__item">
     <article className="pv-shelf__binder" aria-labelledby={titleId}>
-      <Cover binderId={binder.id} />
+      <Cover binderId={binder.id} cover={binder.cover} stickers={binder.stickers} />
       <div className="pv-shelf__facts">
         <h2 id={titleId}><Link to={`/binders/${encodeURIComponent(binder.id)}`}>{binder.name}</Link></h2>
         <p className="pv-binder__hint">{plural(text.cards, binder.copy_count)}</p>
