@@ -673,7 +673,8 @@ def test_progress_is_rederived_after_logout_relogin_and_application_restart(
 
 
 def test_completion_adds_no_storage_of_its_own(set_completion_database):
-    # Later iterations add prices (0005), binders (0007) and Home data (0009); 0008
+    # Later iterations add prices (0005), binders (0007), Home data (0009) and the
+    # card species cache (0010); 0008
     # dropped the boxes. Completion itself stores nothing.
     factory, config = set_completion_database
     head = ScriptDirectory.from_config(config).get_current_head()
@@ -692,6 +693,7 @@ def test_completion_adds_no_storage_of_its_own(set_completion_database):
             "binder_pockets",
             "card_favorites",
             "collection_value_days",
+            "card_species",
         }
         assert session.scalar(text("SELECT version_num FROM alembic_version")) == head
         assert {
