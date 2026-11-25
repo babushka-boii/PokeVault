@@ -265,3 +265,18 @@ describe("avatar", () => {
     await waitFor(() => expect(document.querySelector(".pv-home__trainer .pv-avatar-frame__fill--fallback")).toHaveTextContent("AK"));
   });
 });
+
+describe("chips", () => {
+  test("the link and button chips use the same chip class as the text ones, in one list", async () => {
+    stubHome({ valuation: homeValuation({ pending_count: 2, stale_count: 1 }) });
+    render(<App initialEntries={["/"]} />);
+    const hero = await screen.findByRole("region", { name: "VALOR DE TU COLECCIÓN" });
+    await within(hero).findByText("5 copias");
+    const chips = [...hero.querySelectorAll(".pv-home__chips .pv-chip")];
+    expect(chips.map((chip) => chip.tagName)).toEqual(["SPAN", "SPAN", "A", "BUTTON", "SPAN"]);
+    // Link and button chips are still interactive: a link with its address, a button that retries.
+    expect(within(hero).getByRole("link", { name: "2 sin variante · indicar" })).toHaveAttribute("href", "/collection?variant=unknown");
+    expect(within(hero).getByRole("button", { name: "2 precios pendientes · reintentar" })).toBeVisible();
+    expect(new Set(chips.map((chip) => chip.className.replace(/pv-chip--(link|button)/g, "").trim().split(/\s+/).filter((name) => name === "pv-chip").join(" ")))).toEqual(new Set(["pv-chip"]));
+  });
+});

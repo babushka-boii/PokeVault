@@ -144,3 +144,22 @@
   .pv-bookcase__item--empty { display: none; }
   .pv-bookcase__item::after { left: 0; right: 0; }
 }
+
+/* Hero chips: one box for all of them (text, link or button), so they line up. */
+.pv-home__chips { align-items: stretch; }
+.pv-home__chips li { display: flex; }
+.pv-home__chips .pv-chip {
+  align-items: center;
+  box-sizing: border-box;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--pv-text-sm);
+  gap: var(--pv-space-1);
+  line-height: 1.2;
+  min-height: var(--pv-touch);
+  padding: var(--pv-space-1) var(--pv-space-3);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pv-home__chips .pv-chip--link:hover, .pv-home__chips .pv-chip--link:focus-visible { border-color: var(--pv-cyan); color: var(--pv-text); text-decoration: underline; }

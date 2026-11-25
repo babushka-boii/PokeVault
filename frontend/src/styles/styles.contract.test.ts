@@ -243,6 +243,16 @@ describe("stylesheets", () => {
     expect(rules(stripComments(sheets["/src/components/home/home.css"])).find((rule) => rule.selector === ".pv-home__trainer")?.body ?? "").not.toMatch(/border|background|overflow/);
   });
 
+  test("every chip in the Home hero shares one box, whether it is text, a link or a button", () => {
+    const css = stripComments(sheets["/src/components/home/home.css"]);
+    const box = rules(css).find((rule) => rule.selector === ".pv-home__chips .pv-chip")?.body ?? "";
+    for (const property of ["min-height", "padding", "font-size", "line-height", "box-sizing", "display"]) expect(box, property).toMatch(new RegExp(`(^|;)\\s*${property}:`));
+    // The variants may only change colour and decoration on hover: never the box.
+    const variants = rules(css).filter((rule) => /\.pv-home__chips .*pv-chip--/.test(rule.selector)).map((rule) => rule.body).join(";");
+    expect(variants).not.toMatch(/(min-height|padding|font-size|line-height|height|width|border-width):/);
+    expect(variants).toMatch(/text-decoration:\s*underline/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);
