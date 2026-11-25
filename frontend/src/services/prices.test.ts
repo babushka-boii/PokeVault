@@ -59,3 +59,21 @@ test("the currency setting is read and saved with CSRF", async () => {
   vi.stubGlobal("fetch", vi.fn(async () => json({ preferred_currency: "EUR" })));
   await expect(fetchCurrencySetting(signal())).rejects.toMatchObject({ status: 0 });
 });
+
+test("the collection value asks for more top copies only when told to, and checks the price age", async () => {
+  const request = vi.fn(async () => json(valuation()));
+  vi.stubGlobal("fetch", request);
+  expect((await fetchCollectionValue("CLP", signal())).prices_updated_at).toBe("2026-11-25T09:00:00Z");
+  expect((request.mock.calls[0] as unknown as [string])[0]).toBe("http://localhost:8000/api/v1/prices/collection?currency=CLP");
+  await fetchCollectionValue("CLP", signal(), 12);
+  expect((request.mock.calls[1] as unknown as [string])[0]).toBe("http://localhost:8000/api/v1/prices/collection?currency=CLP&top=12");
+  for (const top of [0, 21, 1.5]) await expect(fetchCollectionValue("CLP", signal(), top)).rejects.toMatchObject({ status: 422 });
+  expect(request).toHaveBeenCalledTimes(2);
+  const many = Array.from({ length: 6 }, (_, n) => copyPrice(n, quote("1038", "CLP", "0.83")));
+  vi.stubGlobal("fetch", vi.fn(async () => json(valuation({ top: many }))));
+  await expect(fetchCollectionValue("CLP", signal())).rejects.toMatchObject({ status: 0 });   // more than asked for
+  vi.stubGlobal("fetch", vi.fn(async () => json({ ...valuation(), prices_updated_at: "yesterday" })));
+  await expect(fetchCollectionValue("CLP", signal())).rejects.toMatchObject({ status: 0 });
+  vi.stubGlobal("fetch", vi.fn(async () => json(valuation({ prices_updated_at: null, top: [], priced_count: 0, unpriced_count: 5, unpriced_by_reason: { variant_unknown: 5 }, sources: {} }))));
+  expect((await fetchCollectionValue("CLP", signal())).prices_updated_at).toBeNull();
+});
