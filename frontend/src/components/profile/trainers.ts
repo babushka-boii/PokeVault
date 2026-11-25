@@ -1,5 +1,5 @@
 // Original 8x11 pixel-art trainers for PokéVault (Unova Noir). No third-party assets, no licence needed.
-// Same drawing style as docs/design/Profile.dc.html: SVG viewBox "0 0 8 11" with shape-rendering="crispEdges".
+// Same drawing style as the Profile design (docs/design/Profile.dc.html): SVG viewBox "0 0 8 11" with shape-rendering="crispEdges".
 // Letters in `rows` map to `palette`; "." is transparent.
 
 export type TrainerId = "mateo" | "diego" | "valentina" | "camila";
