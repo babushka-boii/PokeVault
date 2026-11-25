@@ -24,8 +24,8 @@ function server(initial: string[] = [], options: { fail?: (method: string) => Re
   const request = vi.fn(async (input: string, init?: RequestInit) => {
     const card = decodeURIComponent(new URL(input).pathname.split("/").pop()!); const method = init?.method ?? "GET";
     calls.push({ method, card, csrf: (init?.headers as Record<string, string> | undefined)?.["X-CSRF-Token"] ?? null });
-    const failure = options.fail?.(method); if (failure) return failure;
     if (hold && method !== "GET") await new Promise<void>((resolve) => release.push(resolve));
+    const failure = options.fail?.(method); if (failure) return failure;
     if (method === "PUT") starred.add(card); if (method === "DELETE") starred.delete(card);
     return json({ card_id: card, favorite: starred.has(card) });
   });
@@ -52,7 +52,7 @@ describe("the star", () => {
     expect(star).toHaveTextContent("☆");
   });
 
-  test("changes only after the server confirms, announces it, and sends the CSRF token", async () => {
+  test("changes at once, keeps the change when the server confirms, and sends the CSRF token", async () => {
     const api = server();
     const person = userEvent.setup();
     shell({});
@@ -60,40 +60,59 @@ describe("the star", () => {
     await waitFor(() => expect(star).toBeEnabled());
     api.holdWrites();
     await person.click(star);
-    expect(star).toBeDisabled();                               // pending: no double clicks
-    expect(star).toHaveAttribute("aria-pressed", "false");      // and no optimistic star
-    expect(star).toHaveTextContent("☆");
+    expect(star).toHaveAttribute("aria-pressed", "true");       // optimistic: no waiting for the server
+    expect(star).toHaveTextContent("★");
+    expect(star).toBeDisabled();                                // one write at a time
+    expect(api.starred.size).toBe(0);                           // the server has not answered yet
     api.releaseWrites();
-    await waitFor(() => expect(star).toHaveAttribute("aria-pressed", "true"));
-    expect(star).toBeEnabled();
+    await waitFor(() => expect(star).toBeEnabled());
+    expect(star).toHaveAttribute("aria-pressed", "true");
     expect(await screen.findByRole("status")).toHaveTextContent("Agregada a tus favoritas.");
     expect(api.calls.filter((call) => call.method === "PUT")).toEqual([{ method: "PUT", card: "base1-4", csrf: "csrf" }]);
     await person.click(star);
-    await waitFor(() => expect(star).toHaveAttribute("aria-pressed", "false"));
-    expect(screen.getByRole("status")).toHaveTextContent("Quitada de tus favoritas.");
+    expect(star).toHaveAttribute("aria-pressed", "false");
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Quitada de tus favoritas."));
     expect(api.calls.at(-1)).toEqual({ method: "DELETE", card: "base1-4", csrf: "csrf" });
   });
 
-  test("a failed save keeps the previous state and says so", async () => {
-    server([], { fail: (method) => (method === "PUT" ? json({}, 500) : undefined) });
+  test("a refused save goes back to the previous state with a quiet notice, never an alert", async () => {
+    const api = server([], { fail: (method) => (method === "PUT" ? json({}, 500) : undefined) });
     const person = userEvent.setup();
     shell({});
     const star = await screen.findByRole("button", { name: "Favorita" });
     await waitFor(() => expect(star).toBeEnabled());
+    api.holdWrites();
     await person.click(star);
-    expect(await screen.findByRole("alert")).toHaveTextContent("No se pudo guardar tu favorita. Inténtalo de nuevo.");
-    expect(star).toHaveAttribute("aria-pressed", "false");
+    expect(star).toHaveAttribute("aria-pressed", "true");       // it showed the change first…
+    api.releaseWrites();
+    expect(await screen.findByRole("status")).toHaveTextContent("No se pudo guardar tu favorita; volvimos al estado anterior. Inténtalo de nuevo.");
+    expect(star).toHaveAttribute("aria-pressed", "false");      // …and went back
     expect(star).toBeEnabled();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  test("the limit of 500 is explained", async () => {
+  test("a failed removal puts the star back", async () => {
+    const api = server(["base1-4"], { fail: (method) => (method === "DELETE" ? json({}, 503) : undefined) });
+    const person = userEvent.setup();
+    shell({});
+    const star = await screen.findByRole("button", { name: "Favorita" });
+    await waitFor(() => expect(star).toHaveAttribute("aria-pressed", "true"));
+    api.holdWrites();
+    await person.click(star);
+    expect(star).toHaveAttribute("aria-pressed", "false");
+    api.releaseWrites();
+    await waitFor(() => expect(star).toHaveAttribute("aria-pressed", "true"));
+    expect(screen.getByRole("status")).toHaveTextContent("volvimos al estado anterior");
+  });
+
+  test("the limit of 500 is explained and the star goes back", async () => {
     server([], { fail: (method) => (method === "PUT" ? json({ detail: "favorites_full" }, 409) : undefined) });
     const person = userEvent.setup();
     shell({});
     const star = await screen.findByRole("button", { name: "Favorita" });
     await waitFor(() => expect(star).toBeEnabled());
     await person.click(star);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Llegaste al máximo de 500 cartas favoritas.");
+    expect(await screen.findByRole("status")).toHaveTextContent("Llegaste al máximo de 500 cartas favoritas.");
     expect(star).toHaveAttribute("aria-pressed", "false");
   });
 
@@ -106,6 +125,7 @@ describe("the star", () => {
     await person.click(star);
     await waitFor(() => expect(value.retrySession).toHaveBeenCalled());
     expect(api.starred.size).toBe(0);
+    await waitFor(() => expect(star).toHaveAttribute("aria-pressed", "false"));
     const missing = shell({ getCsrfToken: () => null });
     const stars = await screen.findAllByRole("button", { name: "Favorita" });
     await waitFor(() => expect(stars[1]).toBeEnabled());

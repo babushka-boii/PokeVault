@@ -3,6 +3,7 @@ import { isQuote, isRates, type Currency, type NoPriceReason, type Quote, type R
 
 /** Starred catalog cards (Iteration 9A): per user and card, not per physical copy. */
 export const MAX_LISTED_FAVORITES = 12;
+export const MAX_STATUS = 50;
 export type FavoriteCard = { card_id: string; favorited_at: string; price: Quote | null; reason: NoPriceReason | null };
 export type FavoriteCards = { currency: Currency; total: number; results: FavoriteCard[]; rates: RatesInfo };
 export class FavoritesError extends Error {
@@ -45,6 +46,17 @@ export async function setFavorite(cardId: string, favorite: boolean, csrf: strin
 function isFavoriteCard(v: unknown, currency: Currency): v is FavoriteCard {
   return record(v) && typeof v.card_id === "string" && isCardId(v.card_id) && typeof v.favorited_at === "string" && Number.isFinite(Date.parse(v.favorited_at))
     && ((v.price === null && typeof v.reason === "string" && reasons.includes(v.reason)) || (v.reason === null && isQuote(v.price, currency)));
+}
+
+/** Which of these cards are starred: one request for a whole row (up to 50). */
+export async function fetchFavoriteStatus(cardIds: string[], signal: AbortSignal): Promise<Set<string>> {
+  const asked = [...new Set(cardIds)];
+  if (asked.length === 0) return new Set();
+  if (asked.length > MAX_STATUS || !asked.every(isCardId)) throw new FavoritesError(422);
+  const v = await request(`/status?${new URLSearchParams(asked.map((id) => ["card_id", id]))}`, signal);
+  if (!record(v) || Object.keys(v).length !== 1 || !Array.isArray(v.card_ids) || !v.card_ids.every((id) => typeof id === "string" && asked.includes(id))
+    || new Set(v.card_ids).size !== v.card_ids.length) throw new FavoritesError(0);
+  return new Set(v.card_ids as string[]);
 }
 
 export async function fetchFavoriteCards(currency: Currency, signal: AbortSignal): Promise<FavoriteCards> {

@@ -1,49 +1,39 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/context";
+import { useFavoriteWrite } from "../../hooks/useFavoriteWrite";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
-import { fetchFavoriteState, FavoritesError, setFavorite } from "../../services/favorites";
+import { fetchFavoriteState, FavoritesError } from "../../services/favorites";
 import "./cards.css";
 
-type Message = { kind: "added" | "removed" | "full" | "error" } | null;
+type Message = "added" | "removed" | "full" | "error" | null;
 
 function Toggle({ cardId }: { cardId: string }) {
   const { dictionary } = useLocale();
   const text = dictionary.favorites;
-  const { retrySession, getCsrfToken } = useAuth();
+  const { retrySession } = useAuth();
+  const write = useFavoriteWrite();
   const request = useCallback((signal: AbortSignal) => fetchFavoriteState(cardId, signal).catch((error: unknown) => {
     if (!signal.aborted && error instanceof FavoritesError && error.status === 401) retrySession();
     throw error;
   }), [cardId, retrySession]);
   const { state, retry } = useTcgResource(cardId, request);
-  // The confirmed state, once the user has changed it; before that, what the server said.
-  const [changed, setChanged] = useState<boolean | null>(null);
+  // What the user chose, shown at once; before any choice, what the server said.
+  const [chosen, setChosen] = useState<boolean | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<Message>(null);
-  const controller = useRef<AbortController | null>(null);
-  useEffect(() => () => controller.current?.abort(), []);
   const loaded = state.kind === "loaded";
-  const favorite = changed ?? (loaded ? state.data : false);
+  const favorite = chosen ?? (loaded ? state.data : false);
 
   async function toggle() {
-    const csrf = getCsrfToken();
-    if (!csrf) { retrySession(); setMessage({ kind: "error" }); return; }
     const next = !favorite;
-    const current = new AbortController(); controller.current = current;
-    setPending(true); setMessage(null);
-    try {
-      const confirmed = await setFavorite(cardId, next, csrf, current.signal);
-      if (current.signal.aborted) return;
-      setChanged(confirmed); setMessage({ kind: confirmed ? "added" : "removed" });
-    } catch (error: unknown) {
-      if (current.signal.aborted) return;
-      const status = error instanceof FavoritesError ? error.status : 0;
-      if (status === 401) retrySession();
-      setMessage({ kind: status === 409 && (error as FavoritesError).detail === "favorites_full" ? "full" : "error" });
-    } finally {
-      if (!current.signal.aborted) setPending(false);
-    }
+    setChosen(next); setPending(true); setMessage(null);          // the star changes now…
+    const result = await write(cardId, next);
+    if (result === "aborted") return;
+    setPending(false);
+    if (result === "ok") setMessage(next ? "added" : "removed");
+    else { setChosen(!next); setMessage(result); }                // …and goes back if the server said no
   }
 
   return <div className="pv-favorite">
@@ -51,15 +41,14 @@ function Toggle({ cardId }: { cardId: string }) {
       <span aria-hidden="true">{favorite ? "★" : "☆"}</span> {text.label}
     </button>
     {state.kind === "error" && <p className="pv-favorite__note">{text.loadError} <button type="button" onClick={retry}>{dictionary.home.retry}</button></p>}
-    {message && (message.kind === "added" || message.kind === "removed")
-      ? <p role="status" className="pv-favorite__note">{message.kind === "added" ? text.added : text.removed}</p>
-      : message && <p role="alert" className="pv-favorite__note">{message.kind === "full" ? text.full : text.saveError}</p>}
+    {message && <p role="status" className="pv-favorite__note">{message === "added" ? text.added : message === "removed" ? text.removed : message === "full" ? text.full : text.saveError}</p>}
   </div>;
 }
 
 /**
- * A star on a catalog card (not on a physical copy). It changes only once the server
- * confirms. Guests are invited to sign in; the state is per signed-in user and card.
+ * A star on a catalog card (not on a physical copy). It changes at once and goes back with
+ * a quiet notice if the server refuses. Guests are invited to sign in; the state is per
+ * signed-in user and card.
  */
 export function FavoriteStar({ cardId }: { cardId: string }) {
   const auth = useAuth();

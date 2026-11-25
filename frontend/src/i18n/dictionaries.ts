@@ -131,7 +131,7 @@ export const spanish = {
   },
   favorites: {
     label: "Favorita", added: "Agregada a tus favoritas.", removed: "Quitada de tus favoritas.",
-    loadError: "No se pudo cargar tu favorita.", saveError: "No se pudo guardar tu favorita. Inténtalo de nuevo.",
+    loadError: "No se pudo cargar tu favorita.", saveError: "No se pudo guardar tu favorita; volvimos al estado anterior. Inténtalo de nuevo.",
     full: "Llegaste al máximo de 500 cartas favoritas.", signIn: "Inicia sesión para marcar favoritas",
   },
   chart: {
@@ -489,7 +489,7 @@ export const english: Dictionary = {
   },
   favorites: {
     label: "Favourite", added: "Added to your favourites.", removed: "Removed from your favourites.",
-    loadError: "Your favourite could not be loaded.", saveError: "Your favourite could not be saved. Try again.",
+    loadError: "Your favourite could not be loaded.", saveError: "Your favourite could not be saved; we went back to how it was. Try again.",
     full: "You reached the limit of 500 favourite cards.", signIn: "Sign in to star favourites",
   },
   chart: {

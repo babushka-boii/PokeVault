@@ -43,11 +43,13 @@ export type HomeData = {
   history?: Partial<typeof emptyHistory> | ((url: URL) => Response | Promise<Response>);
   guide?: Partial<typeof openGuide> | (() => Response | Promise<Response>);
   favorites?: { total?: number; results: unknown[] } | (() => Response | Promise<Response>);
+  /** Card ids that start out starred. */
+  starred?: string[];
 };
 
 /** Routes every request by path and fails loudly on anything unplanned. */
 export function stubHome(data: HomeData = {}) {
-  const starred = new Set<string>();
+  const starred = new Set<string>(data.starred ?? []);
   const request = vi.fn((input: string, options?: RequestInit) => {
     const url = new URL(input); const path = url.pathname;
     const custom = data.override?.(url, options); if (custom) return Promise.resolve(custom);
@@ -66,6 +68,10 @@ export function stubHome(data: HomeData = {}) {
     if (path === "/api/v1/home/guide") {
       const guide = data.guide ?? {};
       return Promise.resolve(typeof guide === "function" ? guide() : json({ ...openGuide, ...guide }));
+    }
+    if (path === "/api/v1/favorites/status") {
+      const asked = url.searchParams.getAll("card_id");
+      return Promise.resolve(json({ card_ids: asked.filter((id) => starred.has(id)) }));
     }
     if (path.startsWith("/api/v1/favorites/") && path !== "/api/v1/favorites/cards") {
       const card = decodeURIComponent(path.split("/").pop()!); const method = options?.method ?? "GET";
