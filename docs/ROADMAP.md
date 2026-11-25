@@ -706,3 +706,10 @@ pixel colours are decorative tokens, and last save wins (no edit-conflict revisi
 - [ ] Save, reload: shelf, Home and the open album show the same cover and stickers; closing with changes asks "¿Descartar…?".
 - [ ] "+ Agregar hojas" at the end of the album adds 2 empty sheets that stay after reloading; at 40 it is disabled.
 - [ ] iPhone-size mode: the editor is full screen, buttons are 44 px, and with Reduce Motion there is no pop.
+## Collection polish — 2026-11-25
+- [x] Point 1: whole-collection copy/distinct-card counts and reference value in the selected currency.
+- Existing inventory/valuation endpoints; no migration or new backend endpoint.
+- [x] Point 2: instant attribute chips and progressive name search over up to 500 copies / 100 distinct cards, four concurrent metadata reads shared with rendering.
+- [x] Point 3: client ordering by most recent (default), localized name or expansion; unresolved names sort last and active edits keep their visible page stable.
+- Pending: points 4–7 (album/list view, richer pagination/scroll restoration, premium states); metadata batch endpoint and highest-value ordering remain deferred. No backend changes.
+- Safari acceptance pending: filtered totals, currency switching, price outage and 390 px layout.

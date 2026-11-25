@@ -25,3 +25,18 @@
 @media (max-width: 520px) { .inventory-card-summary { flex-direction: column; } .inventory-art { width: 120px; flex-basis: auto; } }
 
 .inventory-filters { border: 0; padding: 0; min-width: 0; }
+
+/* Collection overview uses the same typography and money treatment as Home/Profile. */
+.pv-collection-header { padding: clamp(16px, 3vw, 32px); background: var(--pv-panel); border: 1px solid var(--pv-border); border-top: 3px solid var(--pv-cyan); }
+.pv-collection-header__heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 16px; }
+.pv-collection-header h1 { font-family: var(--pv-font-display); margin: 0; }
+.pv-collection-header__counts { display: flex; flex-wrap: wrap; gap: 32px; min-height: 72px; }
+.pv-collection-header__counts dt { color: var(--pv-text-2); font-size: var(--pv-text-sm); }
+.pv-collection-header__counts dd { margin: 4px 0 0; font-family: var(--pv-font-display); font-size: var(--pv-text-xl); font-variant-numeric: tabular-nums; }
+.pv-collection-header__value { min-height: 160px; }
+.pv-collection-header .price-total { font-family: var(--pv-font-display); overflow-wrap: anywhere; }
+
+.pv-collection-filters fieldset { border: 0; min-width: 0; padding: 0; margin-block: 12px; }
+.pv-collection-filters legend { color: var(--pv-text-2); margin-bottom: 8px; }
+.pv-collection-filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pv-collection-filter-chips button[aria-pressed="true"] { border-color: var(--pv-cyan); background: var(--pv-cyan-soft); color: var(--pv-cyan); }
