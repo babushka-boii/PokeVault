@@ -125,6 +125,9 @@ export const spanish = {
     pricesNote: "Precios de referencia", pricesAge: { lessThanHour: "actualizados hace menos de 1 h", hours: "actualizados hace {count} h", days: "actualizados hace {count} d" },
     guideTitle: "Primeros pasos", guideScan: "Escanea tu primera carta", guideStore: "Guárdala en una carpeta", guideFavorite: "Marca tu favorita ★",
     guideDone: "(hecho)", guideClose: "Cerrar guía", guideCloseError: "No se pudo cerrar la guía.",
+    cardsTitle: "Tus cartas", tabValuable: "Más valiosas", tabFavorites: "Favoritas", tabAdded: "Recientes", cardsLoading: "Cargando tus cartas…",
+    favoritesEmpty: "Marca cartas con ★ para verlas aquí", addedEmpty: "Agrega tu primera carta", favoritesError: "No se pudieron cargar tus favoritas.", addedError: "No se pudieron cargar tus cartas recientes.",
+    carouselPause: "Pausar", carouselResume: "Reanudar", carouselPrevious: "Cartas anteriores", carouselNext: "Cartas siguientes", noPrice: "Sin precio",
   },
   pokedex: {
     title: "Pokédex",
@@ -469,6 +472,9 @@ export const english: Dictionary = {
     pricesNote: "Reference prices", pricesAge: { lessThanHour: "updated less than 1 h ago", hours: "updated {count} h ago", days: "updated {count} d ago" },
     guideTitle: "First steps", guideScan: "Scan your first card", guideStore: "Store it in a binder", guideFavorite: "Star your favourite ★",
     guideDone: "(done)", guideClose: "Close guide", guideCloseError: "The guide could not be closed.",
+    cardsTitle: "Your cards", tabValuable: "Most valuable", tabFavorites: "Favourites", tabAdded: "Recent", cardsLoading: "Loading your cards…",
+    favoritesEmpty: "Star cards with ★ to see them here", addedEmpty: "Add your first card", favoritesError: "Your favourites could not be loaded.", addedError: "Your recent cards could not be loaded.",
+    carouselPause: "Pause", carouselResume: "Resume", carouselPrevious: "Previous cards", carouselNext: "Next cards", noPrice: "No price",
   },
   pokedex: {
     title: "Pokédex",

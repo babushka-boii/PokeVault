@@ -4,11 +4,11 @@ import { useCollectionValuation } from "../components/prices/useCollectionValuat
 import { useHistory } from "../components/prices/useHistory";
 import { GuestHome } from "../components/home/GuestHome";
 import { HomeGuide } from "../components/home/HomeGuide";
+import { CardCarousel, CAROUSEL_SIZE } from "../components/home/CardCarousel";
 import { BinderShelf } from "../components/home/BinderShelf";
 import { ScannerCard } from "../components/home/ScannerCard";
 import { SetsProgress } from "../components/home/SetsProgress";
 import { SystemStatusFooter } from "../components/home/SystemStatusFooter";
-import { TopCards } from "../components/home/TopCards";
 import { ValueHero } from "../components/home/ValueHero";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useLocale } from "../i18n/LocaleProvider";
@@ -16,7 +16,8 @@ import "../components/home/home.css";
 
 /** Each section owns its request, skeleton and error; only the valuation is shared by the hero and the top cards. */
 function SignedInHome() {
-  const valuation = useCollectionValuation();
+  // The hero and the carousel's "most valuable" view share one valuation request (top 12).
+  const valuation = useCollectionValuation(CAROUSEL_SIZE);
   // One shared history request: the hero reads its 7-day baseline from it, and so will the chart.
   const history = useHistory("30d");
   return <>
@@ -24,7 +25,7 @@ function SignedInHome() {
       <ValueHero resource={valuation} history={history} />
       <div className="pv-home__side"><ScannerCard /></div>
       <HomeGuide />
-      <TopCards resource={valuation} />
+      <CardCarousel valuation={valuation} />
       <BinderShelf />
       <SetsProgress />
     </div>

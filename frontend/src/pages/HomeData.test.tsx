@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../app/App";
 import { binder, callsTo, homeCards, homeValuation, physicalCopy, ratesDown, stubHome, userA, userB } from "../test/homeFixtures";
-import { stubMedia } from "../test/media";
 import { copyId, noRates, valuation } from "../test/priceFixtures";
 import { jsonResponse as json } from "../test/tcgFixtures";
 
@@ -68,29 +67,6 @@ describe("value hero", () => {
     const status = await screen.findByText("Cargando valor…");
     expect(status.parentElement).toHaveAttribute("aria-busy", "true");
     expect(within(status.parentElement!).queryByRole("progressbar")).not.toBeInTheDocument();
-  });
-});
-
-describe("most valuable cards", () => {
-  test("lists the top five in price order with names, prices and copy links", async () => {
-    stubHome();
-    render(<App initialEntries={["/"]} />);
-    const top = await screen.findByRole("region", { name: "Tus cartas más valiosas" });
-    const links = await within(top).findAllByRole("link", { name: /^Card \d/ });
-    expect(links.map((link) => link.getAttribute("href"))).toEqual([0, 1, 2, 3, 4].map((index) => `/collection/${copyId(100 + index)}`));
-    expect(links.map((link) => link.textContent)).toEqual(["Card 1", "Card 2", "Card 3", "Card 4", "Card 5"]);
-    expect(within(top).getAllByText(/Holográfica/)).toHaveLength(5);
-    expect(within(top).getByRole("link", { name: "Ver mi colección" })).toHaveAttribute("href", "/collection");
-  });
-
-  test("drops card tilt and glare under reduced motion", async () => {
-    stubMedia({ reducedMotion: true });
-    stubHome();
-    render(<App initialEntries={["/"]} />);
-    const top = await screen.findByRole("region", { name: "Tus cartas más valiosas" });
-    await within(top).findAllByRole("link", { name: /^Card \d/ });
-    expect(within(top).queryByRole("button", { name: "Inclinar carta" })).not.toBeInTheDocument();
-    expect(top.querySelector(".tcg-card-glare")).toBeNull();
   });
 });
 
@@ -204,7 +180,8 @@ describe("failures and sessions", () => {
     expect(await main().findByText("No se pudo cargar el valor de tu colección.")).toBeVisible();
     expect(await screen.findByRole("link", { name: "Favoritas" })).toBeVisible();
     expect(await screen.findByRole("region", { name: "Expansiones" })).toBeVisible();
-    expect(main().getByRole("region", { name: "Tus cartas más valiosas" })).toBeVisible();
+    expect(main().getByRole("region", { name: "Tus cartas" })).toBeVisible();
+    expect(main().getByText("No se pudieron cargar tus cartas más valiosas.")).toBeVisible();   // the carousel explains, the hero retries
     fail = false;
     await user.click(main().getByRole("button", { name: "Reintentar" }));
     expect(await main().findByText(/1\.112/)).toBeVisible();
