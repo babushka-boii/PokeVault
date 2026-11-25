@@ -428,7 +428,17 @@ class CardProvider:
             OrderedDict()
         )
         self._pages: OrderedDict[
-            tuple[int, Language, int, int, str | None, CardSort], tuple[float, CardPage]
+            tuple[
+                int,
+                Language,
+                int,
+                int,
+                str | None,
+                CardSort,
+                frozenset[str] | None,
+                frozenset[str] | None,
+            ],
+            tuple[float, CardPage],
         ] = OrderedDict()
         self._indexes: OrderedDict[int, tuple[float, list[_Brief]]] = OrderedDict()
         self._catalogs: OrderedDict[Language, tuple[float, dict[str, CardSet]]] = (
@@ -1276,6 +1286,22 @@ class CardProvider:
         self._store(self._indexes, number, rows, 32)
         return rows
 
+    async def species_total(self, number: int) -> int:
+        """How many cards the verified English catalog has of this species."""
+        async with self._lock:
+            try:
+                async with asyncio.timeout(15), self._client() as client:
+                    return len(await self._species_index(client, number))
+            except (
+                ExceptionGroup,
+                httpx.HTTPError,
+                TimeoutError,
+                ValueError,
+                TypeError,
+                AttributeError,
+            ) as error:
+                raise CardsUnavailable from error
+
     @staticmethod
     def _sort_key(brief: _Brief, sort: CardSort, sets: dict[str, CardSet]) -> tuple:
         if sort == "id":
@@ -1298,8 +1324,16 @@ class CardProvider:
         page_size: int = 12,
         set_id: str | None = None,
         sort: CardSort = "name",
+        only: frozenset[str] | None = None,
+        exclude: frozenset[str] | None = None,
     ) -> CardPage:
-        key = (number, language, page, page_size, set_id, sort)
+        """The species' cards, newest page first by ``sort``.
+
+        ``only`` keeps just those card ids and ``exclude`` drops them, both **before**
+        pagination, so a page of "owned" or "missing" cards is full and its
+        ``has_more`` is exact. ``only=frozenset()`` is a real, empty filter.
+        """
+        key = (number, language, page, page_size, set_id, sort, only, exclude)
         async with self._lock:
             found, cached = self._cached(self._pages, key)
             if found:
@@ -1321,7 +1355,9 @@ class CardProvider:
                     matching = [
                         brief
                         for brief in index
-                        if set_id is None or brief.set_id == set_id
+                        if (set_id is None or brief.set_id == set_id)
+                        and (only is None or brief.id in only)
+                        and (exclude is None or brief.id not in exclude)
                     ]
                     matching.sort(
                         key=lambda brief: self._sort_key(brief, sort, catalog)
