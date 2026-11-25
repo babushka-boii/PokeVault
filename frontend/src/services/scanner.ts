@@ -7,7 +7,15 @@ export type ScanClues = { name: string; local_number: string; printed_total: num
 export type ScanEvidence = "name_exact" | "name_similar" | "number_exact" | "set_exact" | "printed_total" | "visual_features";
 export type ScanCandidate = { card: SetCard; set: SetSummary; quality: "strong" | "possible" | "uncertain"; evidence: ScanEvidence[] };
 export type MatchResult = { clues: ScanClues; candidates: ScanCandidate[]; status: "matches" | "no_match" | "insufficient_clues"; limited: boolean; warnings: string[] };
-export type RecognizeResult = MatchResult & { engine_languages: ("eng" | "spa")[] };
+/** The card found in the photo: top-left, top-right, bottom-right, bottom-left, each 0-1 of the oriented image. */
+export type CardCorners = readonly [readonly [number, number], readonly [number, number], readonly [number, number], readonly [number, number]];
+export type RecognizeResult = MatchResult & { engine_languages: ("eng" | "spa")[]; corners: CardCorners | null };
+const unit = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 1;
+/** Four points inside the photo; anything else (or a missing field) means no reliable detection. */
+export function parseCorners(value: unknown): CardCorners | null {
+  if (!Array.isArray(value) || value.length !== 4 || !value.every((point) => Array.isArray(point) && point.length === 2 && unit(point[0]) && unit(point[1]))) return null;
+  return value as unknown as CardCorners;
+}
 export type ScanCapabilities = { available: boolean; languages: ("eng" | "spa")[]; formats: string[]; max_upload_bytes: number };
 export class ScanError extends Error {
   constructor(public readonly status: number, public readonly code = "unavailable") { super("Scanner request failed"); }
@@ -70,7 +78,9 @@ export async function recognizeScan(file: File, locale: Locale, csrf: string, si
     headers: { Accept: "application/json", "Content-Type": type, "X-CSRF-Token": csrf } });
   const languages = record(payload) ? payload.engine_languages : undefined;
   if (!isResult(payload) || !engineLanguages(languages) || (languages as unknown[]).length === 0) throw new ScanError(0);
-  return payload as RecognizeResult;
+  const raw = payload as unknown as Record<string, unknown>;
+  // Corners only crop the preview, so a malformed value is dropped instead of failing the whole scan.
+  return { ...(payload as MatchResult), engine_languages: languages as ("eng" | "spa")[], corners: parseCorners(raw.corners) };
 }
 export async function matchScan(clues: ScanClues, locale: Locale, csrf: string, signal: AbortSignal): Promise<MatchResult> {
   if (!csrf) throw new ScanError(401);

@@ -20,6 +20,9 @@ class PreparedCard:
     image: Image.Image
     rectified: bool
     warnings: list[str]
+    # The outline in the oriented photograph, each coordinate 0-1, ordered top-left,
+    # top-right, bottom-right, bottom-left. Only set when the card was rectified.
+    corners: tuple[tuple[float, float], ...] | None = None
 
 
 def _bounded(image: Image.Image) -> Image.Image:
@@ -71,6 +74,22 @@ def _quad(contour, size: tuple[int, int]):
         points = np.roll(points, -1, axis=0)
         sides = sides[::-1]
     return area, points, sides
+
+
+def _corners(points, size: tuple[int, int]) -> tuple[tuple[float, float], ...]:
+    """Order an outline top-left, top-right, bottom-right, bottom-left; scale to 0-1."""
+    total = points.sum(axis=1)
+    difference = points[:, 0] - points[:, 1]
+    ordered = points[
+        [
+            np.argmin(total),
+            np.argmax(difference),
+            np.argmax(total),
+            np.argmin(difference),
+        ]
+    ]
+    unit = np.clip(ordered / np.float32(size), 0.0, 1.0)
+    return tuple((round(float(x), 4), round(float(y), 4)) for x, y in unit)
 
 
 def prepare_card(image: Image.Image) -> PreparedCard:
@@ -127,4 +146,9 @@ def prepare_card(image: Image.Image) -> PreparedCard:
         flags=cv2.INTER_CUBIC,
         borderMode=cv2.BORDER_REPLICATE,
     )
-    return PreparedCard(Image.fromarray(corrected), True, ["card_rectified"])
+    return PreparedCard(
+        Image.fromarray(corrected),
+        True,
+        ["card_rectified"],
+        _corners(points, small.size),
+    )

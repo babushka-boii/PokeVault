@@ -59,10 +59,13 @@ def scanner(inventory):
                 formats=["image/jpeg", "image/png", "image/webp"],
             )
 
+        corners = None
+
         async def recognize(self, data, content_type):
             return OCRResult(
                 clues=ScanClues(name="Pikachu", local_number="025", printed_total=198),
                 engine_languages=["eng", "spa"],
+                corners=self.corners,
             )
 
     async def matcher(provider, payload):
@@ -87,6 +90,40 @@ def test_recognition_extracts_clues_but_does_not_create_inventory(scanner):
     assert response.headers["cache-control"] == "no-store"
     with factory() as session:
         assert session.scalar(select(func.count()).select_from(InventoryCopy)) == 0
+
+
+def test_recognition_returns_the_detected_corners_or_null(scanner):
+    client, _ = scanner
+    headers = {**identity(client, "ash"), "Content-Type": "image/png"}
+    url = "/api/v1/scans/recognize"
+    assert client.post(url, content=b"x", headers=headers).json()["corners"] is None
+    client.app.state.ocr_service.corners = [
+        [0.1, 0.1],
+        [0.9, 0.1],
+        [0.9, 0.9],
+        [0.1, 0.9],
+    ]
+    response = client.post(url, content=b"x", headers=headers)
+    assert response.json()["corners"] == [
+        [0.1, 0.1],
+        [0.9, 0.1],
+        [0.9, 0.9],
+        [0.1, 0.9],
+    ]
+    assert "photo" not in response.text
+
+
+@pytest.mark.parametrize(
+    "corners",
+    [
+        [[0, 0]] * 3,
+        [[0, 0], [1, 0], [1, 1], [0, 1.2]],
+        [[0, 0], [1, 0], [1, 1], [-0.1, 1]],
+    ],
+)
+def test_corners_must_be_four_unit_points(corners):
+    with pytest.raises(ValueError):
+        OCRResult(clues=ScanClues(), engine_languages=["eng"], corners=corners)
 
 
 @pytest.mark.parametrize("name,status", [(None, 401), ("expired", 401), ("ash", 403)])

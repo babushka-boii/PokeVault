@@ -8,6 +8,7 @@ from app.cards.schemas import Category, Identifier, Language
 from app.cards.set_schemas import SetCard, SetSummary
 
 MAX_UPLOAD_BYTES = 8 * 1024 * 1024
+Corner = tuple[float, float]
 EngineLanguage = Literal["eng", "spa"]
 Evidence = Literal[
     "name_exact",
@@ -60,14 +61,28 @@ class MatchResult(BaseModel):
     warnings: list[str] = Field(default_factory=list, max_length=16)
 
 
+def _unit_corners(value: list[Corner] | None) -> list[Corner] | None:
+    if value is not None and not all(0 <= x <= 1 and 0 <= y <= 1 for x, y in value):
+        raise ValueError("Corners are normalized to 0-1")
+    return value
+
+
 class OCRResult(BaseModel):
     clues: ScanClues
     engine_languages: list[EngineLanguage]
     warnings: list[str] = Field(default_factory=list, max_length=16)
+    # Where the card was found, normalized 0-1: top-left, top-right, bottom-right,
+    # bottom-left of the oriented photograph; null when no reliable outline was found.
+    corners: list[Corner] | None = Field(default=None, min_length=4, max_length=4)
+
+    _check_corners = field_validator("corners")(_unit_corners)
 
 
 class RecognizeResult(MatchResult):
     engine_languages: list[EngineLanguage]
+    corners: list[Corner] | None = Field(default=None, min_length=4, max_length=4)
+
+    _check_corners = field_validator("corners")(_unit_corners)
 
 
 class ScanCapabilities(BaseModel):

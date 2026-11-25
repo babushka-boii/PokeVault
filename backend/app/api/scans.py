@@ -170,6 +170,7 @@ async def recognize(
                     :16
                 ],
                 engine_languages=ocr_result.engine_languages,
+                corners=ocr_result.corners,
             )
 
         result = await while_connected(request, process())

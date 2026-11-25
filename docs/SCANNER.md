@@ -494,3 +494,11 @@ The italic flagged "1" remains fragile: some preprocessing variants (other block
 sizes, English-only, shear correction) consistently read 430 or 730. Agreement
 between variants is therefore not proof. The reading is only OCR evidence; matching
 keeps reporting name/number conflicts as uncertain and still requires confirmation.
+
+## Visual feedback and crop (Iteration "scanner visual")
+
+`POST /scans/recognize` also returns `corners`: the outline `geometry.py` already finds, as four points normalized 0-1 on the EXIF-oriented photo (top-left, top-right, bottom-right, bottom-left), or `null` when no reliable outline was found. OCR, matching and the photo handling are unchanged: the photo is still never stored.
+While it recognises, the preview shows a cyan beam sweeping top to bottom inside viewfinder corners, the dimmed photo in a chamfered frame and the text "Analizando carta…" (`role="status"`), for at least 1.2 s so it never flashes. With reduced motion there is no sweep and no transition, only the static frame and the same text.
+When corners arrive, the photo is clipped to the outline and straightened into a 63:88 frame with `matrix3d` (`components/scanner/perspective.ts`, a homography). With `null` corners, an error, or HEIC without a preview, nothing is cropped (HEIC shows only the status text).
+The crop is only a preview aid: it never changes the clues, the candidates or what gets saved, and a malformed `corners` value is dropped instead of failing the scan.
+Tests: the geometry and API tests cover corners with and without detection; `ScanPhoto.test.tsx` covers the minimum duration, the crop and the no-corners cases.
