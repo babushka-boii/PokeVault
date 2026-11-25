@@ -50,8 +50,14 @@ class GoogleOIDCClient:
     def authorization_url(self, state: str, nonce: str, verifier: str) -> str:
         # URL creation is local and does not acquire network resources.
         client = self.client()
+        # select_account always shows Google's account chooser, so the browser never
+        # signs in on its own with the last account it used.
         url, _ = client.create_authorization_url(
-            AUTHORIZATION_ENDPOINT, state=state, nonce=nonce, code_verifier=verifier
+            AUTHORIZATION_ENDPOINT,
+            state=state,
+            nonce=nonce,
+            code_verifier=verifier,
+            prompt="select_account",
         )
         return url
 

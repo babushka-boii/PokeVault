@@ -142,6 +142,8 @@ def test_login_requests_minimum_scopes_pkce_and_bound_cookie(auth_app):
     assert query["response_type"] == ["code"]
     assert query["code_challenge_method"] == ["S256"]
     assert query["redirect_uri"] == ["http://localhost:8000" + CALLBACK]
+    # Always show Google's account chooser instead of silently reusing the last account.
+    assert query["prompt"] == ["select_account"]
     flow_cookie = client.cookies["pokevault_oauth"]
     with factory() as session:
         transaction = session.scalar(select(models.OAuthTransaction))
