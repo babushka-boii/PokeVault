@@ -48,10 +48,17 @@ class UpdateBinder(BaseModel):
 
 
 def _decimals(places: int):
+    """At most ``places`` decimals.
+
+    Binary float noise (JavaScript sends 1.2000000000000002 after 0.1 steps) is not
+    extra precision and is rounded away; a real extra decimal is still rejected.
+    """
+
     def check(value: float) -> float:
-        if round(value, places) != value:
+        rounded = round(value, places)
+        if abs(rounded - value) > 1e-9:
             raise ValueError(f"At most {places} decimal places")
-        return value
+        return rounded
 
     return check
 

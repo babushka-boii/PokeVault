@@ -90,6 +90,105 @@ def test_saving_replaces_the_whole_look_and_can_clear_it(binders):  # noqa: F811
         assert session.scalars(select(BinderSticker)).all() == []
 
 
+def test_seven_mixed_stickers_by_species_and_pixel_design_are_accepted(binders):  # noqa: F811
+    client, _ = binders
+    headers = identity(client)
+    binder = create_binder(client, headers)
+    stickers = [
+        {
+            "kind": "pokemon",
+            "species_id": 560,
+            "x": 12.3,
+            "y": 80,
+            "rotation": 5,
+            "scale": 1.1,
+        },
+        {
+            "kind": "pokemon",
+            "species_id": 501,
+            "x": 40,
+            "y": 20.5,
+            "rotation": -15,
+            "scale": 0.85,
+        },
+        {
+            "kind": "pokemon",
+            "species_id": 849,
+            "x": 70.7,
+            "y": 35,
+            "rotation": 0,
+            "scale": 1.5,
+        },
+        {
+            "kind": "pokemon",
+            "species_id": 605,
+            "x": 30,
+            "y": 55,
+            "rotation": 180,
+            "scale": 2,
+        },
+        {
+            "kind": "pixel",
+            "pixel_key": "bolt",
+            "x": 0,
+            "y": 0,
+            "rotation": -180,
+            "scale": 0.5,
+        },
+        {
+            "kind": "pixel",
+            "pixel_key": "heart",
+            "x": 100,
+            "y": 100,
+            "rotation": 12.5,
+            "scale": 1,
+        },
+        {
+            "kind": "pixel",
+            "pixel_key": "star",
+            "x": 50,
+            "y": 50,
+            "rotation": 0,
+            "scale": 1.25,
+        },
+    ]
+    response = save(client, headers, binder["id"], "holographic", stickers)
+    assert response.status_code == 200, response.text
+    assert [s["species_id"] for s in response.json()["stickers"]][:4] == [
+        560,
+        501,
+        849,
+        605,
+    ]
+    assert len(client.get(f"{PATH}/{binder['id']}").json()["stickers"]) == 7
+
+
+def test_browser_float_noise_is_rounded_but_real_extra_precision_is_not(
+    binders,  # noqa: F811
+):
+    client, _ = binders
+    headers = identity(client)
+    binder = create_binder(client, headers)
+    # What JavaScript produces after a few "+0.1" steps (1.2000000000000002).
+    noisy = {
+        **PIXEL,
+        "scale": 1.2000000000000002,
+        "x": 20.299999999999997,
+        "rotation": 4.999999999999999,
+    }
+    response = save(client, headers, binder["id"], "noir", [noisy])
+    assert response.status_code == 200, response.text
+    assert response.json()["stickers"][0]["scale"] == 1.2
+    assert response.json()["stickers"][0]["x"] == 20.3
+    assert response.json()["stickers"][0]["rotation"] == 5.0
+    assert (
+        save(
+            client, headers, binder["id"], "noir", [{**PIXEL, "scale": 1.234}]
+        ).status_code
+        == 422
+    )
+
+
 def test_the_limit_is_24_stickers(binders):  # noqa: F811
     client, _ = binders
     headers = identity(client)
