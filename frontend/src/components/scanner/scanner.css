@@ -12,6 +12,23 @@
 .scanner-page button:disabled { cursor: default; opacity: .55; }
 .scanner-photo { margin: 1rem 0; max-width: 25rem; }
 .scanner-photo img { background: var(--pv-panel-raised); border: 1px solid var(--pv-border); border-radius: var(--pv-radius-2); display: block; max-height: 27rem; object-fit: contain; width: 100%; }
+/* The photo while it is read (the beam), then cropped to the card. Coordinates are percentages of the photo, so the frame takes its exact shape. */
+.scan-frame { aspect-ratio: var(--scan-ratio, .75); background: var(--pv-panel-raised); clip-path: polygon(var(--pv-cut-sm) 0, 100% 0, 100% calc(100% - var(--pv-cut-sm)), calc(100% - var(--pv-cut-sm)) 100%, 0 100%, 0 var(--pv-cut-sm)); max-height: 27rem; overflow: hidden; position: relative; width: min(100%, calc(27rem * var(--scan-ratio, .75))); }
+.scan-frame img { border: 0; border-radius: 0; height: 100%; max-height: none; object-fit: fill; transform-origin: 0 0; transition: clip-path 450ms ease, transform 600ms ease 450ms; width: 100%; }
+.scan-frame[data-scanning] img { filter: brightness(.6); }
+.scan-frame__overlay { inset: 0; pointer-events: none; position: absolute; }
+.scan-frame__overlay i { border: 0 solid var(--pv-cyan); height: 1.5rem; position: absolute; width: 1.5rem; }
+.scan-frame__overlay i:nth-child(2) { border-left-width: 3px; border-top-width: 3px; left: .5rem; top: .5rem; }
+.scan-frame__overlay i:nth-child(3) { border-right-width: 3px; border-top-width: 3px; right: .5rem; top: .5rem; }
+.scan-frame__overlay i:nth-child(4) { border-bottom-width: 3px; border-right-width: 3px; bottom: .5rem; right: .5rem; }
+.scan-frame__overlay i:nth-child(5) { border-bottom-width: 3px; border-left-width: 3px; bottom: .5rem; left: .5rem; }
+.scan-frame__overlay .scan-frame__beam { animation: scan-sweep 1.4s ease-in-out infinite; background: var(--pv-cyan); border: 0; box-shadow: 0 0 .75rem .25rem var(--pv-cyan-soft), 0 0 .25rem var(--pv-cyan); height: 2px; left: 0; top: 0; width: 100%; }
+.scan-frame__status { color: var(--pv-cyan); font-size: .85rem; font-weight: 600; margin: .5rem 0 0; }
+@keyframes scan-sweep { 0% { top: 0; } 50% { top: calc(100% - 2px); } 100% { top: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .scan-frame__overlay .scan-frame__beam { animation: none; display: none; }
+  .scan-frame img { transition: none; }
+}
 .scanner-photo figcaption { color: var(--pv-text-2); font-size: .75rem; margin-top: .5rem; overflow-wrap: anywhere; }
 .scanner-actions { align-items: center; display: flex; flex-wrap: wrap; gap: .75rem 1rem; margin: 1rem 0; }
 .scanner-actions a, .scanner-page > p > a { color: var(--pv-cyan); font-size: .85rem; font-weight: 700; text-underline-offset: .2rem; }

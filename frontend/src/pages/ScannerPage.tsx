@@ -9,7 +9,8 @@ import { ScannerResults } from "../components/scanner/ScannerResults";
 import { useLocale } from "../i18n/LocaleProvider";
 import type { Dictionary } from "../i18n/dictionaries";
 import type { InventoryCopy } from "../services/inventory";
-import { fetchScanCapabilities, matchScan, recognizeScan, ScanError, scanImageFormats, scanImageType, type MatchResult, type ScanCandidate, type ScanCapabilities, type ScanClues } from "../services/scanner";
+import { ScanPhoto } from "../components/scanner/ScanPhoto";
+import { fetchScanCapabilities, matchScan, recognizeScan, ScanError, scanImageFormats, scanImageType, type CardCorners, type MatchResult, type RecognizeResult, type ScanCandidate, type ScanCapabilities, type ScanClues } from "../services/scanner";
 import "../components/cards/cards.css";
 import "../components/scanner/scanner.css";
 
@@ -46,6 +47,7 @@ function ScannerSession({ suspended }: { suspended: boolean }) {
   const [selected, setSelected] = useState<ScanCandidate | null>(null); const [saved, setSaved] = useState<InventoryCopy | null>(null);
   const [copyDefaults, setCopyDefaults] = useState<CopyDefaults>();
   const [manualOpen, setManualOpen] = useState(false);
+  const [corners, setCorners] = useState<{ file: File; value: CardCorners | null } | null>(null);
   const [busy, setBusy] = useState<"recognize" | "match" | null>(null); const [error, setError] = useState<string | null>(null); const [cancelled, setCancelled] = useState(false);
   const pending = useRef<AbortController | null>(null); const success = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -93,7 +95,7 @@ function ScannerSession({ suspended }: { suspended: boolean }) {
     const request = kind === "match" ? matchScan(clues, locale, token, controller.signal)
       : capabilities?.formats.includes(scanImageType(selectedFile!)) ? recognizeScan(selectedFile!, locale, token, controller.signal)
       : Promise.reject(new ScanError(415));
-    void request.then((data) => { if (!controller.signal.aborted) { setClues(data.clues); setResult(data); if (data.status !== "matches") setManualOpen(true); } }, (reason: unknown) => {
+    void request.then((data) => { if (!controller.signal.aborted) { if (kind === "recognize" && selectedFile) setCorners({ file: selectedFile, value: (data as RecognizeResult).corners ?? null }); setClues(data.clues); setResult(data); if (data.status !== "matches") setManualOpen(true); } }, (reason: unknown) => {
       if (!controller.signal.aborted) {
         setError(errorMessage(reason, dictionary));
         setManualOpen(true);
@@ -111,7 +113,7 @@ function ScannerSession({ suspended }: { suspended: boolean }) {
     }, 0);
     return () => window.clearTimeout(timer);
   }, [suspended, capabilities, image, identify]);
-  const imagePreview = image && <figure className="scanner-photo">{image.url ? <img src={image.url} alt={text.preview} /> : <p className="scanner-hint">{text.previewUnavailable}</p>}<figcaption>{image.file.name}</figcaption></figure>;
+  const imagePreview = image && <ScanPhoto url={image.url} name={image.file.name} scanning={busy === "recognize"} corners={corners?.file === image.file ? corners.value : null} />;
   if (saved && selected) return <section className="scanner-success" aria-labelledby="scanner-saved"><h2 id="scanner-saved" tabIndex={-1} ref={success}>{dictionary.inventory.added}</h2>
     <div className="scanner-actions"><Link to={`/collection/${encodeURIComponent(saved.id)}`}>{text.savedCopy}</Link>
       <Link to="/binders">{text.storeInBinder}</Link>

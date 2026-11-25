@@ -100,8 +100,8 @@ describe("stylesheets", () => {
     expect(offenders).toEqual([]);
   });
 
-  // The Profile design mandates a two-step idle bob on the trainer and the team; it stays off under reduced motion.
-  const IDLE_MOTION = new Set(["/src/components/profile/profile.css"]);
+  // The Profile's idle bob and the scanner's sweeping beam loop only while something is shown; both stop under reduced motion.
+  const IDLE_MOTION = new Set(["/src/components/profile/profile.css", "/src/components/scanner/scanner.css"]);
   test("the idle bob is stopped for reduced-motion users", () => {
     for (const file of IDLE_MOTION) expect(stripComments(sheets[file])).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{[^}]*animation:\s*none/);
   });
