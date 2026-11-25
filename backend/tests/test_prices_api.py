@@ -202,6 +202,47 @@ def test_collection_value_counts_only_the_signed_in_users_copies(prices):
     assert {item["copy_id"] for item in misty["top"]} == set(ids["misty_towers"])
 
 
+def test_top_copies_default_to_five_and_accept_one_to_twenty(prices):
+    client, factory, _, users, _, _ = prices
+    for _ in range(8):
+        copy(factory, users["ash"], "me02.5-261", "holo")
+    identity(client, "ash")
+    assert len(client.get("/api/v1/prices/collection").json()["top"]) == 5
+    assert len(client.get("/api/v1/prices/collection?top=8").json()["top"]) == 8
+    assert len(client.get("/api/v1/prices/collection?top=1").json()["top"]) == 1
+    for bad in ("0", "21", "x"):
+        assert client.get(f"/api/v1/prices/collection?top={bad}").status_code == 422
+
+
+def test_the_valuation_reports_how_old_its_least_fresh_price_is(prices):
+    client, factory, app, users, _, _ = prices
+    seed(factory, users)
+    identity(client, "ash")
+    first = client.get("/api/v1/prices/collection").json()
+    assert first["prices_updated_at"] is not None
+    # Age one snapshot: the reported time is the oldest one used by a priced copy.
+    old = datetime(2026, 11, 1, tzinfo=UTC)
+    with factory.begin() as session:
+        from app.db.models import CardPriceSnapshot
+
+        session.get(CardPriceSnapshot, "me05-044").fetched_at = old
+    app.state.price_service._provider_down_until = datetime(2999, 1, 1, tzinfo=UTC)
+    aged = client.get("/api/v1/prices/collection").json()
+    assert aged["prices_updated_at"].startswith("2026-11-01")
+    identity(client, "misty")
+    assert (
+        client.get("/api/v1/prices/collection").json()["prices_updated_at"] is not None
+    )
+
+
+def test_nothing_priced_means_no_price_age(prices):
+    client, factory, _, users, _, _ = prices
+    copy(factory, users["ash"], "me02.5-130", "unknown")
+    identity(client, "ash")
+    value = client.get("/api/v1/prices/collection").json()
+    assert value["priced_count"] == 0 and value["prices_updated_at"] is None
+
+
 def test_a_user_without_copies_gets_an_empty_valuation(prices):
     client, factory, _, users, provider, rates = prices
     seed(factory, users)

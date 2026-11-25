@@ -1,6 +1,7 @@
 from functools import lru_cache
 from typing import Annotated, Literal, Self
 from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -62,9 +63,22 @@ class Settings(BaseSettings):
     auth_session_ttl_seconds: int = Field(
         default=604800, ge=60, le=2592000, validation_alias="AUTH_SESSION_TTL_SECONDS"
     )
+    # The calendar day used for the daily collection value records.
+    home_timezone: str = Field(
+        default="America/Santiago", validation_alias="HOME_TIMEZONE"
+    )
     auth_transaction_ttl_seconds: int = Field(
         default=600, ge=60, le=900, validation_alias="AUTH_TRANSACTION_TTL_SECONDS"
     )
+
+    @field_validator("home_timezone")
+    @classmethod
+    def validate_home_timezone(cls, value: str) -> str:
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError) as error:
+            raise ValueError("HOME_TIMEZONE must be an IANA time zone name") from error
+        return value
 
     @field_validator("cors_origins", mode="before")
     @classmethod

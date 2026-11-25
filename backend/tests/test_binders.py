@@ -548,6 +548,34 @@ def test_views_are_owned_paginated_stable_and_use_acquisition_date(binders):
     assert client.get(f"{PATH}/views/unknown").status_code == 422
 
 
+def test_the_added_view_orders_by_creation_not_by_acquisition_date(binders):
+    client, factory = binders
+    headers = identity(client)
+    now = datetime(2026, 11, 20, tzinfo=UTC)
+    oldest = add_copy(factory, acquired_on=date(2026, 12, 1), created_at=now)
+    middle = add_copy(
+        factory, acquired_on=date(2026, 1, 1), created_at=now + timedelta(days=1)
+    )
+    newest = add_copy(factory, acquired_on=None, created_at=now + timedelta(days=2))
+    add_copy(factory, "misty", created_at=now + timedelta(days=3))
+    added = client.get(f"{PATH}/views/added").json()
+    assert [r["id"] for r in added["results"]] == [
+        str(newest),
+        str(middle),
+        str(oldest),
+    ]
+    assert added["total"] == 3
+    # The existing "recent" order (acquisition date first) is unchanged.
+    recent = client.get(f"{PATH}/views/recent").json()
+    assert recent["results"][0]["id"] == str(oldest)
+    page = client.get(f"{PATH}/views/added", params={"offset": 1, "limit": 1}).json()
+    assert [r["id"] for r in page["results"]] == [str(middle)] and page["total"] == 3
+    # Copies in a binder are still "added"; the view is not about placement.
+    binder = create_binder(client, headers)
+    assert store(client, headers, binder["id"], newest).status_code == 200
+    assert client.get(f"{PATH}/views/added").json()["total"] == 3
+
+
 def test_locations_name_the_binder_page_and_pocket_of_owned_copies(binders):
     client, factory = binders
     headers = identity(client)

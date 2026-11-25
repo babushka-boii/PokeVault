@@ -112,4 +112,5 @@ class CopyViewPage(BaseModel):
     limit: int
 
 
-View = Literal["owned", "unassigned", "recent"]
+# "recent" orders by acquisition date (Expansiones); "added" by creation time.
+View = Literal["owned", "unassigned", "recent", "added"]

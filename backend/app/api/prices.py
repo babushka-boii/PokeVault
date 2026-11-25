@@ -27,6 +27,7 @@ from app.prices.service import CopyRef, PriceService
 
 router = APIRouter(prefix="/api/v1", tags=["prices"])
 TOP_COPIES = 5
+MAX_TOP_COPIES = 20
 CurrencyParam = Annotated[TargetCurrency | None, Query()]
 
 
@@ -121,6 +122,7 @@ async def copy_prices(
 async def collection_value(
     request: Request,
     currency: CurrencyParam = None,
+    top: Annotated[int, Query(ge=1, le=MAX_TOP_COPIES)] = TOP_COPIES,
     user: User = Depends(require_current_user),
     service: PriceService = Depends(get_price_service),
 ) -> Valuation:
@@ -133,9 +135,7 @@ async def collection_value(
         return _refs(rows), currency or user_currency(session, user)
 
     refs, chosen = _read(request, load)
-    result = await _priced(
-        service.value(_factory(request), refs, chosen, top=TOP_COPIES)
-    )
+    result = await _priced(service.value(_factory(request), refs, chosen, top=top))
     _still_signed_in(request, user)
     return result
 

@@ -8,6 +8,7 @@ from app.api.binders import router as binders_router
 from app.api.cards import router as cards_router
 from app.api.favorites import router as favorites_router
 from app.api.health import router as health_router
+from app.api.history import router as history_router
 from app.api.inventory import router as inventory_router
 from app.api.pokemon import router as pokemon_router
 from app.api.prices import router as prices_router
@@ -51,6 +52,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(inventory_router)
     app.include_router(binders_router)
     app.include_router(favorites_router)
+    app.include_router(history_router)
     app.include_router(prices_router)
     app.include_router(settings_router)
     app.include_router(pokemon_router)
