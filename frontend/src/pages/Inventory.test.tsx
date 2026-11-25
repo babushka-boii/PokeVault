@@ -121,7 +121,7 @@ test("shows translated inventory failure with retry, and hides a late response a
   expect(screen.queryByText("My first copy")).not.toBeInTheDocument();
 });
 
-test("hides the previous collection immediately while a different account is being validated", async () => {
+test("keeps the collection visible while the session is checked, and replaces it if a different account answers", async () => {
   let resolveSession!: (r: Response) => void;
   let revalidate = false;
   vi.stubGlobal("fetch", vi.fn(async (input: string) => {
@@ -133,8 +133,8 @@ test("hides the previous collection immediately while a different account is bei
   expect(await screen.findByText("My first copy")).toBeVisible();
   revalidate = true;
   await act(async () => { window.dispatchEvent(new Event("focus")); });
-  expect(screen.queryByText("My first copy")).not.toBeInTheDocument();
-  expect(screen.getByRole("status")).toHaveTextContent("Comprobando sesión");
+  expect(screen.getByText("My first copy")).toBeVisible();   // a background check does not unmount the page
+  expect(screen.queryByText("Comprobando sesión…")).not.toBeInTheDocument();
   await act(async () => { resolveSession(json({ ...session, user: { ...profile, id: "misty", display_name: "Misty" } })); });
   expect(await screen.findByText("Tu colección está vacía. Explora el catálogo y añade tu primera carta.")).toBeVisible();
   expect(screen.queryByText("My first copy")).not.toBeInTheDocument();

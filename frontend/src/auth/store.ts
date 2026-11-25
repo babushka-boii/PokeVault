@@ -14,6 +14,11 @@ export type AuthState = {
   validating?: boolean;
 };
 
+/** Coming back to the page revalidates only after this long away, or when the last check is this old. */
+export const AWAY_MS = 30_000;
+export const STALE_MS = 60_000;
+export type RevalidateReason = "focus" | "visible" | "pageshow" | "bfcache";
+
 const unauthenticated: AuthState = { status: "unauthenticated", user: null, error: null, loggingOut: false };
 
 // Each mounted application owns its own in-memory session. No provider tokens or
@@ -24,6 +29,8 @@ export function createAuthStore() {
   let active = false;
   let generation = 0;
   let pending: Promise<void> | null = null;
+  let lastValidated = 0;
+  let awayAt: number | null = null;
   let sessionController: AbortController | null = null;
   let logoutController: AbortController | null = null;
   const listeners = new Set<() => void>();
@@ -31,10 +38,12 @@ export function createAuthStore() {
 
   function restore() {
     if (!active || state.loggingOut || pending) return;
-    // Until the cookie has been revalidated, no private identity is trusted.
-    // Marking validation unmounts private requests and disables CSRF access.
-    publish(state.status === "authenticated"
-      ? { ...state, validating: true }
+    // While the cookie is revalidated the page stays as it is (nothing unmounts), but the CSRF token
+    // is withheld, so nothing can be written until the server has confirmed the session again.
+    const previous = state;
+    lastValidated = Date.now();
+    publish(previous.status === "authenticated"
+      ? { ...previous, validating: true }
       : { status: "loading", user: null, error: null, loggingOut: false });
     const currentGeneration = generation;
     const controller = new AbortController();
@@ -42,9 +51,16 @@ export function createAuthStore() {
     const request = fetchSession(controller.signal).then((result) => {
       if (!active || controller.signal.aborted || currentGeneration !== generation) return;
       session = result;
+      lastValidated = Date.now();
       publish(result ? { status: "authenticated", user: result.user, error: null, loggingOut: false } : unauthenticated);
     }).catch(() => {
       if (!active || controller.signal.aborted || currentGeneration !== generation) return;
+      // A network or server failure is not a logout: keep what was shown and say so calmly.
+      // Only a definite "no session" answer (above) clears the private data.
+      if (previous.status === "authenticated" && session) {
+        publish({ status: "authenticated", user: previous.user, error: "session_unavailable", loggingOut: false });
+        return;
+      }
       session = null;
       publish({ status: "error", user: null, error: "session_unavailable", loggingOut: false });
     }).finally(() => {
@@ -52,6 +68,18 @@ export function createAuthStore() {
     });
     pending = request;
   }
+
+  /** Called on focus, visibility and pageshow; one check per return, and only when it is worth it. */
+  function revalidate(reason: RevalidateReason) {
+    if (!active || state.loggingOut || pending) return;
+    const now = Date.now();
+    const awayLong = awayAt !== null && now - awayAt > AWAY_MS;
+    const stale = now - lastValidated > STALE_MS;
+    awayAt = null;
+    if (reason === "bfcache" || awayLong || stale) restore();
+  }
+
+  function markAway() { if (awayAt === null) awayAt = Date.now(); }
 
   function logout() {
     if (!active || !session || state.loggingOut) return;
@@ -94,10 +122,13 @@ export function createAuthStore() {
     },
     retrySession: () => {
       if (pending || state.loggingOut) return;
+      if (state.status === "authenticated") { restore(); return; }   // a failed private request: check again in the background
       publish({ status: "loading", user: null, error: null, loggingOut: false });
       restore();
     },
     restore,
+    revalidate,
+    markAway,
     logout,
   };
 }

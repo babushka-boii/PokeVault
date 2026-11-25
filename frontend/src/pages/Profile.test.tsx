@@ -55,7 +55,9 @@ test("the band names the trainer, since when, the team and its free slots", asyn
   expect(await screen.findByText("Entrenador desde nov 2026")).toBeVisible();
   expect(screen.getByRole("img", { name: "Tu entrenador" })).toBeVisible();
   const team = screen.getByRole("list", { name: "Equipo" });
-  expect(await within(team).findByRole("img", { name: "Scraggy" })).toHaveAttribute("src", expect.stringContaining("/559.png"));
+  const scraggy = (await within(team).findByText("Scraggy")).closest("li")!.querySelector("img")!;
+  expect(scraggy).toHaveAttribute("src", expect.stringContaining("/559.png"));
+  expect(scraggy).toHaveAttribute("width", "108");
   expect(within(team).getAllByRole("img", { name: "Espacio libre en el equipo" })).toHaveLength(2);
   expect(screen.getByRole("button", { name: "Cambiar entrenador" })).toBeEnabled();
   expect(screen.getByRole("button", { name: "Editar equipo (3/5)" })).toBeEnabled();

@@ -21,7 +21,7 @@ export function OwnedCopy({ copy, onChanged, locked, onActiveChange, price }: { 
     {mode === "edit" ? <CopyForm cardId={copy.card_id} copy={copy} onCancel={() => { setMode("view"); onActiveChange(null); }} onSaved={() => onChanged("updated")} />
       : mode === "confirm" ? <div className="inventory-confirm">
         <p>{text.confirmText}</p>
-        <button type="button" disabled={busy} onClick={() => {
+        <button type="button" disabled={busy || Boolean(auth.validating)} onClick={() => {
           if (pending.current) return;
           const token = auth.getCsrfToken();
           if (!token) { setError(401); return; }
@@ -37,8 +37,8 @@ export function OwnedCopy({ copy, onChanged, locked, onActiveChange, price }: { 
         }}>{busy ? text.saving : text.confirm}</button>
         <button type="button" disabled={busy} onClick={() => { setMode("view"); onActiveChange(null); }}>{text.cancel}</button>
       </div> : <div className="inventory-actions">
-        <button type="button" disabled={locked} onClick={() => { setMode("edit"); onActiveChange(copy.id); }}>{text.edit}</button>
-        <button type="button" disabled={locked} onClick={() => { setMode("confirm"); setError(null); onActiveChange(copy.id); }}>{text.remove}</button>
+        <button type="button" disabled={locked || Boolean(auth.validating)} onClick={() => { setMode("edit"); onActiveChange(copy.id); }}>{text.edit}</button>
+        <button type="button" disabled={locked || Boolean(auth.validating)} onClick={() => { setMode("confirm"); setError(null); onActiveChange(copy.id); }}>{text.remove}</button>
       </div>}
     {error !== null && <p role="alert">{error === 401 || error === 403 ? text.expired : error === 404 ? text.missing : text.mutationError}</p>}
   </li>;

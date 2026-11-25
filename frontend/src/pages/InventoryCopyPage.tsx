@@ -57,7 +57,7 @@ export function InventoryCopyPage() {
     <h1 id="copy-title">{dictionary.inventory.title}</h1>
     <SessionNotice />
     {auth.status === "unauthenticated" && <Link to="/login">{dictionary.auth.signIn}</Link>}
-    {auth.status === "authenticated" && !auth.loggingOut && !auth.validating && <PersonalCopy key={`${auth.user.id}:${copyId}`} id={copyId} />}
+    {auth.status === "authenticated" && !auth.loggingOut && <PersonalCopy key={`${auth.user.id}:${copyId}`} id={copyId} />}
     <p><Link to="/collection">{dictionary.inventory.title}</Link> · <Link to="/binders">{dictionary.binders.title}</Link></p>
   </section>;
 }

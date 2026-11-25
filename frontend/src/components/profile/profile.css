@@ -2,23 +2,22 @@
 .pv-profile { display: flex; flex-direction: column; gap: 24px; }
 .pv-profile h1, .pv-profile h2 { font-family: var(--pv-font-display); }
 
-/* 1. Trainer band */
-.pv-band { align-items: flex-end; background: radial-gradient(ellipse 50% 70% at 50% 90%, color-mix(in srgb, var(--pv-cyan) 10%, transparent), transparent 70%); display: flex; flex: 0 0 270px; gap: 24px; height: 270px; justify-content: space-between; padding: 0 8px 8px; position: relative; }
-.pv-band__who { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-bottom: 18px; }
+/* 1. Trainer band: name | stage | buttons in a grid, so nothing can overlap at any width */
+.pv-band { --slot: 112px; align-items: end; background: radial-gradient(ellipse 50% 70% at 50% 90%, color-mix(in srgb, var(--pv-cyan) 10%, transparent), transparent 70%); display: grid; gap: 16px 24px; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding: 8px 8px 12px; position: relative; }
+.pv-band__who { align-self: center; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .pv-band__who h1 { font-size: 30px; font-weight: 700; margin: 0; overflow-wrap: anywhere; }
 .pv-band__who p { color: var(--pv-text-2); font-size: 13px; margin: 0; }
-.pv-band__stage { align-items: flex-end; bottom: 18px; display: flex; gap: 18px; left: 50%; position: absolute; transform: translateX(-50%); }
-.pv-band__team { align-items: flex-end; display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; }
+.pv-band__stage { align-items: flex-end; display: flex; gap: 10px; justify-content: center; min-width: 0; }
+.pv-band__team { align-items: flex-end; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; list-style: none; margin: 0; padding: 0; }
 .pv-band__team li { align-items: center; display: flex; flex-direction: column; }
-.pv-slot { align-items: center; display: flex; height: 72px; justify-content: center; width: 72px; }
-.pv-slot img { height: 64px; image-rendering: pixelated; width: 64px; }
-.pv-slot--empty { border: 1px dashed var(--pv-border-strong); color: var(--pv-border-strong); font-size: 20px; }
+.pv-slot { align-items: flex-end; display: flex; height: var(--slot); justify-content: center; width: var(--slot); }
+.pv-slot--empty { align-items: center; border: 1px dashed var(--pv-border-strong); color: var(--pv-border-strong); font-size: 20px; height: calc(var(--slot) * .65); width: calc(var(--slot) * .65); }
 .pv-shadow { background: color-mix(in srgb, var(--pv-shadow-color) 55%, transparent); border-radius: 50%; display: block; margin-top: 2px; }
-.pv-shadow--small { height: 8px; width: 52px; }
+.pv-shadow--small { height: 8px; width: calc(var(--slot) * .55); }
 .pv-shadow--large { background: color-mix(in srgb, var(--pv-shadow-color) 60%, transparent); height: 10px; width: 80px; }
 .pv-band__trainer { align-items: center; display: flex; flex-direction: column; margin-left: 10px; }
-.pv-band__trainer > span:first-child { align-items: center; display: flex; height: 140px; justify-content: center; width: 104px; }
-.pv-band__actions { display: flex; gap: 8px; padding-bottom: 18px; }
+.pv-band__trainer > span:first-child { align-items: flex-end; display: flex; height: 132px; justify-content: center; width: 96px; }
+.pv-band__actions { align-items: stretch; align-self: center; display: flex; flex-direction: column; gap: 8px; justify-self: end; }
 .pv-band__rule { background: linear-gradient(90deg, transparent, var(--pv-border) 20%, var(--pv-border) 80%, transparent); bottom: 0; height: 1px; left: 0; position: absolute; right: 0; }
 .pv-pbtn { background: var(--pv-panel); border: 1px solid var(--pv-border); color: var(--pv-text); cursor: pointer; font: 600 13px var(--pv-font-body); min-height: var(--pv-touch); padding: 0 14px; }
 .pv-pbtn--primary { background: var(--pv-cyan); border: 0; color: var(--pv-on-cyan); }
@@ -106,16 +105,20 @@
 .pv-teamresults button:disabled { cursor: not-allowed; opacity: .5; }
 .pv-teamresults img, .pv-teamlist img { image-rendering: pixelated; }
 
-/* Narrow screens: the band stacks, rows wrap */
+/* Narrow screens: one column, the team shrinks to fit, the buttons sit side by side while they fit */
+@media (max-width: 1100px) {
+  .pv-band { --slot: 96px; grid-template-columns: minmax(0, 1fr); }
+  .pv-band__stage { justify-self: center; }
+  .pv-band__actions { flex-direction: row; flex-wrap: wrap; justify-self: stretch; }
+  .pv-band__actions .pv-pbtn { flex: 1 1 10rem; }
+}
+@media (max-width: 600px) {
+  .pv-band { --slot: 56px; }
+  .pv-band__stage { flex-direction: column; align-items: center; }
+  .pv-band__trainer { margin-left: 0; }
+  .pv-band__actions { flex-direction: column; }
+}
 @media (max-width: 900px) {
-  .pv-band { align-items: stretch; flex-direction: column; flex-basis: auto; gap: 12px; height: auto; padding: 8px 0 16px; }
-  .pv-band__who { padding-bottom: 0; }
-  .pv-band__stage { align-self: center; bottom: auto; left: auto; position: static; transform: none; }
-  .pv-band__team { gap: 6px; }
-  .pv-slot { height: 56px; width: 56px; }
-  .pv-slot img { height: 48px; width: 48px; }
-  .pv-shadow--small { width: 40px; }
-  .pv-band__actions { flex-wrap: wrap; padding-bottom: 0; }
   .pv-profile__summary, .pv-breaks { flex-direction: column; }
   .pv-favs__row { grid-auto-columns: 38%; grid-auto-flow: column; grid-template-columns: none; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
   .pv-favs__row li { scroll-snap-align: start; }

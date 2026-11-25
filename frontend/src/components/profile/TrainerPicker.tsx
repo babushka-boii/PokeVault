@@ -5,7 +5,7 @@ import { TrainerSprite } from "./TrainerSprite";
 import { TRAINERS, type TrainerId } from "./trainers";
 
 /** Four original trainers. Choosing one saves it; the dialog stays open with a message if that fails. */
-export function TrainerPicker({ current, onSave, onClose }: { current: TrainerId; onSave: (id: TrainerId) => Promise<boolean>; onClose: () => void }) {
+export function TrainerPicker({ current, blocked = false, onSave, onClose }: { current: TrainerId; blocked?: boolean; onSave: (id: TrainerId) => Promise<boolean>; onClose: () => void }) {
   const text = useLocale().dictionary.profilePage;
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -19,7 +19,7 @@ export function TrainerPicker({ current, onSave, onClose }: { current: TrainerId
   }
   return <ProfileDialog title={text.trainerTitle} onClose={onClose}>
     <div className="pv-trainers" role="radiogroup" aria-label={text.trainerTitle}>
-      {TRAINERS.map((trainer) => <button key={trainer.id} type="button" role="radio" aria-checked={trainer.id === current} disabled={busy} onClick={() => void choose(trainer.id)}>
+      {TRAINERS.map((trainer) => <button key={trainer.id} type="button" role="radio" aria-checked={trainer.id === current} disabled={busy || blocked} onClick={() => void choose(trainer.id)}>
         <TrainerSprite id={trainer.id} width={64} height={88} />
         <span>{trainer.name}</span>
       </button>)}

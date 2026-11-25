@@ -93,7 +93,7 @@ export function SetsPage() {
     return `${location.pathname}?${nextParams}`;
   };
   const data = state.kind === "loaded" ? state.data : null;
-  const personal = auth.status === "authenticated" && !auth.loggingOut && !auth.validating;
+  const personal = auth.status === "authenticated" && !auth.loggingOut;
   return <section className="panel tcg-page sets-page" aria-labelledby="sets-title">
     <h1 id="sets-title" ref={heading} tabIndex={-1}>{text.title}</h1><p>{text.description}</p>
     <p className="tcg-coverage">{text.coverage}</p>

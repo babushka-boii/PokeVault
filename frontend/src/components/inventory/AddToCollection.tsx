@@ -22,6 +22,6 @@ export function AddToCollection({ cardId, onSaved, locked, onActiveChange }: { c
   const { dictionary } = useLocale();
   return <div className="inventory-add"><SessionNotice />
     {auth.status === "unauthenticated" && <Link to="/login">{dictionary.auth.signIn} · {dictionary.inventory.add}</Link>}
-    {auth.status === "authenticated" && !auth.loggingOut && !auth.validating && <AddCopy key={`${auth.user.id}:${cardId}`} cardId={cardId} onSaved={onSaved} locked={locked} onActiveChange={onActiveChange} />}
+    {auth.status === "authenticated" && !auth.loggingOut && <AddCopy key={`${auth.user.id}:${cardId}`} cardId={cardId} onSaved={onSaved} locked={locked} onActiveChange={onActiveChange} />}
   </div>;
 }

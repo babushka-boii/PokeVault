@@ -12,6 +12,8 @@ export function CopyForm({ cardId, copy, defaults, onSaved, onCancel, suspended 
   const { dictionary } = useLocale();
   const text = dictionary.inventory;
   const auth = useAuth();
+  // Being confirmed in the background: the form and its text stay, but it cannot be saved yet.
+  const blocked = suspended || Boolean(auth.validating);
   const prefix = useId();
   const [values, setValues] = useState<CopyAttributes>(() => copy ? {
     condition: copy.condition, language: copy.language, variant: copy.variant,
@@ -35,7 +37,7 @@ export function CopyForm({ cardId, copy, defaults, onSaved, onCancel, suspended 
   }, [suspended, copy]);
   return <form className="inventory-form" onSubmit={(event) => {
     event.preventDefault();
-    if (suspended || pending.current) return;
+    if (blocked || pending.current) return;
     const token = auth.getCsrfToken();
     if (!token) { setError(401); return; }
     const controller = new AbortController();
@@ -58,7 +60,7 @@ export function CopyForm({ cardId, copy, defaults, onSaved, onCancel, suspended 
       if (!controller.signal.aborted) { pending.current = null; setBusy(false); }
     });
   }}>
-    <fieldset disabled={suspended || busy || uncertain || error === 409}>
+    <fieldset disabled={blocked || busy || uncertain || error === 409}>
       <legend>{copy ? text.edit : text.add}</legend>
       <label htmlFor={`${prefix}-condition`}>{text.condition}</label>
       <select ref={first} id={`${prefix}-condition`} value={values.condition} onChange={(e) => setValues({ ...values, condition: e.target.value as CopyAttributes["condition"] })}>
@@ -78,7 +80,7 @@ export function CopyForm({ cardId, copy, defaults, onSaved, onCancel, suspended 
       <textarea id={`${prefix}-notes`} maxLength={2000} rows={3} value={values.notes} onChange={(e) => setValues({ ...values, notes: e.target.value })} />
     </fieldset>
     {error !== null && <p role="alert">{uncertain ? text.uncertain : error === 409 ? text.conflict : error === 401 || error === 403 ? text.expired : error === 422 ? text.invalid : error === 404 ? text.missing : text.mutationError}</p>}
-    <div className="inventory-actions"><button type="submit" disabled={suspended || busy || error === 409}>{busy ? text.saving : uncertain ? text.retrySame : text.save}</button>
+    <div className="inventory-actions"><button type="submit" disabled={blocked || busy || error === 409}>{busy ? text.saving : uncertain ? text.retrySame : text.save}</button>
       <button type="button" disabled={suspended || busy} onClick={onCancel}>{text.cancel}</button></div>
     <p className="inventory-hint">{text.physicalNote}</p>
   </form>;

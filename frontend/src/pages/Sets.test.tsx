@@ -262,7 +262,7 @@ test("refreshes missing entry and whole-set progress after adding on existing ca
   expect(screen.getByText("1 copias propias")).toBeVisible();
 });
 
-test("hides and aborts private progress immediately during session validation and ignores the old account response", async () => {
+test("keeps private progress on screen during session validation and discards it when the session turns out to be gone", async () => {
   let validating = false;
   let resolveSession!: (response: Response) => void;
   let finishProgress!: (response: Response) => void;
@@ -278,16 +278,16 @@ test("hides and aborts private progress immediately during session validation an
   await waitFor(() => expect(finishProgress).toBeTypeOf("function"));
   validating = true;
   await act(async () => window.dispatchEvent(new Event("focus")));
-  expect(privateSignal?.aborted).toBe(true);
-  expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  expect(privateSignal?.aborted).toBe(false);   // a background check cancels nothing
   expect(await screen.findByRole("link", { name: pikachuCard.name })).toBeVisible();
-  await act(async () => resolveSession(json({}, 401)));
   await act(async () => finishProgress(json(setCollectionPage())));
+  expect(await screen.findByText("3 copias propias")).toBeVisible();   // read-only content stays while the session is checked
+  await act(async () => resolveSession(json({}, 401)));
   expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
   expect(screen.queryByText("3 copias propias")).not.toBeInTheDocument();
 });
 
-test("discards loaded ownership badges while switching accounts and reads fresh progress", async () => {
+test("replaces the ownership badges when a different account answers the check and reads fresh progress", async () => {
   let switched = false;
   setup((url) => {
     if (url.pathname.endsWith("/auth/me")) return json(switched ? { ...setSession, user: { ...setSession.user, id: "misty" } } : setSession);
@@ -299,7 +299,6 @@ test("discards loaded ownership badges while switching accounts and reads fresh 
   await screen.findByText("3 copias propias");
   switched = true;
   fireEvent.focus(window);
-  expect(screen.queryByText("3 copias propias")).not.toBeInTheDocument();
   expect(await screen.findByText("0 / 100 · 0%")).toBeVisible();
   expect(screen.queryByText("3 copias propias")).not.toBeInTheDocument();
 });
@@ -383,7 +382,7 @@ test("withholds progress when private and public checklist revisions disagree", 
   expect(await screen.findByRole("link", { name: pikachuCard.name })).toBeVisible();
 });
 
-test("uses one no-store private explorer batch and clears badges while revalidating", async () => {
+test("uses one no-store private explorer batch and keeps the badges while revalidating", async () => {
   let revalidating = false;
   let finish!: (response: Response) => void;
   const request = setup((url) => url.pathname.endsWith("/auth/me") && revalidating
@@ -396,9 +395,10 @@ test("uses one no-store private explorer batch and clears badges while revalidat
   expect(batchCalls[0][1]).toMatchObject({ credentials: "include", cache: "no-store" });
   revalidating = true;
   await act(async () => window.dispatchEvent(new Event("focus")));
-  expect(screen.queryByText("8 / 100 · 8%")).not.toBeInTheDocument();
+  expect(screen.getByText("8 / 100 · 8%")).toBeVisible();   // read-only content is not unmounted by a background check
   expect(screen.getByRole("link", { name: "Team Up" })).toBeVisible();
   await act(async () => finish(json({}, 401)));
+  expect(screen.queryByText("8 / 100 · 8%")).not.toBeInTheDocument();   // a 401 clears what was private
 });
 
 test.each(["incomplete", "empty"])("shows explicit %s coverage without a percentage or enabled ownership filter", async (status) => {

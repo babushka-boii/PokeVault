@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -179,10 +179,12 @@ describe("guests and sessions", () => {
     expect(api.request).not.toHaveBeenCalled();
   });
 
-  test("nothing shows or is requested while the session is being validated", () => {
-    const api = server();
+  test("the star stays on screen while the session is checked in the background, but cannot be changed", async () => {
+    const api = server(["base1-4"]);
     shell({ validating: true });
-    expect(within(document.body).queryByRole("button", { name: "Favorita" })).not.toBeInTheDocument();
-    expect(api.request).not.toHaveBeenCalled();
+    const star = await screen.findByRole("button", { name: "Favorita" });
+    expect(star).toBeDisabled();
+    expect(star).toHaveAttribute("aria-pressed", "true");
+    expect(api.calls.filter((call) => call.method !== "GET")).toHaveLength(0);
   });
 });
