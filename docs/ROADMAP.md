@@ -644,3 +644,14 @@ Apply migration 0009 first (`docs/HOME.md`), then open http://localhost:5173/.
 - [ ] Guide: steps get crossed out as you scan, store and star; "Cerrar guía" keeps it closed after a reload.
 - [ ] Guest, empty account, prices offline and the catalog offline all keep the page usable.
 - [ ] VoiceOver and keyboard only (tabs with arrow keys, the Pause button, the chart's summary and table).
+
+### 9A after the first review
+
+- [ ] The chart, the card ★ and the guide work with migration 0009 applied.
+- [ ] The greeting's picture is a square with the cut corner and fills it; the same on Profile.
+- [ ] The three hero chips have the same height and type; the "sin variante" one still underlines on hover.
+- [ ] Clicking a carousel card opens its catalog page; "Volver al Inicio" returns to Home.
+- [ ] Hovering a card shows a ★ at its top right; clicking it stars at once, the card does not open, the carousel keeps its Pause state. On a phone the ★ is always visible, smaller.
+- [ ] Starring changes the Favoritas tab without reloading; an offline server puts the star back with a quiet notice.
+- [ ] Turn the API off: each Home section says "No pudimos cargar … por ahora" with Reintentar, with no alarm.
+- [ ] The guide shows your two finished steps crossed out; "Marca tu favorita ★" scrolls to the carousel and focuses its title.

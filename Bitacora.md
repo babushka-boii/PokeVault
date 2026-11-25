@@ -799,3 +799,9 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Implementación por tareas con commit cada una, pruebas (con errores plantados para comprobar que fallan) y documentación. El estudiante revisa y debe entender el código antes de la entrega.
+
+### 9A — ajustes tras la primera revisión (2026-11-25)
+
+- Diagnóstico: la base local estaba en `0009` y las rutas nuevas respondían bien; el error del gráfico y de la ★ coincidía con haber cargado el Inicio antes de aplicar la migración (el primer registro diario se creó a las 10:00, justo después). Se comprobó leyendo la base con las mismas herramientas de la app, sin tocar `backend/.env`.
+- Avatar cuadrado con corte diagonal; chips del hero con la misma caja; las cartas del carrusel abren el detalle del catálogo (con "Volver al Inicio"); ★ rápida en el carrusel; favoritas optimistas en el carrusel, el detalle y el menú; errores más amables y sin alarma; la guía muestra un aviso si falla y su último paso lleva al carrusel.
+- Nuevo: `GET /favorites/status` (hasta 50 cartas en una sola petición).
