@@ -21,10 +21,11 @@ export function PocketPrice({ price }: { price?: CopyPrice }) {
 /**
  * One 3×3 page. Pockets are buttons in a roving-tabindex grid: arrows move focus and the
  * selection within the page (onSelect); a click, Enter or Space activates (onActivate); Page Up / Page Down ask the binder view to turn the page. Names carry card,
- * expansion, page and pocket, never a UUID. Card images are decorative.
+ * expansion, page and pocket, never a UUID. Card images are decorative. A pocket shows only
+ * the card name on one line; price, page and pocket and the rest live in its contextual menu.
  */
-export function PageGrid({ page, pockets, cards, prices, selected, arrived, incoming, targetable, onSelect, onActivate, onTurn, register }: {
-  page: number; pockets: BinderPocket[]; cards: Record<string, TcgCard>; prices: Record<string, CopyPrice>;
+export function PageGrid({ page, pockets, cards, selected, arrived, incoming, targetable, onSelect, onActivate, onTurn, register }: {
+  page: number; pockets: BinderPocket[]; cards: Record<string, TcgCard>;
   selected: PocketRef | null; arrived: PocketRef | null; incoming: PocketRef | null; targetable: boolean;
   onSelect: (target: PocketRef) => void; onActivate: (target: PocketRef) => void; onTurn: (direction: 1 | -1) => void;
   register: (target: PocketRef) => RefCallback<HTMLButtonElement>;
@@ -68,7 +69,6 @@ export function PageGrid({ page, pockets, cards, prices, selected, arrived, inco
               </span>
               {held && <span className="pv-pocket__caption" aria-hidden="true">
                 <span className="pv-pocket__name">{card?.name ?? held.copy.card_id}</span>
-                <PocketPrice price={prices[held.copy.id]} />
               </span>}
             </button>
           </div>;

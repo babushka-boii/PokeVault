@@ -24,8 +24,12 @@ describe("spread and pockets", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Kanto" })).toBeVisible();
     expect(screen.getAllByRole("grid")).toHaveLength(2);
     const pocket = await within(await findGrid(1)).findByRole("button", { name: "Página 1, bolsillo 1: Card 1 · Expansion 1; Holográfica, Casi impecable" });
-    expect(within(pocket).getByText("Card 1")).toBeInTheDocument();
-    expect(await within(pocket).findByText("$1.500")).toBeInTheDocument();
+    // A pocket shows only the card name, on one line: no price, expansion, page or pocket text.
+    const caption = pocket.querySelector(".pv-pocket__caption")!;
+    expect(caption.textContent).toBe("Card 1");
+    expect(caption.children).toHaveLength(1);
+    await waitFor(() => expect(document.querySelector(".pv-binder-value")?.textContent).toMatch(/\$1\.500/));   // prices are loaded
+    expect(within(pocket).queryByText(/\$/)).not.toBeInTheDocument();
     expect(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 4: vacío" })).toBeInTheDocument();
     expect(within(grid(2)).getAllByRole("gridcell")).toHaveLength(9);
     expect(screen.getByText("pág. 1–2 de 4")).toBeVisible();

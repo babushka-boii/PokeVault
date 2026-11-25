@@ -120,8 +120,7 @@
 .pv-pocket__number { color: var(--pv-text-3); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); }
 .pv-pocket__fallback { color: var(--pv-text-2); font-size: var(--pv-text-xs); overflow-wrap: anywhere; padding: var(--pv-space-1); text-align: center; }
 .pv-pocket__caption { display: grid; font-size: var(--pv-text-xs); gap: 2px; min-width: 0; text-align: left; }
-.pv-pocket__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pv-pocket__price { font-size: var(--pv-text-xs); }
+.pv-pocket__name { display: block; line-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /*
  * Entry into the sleeve (500 ms) after the flight: the card starts one card height above
@@ -190,7 +189,7 @@
 .pv-album .pv-page:nth-child(2) { box-shadow: inset 10px 0 16px var(--pv-shadow-color); }
 .pv-album .pv-page__grid, .pv-album .pv-page__row { gap: 8px; }
 .pv-album .pv-pocket { padding: 0; }
-.pv-album .pv-pocket__caption { height: 32px; font-size: 12px; }
+.pv-album .pv-pocket__caption { display: block; font-size: 13px; line-height: 20px; min-height: 20px; text-align: center; }
 .pv-album__rings { position: absolute; left: calc(50% - 18px); top: 12%; bottom: 12%; width: 36px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
 .pv-album__rings i { height: 14px; border: 3px solid var(--pv-text-2); border-radius: 50%; background: var(--pv-panel-raised); }
 .pv-tray { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; padding: 8px 16px; max-height: 190px; overflow-y: auto; }

@@ -315,7 +315,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
         <div className="pv-binder__stage" role="group" aria-label={label}>
         <Button className="pv-binder__arrow pv-binder__arrow--prev" aria-label={text.previous} disabled={first <= 1} onClick={() => turnPage(-1)}><span aria-hidden="true">‹</span></Button>
         <AlbumFrame mobile={mobile} turn={turn} swipeEnabled={!busy && !menu && !incoming} onSwipe={(direction) => { if (mobile) turnPage(direction); }}>
-          {visible.map((page) => <PageGrid key={page} page={page} pockets={binder.pockets} cards={metadata.cards} prices={priceById}
+          {visible.map((page) => <PageGrid key={page} page={page} pockets={binder.pockets} cards={metadata.cards}
             selected={selected} arrived={arrived} incoming={incoming} targetable={mode.kind === "move" && mode.binderId === binderId}
             onSelect={select} onActivate={activate} onTurn={turnPage} register={register} />)}
         </AlbumFrame>

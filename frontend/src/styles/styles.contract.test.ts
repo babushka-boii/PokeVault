@@ -195,6 +195,18 @@ describe("stylesheets", () => {
     expect(arrow).toMatch(/min-width:\s*var\(--pv-touch\)/);
   });
 
+  test("a pocket name is a single line with an ellipsis, never clipped at the top", () => {
+    const css = stripComments(sheets["/src/components/binders/binders.css"]);
+    const name = rules(css).find((rule) => rule.selector === ".pv-pocket__name")?.body ?? "";
+    expect(name).toMatch(/white-space:\s*nowrap/);
+    expect(name).toMatch(/text-overflow:\s*ellipsis/);
+    expect(name).toMatch(/overflow:\s*hidden/);
+    expect(name).toMatch(/line-height:\s*\d+px/);
+    const caption = rules(css).find((rule) => rule.selector === ".pv-album .pv-pocket__caption")?.body ?? "";
+    expect(caption).not.toMatch(/(^|;)\s*height:/);                    // a fixed height is what cut names before
+    expect(caption).toMatch(/min-height:\s*20px/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);
