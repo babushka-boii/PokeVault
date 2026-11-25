@@ -694,6 +694,7 @@ def test_completion_adds_no_storage_of_its_own(set_completion_database):
             "card_favorites",
             "collection_value_days",
             "card_species",
+            "binder_stickers",
         }
         assert session.scalar(text("SELECT version_num FROM alembic_version")) == head
         assert {

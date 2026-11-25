@@ -98,6 +98,25 @@ def insert_pocket(session, owner, binder=None, copy=None, page=1, pocket=1):
             "pocket": pocket,
         },
     )
+    # Like the API: a card beyond the stored pages grows them (page + spare, even).
+    # Tests pinned to an older revision have no such column yet.
+    stored = session.execute(
+        text(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'binders' AND column_name = 'page_count'"
+        )
+    ).first()
+    if stored:
+        session.execute(
+            text(
+                "UPDATE binders SET page_count = GREATEST(page_count, :pages) "
+                "WHERE id = :id"
+            ),
+            {
+                "pages": min(40, max(2, -(-(page + 1) // 2) * 2)),
+                "id": binder or owner["binders"][0],
+            },
+        )
 
 
 def rows(factory, table):

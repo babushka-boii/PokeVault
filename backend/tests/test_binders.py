@@ -14,7 +14,7 @@ from app.auth.sessions import csrf_token, token_digest
 from app.binders.placement import next_free, visible_pages
 from app.core.config import Settings
 from app.db.base import Base
-from app.db.models import AuthSession, BinderPocket, InventoryCopy, User
+from app.db.models import AuthSession, Binder, BinderPocket, InventoryCopy, User
 from app.main import create_app
 
 PATH = "/api/v1/binders"
@@ -167,6 +167,7 @@ def test_crud_order_and_private_summary(binders):
         "last_placed_at",
         "created_at",
         "updated_at",
+        "stickers",
     }
     second = create_binder(client, headers, "Second", cover="noir")
     third = create_binder(client, headers, "Third")
@@ -408,6 +409,8 @@ def test_store_reports_a_full_binder_without_moving_the_copy(binders):
             )
             for index, copy_id in enumerate(user_id_copies[:360])
         )
+        # Rows inserted directly bypass the API, which grows the stored page count.
+        session.get(Binder, UUID(full["id"])).page_count = 40
     last = user_id_copies[360]
     assert place(client, headers, spare["id"], 1, 1, last).status_code == 200
     response = store(client, headers, full["id"], last)

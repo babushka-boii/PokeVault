@@ -18,6 +18,14 @@ def table(factory, name):
         return session.execute(text(f"SELECT * FROM {name}")).mappings().all()
 
 
+def unpaged(rows):
+    """Binder rows without the page count that migration 0012 adds."""
+    kept = [{k: v for k, v in row.items() if k != "page_count"} for row in rows]
+    return sorted(
+        kept, key=lambda row: str(row["id"])
+    )  # a column change rewrites the table
+
+
 def names(factory):
     with factory() as session:
         return set(inspect(session.get_bind()).get_table_names())
@@ -97,7 +105,10 @@ def test_upgrade_drops_only_the_box_tables_and_keeps_inventory_and_binders(
     assert not {"personal_boxes", "box_memberships"} & names(factory)
     assert {"binders", "binder_pockets", "inventory_copies"} <= names(factory)
     for name, rows in before.items():
-        assert table(factory, name) == rows
+        if name == "binders":
+            assert unpaged(table(factory, name)) == unpaged(rows)
+        else:
+            assert table(factory, name) == rows
     with factory() as session:
         inspector = inspect(session.get_bind())
         assert ["user_id", "id"] in [
@@ -229,7 +240,7 @@ def test_upgrade_downgrade_upgrade_leaves_binders_identical(drop_database):
     )
     command.downgrade(config, "0007")
     command.upgrade(config, "head")
-    assert table(factory, "binders") == binders
+    assert unpaged(table(factory, "binders")) == unpaged(binders)
     assert (
         sorted(
             table(factory, "binder_pockets"),
