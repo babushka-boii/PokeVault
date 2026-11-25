@@ -773,3 +773,17 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Revisión, spec, plan, migración, frontend, pruebas y documentación. El estudiante revisa y debe entender el código antes de la entrega.
+
+## Iteración 8D, Parte 1 — Álbum abierto y acciones en contexto (2026-11-24)
+
+- Se aprobaron D1–D7 y la Parte 1; la Parte 2 (portadas y stickers, migración `0009`) queda bloqueada hasta tu revisión en Safari.
+- Álbum: dos páginas con lomo de tres anillos, fundas 63:88 ajustadas al espacio medido, flechas laterales y bandeja fija abajo en tira horizontal. En celular, una página y deslizar para pasar de página.
+- Acciones en contexto: se quitó el panel lateral. Al pulsar un bolsillo se abre un diálogo anclado a él (hoja inferior en celular). Las flechas solo mueven el foco; Enter, Espacio o un clic activan. El modo mover tiene aviso y cancelación, y nunca sobrescribe un bolsillo ocupado.
+- El detalle de copia ya no muestra el UUID: muestra carta y expansión, y "Volver a la carpeta" regresa al mismo bolsillo con un destino validado.
+- Hallazgo de las pruebas: el clic que sigue a un gesto quedaba atrapado y rompía la prueba siguiente; ahora ese filtro se limpia con el siguiente toque.
+- Aparte: la prueba del OCR con plazo de 0,4 s fallaba en el Mac cargado; ahora usa 3 s.
+- Pendiente: revisión en Safari (lista en `docs/ROADMAP.md`).
+
+### Uso de IA (Claude Code)
+
+- Implementación por tareas con commit cada una, pruebas (con errores plantados para comprobar que fallan) y documentación. El estudiante revisa y debe entender el código antes de la entrega.

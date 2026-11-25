@@ -50,6 +50,9 @@ describe("contextual controls", () => {
       expect(element.getAttribute("aria-label") ?? "").not.toMatch(UUID);
       expect(element.getAttribute("title") ?? "").not.toMatch(UUID);
     }
+    // View card keeps the way back to this exact pocket.
+    expect(within(dialog).getByRole("link", { name: "Ver carta" })).toHaveAttribute("href",
+      `/collection/${physical(0).id}?returnTo=${encodeURIComponent(`/binders/${binderId(1)}?page=1&pocket=1`)}`);
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(pocket).toHaveFocus();

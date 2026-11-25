@@ -21,7 +21,7 @@ import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, settled, wait, t
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import {
-  fetchBinder, MAX_PAGES, placeInPocket, removeFromPocket, spreadStart, storeNext,
+  copyDetailPath, fetchBinder, MAX_PAGES, placeInPocket, removeFromPocket, spreadStart, storeNext,
   type Binder, type StoreResult,
 } from "../services/binders";
 import type { InventoryCopy } from "../services/inventory";
@@ -299,7 +299,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
         identity: cardIdentity(menuHeld.copy, menuCard),
         details: `${dictionary.inventory.variants[menuHeld.copy.variant]} · ${dictionary.inventory.languages[menuHeld.copy.language]} · ${dictionary.inventory.conditions[menuHeld.copy.condition]}`,
         price: menuQuote ? <PocketPrice price={priceById[menuHeld.copy.id]} /> : prices.state.kind === "error" ? text.priceUnavailable : null,
-        copyHref: `/collection/${encodeURIComponent(menuHeld.copy.id)}`,
+        copyHref: copyDetailPath(menuHeld.copy.id, binderId, menu),
       } : undefined}
       onClose={closeMenu}
       onMovePocket={() => { if (menuHeld) { setMode({ kind: "move", copy: menuHeld.copy, from: menu, binderId }); setMenu(null); setFocusRequest({ ...menu }); } }}

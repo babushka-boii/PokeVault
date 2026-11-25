@@ -176,14 +176,14 @@ route-scoped shell.css/AppShell.tsx only if required to reserve existing shell s
 if validated binder return context needs extending), related tests, dictionaries.ts;
 docs/BINDERS.md, docs/UX_UI.md, docs/ROADMAP.md, Bitacora.md, Autoria.md.
 
-- [ ] Test copy name/expansion plus catalog-ID fallback; neither loaded, failed, editing,
+- [x] Test copy name/expansion plus catalog-ID fallback; neither loaded, failed, editing,
   deleting nor accessible content exposes a copy UUID. Preserve owner/revalidation tests.
-- [ ] Remove the UUID node, reuse metadata/identity helpers, add validated binder/page/
+- [x] Remove the UUID node, reuse metadata/identity helpers, add validated binder/page/
   pocket return context from View card; reject external and malformed return targets.
-- [ ] Run `npm test --prefix frontend -- --run src/pages/InventoryCopyPage.test.tsx
+- [x] Run `npm test --prefix frontend -- --run src/pages/InventoryCopyPage.test.tsx
   src/services/cards.test.ts src/pages/BinderView.test.tsx
   src/components/binders/flight.test.ts src/styles/styles.contract.test.ts`, lint/typecheck.
-- [ ] Record actual automated outcomes and pending browser checks; commit:
+- [x] Record actual automated outcomes and pending browser checks; commit:
   `fix(inventory): show card identity and preserve binder return context`.
 - [ ] Hand off spec §10 Part 1 checklist for Safari at http://localhost:5173/binders.
   **STOP. Wait for the student's explicit approval after Safari review.** Fix feedback
@@ -363,3 +363,4 @@ Planning checks: source audit, main fast-forward pull, spec/plan cross-check and
   activating click and only when the source is mounted and in the viewport, else the sleeve
   entry plays alone. Planted bugs (resize ignored, arrows activating, outside click not
   swallowed) each failed tests. 560 frontend tests, lint and typecheck green.
+- Task 4 complete (2026-11-24): the copy detail names the card and expansion (catalog id as fallback), no UUID in any state; `safeBinderReturn` accepts only `/binders/<uuid>` with an optional valid `?page=&pocket=`; the pocket's "Ver carta" link carries it. Safari approval for Part 1: pending; Part 2 and 0009 not started.

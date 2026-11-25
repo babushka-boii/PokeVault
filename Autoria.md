@@ -468,3 +468,13 @@ printing solely from first rank. No hybrid recognition or Iteration 7 work.
 ### Uso de IA (Claude Code)
 
 - Spec, plan, migración, frontend, pruebas y documentación. La aceptación visual la hace el estudiante en su navegador.
+
+## Iteración 8D, Parte 1 — Álbum abierto y acciones en contexto (2026-11-24)
+
+### Decisiones del estudiante
+
+- Aprobó D1–D7 y la Parte 1, y pidió detenerse antes de la Parte 2 para revisar en Safari.
+
+### Uso de IA (Claude Code)
+
+- Álbum, acciones en contexto, gestos, detalle de copia, pruebas y documentación. La aceptación visual la hace el estudiante en su navegador.

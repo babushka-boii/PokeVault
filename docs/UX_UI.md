@@ -438,6 +438,9 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
   - Conflicts (occupied pocket, full binder) use an alert and refresh the binder.
 - Pocket and tray names carry card, expansion, page and pocket. They never contain a
   UUID, and tests guard this.
+- Open album (8D): two 3×3 pages with a three-ring spine, 63:88 sleeves sized to the space,
+  side arrows, a pinned bottom tray, contextual pocket controls (popover on desktop, bottom
+  sheet on a phone) and swipe paging on a phone. See docs/BINDERS.md.
 - Motion: storing or moving a card flies a floating clone like a hand carrying it, from
   where the user clicked: a 150 ms lift (scale 1.06, bigger shadow), a 550 ms curved
   flight with a slight tilt that ends decelerating just over the sleeve's opening, and a
