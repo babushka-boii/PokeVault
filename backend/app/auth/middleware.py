@@ -18,6 +18,9 @@ class AuthenticationPrivacyMiddleware:
             or scope["path"].startswith("/api/v1/scans/")
             or scope["path"].startswith("/api/v1/prices/")
             or scope["path"].startswith("/api/v1/me/")
+            or scope["path"].startswith("/api/v1/favorites/")
+            or scope["path"].startswith("/api/v1/collection/")
+            or scope["path"].startswith("/api/v1/home/")
             or (
                 scope["path"].startswith("/api/v1/sets/")
                 and scope["path"].endswith("/progress")
