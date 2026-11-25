@@ -76,3 +76,17 @@ test("withholds recognition without a CSRF token", async () => {
   await expect(matchScan(scanClues, "es", "", new AbortController().signal)).rejects.toBeInstanceOf(ScanError);
   expect(request).not.toHaveBeenCalled();
 });
+
+const square = [[0.1, 0.1], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9]];
+test("keeps valid card corners and treats a missing or malformed field as no detection", async () => {
+  const run = async (corners: unknown) => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ ...recognizeResult, ...(corners === undefined ? {} : { corners }) })));
+    return (await recognizeScan(new File(["x"], "card.jpg", { type: "image/jpeg" }), "es", "token", new AbortController().signal)).corners;
+  };
+  expect(await run(square)).toEqual(square);
+  expect(await run(null)).toBeNull();
+  expect(await run(undefined)).toBeNull();
+  expect(await run([[0, 0], [1, 0], [1, 1]])).toBeNull();           // three points
+  expect(await run([[0, 0], [1, 0], [1, 1], [0, 1.5]])).toBeNull();  // outside the photo
+  expect(await run([[0, 0], [1, 0], [1, 1], ["0", 1]])).toBeNull();  // not a number
+});
