@@ -229,6 +229,20 @@ describe("stylesheets", () => {
     expect(phone).toMatch(/overflow-x:\s*auto/);
   });
 
+  test("the large avatar is a square with the diagonal cut and a picture that covers it", () => {
+    const css = stripComments(sheets["/src/components/shell/shell.css"]);
+    const frame = rules(css).find((rule) => rule.selector === ".pv-avatar-frame")?.body ?? "";
+    expect(frame).toMatch(/width:\s*var\(--pv-avatar-size/);
+    expect(frame).toMatch(/height:\s*var\(--pv-avatar-size/);
+    expect(frame).not.toMatch(/border-radius/);                       // never a circle
+    const fill = rules(css).find((rule) => rule.selector === ".pv-avatar-frame__fill")?.body ?? "";
+    expect(fill).toMatch(/object-fit:\s*cover/);
+    expect(fill).toMatch(/width:\s*100%/);
+    expect(fill).toMatch(/height:\s*100%/);
+    expect(fill).toMatch(/clip-path:\s*polygon\(/);                  // the corner cut of the system
+    expect(rules(stripComments(sheets["/src/components/home/home.css"])).find((rule) => rule.selector === ".pv-home__trainer")?.body ?? "").not.toMatch(/border|background|overflow/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);

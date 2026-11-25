@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../app/App";
@@ -19,7 +19,11 @@ describe("greeting", () => {
     const slot = document.querySelector(".pv-home__trainer")!;
     expect(slot).toBeInTheDocument();
     expect(slot).toHaveAttribute("aria-hidden", "true");        // the name is already in the text
-    expect(slot.querySelector("img, .pv-avatar--fallback, [class*='fallback']")).not.toBeNull();
+    // A square with the diagonal cut, and the picture (or initials) filling all of it.
+    const frame = slot.querySelector(".pv-avatar-frame")!;
+    expect(frame).toHaveClass("pv-cut");
+    expect(frame.querySelector(".pv-avatar-frame__fill")).not.toBeNull();
+    expect(slot.querySelector(".pv-avatar")).toBeNull();                // no round avatar inside a box
   });
 
   test.each([
@@ -237,5 +241,27 @@ describe("new-user guide", () => {
     await screen.findByText("TU BÓVEDA TCG");
     expect(callsTo(request, "/api/v1/home/guide")).toHaveLength(0);
     expect(callsTo(request, "/api/v1/collection/history")).toHaveLength(0);
+  });
+});
+
+describe("avatar", () => {
+  test("a picture fills the cut-corner square and is decorative next to the name", async () => {
+    stubHome({ user: { ...userA, picture_url: "https://example.test/ash.png" } });
+    render(<App initialEntries={["/"]} />);
+    await screen.findByRole("heading", { level: 2, name: "Hola, Ash" });
+    const image = document.querySelector(".pv-home__trainer img") as HTMLImageElement;
+    expect(image).toHaveClass("pv-avatar-frame__fill");
+    expect(image).toHaveAttribute("alt", "");
+    expect(image).toHaveAttribute("width", "64"); expect(image).toHaveAttribute("height", "64");
+    expect(image).toHaveAttribute("referrerpolicy", "no-referrer");
+    expect(image.closest(".pv-avatar-frame")).toHaveStyle({ "--pv-avatar-size": "64px" });
+  });
+
+  test("initials fill the same square when the picture fails", async () => {
+    stubHome({ user: { ...userA, picture_url: "https://example.test/broken.png" } });
+    render(<App initialEntries={["/"]} />);
+    const image = await waitFor(() => { const found = document.querySelector<HTMLImageElement>(".pv-home__trainer img"); if (!found) throw new Error("no image yet"); return found; });
+    fireEvent.error(image);
+    await waitFor(() => expect(document.querySelector(".pv-home__trainer .pv-avatar-frame__fill--fallback")).toHaveTextContent("AK"));
   });
 });

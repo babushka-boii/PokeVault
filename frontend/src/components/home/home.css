@@ -63,9 +63,8 @@
 
 /* Greeting with a reserved trainer slot (Profile fills it later). */
 .pv-home__greeting { align-items: center; display: flex; gap: var(--pv-space-3); margin-bottom: var(--pv-space-2); }
-.pv-home__trainer { align-items: center; background: var(--pv-panel-raised); border: 1px solid var(--pv-border); display: inline-flex; flex: none; height: 64px; justify-content: center; overflow: hidden; width: 64px; }
-.pv-home__trainer .pv-avatar { height: 100%; object-fit: cover; width: 100%; }
-.pv-home__trainer .pv-avatar--fallback { align-items: center; color: var(--pv-text-2); display: flex; font-family: var(--pv-font-display); font-size: var(--pv-text-lg); justify-content: center; }
+/* The trainer slot is the avatar's cut-corner square (64 px); Profile will put the trainer here. */
+.pv-home__trainer { display: inline-flex; flex: none; }
 .pv-home__greeting h2 { font-size: var(--pv-text-xl); margin: 0; overflow-wrap: anywhere; }
 
 /* Change against seven days ago: soft colour, plus an arrow and a word. */

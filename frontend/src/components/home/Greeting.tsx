@@ -15,7 +15,7 @@ export function Greeting() {
   const name = firstName(auth.user.display_name);
   return <div className="pv-home__greeting">
     <span className="pv-home__trainer" aria-hidden="true">
-      <Avatar key={`${auth.user.id}:${auth.user.picture_url}`} user={auth.user} className="pv-avatar" size={64} decorative />
+      <Avatar key={`${auth.user.id}:${auth.user.picture_url}`} user={auth.user} className="" size={64} decorative cut />
     </span>
     <h2 id="home-greeting">{name ? dictionary.home.greeting.replace("{name}", name) : dictionary.home.greetingAnonymous}</h2>
   </div>;

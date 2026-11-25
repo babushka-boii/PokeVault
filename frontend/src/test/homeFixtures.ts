@@ -4,7 +4,7 @@ import { setProgress } from "./setFixtures";
 import { jsonResponse as json, pikachuCard } from "./tcgFixtures";
 import type { Valuation } from "../services/prices";
 
-export const userA = { id: "4f6a3fab-002c-44e1-b3e8-0247badc013c", display_name: "Ash Ketchum", email: "ash@example.test", email_verified: true, picture_url: null };
+export const userA = { id: "4f6a3fab-002c-44e1-b3e8-0247badc013c", display_name: "Ash Ketchum", email: "ash@example.test", email_verified: true, picture_url: null as string | null };
 export const userB = { ...userA, id: "9b1d5c7e-1111-4222-8333-444455556666", display_name: "Misty Waterflower" };
 
 /** Eight cards, each in its own expansion, so set deduplication and the six-row cap are observable. */
