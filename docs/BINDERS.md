@@ -96,11 +96,38 @@ prices.
   - Pockets show the official card image in a sleeve, the name and the copy price.
   - Pocket names read "Página 2, bolsillo 5: Pikachu · Team Up; Holográfica, Casi
     impecable" and never contain a UUID. If card data fails, the card id is used.
-- **Actions** (no drag & drop):
-  - Tapping a tray card stores it in the next free pocket.
-  - "Elegir de la bandeja" stores a card in the selected empty pocket.
-  - "Mover" moves to a chosen empty pocket, another binder, or the next free pocket.
-  - "Sacar de la carpeta" returns the card to the tray.
+- **Open album (8D Part 1):** two pages side by side with a central spine of three rings
+  (one page and rings along the edge on a phone), sleeves at the real 63:88 proportion
+  sized to the whole available height (`fitAlbum`, 140 px minimum: a window too short for
+  that scrolls vertically instead of shrinking them; width still limits down to 64 px, e.g.
+  on phones), tall `‹ ›` icon arrows (with an aria-label) on each side of the album (below it
+  on phones), and the "Sin carpeta" tray pinned at the bottom as a horizontal strip (still 30
+  cards per page) that folds to a thin bar, folded by default when empty and forced open
+  while choosing for a pocket. The header is one line: name · N cartas · gold value, with the
+  totals folded into "Detalles" and the "Rates By Exchange Rate API" attribution always
+  visible. The keyboard help is for screen readers only. A pocket shows only the card name
+  on one line (ellipsis); price, page, pocket and details are in its menu. On a phone, swiping a page
+  horizontally (48 px, at least 1.5× more horizontal than vertical; touch and pen only) turns
+  it; it never writes anything.
+- **Actions in context** (no drag & drop, no side panel). Arrow keys, Home/End and Page
+  Up/Down only move focus and the selection; a click, Enter or Space activates:
+  - An occupied pocket opens a dialog anchored to it (right of the pocket, else left,
+    clamped to the viewport; a modal bottom sheet on a phone) with the card, expansion,
+    page, pocket, physical facts and price (or "Precio no disponible"). Escape, "Cerrar" or
+    a press outside closes it and gives focus back to the pocket; that press never
+    activates the pocket underneath.
+  - "Ver carta" opens the copy detail with a validated way back to this pocket.
+  - "Mover a otro bolsillo" starts an explicit move mode (banner with Cancel, Escape also
+    cancels): only an empty pocket places the card, never an occupied one, and arrows never
+    place anything. "Mover a otra carpeta" picks the binder inline and uses the next free pocket.
+  - "Sacar de la carpeta" returns the card to the tray, playing the entry in reverse: the
+    card slides up out of its sleeve behind the plastic (400 ms) and a clone flies in an arc
+    (600 ms) to the tray's first slot, or to its bar when folded. It starts only after the
+    server confirms, hides the original, is cancelled by a new action or leaving the page
+    (the pocket then empties at once) and is skipped with reduced motion.
+  - An empty pocket offers "Elegir de la bandeja"; that second, explicit step enters tray
+    choice for that pocket and moves focus to the first tray card.
+  - Tapping a tray card stores it in the next free pocket (or in the chosen pocket).
   - Results are announced in a polite status region, and conflicts in an alert.
 - **Motion:**
   - Each pocket is a real sleeve: the card (`.pv-pocket__card`) sits behind a see-through

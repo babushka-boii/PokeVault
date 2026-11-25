@@ -535,8 +535,8 @@ Spec and plan: `docs/superpowers/specs|plans/2026-11-23-binders-8c*`. Reference:
 - [x] **Drop the frozen box tables** (`personal_boxes`, `box_memberships`) — done by
   migration `0008` in 8C.1. Its downgrade must rebuild boxes from binders:
   one box per 30 pockets, with name suffixes " (2)", " (3)".
-- [ ] The copy detail page still prints the copy UUID under the card id. It was outside
-  this request; the same anti-UUID rule could apply.
+- [x] The copy detail page printed the copy UUID under the card id — removed in 8D Part 1:
+  it shows the card and expansion (or the catalog id) and a safe way back to the binder.
 - [ ] 8D: covers and stickers (the proposed `binder_stickers` shape is in the 8C spec,
   §5.5).
 
@@ -591,3 +591,35 @@ was merged, but `origin/main` did not contain it when checked, so this iteration
 - [ ] Redesign the Pokédex in the Unova Noir style (see the pending iteration above).
 - [ ] The Pokédex search shows names and numbers only (the endpoint returns no sprite or
   types); richer results would need a backend change.
+
+## Iteration 8D Part 1 — Open album and contextual actions (Safari checklist)
+
+Open http://localhost:5173/binders. Part 2 (covers and stickers, migration 0009) is blocked
+until this is approved.
+
+- [ ] At 1280×720 and 1440×900 (100% zoom) the two pages, rings, arrows and the bottom tray
+  fit without scrolling the document; sleeves keep the card proportion.
+- [ ] On a phone-sized window: one page with rings, arrows, a swipe left/right turns the
+  page, the tray sits above the tab bar, the safe area is clear.
+- [ ] Click a corner pocket: the controls appear beside it and stay on screen; on a phone
+  they are a bottom sheet. Escape and an outside press close them and return focus.
+- [ ] Arrows only move focus; Enter or Space opens the controls; Page Up/Down turns pages.
+- [ ] Choose from the tray, cancel, move to another page, move to another binder, remove.
+- [ ] The card flight, entry and shine are unchanged; resizing the window mid-flight leaves
+  no floating card; reduced motion shows no flight or page turn.
+- [ ] A very short window or high zoom scrolls instead of shrinking the pockets.
+- [ ] "Ver carta" opens the copy detail with no UUID and "‹ Volver a la carpeta" returns to
+  the same pocket.
+- [ ] VoiceOver and keyboard only.
+
+### 8D Part 1 adjustments after the first review
+
+- [ ] The header is one line with the gold value; "Detalles" opens the rest and the
+  "Rates By Exchange Rate API" link is always visible. No keyboard help text under the album.
+- [ ] Pockets are large (at least 140 px wide); on a short window the page scrolls instead.
+- [ ] The tray folds to a thin bar (folded by default when empty).
+- [ ] The ‹ › arrows are tall icon buttons at both sides of the album.
+- [ ] Each pocket shows only the card name, one line, nothing clipped ("Toxtricity", "Eevee").
+- [ ] "Sacar de la carpeta": the card rises out of the sleeve, flies to the tray (or its
+  bar when folded); no duplicate card; another click mid-flight leaves nothing floating.
+- [ ] Google login always asks which account to use.

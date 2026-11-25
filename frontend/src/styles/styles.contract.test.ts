@@ -176,6 +176,37 @@ describe("stylesheets", () => {
     expect(reduced).toMatch(/\.pv-flight\s*\{\s*display:\s*none/);
   });
 
+  test("the album keeps vertical scroll and pinch zoom for the browser, and the tray scrolls sideways", () => {
+    const css = stripComments(sheets["/src/components/binders/binders.css"]);
+    expect(rules(css).filter((rule) => rule.selector === ".pv-album").map((rule) => rule.body).join(";")).toMatch(/touch-action:\s*pan-y pinch-zoom/);
+    const list = rules(css).filter((rule) => rule.selector === ".pv-tray__list").map((rule) => rule.body).join(";");
+    expect(list).toMatch(/display:\s*flex/);
+    expect(list).toMatch(/overflow-x:\s*auto/);
+    // The action sheet and popover live above the spread, never clipped by it.
+    expect(rules(css).find((rule) => rule.selector === ".pv-actions-layer")?.body).toMatch(/position:\s*fixed/);
+  });
+
+  test("the page arrows are as tall as the album and never wrap their label", () => {
+    const css = stripComments(sheets["/src/components/binders/binders.css"]);
+    const stage = rules(css).find((rule) => rule.selector === ".pv-binder__stage")?.body ?? "";
+    expect(stage).toMatch(/align-items:\s*stretch/);
+    const arrow = rules(css).find((rule) => rule.selector === ".pv-binder__arrow")?.body ?? "";
+    expect(arrow).toMatch(/align-self:\s*stretch/);
+    expect(arrow).toMatch(/min-width:\s*var\(--pv-touch\)/);
+  });
+
+  test("a pocket name is a single line with an ellipsis, never clipped at the top", () => {
+    const css = stripComments(sheets["/src/components/binders/binders.css"]);
+    const name = rules(css).find((rule) => rule.selector === ".pv-pocket__name")?.body ?? "";
+    expect(name).toMatch(/white-space:\s*nowrap/);
+    expect(name).toMatch(/text-overflow:\s*ellipsis/);
+    expect(name).toMatch(/overflow:\s*hidden/);
+    expect(name).toMatch(/line-height:\s*\d+px/);
+    const caption = rules(css).find((rule) => rule.selector === ".pv-album .pv-pocket__caption")?.body ?? "";
+    expect(caption).not.toMatch(/(^|;)\s*height:/);                    // a fixed height is what cut names before
+    expect(caption).toMatch(/min-height:\s*20px/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);

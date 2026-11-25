@@ -199,3 +199,115 @@ export async function flyCard(origin: FlightOrigin, card: Element, { signal, onL
   }
   return landed ? "completed" : "cancelled";
 }
+
+// ---------------------------------------------------------------------------------------
+// Taking a card out of a binder: the entry in reverse.
+// ---------------------------------------------------------------------------------------
+
+/** The real card slides up out of its sleeve, behind the front plastic. */
+export const EXIT_MS = 400;
+/** Then a clone flies in an arc to the tray (its bar when the tray is folded). */
+export const RETURN_MS = 600;
+const EXIT_EASING = "cubic-bezier(.4, 0, 1, .8)";   // accelerates: the entry's mirror image
+
+/** Visual centre of a card box that sits one card height above its place, tilted `ENTRY_TILT_DEG` around its bottom centre. */
+function exitedCentre(card: Box) {
+  const angle = (ENTRY_TILT_DEG * Math.PI) / 180;
+  return {
+    x: card.left + card.width / 2 + (card.height / 2) * Math.sin(angle),
+    y: card.top - (card.height / 2) * Math.cos(angle),
+  };
+}
+
+/**
+ * Keyframes for the clone's flight from the sleeve to the tray. `from` is the card at rest in
+ * its sleeve (the clone is laid out there at its own size) and `target` the box it shrinks
+ * into. It starts exactly on the card's exit pose (the last frame of the rise, which is the
+ * entry's first frame) and ends on `target`, decelerating, with an arc elevated in proportion
+ * to the distance and a tilt that returns to 0. Pure: used by the animation and its tests.
+ */
+export function buildReturnKeyframes(from: Box, target: Box): { keyframes: Keyframe[]; duration: number } {
+  const endX = from.width ? target.width / from.width : 1;
+  const endY = from.height ? target.height / from.height : 1;
+  const start = exitedCentre(from);
+  const end = { x: target.left + target.width / 2, y: target.top + target.height / 2 };
+  const distance = Math.hypot(end.x - start.x, end.y - start.y);
+  const arc = Math.min(160, Math.max(24, distance * 0.2));
+  const direction = Math.abs(end.x - start.x) < 4 ? 0 : Math.sign(end.x - start.x);
+  const tilt = direction * Math.min(8, Math.max(2, distance / 90));
+  const ease = cubicBezier(...FLIGHT_EASING);
+  const place = (centre: { x: number; y: number }, scaleX: number, scaleY: number, rotate: number) => {
+    const angle = (rotate * Math.PI) / 180; const halfX = (scaleX * from.width) / 2; const halfY = (scaleY * from.height) / 2;
+    return { x: centre.x - (halfX * Math.cos(angle) - halfY * Math.sin(angle)) - from.left, y: centre.y - (halfX * Math.sin(angle) + halfY * Math.cos(angle)) - from.top };
+  };
+  const frame = (offset: number, at: { x: number; y: number }, scaleX: number, scaleY: number, rotate: number, shadow: string, easing: string): Keyframe =>
+    ({ offset, transform: `translate(${at.x}px, ${at.y}px) rotate(${rotate}deg) scale(${scaleX}, ${scaleY})`, boxShadow: shadow, easing });
+
+  const keyframes: Keyframe[] = [frame(0, entryStart(from, from), 1, 1, ENTRY_TILT_DEG, SHADOW_NONE, "linear")];
+  for (let sample = 1; sample <= SAMPLES; sample++) {
+    const progress = ease(sample / SAMPLES);
+    const swell = 1 + (LIFT_SCALE - 1) * Math.sin(Math.PI * progress);       // a hand lifting it a little mid-way
+    const scaleX = (1 + (endX - 1) * progress) * swell;
+    const scaleY = (1 + (endY - 1) * progress) * swell;
+    const rotate = ENTRY_TILT_DEG * (1 - progress) + tilt * Math.sin(Math.PI * progress);
+    const centre = { x: start.x + (end.x - start.x) * progress, y: start.y + (end.y - start.y) * progress - arc * 4 * progress * (1 - progress) };
+    const last = sample === SAMPLES;
+    keyframes.push(frame(sample / SAMPLES, place(last ? end : centre, last ? endX : scaleX, last ? endY : scaleY, last ? 0 : rotate),
+      last ? endX : scaleX, last ? endY : scaleY, last ? 0 : rotate, last ? SHADOW_NONE : SHADOW_RAISED, "linear"));
+  }
+  return { keyframes, duration: RETURN_MS };
+}
+
+/**
+ * Taking a card out, in four beats: (1) the real card slides up out of its sleeve, behind the
+ * front plastic (`EXIT_MS`); (2) at its last frame `onLaunch` runs and, in the same task, the
+ * real card is hidden and a clone takes its place; (3) the clone flies in an arc to
+ * `target()` (`RETURN_MS`); (4) `onLand` runs and the clone is removed. Cancelling at any beat
+ * removes the clone and gives the real card back its look. `target` is resolved at launch,
+ * so a tray that changed meanwhile is respected; null skips the flight.
+ */
+export async function exitCard(
+  origin: FlightOrigin, target: () => Box | null,
+  { signal, onLaunch, onLand }: { signal?: AbortSignal; onLaunch?: () => void; onLand?: () => void } = {},
+): Promise<FlightResult> {
+  const { ghost, element } = origin;
+  if (typeof element.animate !== "function" || typeof ghost.animate !== "function" || signal?.aborted) return signal?.aborted ? "cancelled" : "skipped";
+  const previous = element.style.visibility;
+  const rise = element.animate([{ transform: "translateY(0) rotate(0deg)" }, { transform: `translateY(-100%) rotate(${ENTRY_TILT_DEG}deg)` }],
+    { duration: EXIT_MS, easing: EXIT_EASING, fill: "forwards" });
+  const stopRise = () => rise.cancel();
+  signal?.addEventListener("abort", stopRise, { once: true });
+  let flight: Animation | null = null;
+  let stopFlight: (() => void) | null = null;
+  try {
+    try { await rise.finished; } catch { return "cancelled"; }
+    if (signal?.aborted) return "cancelled";
+    const to = target();
+    // The hand-off, in one task: the real card is hidden, the clone appears at the same pose.
+    const from: Box = { ...origin.rect, left: origin.rect.left - window.scrollX, top: origin.rect.top - window.scrollY };
+    element.style.visibility = "hidden";
+    onLaunch?.();
+    if (!to) return "skipped";
+    ghost.classList.add("pv-flight");
+    ghost.setAttribute("aria-hidden", "true");
+    Object.assign(ghost.style, {
+      position: "fixed", left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`,
+      margin: "0", zIndex: "60", pointerEvents: "none", transformOrigin: "0 0",
+    });
+    document.body.appendChild(ghost);
+    const { keyframes, duration } = buildReturnKeyframes(from, to);
+    flight = ghost.animate(keyframes, { duration, easing: "linear", fill: "forwards" });
+    stopFlight = () => flight?.cancel();
+    signal?.addEventListener("abort", stopFlight, { once: true });
+    try { await flight.finished; } catch { return "cancelled"; }
+    if (signal?.aborted) return "cancelled";
+    onLand?.();
+    return "completed";
+  } finally {
+    signal?.removeEventListener("abort", stopRise);
+    if (stopFlight) signal?.removeEventListener("abort", stopFlight);
+    ghost.remove();
+    rise.cancel();
+    element.style.visibility = previous;
+  }
+}

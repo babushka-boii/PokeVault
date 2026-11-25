@@ -9,6 +9,7 @@ Gestor de colección Pokémon TCG (proyecto de Diseño de Software, UAI). Un sol
 - No inventar el estado del proyecto: verificarlo en el repo (git, docs/ROADMAP.md, docs/SCANNER.md).
 - Codex y Claude se turnan el trabajo (Codex sobre todo en el frontend visual). Dejar cambios claros, con commits pequeños y bitácora actualizada.
 - Conversación en español. Código, commits y docs/ en inglés.
+- Nunca encadenes un commit después de un comando de pruebas. Corre las pruebas, confirma que el código de salida es 0 y recién entonces haz commit.
 - No hacer commit/push sin que lo pida o confirme. Nunca leer ni subir `backend/.env` ni fotos privadas.
 
 ## Stack

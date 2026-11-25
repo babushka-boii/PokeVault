@@ -126,3 +126,22 @@ export async function fetchLocations(copyIds: string[], signal: AbortSignal): Pr
 
 /** Pages shown for a binder view, as pairs (spreads). */
 export function spreadStart(pageNumber: number) { return pageNumber % 2 === 0 ? pageNumber - 1 : pageNumber; }
+
+
+/**
+ * A binder return target (`/binders/<id>` with optional `?page=N&pocket=M`) is accepted only
+ * in exactly that shape; anything else (another path or host, extra parameters, a fragment,
+ * out-of-range numbers) gives null, so a link in the address bar can never send the user away.
+ */
+export function safeBinderReturn(value: string | null | undefined): string | null {
+  if (!value || value.length > 120) return null;
+  const match = /^\/binders\/([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})(?:\?page=([1-9]\d?)&pocket=([1-9]))?$/i.exec(value);
+  if (!match) return null;
+  return match[2] === undefined || Number(match[2]) <= MAX_PAGES ? value : null;
+}
+
+/** The copy-detail link of a pocket, remembering where to come back to. */
+export function copyDetailPath(copyId: string, binderId: string, target: { page: number; pocket: number }): string {
+  const returnTo = `/binders/${binderId}?page=${target.page}&pocket=${target.pocket}`;
+  return `/collection/${encodeURIComponent(copyId)}?${new URLSearchParams({ returnTo })}`;
+}

@@ -24,8 +24,12 @@ describe("spread and pockets", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Kanto" })).toBeVisible();
     expect(screen.getAllByRole("grid")).toHaveLength(2);
     const pocket = await within(await findGrid(1)).findByRole("button", { name: "Página 1, bolsillo 1: Card 1 · Expansion 1; Holográfica, Casi impecable" });
-    expect(within(pocket).getByText("Card 1")).toBeInTheDocument();
-    expect(await within(pocket).findByText("$1.500")).toBeInTheDocument();
+    // A pocket shows only the card name, on one line: no price, expansion, page or pocket text.
+    const caption = pocket.querySelector(".pv-pocket__caption")!;
+    expect(caption.textContent).toBe("Card 1");
+    expect(caption.children).toHaveLength(1);
+    await waitFor(() => expect(document.querySelector(".pv-binder-value")?.textContent).toMatch(/\$1\.500/));   // prices are loaded
+    expect(within(pocket).queryByText(/\$/)).not.toBeInTheDocument();
     expect(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 4: vacío" })).toBeInTheDocument();
     expect(within(grid(2)).getAllByRole("gridcell")).toHaveLength(9);
     expect(screen.getByText("pág. 1–2 de 4")).toBeVisible();
@@ -40,7 +44,7 @@ describe("spread and pockets", () => {
     await screen.findByRole("heading", { level: 1, name: "Kanto" });
     expect(screen.getAllByRole("grid")).toHaveLength(1);
     expect(screen.getByText("pág. 1 de 4")).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "Página siguiente ›" }));
+    await user.click(screen.getByRole("button", { name: "Página siguiente" }));
     expect(screen.getByRole("grid", { name: "Página 2" })).toBeInTheDocument();
     const spread = document.querySelector(".pv-spread")!;
     expect(spread).toHaveAttribute("data-turn", "next");
@@ -57,14 +61,21 @@ describe("spread and pockets", () => {
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     const first = await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ });
     await user.click(first);
-    const panel = screen.getByRole("complementary", { name: "Bolsillo seleccionado" });
-    expect(within(panel).getByRole("heading", { name: "Pág. 1 · bolsillo 1" })).toBeVisible();
+    const dialog = await screen.findByRole("dialog", { name: "Card 1 · Expansion 1" });
+    expect(within(dialog).getByText(/Pág\. 1 · bolsillo 1/)).toBeVisible();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(first).toHaveFocus();
+    // Arrows only move focus and selection: no dialog opens.
     await user.keyboard("{ArrowRight}");
     expect(within(grid(1)).getAllByRole("button")[1]).toHaveFocus();
-    expect(await within(panel).findByText("Card 2 · Expansion 2")).toBeVisible();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.keyboard("{ArrowDown}");
-    expect(within(panel).getByRole("heading", { name: "Pág. 1 · bolsillo 5" })).toBeVisible();
-    expect(within(panel).getByRole("button", { name: "Elegir de la bandeja" })).toBeVisible();
+    expect(within(grid(1)).getAllByRole("button")[4]).toHaveFocus();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await user.keyboard("{Enter}");
+    const empty = await screen.findByRole("dialog", { name: "Pág. 1 · bolsillo 5" });
+    expect(within(empty).getByRole("button", { name: "Elegir de la bandeja" })).toBeVisible();
   });
 
   test("a deep link opens the spread of the page and focuses the pocket", async () => {
@@ -73,6 +84,84 @@ describe("spread and pockets", () => {
     const pocket = await screen.findByRole("button", { name: /^Página 3, bolsillo 5: Card 1/ });
     await waitFor(() => expect(pocket).toHaveFocus());
     expect(screen.getByText("pág. 3–4 de 4")).toBeVisible();
+  });
+});
+
+describe("compact header and folding tray", () => {
+  test("the header is one line: name, count and gold value, with the attribution visible and the rest folded", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [pocketOf(1, 1, physical(0)), pocketOf(1, 2, physical(1))] }] });
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const header = (await screen.findByRole("heading", { level: 1, name: "Kanto" })).closest("header")!;
+    expect(within(header).getByText(/2 cartas/)).toBeVisible();
+    expect(await within(header).findByText("$1.500")).toBeVisible();
+    expect(within(header).getByRole("link", { name: "Rates By Exchange Rate API" })).toBeVisible();   // never hidden
+    const details = header.querySelector("details")!;
+    expect(details).not.toHaveAttribute("open");
+    expect(within(header).getByText("1 de 1 copias con precio")).not.toBeVisible();
+    expect(header.querySelectorAll("h1")).toHaveLength(1);
+  });
+
+  test("the keyboard help is for screen readers only", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [] }] });
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const help = await screen.findByText(/Flechas: moverse entre bolsillos/);
+    expect(help).toHaveClass("pv-sr-only");
+  });
+
+  test("an empty tray is folded to a thin bar by default and unfolds on request", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [] }], tray: [] });
+    const user = userEvent.setup();
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const tray = await screen.findByRole("region", { name: "Sin carpeta" });
+    const fold = await within(tray).findByRole("button", { name: "Desplegar la bandeja" });
+    await waitFor(() => expect(within(tray).getByText("(0)")).toBeVisible());
+    expect(fold).toHaveAttribute("aria-expanded", "false");
+    expect(tray).toHaveAttribute("data-open", "false");
+    expect(within(tray).queryByText(/Toca una carta/)).not.toBeInTheDocument();
+    await user.click(fold);
+    expect(tray).toHaveAttribute("data-open", "true");
+    expect(within(tray).getByText("Todas tus cartas están en carpetas.")).toBeVisible();
+    await user.click(within(tray).getByRole("button", { name: "Plegar la bandeja" }));
+    expect(tray).toHaveAttribute("data-open", "false");
+  });
+
+  test("a tray with cards is open by default, can be folded, and choosing for a pocket opens it", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [] }], tray: [physical(0), physical(1)] });
+    const user = userEvent.setup();
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const tray = await screen.findByRole("region", { name: "Sin carpeta" });
+    expect(await within(tray).findByText("(2)")).toBeVisible();
+    expect(tray).toHaveAttribute("data-open", "true");
+    await user.click(within(tray).getByRole("button", { name: "Plegar la bandeja" }));
+    expect(tray).toHaveAttribute("data-open", "false");
+    expect(within(tray).queryByRole("button", { name: /^Guardar Card 1/ })).not.toBeInTheDocument();
+    // Choosing from the tray for a pocket opens it again, and the fold is disabled meanwhile.
+    await user.click(await within(await findGrid(1)).findByRole("button", { name: "Página 1, bolsillo 3: vacío" }));
+    await user.click(await screen.findByRole("button", { name: "Elegir de la bandeja" }));
+    expect(tray).toHaveAttribute("data-open", "true");
+    expect(within(tray).getByRole("button", { name: "Plegar la bandeja" })).toBeDisabled();
+    expect(await within(tray).findByRole("button", { name: /^Guardar Card 1/ })).toBeVisible();
+  });
+});
+
+describe("page arrows", () => {
+  test("are icon buttons named for screen readers, flank the album and disable at the bounds", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [pocketOf(1, 1, physical(0)), pocketOf(3, 1, physical(1))] }] });
+    const user = userEvent.setup();
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    await screen.findByRole("grid", { name: "Página 1" });
+    const previous = screen.getByRole("button", { name: "Página anterior" });
+    const next = screen.getByRole("button", { name: "Página siguiente" });
+    expect(previous).toHaveTextContent(/^‹$/);                      // the letters never run vertically: one glyph
+    expect(next).toHaveTextContent(/^›$/);
+    const stage = screen.getByRole("group", { name: "pág. 1–2 de 4" });
+    expect([...stage.children].map((child) => child.classList.contains("pv-album") ? "album" : child.classList.contains("pv-binder__arrow") ? "arrow" : "?")).toEqual(["arrow", "album", "arrow"]);
+    expect(previous).toBeDisabled();
+    await user.click(next);
+    expect(await screen.findByRole("grid", { name: "Página 3" })).toBeVisible();
+    expect(screen.getByRole("group", { name: "pág. 3–4 de 4" })).toBeVisible();
+    expect(next).toBeDisabled();
+    expect(previous).toBeEnabled();
   });
 });
 
@@ -91,6 +180,10 @@ describe("tray and actions", () => {
     await waitFor(() => expect(stored).toHaveFocus());
     // The arrival mark clears just after its 600 ms animation.
     await waitFor(() => expect(stored).not.toHaveAttribute("data-arrived"), { timeout: 1500 });
+    // An empty tray folds to its bar: "Sin carpeta (0)".
+    await waitFor(() => expect(within(tray).getByText("(0)")).toBeVisible());
+    expect(within(tray).queryByText("Todas tus cartas están en carpetas.")).not.toBeInTheDocument();
+    await user.click(within(tray).getByRole("button", { name: "Desplegar la bandeja" }));
     expect(await within(tray).findByText("Todas tus cartas están en carpetas.")).toBeVisible();
   });
 
@@ -99,8 +192,8 @@ describe("tray and actions", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(2)}`]} />);
     await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 4:/ }));
-    await user.click(screen.getByRole("button", { name: "Mover" }));
-    const panel = screen.getByRole("complementary", { name: "Bolsillo seleccionado" });
+    const panel = await screen.findByRole("dialog");
+    await user.click(within(panel).getByRole("button", { name: "Mover a otra carpeta" }));
     const select = await within(panel).findByLabelText("Carpeta de destino");
     await waitFor(() => expect(within(select).getAllByRole("option")).toHaveLength(2));
     await user.selectOptions(select, binderId(1));
@@ -114,7 +207,8 @@ describe("tray and actions", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ }));
-    await user.click(screen.getByRole("button", { name: "Mover" }));
+    await user.click(await screen.findByRole("button", { name: "Mover a otro bolsillo" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.click(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 9: vacío" }));
     await waitFor(() => expect(live()).toHaveTextContent("Movida a pág. 2 · bolsillo 9"));
     expect(world.mutations()).toEqual([{ method: "PUT", path: `/api/v1/binders/${binderId(1)}/pockets/2/9`, body: { copy_id: physical(0).id } }]);
@@ -125,12 +219,15 @@ describe("tray and actions", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     await user.click(await within(await findGrid(2)).findByRole("button", { name: "Página 2, bolsillo 5: vacío" }));
-    await user.click(screen.getByRole("button", { name: "Elegir de la bandeja" }));
+    await user.click(await screen.findByRole("button", { name: "Elegir de la bandeja" }));
     const tray = screen.getByRole("region", { name: "Sin carpeta" });
     expect(within(tray).getByText("Toca una carta para guardarla en la página 2, bolsillo 5.")).toBeVisible();
-    await user.click(await within(tray).findByRole("button", { name: "Guardar Card 1 · Expansion 1 en página 2, bolsillo 5" }));
+    const card = await within(tray).findByRole("button", { name: "Guardar Card 1 · Expansion 1 en página 2, bolsillo 5" });
+    await waitFor(() => expect(card).toHaveFocus());   // focus moves to the first tray card
+    await user.click(card);
     await waitFor(() => expect(live()).toHaveTextContent("Guardada en Tesoros · pág. 2 · bolsillo 5"));
-    await user.click(screen.getByRole("button", { name: "Sacar de la carpeta" }));
+    await user.click(within(grid(2)).getByRole("button", { name: /^Página 2, bolsillo 5: Card 1/ }));
+    await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
     await waitFor(() => expect(live()).toHaveTextContent("Devuelta a la bandeja"));
     expect(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 5: vacío" })).toBeInTheDocument();
     expect(world.mutations().map((c) => `${c.method} ${c.path}`)).toEqual([
@@ -251,7 +348,7 @@ describe("FLIP flight", () => {
       expect(original.style.visibility).toBe("");                 // visible again
       expect(pocket).not.toHaveAttribute("data-incoming");
       expect(pocket).not.toHaveAttribute("data-arrived");         // the cancelled entry never plays
-      expect(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 5: vacío" })).toHaveFocus();
+      expect(await screen.findByRole("dialog", { name: "Pág. 1 · bolsillo 5" })).toBeVisible();
     } finally { motion.restore(); }
   });
 
@@ -281,7 +378,7 @@ describe("FLIP flight", () => {
       const source = within(await findGrid(1)).getByRole("button", { name: /^Página 1, bolsillo 1:/ });
       const held = source.querySelector(".pv-pocket__card") as HTMLElement;
       await user.click(source);
-      await user.click(screen.getByRole("button", { name: "Mover" }));
+      await user.click(await screen.findByRole("button", { name: "Mover a otro bolsillo" }));
       await user.click(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 9: vacío" }));
       await waitFor(() => expect(motion.flights).toHaveLength(1));
       // The card itself flies (not the sleeve and its plastic).
@@ -324,6 +421,117 @@ describe("FLIP flight", () => {
     } finally { motion.restore(); }
   });
 
+  describe("taking a card out", () => {
+    async function openMenuOnFirstPocket(motion: ReturnType<typeof stubAnimate>, tray = [physical(5)]) {
+      const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [pocketOf(1, 1, physical(0))] }], tray });
+      const user = userEvent.setup();
+      render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+      const pocket = await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1: Card 1/ });
+      const card = pocket.querySelector(".pv-pocket__card") as HTMLElement;
+      await user.click(pocket);
+      await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
+      void motion;
+      return { world, user, pocket, card };
+    }
+
+    test("the card rises out of its sleeve, then flies to the tray: the entry in reverse, in order", async () => {
+      const motion = stubAnimate();
+      try {
+        const { world, pocket, card } = await openMenuOnFirstPocket(motion);
+        // Beat 1: only after the server confirms does the real card rise; the pocket still holds it.
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        expect(world.mutations().map((call) => call.method)).toEqual(["DELETE"]);
+        expect(motion.flights[0].element).toBe(card);
+        expect(motion.flights[0].options.duration).toBe(400);
+        expect(pocket).toHaveAccessibleName(/Card 1/);                       // not emptied yet
+        expect(clones()).toHaveLength(0);
+        // Beat 2: at the hand-off the pocket empties and the clone appears, in the same commit.
+        const seen: string[] = [];
+        await act(async () => {
+          motion.flights[0].finish();
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+        await waitFor(() => expect(motion.flights).toHaveLength(2));
+        seen.push(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 1: vacío" }) ? "pocket-empty" : "");
+        expect(seen).toEqual(["pocket-empty"]);
+        expect(clones()).toHaveLength(1);
+        expect(motion.flights[1].options.duration).toBe(600);
+        expect(live()).toHaveTextContent("Devuelta a la bandeja");
+        // Beat 3: it lands, the clone goes and the tray reloads with the card.
+        await act(async () => motion.flights[1].finish());
+        await waitFor(() => expect(clones()).toHaveLength(0));
+        expect(await screen.findByRole("button", { name: /^Guardar Card 1/ })).toBeVisible();
+      } finally { motion.restore(); }
+    });
+
+    test("it flies to the thin bar when the tray is folded, and to its first slot when open", async () => {
+      const motion = stubAnimate();
+      try {
+        await openMenuOnFirstPocket(motion, []);          // an empty tray is folded
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        const target = document.querySelector("[data-tray-target]") as HTMLElement;
+        expect(target).toHaveAttribute("data-tray-target", "bar");
+        expect(target).toHaveClass("pv-tray__head");
+      } finally { motion.restore(); }
+      const openMotion = stubAnimate();
+      try {
+        document.body.innerHTML = "";
+        await openMenuOnFirstPocket(openMotion, [physical(5)]);
+        await waitFor(() => expect(openMotion.flights).toHaveLength(1));
+        expect(document.querySelector("[data-tray-target]")).toHaveAttribute("data-tray-target", "slot");
+      } finally { openMotion.restore(); }
+    });
+
+    test("another action while the card rises cancels it: the pocket empties at once, no clone, the card is visible again", async () => {
+      const motion = stubAnimate();
+      try {
+        const { user, card } = await openMenuOnFirstPocket(motion);
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        await user.click(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 5: vacío" }));
+        await waitFor(() => expect(motion.flights[0].cancelled).toBe(true));
+        expect(await within(grid(1)).findByRole("button", { name: "Página 1, bolsillo 1: vacío" })).toBeVisible();
+        expect(clones()).toHaveLength(0);
+        expect(motion.flights).toHaveLength(1);              // it never reached the flight
+        expect(card.style.visibility).not.toBe("hidden");
+        expect(await screen.findByRole("button", { name: /^Guardar Card 1/ })).toBeVisible();
+      } finally { motion.restore(); }
+    });
+
+    test("leaving the page mid-flight removes the clone", async () => {
+      const motion = stubAnimate();
+      try {
+        const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [pocketOf(1, 1, physical(0))] }], tray: [] });
+        void world;
+        const user = userEvent.setup();
+        const view = render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+        await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ }));
+        await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        await act(async () => { motion.flights[0].finish(); await new Promise((resolve) => setTimeout(resolve, 0)); });
+        await waitFor(() => expect(clones()).toHaveLength(1));
+        view.unmount();
+        await act(async () => undefined);
+        expect(clones()).toHaveLength(0);
+      } finally { motion.restore(); }
+    });
+
+    test("with reduced motion the card just leaves its pocket: no rise, no flight", async () => {
+      stubMedia({ reducedMotion: true });
+      const motion = stubAnimate();
+      try {
+        binderWorld({ binders: [{ name: "Tesoros", pockets: [pocketOf(1, 1, physical(0))] }], tray: [] });
+        const user = userEvent.setup();
+        render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+        await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ }));
+        await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
+        await waitFor(() => expect(live()).toHaveTextContent("Devuelta a la bandeja"));
+        expect(motion.animate).not.toHaveBeenCalled();
+        expect(clones()).toHaveLength(0);
+        expect(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 1: vacío" })).toBeInTheDocument();
+      } finally { motion.restore(); }
+    });
+  });
+
   test("with reduced motion there is no flight and the original is never hidden", async () => {
     stubMedia({ reducedMotion: true });
     const motion = stubAnimate();
@@ -359,7 +567,7 @@ describe("tray paging", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     const tray = await screen.findByRole("region", { name: "Sin carpeta" });
-    expect(await within(tray).findByText("31 sin carpeta")).toBeVisible();
+    expect(await within(tray).findByText("(31)")).toBeVisible();
     expect(within(tray).getAllByRole("listitem")).toHaveLength(30);
     expect(within(tray).getByRole("button", { name: "Cartas anteriores" })).toBeDisabled();
     await user.click(within(tray).getByRole("button", { name: "Más cartas" }));

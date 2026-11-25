@@ -229,8 +229,11 @@ test("a binder shows its own total and refreshes when its contents change", asyn
   vi.stubGlobal("fetch", request);
   const view = renderBinderValue(binder, "0:a,1:b");
   expect(await screen.findByText("$1.075")).toBeVisible();
-  expect(screen.getByText("2 de 2 copias con precio")).toBeVisible();
+  // The attribution stays visible; the rest folds into "Detalles".
   expect(screen.getByRole("link", { name: "Rates By Exchange Rate API" })).toBeVisible();
+  expect(screen.getByText("2 de 2 copias con precio")).not.toBeVisible();
+  await userEvent.setup().click(screen.getByText("Detalles"));
+  expect(screen.getByText("2 de 2 copias con precio")).toBeVisible();
   empty = true;
   view.rerender("");
   expect(await screen.findByText("Sin copias")).toBeVisible();

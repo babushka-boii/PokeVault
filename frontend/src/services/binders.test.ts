@@ -73,3 +73,16 @@ test("sends a full ordering, validates bounded views and owned locations", async
 test("spreads start on the odd page", () => {
   expect([1, 2, 3, 4, 40].map(spreadStart)).toEqual([1, 1, 3, 3, 39]);
 });
+
+test("only an exact binder address (with an optional valid page and pocket) is a return target", async () => {
+  const { safeBinderReturn, copyDetailPath } = await import("./binders");
+  expect(safeBinderReturn(`/binders/${id}`)).toBe(`/binders/${id}`);
+  expect(safeBinderReturn(`/binders/${id}?page=40&pocket=9`)).toBe(`/binders/${id}?page=40&pocket=9`);
+  for (const bad of [null, "", "/binders", `/binders/${id}?page=0&pocket=1`, `/binders/${id}?page=41&pocket=1`, `/binders/${id}?page=1&pocket=0`,
+    `/binders/${id}?pocket=1&page=1`, `/binders/${id}?page=1`, `https://x.test/binders/${id}`, `//x.test/binders/${id}`, `/binders/${id}/x`]) {
+    expect(safeBinderReturn(bad)).toBeNull();
+  }
+  const path = copyDetailPath(copyId, id, { page: 2, pocket: 5 });
+  expect(path).toBe(`/collection/${copyId}?returnTo=${encodeURIComponent(`/binders/${id}?page=2&pocket=5`)}`);
+  expect(safeBinderReturn(new URL(path, "http://x").searchParams.get("returnTo"))).toBe(`/binders/${id}?page=2&pocket=5`);
+});

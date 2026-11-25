@@ -6,18 +6,39 @@ import { formatMoney } from "./format";
 import { CurrencySwitch, PriceText, RatesAttribution, ReferenceNote } from "./PriceDisplay";
 import { useCollectionValuation } from "./useCollectionValuation";
 
-export function ValueTotal({ value }: { value: Valuation }) {
-  const { dictionary, locale } = useLocale();
-  const text = dictionary.prices;
-  const originals = Object.entries(value.original_totals)
+function useOriginals(value: Valuation) {
+  const { locale } = useLocale();
+  return Object.entries(value.original_totals)
     .map(([code, amount]) => formatMoney(amount, code as "EUR" | "USD", locale, true)).join(" + ");
+}
+
+/** The detail lines under a total: how many copies are priced, original-currency totals, stale prices. */
+export function ValueDetails({ value }: { value: Valuation }) {
+  const { dictionary } = useLocale();
+  const text = dictionary.prices;
+  const originals = useOriginals(value);
   return <>
-    {value.total !== null ? <p className="price-total">{formatMoney(value.total, value.currency, locale)}</p>
-      : <><p className="price-total">{originals}</p><p className="price-meta">{text.conversionUnavailable}</p></>}
     <p>{text.priced.replace("{priced}", String(value.priced_count)).replace("{count}", String(value.copy_count))}</p>
     {value.total !== null && value.priced_count > 0 && originals && <p className="price-meta">{text.originalTotals.replace("{amounts}", originals)}</p>}
     {value.stale_count > 0 && <p className="price-meta">{text.staleCount.replace("{count}", String(value.stale_count))}</p>}
   </>;
+}
+
+export function ValueTotal({ value }: { value: Valuation }) {
+  const { dictionary, locale } = useLocale();
+  const originals = useOriginals(value);
+  return <>
+    {value.total !== null ? <p className="price-total">{formatMoney(value.total, value.currency, locale)}</p>
+      : <><p className="price-total">{originals}</p><p className="price-meta">{dictionary.prices.conversionUnavailable}</p></>}
+    <ValueDetails value={value} />
+  </>;
+}
+
+/** The amount alone, in gold (no paragraph), for one-line headers. */
+export function ValueAmount({ value }: { value: Valuation }) {
+  const { locale } = useLocale();
+  const originals = useOriginals(value);
+  return <span className="price-total pv-binder-value__total">{value.total !== null ? formatMoney(value.total, value.currency, locale) : originals}</span>;
 }
 
 export function CollectionValue() {
