@@ -623,3 +623,24 @@ until this is approved.
 - [ ] "Sacar de la carpeta": the card rises out of the sleeve, flies to the tray (or its
   bar when folded); no duplicate card; another click mid-flight leaves nothing floating.
 - [ ] Google login always asks which account to use.
+
+## Iteration 9A — Home (Safari checklist)
+
+Apply migration 0009 first (`docs/HOME.md`), then open http://localhost:5173/.
+
+- [ ] Order: greeting/value/scanner → (guide) → Tus cartas → Mis carpetas → Expansiones → value chart.
+- [ ] "Hola, {nombre}" with the picture in the trainer slot; the value in gold. After a week
+  of records the change reads as an arrow, an amount, a percentage and "en 7 días", in soft green or red.
+- [ ] One "Precios de referencia · actualizados hace N h" note next to "Rates By Exchange Rate API".
+- [ ] Carousel: it drifts slowly and loops with no visible cut; hovering, focusing or touching
+  pauses it; "Pausar"/"Reanudar" works; the ‹ › buttons move one card; hovering a card grows and
+  tilts it; with "reducir movimiento" it stays still. Cards show only image, name and price.
+- [ ] The three tabs (most valuable · favourites · recent) switch without a jump; favourites
+  say "Marca cartas con ★…" when empty.
+- [ ] ★ on a card's detail page and in a pocket menu; the card appears under Favoritas on Home.
+- [ ] Bookcase: two wooden shelves, three covers each, name/count/value under each; one scrolling shelf on a phone.
+- [ ] Chart: first day shows the "Empezamos a registrar…" note; after records, a gold line with a dot
+  per record (days with no record are joined by the line); 7 d / 30 d / 1 año; CLP/USD follows the switch.
+- [ ] Guide: steps get crossed out as you scan, store and star; "Cerrar guía" keeps it closed after a reload.
+- [ ] Guest, empty account, prices offline and the catalog offline all keep the page usable.
+- [ ] VoiceOver and keyboard only (tabs with arrow keys, the Pause button, the chart's summary and table).

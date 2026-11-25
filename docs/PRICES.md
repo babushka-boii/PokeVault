@@ -91,8 +91,16 @@ this with two users owning the same card.
 
 ## Limitations
 
-- No price history, condition or language adjustment, grading or appraisal.
+- No per-card price history (only the user's own daily collection total is recorded, see `docs/HOME.md`), no condition or language adjustment, grading or appraisal.
 - Prices refresh on demand; there is no background job. Large collections may show some
   `pending` prices on the first visit.
 - Exchange rates are daily references from a free API, not bank or Banco Central rates.
 - Manual browser acceptance is listed in `docs/ROADMAP.md`.
+
+## Collection value history (9A)
+
+The Home chart reads `collection_value_days`: one total per user and day, recorded lazily when
+the history is read and only from a complete valuation. Each record stores the original EUR and
+USD totals, both converted totals and the day's rates for audit. Rates are never returned by the API
+(ExchangeRate-API terms), and the attribution stays visible wherever a converted amount is shown.
+`GET /prices/collection` also reports `prices_updated_at`, the age of the least fresh price used.

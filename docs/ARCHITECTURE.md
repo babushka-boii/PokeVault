@@ -543,3 +543,12 @@ icons) and the personal boxes (5C) are **historical**: that code and its tables 
   the binder tables need it.
 - `pokevault.audio` and `pokevault.spriteMode` are removed from the browser at start.
 - Backend `/api/v1/pokemon*` endpoints are unchanged.
+
+## Iteration 9A — Home
+
+New owner-scoped resources, all `no-store`: favourites (`/api/v1/favorites`), the value history
+(`/api/v1/collection/history`) and the new-user guide (`/api/v1/home/guide`), plus a `top`
+option and `prices_updated_at` on `/prices/collection` and a `views/added` copy view. The frontend keeps one
+request per section; the hero and the carousel share one valuation (`top=12`) and the hero and
+the chart share one 30-day history. No new dependency: the chart is a small SVG and the carousel one
+animation-frame loop. See `docs/HOME.md`.

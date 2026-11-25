@@ -469,3 +469,10 @@ First phase of the visual redesign (8B quick save and animated scanner, 8C easy 
 - Old links keep working: `/boxes?pokemon=N` opens species N's gallery, `/boxes?mode=personal`
   opens the binders, and any other `/boxes` opens the Pokédex.
 - **Pending:** a visual redesign of the Pokédex in the "Unova Noir" style (ROADMAP).
+
+## Iteration 9A — Home
+
+Final Home: greeting with a trainer slot, value with a 7-day change, one price note, a
+three-view drifting carousel of sober cards (image, name, gold price), a wooden bookcase for the binders
+and a gold value chart. Colour never carries meaning alone (arrows, words, "(hecho)"); motion
+respects reduced motion (no drift, no hover growth, no chart fade). See `docs/HOME.md`.
