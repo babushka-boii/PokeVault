@@ -53,7 +53,7 @@ function SignedProfile() {
       {value && value.total !== null && value.priced_count > 0 && <RatesAttribution rates={value.rates} />}
       <CurrencySwitch />
       <SessionNotice />
-      {auth.error && <p className="auth-error" role="alert">{dictionary.auth.errors[auth.error]}</p>}
+      {auth.error && auth.error !== "session_unavailable" && <p className="auth-error" role="alert">{dictionary.auth.errors[auth.error]}</p>}
       <button className="auth-button auth-button--secondary" type="button" onClick={auth.logout} disabled={auth.loggingOut}>{dictionary.auth.logout}</button>
       <p className="auth-catalog-note">{dictionary.auth.publicCatalog}</p>
     </footer>
@@ -63,13 +63,13 @@ function SignedProfile() {
 export function ProfilePage() {
   const auth = useAuth();
   const { dictionary } = useLocale();
-  if (auth.status === "authenticated" && !auth.validating && !auth.loggingOut) return <SignedProfile key={auth.user.id} />;
+  if (auth.status === "authenticated" && !auth.loggingOut) return <SignedProfile key={auth.user.id} />;
   return <section className="panel auth-panel" aria-labelledby="profile-title">
     <p className="eyebrow">PokéVault</p>
     <h1 id="profile-title">{dictionary.profile.title}</h1>
     <SessionNotice />
     {auth.status === "authenticated" && <>
-      {!auth.validating && <div className="auth-profile">
+      {<div className="auth-profile">
         <Avatar key={`${auth.user.id}:${auth.user.picture_url}`} user={auth.user} className="" size={96} cut />
         <div className="auth-identity">
           <h2>{auth.user.display_name.trim() || dictionary.auth.account}</h2>

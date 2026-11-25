@@ -118,7 +118,7 @@ export function CollectionPage() {
     <h1 id="collection-title">{dictionary.inventory.title}</h1>
     <SessionNotice />
     {auth.status === "unauthenticated" && <Link to="/login">{dictionary.auth.signIn}</Link>}
-    {auth.status === "authenticated" && !auth.loggingOut && !auth.validating && <PersonalCollection key={auth.user.id} />}
+    {auth.status === "authenticated" && !auth.loggingOut && <PersonalCollection key={auth.user.id} />}
     <p><Link to="/pokedex">{dictionary.inventory.browse}</Link></p>
   </section>;
 }

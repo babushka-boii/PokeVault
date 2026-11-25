@@ -165,7 +165,7 @@ export function ScannerPage() {
     <p className="scanner-hint">{text.privacy}</p><SessionNotice />
     {auth.status === "unauthenticated" && <p><Link to="/login">{text.signIn}</Link></p>}
     <p><Link to="/sets">{text.browse}</Link></p>
-    {auth.status === "authenticated" && !auth.loggingOut && <div key={auth.user.id} inert={Boolean(auth.validating)} style={{ display: auth.validating ? "none" : undefined }}>
+    {auth.status === "authenticated" && !auth.loggingOut && <div key={auth.user.id}>
       <ScannerSession suspended={Boolean(auth.validating)} />
     </div>}
   </section>;

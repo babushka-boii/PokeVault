@@ -12,7 +12,7 @@ const CONFLICTS: BinderErrorKey[] = ["pocket_occupied", "binder_full", "pocket_c
  * responses are ignored. A 401 re-checks the session.
  */
 export function useBinderMutations() {
-  const { retrySession, getCsrfToken } = useAuth();
+  const { retrySession, getCsrfToken, validating } = useAuth();
   const [busy, setBusy] = useState(false);
   const pending = useRef(false);
   const controllers = useRef(new Set<AbortController>());
@@ -42,5 +42,6 @@ export function useBinderMutations() {
       if (!controller.signal.aborted) { pending.current = false; setBusy(false); }
     }
   }, [getCsrfToken, retrySession]);
-  return { busy, run };
+  // While the session is being confirmed in the background nothing can be written (no CSRF token).
+  return { busy: busy || Boolean(validating), run };
 }

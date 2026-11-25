@@ -624,7 +624,7 @@ describe("conflicts, sessions and outages", () => {
     expectNoUuid(screen.getByRole("main"));
   });
 
-  test("session validation aborts a pending store and an account switch ignores its late response", async () => {
+  test("session validation keeps the binder on screen; an account switch then drops it and ignores the late response", async () => {
     const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [] }], tray: [physical(0)] });
     const base = world.request.getMockImplementation()!;
     let validating = false; let switched = false; let storeSignal: AbortSignal | undefined;
@@ -642,8 +642,8 @@ describe("conflicts, sessions and outages", () => {
     await waitFor(() => expect(finishStore).toBeTypeOf("function"));
     validating = true;
     await act(async () => window.dispatchEvent(new Event("focus")));
-    expect(storeSignal?.aborted).toBe(true);
-    expect(screen.queryByRole("heading", { level: 1, name: "Tesoros" })).not.toBeInTheDocument();
+    expect(storeSignal?.aborted).toBe(false);   // the store in flight is not cancelled by a background check
+    expect(screen.getByRole("heading", { level: 1, name: "Tesoros" })).toBeVisible();
     switched = true;
     await act(async () => finishSession(json({ user: { id: "misty", display_name: "Misty", email: null, email_verified: true, picture_url: null }, csrf_token: "c" })));
     expect(await screen.findByText("La carpeta o la carta ya no está disponible. Se actualizaron los datos.")).toBeVisible();

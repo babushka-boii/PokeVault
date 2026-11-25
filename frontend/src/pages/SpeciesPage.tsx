@@ -39,7 +39,7 @@ export function SpeciesPage() {
   const text = dictionary.pokedex;
   const cardText = dictionary.cards;
   const auth = useAuth();
-  const signedIn = auth.status === "authenticated" && !auth.loggingOut && !auth.validating;
+  const signedIn = auth.status === "authenticated" && !auth.loggingOut;
   const userId = signedIn ? auth.user.id : "";
   const { currency, ready } = useCurrency();
   const location = useLocation();
@@ -70,8 +70,8 @@ export function SpeciesPage() {
     const next = new URLSearchParams(params); next.set("page", String(page)); setParams(next, { replace: true });
   }, [rawPage, page, params, setParams]);
   useEffect(() => {
-    if (params.get("show") && !signedIn && auth.status !== "loading" && !auth.validating) { const next = new URLSearchParams(params); next.delete("show"); setParams(next, { replace: true }); }
-  }, [params, signedIn, auth.status, auth.validating, setParams]);
+    if (params.get("show") && !signedIn && auth.status !== "loading") { const next = new URLSearchParams(params); next.delete("show"); setParams(next, { replace: true }); }
+  }, [params, signedIn, auth.status, setParams]);
 
   if (number === undefined) return <section className="pv-dex" aria-labelledby="species-title">
     <h1 id="species-title" tabIndex={-1} ref={heading}>{text.gridTitle}</h1>

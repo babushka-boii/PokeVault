@@ -8,7 +8,7 @@ const pad = (n: number) => `#${String(n).padStart(3, "0")}`;
 const RESULTS = 24;
 
 /** Up to five different species chosen from the 9B species index; nothing is saved until "Guardar". */
-export function TeamPicker({ rows, team, onSave, onClose }: { rows: readonly SpeciesRow[]; team: number[]; onSave: (team: number[]) => Promise<boolean>; onClose: () => void }) {
+export function TeamPicker({ rows, team, blocked = false, onSave, onClose }: { rows: readonly SpeciesRow[]; team: number[]; blocked?: boolean; onSave: (team: number[]) => Promise<boolean>; onClose: () => void }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.profilePage;
   const [draft, setDraft] = useState(team);
@@ -46,7 +46,7 @@ export function TeamPicker({ rows, team, onSave, onClose }: { rows: readonly Spe
     {failed && <p role="alert" className="pv-pdialog__note pv-pdialog__note--error">{text.saveError}</p>}
     <div className="pv-pdialog__actions">
       <button type="button" className="pv-pbtn" onClick={onClose}>{text.cancel}</button>
-      <button type="button" className="pv-pbtn pv-pbtn--primary" disabled={busy} onClick={() => void save()}>{busy ? text.saving : text.save}</button>
+      <button type="button" className="pv-pbtn pv-pbtn--primary" disabled={busy || blocked} onClick={() => void save()}>{busy ? text.saving : text.save}</button>
     </div>
   </ProfileDialog>;
 }

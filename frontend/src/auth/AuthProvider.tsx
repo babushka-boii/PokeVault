@@ -8,13 +8,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     store.activate();
-    const onVisibility = () => { if (document.visibilityState === "visible") store.restore(); };
-    window.addEventListener("focus", store.restore);
-    window.addEventListener("pageshow", store.restore);
+    const onFocus = () => store.revalidate("focus");
+    const onBlur = () => store.markAway();
+    const onPageShow = (event: PageTransitionEvent) => store.revalidate(event.persisted ? "bfcache" : "pageshow");
+    const onVisibility = () => { if (document.visibilityState === "visible") store.revalidate("visible"); else store.markAway(); };
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("pageshow", onPageShow);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      window.removeEventListener("focus", store.restore);
-      window.removeEventListener("pageshow", store.restore);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("pageshow", onPageShow);
       document.removeEventListener("visibilitychange", onVisibility);
       store.deactivate();
     };

@@ -373,14 +373,14 @@ test("explains conflicting replay data without silently starting another copy", 
   expect(await screen.findByRole("alert")).toHaveTextContent("datos distintos"); expect(screen.getByRole("button", { name: "Guardar copia" })).toBeDisabled(); expect(writes(request)).toHaveLength(1);
 });
 
-test("hides photos and aborts recognition during validation, then discards them when the session expires", async () => {
+test("keeps the photo visible but aborts recognition during validation, then discards it when the session expires", async () => {
   let checking = false; let session!: (response: Response) => void; let finish!: (response: Response) => void; let scanSignal: AbortSignal | undefined;
   setup((url, options) => {
     if (url.pathname.endsWith("/auth/me") && checking) return new Promise<Response>((resolve) => { session = resolve; });
     if (url.pathname.endsWith("/recognize")) { scanSignal = options?.signal as AbortSignal; return new Promise<Response>((resolve) => { finish = resolve; }); }
   });
   const user = userEvent.setup(); render(<App initialEntries={["/scanner"]} />); await user.upload(await screen.findByLabelText("Elegir imagen o fototeca"), photo());
-  checking = true; await act(async () => window.dispatchEvent(new Event("focus"))); expect(scanSignal?.aborted).toBe(true); expect(screen.queryByRole("img", { name: "Vista previa de la carta" })).not.toBeInTheDocument(); expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+  checking = true; await act(async () => window.dispatchEvent(new Event("focus"))); expect(scanSignal?.aborted).toBe(true); expect(screen.getByRole("img", { name: "Vista previa de la carta" })).toBeVisible(); expect(URL.revokeObjectURL).not.toHaveBeenCalled();
   await act(async () => session(json({}, 401))); await act(async () => finish(json(recognizeResult)));
   expect(await screen.findByRole("link", { name: "Inicia sesión para escanear y añadir cartas." })).toBeVisible(); expect(screen.queryByRole("list", { name: "Cartas candidatas" })).not.toBeInTheDocument(); expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:card-1");
 });
@@ -499,8 +499,8 @@ test.each(["focus", "pageshow", "visibilitychange"])("preserves the same owner's
   await user.click(screen.getByRole("link", { name: "Ver detalles de la carta" })); checking = true;
   if (eventName === "visibilitychange") vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
   await act(async () => (eventName === "visibilitychange" ? document : window).dispatchEvent(new Event(eventName)));
-  expect(preview).toBeInTheDocument(); expect(preview).not.toBeVisible(); expect(preview.closest("[inert]")).not.toBeNull();
-  expect(screen.queryByRole("list", { name: "Cartas candidatas" })).not.toBeInTheDocument(); expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+  expect(preview).toBeVisible(); expect(preview.closest("[inert]")).toBeNull();   // a background check hides nothing
+  expect(screen.getByRole("list", { name: "Cartas candidatas" })).toBeVisible(); expect(URL.revokeObjectURL).not.toHaveBeenCalled();
   await act(async () => finishSession(json(setSession)));
   expect(preview).toBeVisible(); expect(name).toHaveValue("Pikachu & Zekrom-GX"); expect(screen.getByLabelText("Número de carta")).toHaveValue("033");
   expect(screen.getByRole("list", { name: "Cartas candidatas" })).toHaveTextContent("sm9-33"); expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
@@ -512,7 +512,7 @@ test("preserves selection and physical-copy draft after returning focus from car
   const user = userEvent.setup(); render(<App initialEntries={["/scanner"]} />); await recognize(user); await select(user);
   const notes = screen.getByLabelText("Notas personales"); await user.type(notes, "Verified physical copy"); await user.selectOptions(screen.getByLabelText("Idioma de la copia"), "ja");
   await user.click(screen.getByRole("link", { name: "Ver detalles de la carta" })); checking = true; await act(async () => window.dispatchEvent(new Event("focus")));
-  expect(notes).toBeInTheDocument(); expect(notes).not.toBeVisible(); expect(notes).toBeDisabled();
+  expect(notes).toBeVisible(); expect(notes).toBeDisabled();   // the text stays; saving waits for the session
   await act(async () => finishSession(json(setSession)));
   expect(screen.getByRole("heading", { name: "Confirmar copia física" })).toBeVisible(); expect(notes).toHaveValue("Verified physical copy"); expect(notes).toBeEnabled();
   expect(screen.getByLabelText("Idioma de la copia")).toHaveValue("ja"); expect(screen.getByRole("img", { name: "Vista previa de la carta" })).toBeVisible();
@@ -540,7 +540,7 @@ test("suspends a pending create during validation and resumes explicit retry wit
   });
   const user = userEvent.setup(); render(<App initialEntries={["/scanner"]} />); await recognize(user); await select(user); await user.type(screen.getByLabelText("Notas personales"), "One physical copy");
   const form = screen.getByRole("button", { name: "Guardar copia" }).closest("form")!; await user.click(screen.getByRole("button", { name: "Guardar copia" }));
-  checking = true; await act(async () => window.dispatchEvent(new Event("focus"))); expect(saveSignal?.aborted).toBe(true); expect(form).toBeInTheDocument(); expect(form).not.toBeVisible();
+  checking = true; await act(async () => window.dispatchEvent(new Event("focus"))); expect(saveSignal?.aborted).toBe(true); expect(form).toBeVisible();
   fireEvent.submit(form); expect(writes(request)).toHaveLength(1);
   await act(async () => finishSession(json({ ...setSession, csrf_token: "refreshed-csrf" })));
   expect(await screen.findByRole("button", { name: "Reintentar la misma copia" })).toBeEnabled(); expect(screen.getByLabelText("Notas personales")).toHaveValue("One physical copy"); expect(screen.getByLabelText("Notas personales")).toBeDisabled();
@@ -597,12 +597,13 @@ test("suspends owned quantity checks, retains the form, and refreshes quantity f
   expect(screen.queryByText("3 copias propias")).not.toBeInTheDocument(); expect(screen.getByLabelText("Notas personales")).toHaveValue("Keep selection");
 });
 
-test("discards the retained scan when revalidation cannot confirm the account", async () => {
+test("keeps the retained scan, with a calm notice, when revalidation cannot reach the server", async () => {
   let checking = false; let rejectSession!: (reason: unknown) => void;
   setup((url) => url.pathname.endsWith("/auth/me") && checking ? new Promise<Response>((_resolve, reject) => { rejectSession = reject; }) : undefined);
   const user = userEvent.setup(); render(<App initialEntries={["/scanner"]} />); await recognize(user); checking = true; await act(async () => window.dispatchEvent(new Event("focus")));
   expect(URL.revokeObjectURL).not.toHaveBeenCalled(); await act(async () => rejectSession(new TypeError("Session unavailable")));
-  expect(await screen.findByRole("alert")).toHaveTextContent("No se pudo comprobar tu sesión"); expect(screen.queryByLabelText("Nombre de carta")).not.toBeInTheDocument(); expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:card-1");
+  expect(await screen.findByRole("status", { name: "" })).toBeDefined(); expect(await screen.findByText(/No se pudo comprobar tu sesión/)).toBeVisible();
+  expect(screen.getByRole("img", { name: "Vista previa de la carta" })).toBeVisible(); expect(URL.revokeObjectURL).not.toHaveBeenCalled();   // a network failure is not a logout
 });
 
 test.each(["sm9-33", "sm9-34"])("starts a clean confirmed scan with a fresh registration identity for %s", async (nextId) => {

@@ -140,7 +140,7 @@ export function SetPage() {
   const { state, retry } = useTcgResource(valid ? `${setId}:${locale}` : undefined, request);
   useEffect(() => { heading.current?.focus(); }, [location.pathname, state.kind]);
   const metadata = state.kind === "loaded" ? state.data : null;
-  const personal = auth.status === "authenticated" && !auth.validating && !auth.loggingOut;
+  const personal = auth.status === "authenticated" && !auth.loggingOut;
   const canFilter = personal && metadata?.checklist_status === "verified" && metadata.checklist_size > 0;
   const rawPage = params.get("page") ?? "1";
   const page = /^\d+$/.test(rawPage) ? Math.min(MAX_SET_PAGE, Math.max(1, Number(rawPage))) : 1;

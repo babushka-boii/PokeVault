@@ -9,7 +9,7 @@ import "./cards.css";
 
 type Message = "added" | "removed" | "full" | "error" | null;
 
-function Toggle({ cardId }: { cardId: string }) {
+function Toggle({ cardId, blocked }: { cardId: string; blocked: boolean }) {
   const { dictionary } = useLocale();
   const text = dictionary.favorites;
   const { retrySession } = useAuth();
@@ -37,7 +37,7 @@ function Toggle({ cardId }: { cardId: string }) {
   }
 
   return <div className="pv-favorite">
-    <button type="button" className="pv-favorite__button" aria-pressed={favorite} disabled={!loaded || pending} onClick={() => void toggle()}>
+    <button type="button" className="pv-favorite__button" aria-pressed={favorite} disabled={!loaded || pending || blocked} onClick={() => void toggle()}>
       <span aria-hidden="true">{favorite ? "★" : "☆"}</span> {text.label}
     </button>
     {state.kind === "error" && <p className="pv-favorite__note">{text.loadError} <button type="button" onClick={retry}>{dictionary.home.retry}</button></p>}
@@ -54,6 +54,7 @@ export function FavoriteStar({ cardId }: { cardId: string }) {
   const auth = useAuth();
   const { dictionary } = useLocale();
   if (auth.status === "unauthenticated") return <p className="pv-favorite"><Link to="/login">{dictionary.favorites.signIn}</Link></p>;
-  if (auth.status !== "authenticated" || auth.loggingOut || auth.validating) return null;
-  return <Toggle key={`${auth.user.id}:${cardId}`} cardId={cardId} />;
+  if (auth.status !== "authenticated" || auth.loggingOut) return null;
+  // A background check keeps the star on screen; it only cannot be changed until the session is confirmed.
+  return <Toggle key={`${auth.user.id}:${cardId}`} cardId={cardId} blocked={Boolean(auth.validating)} />;
 }

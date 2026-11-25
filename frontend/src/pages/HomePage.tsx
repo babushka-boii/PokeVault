@@ -55,7 +55,7 @@ function ResolvingHome() {
 export function HomePage() {
   const auth = useAuth();
   const { dictionary } = useLocale();
-  const resolving = auth.status === "loading" || auth.validating;
+  const resolving = auth.status === "loading";
   return <div className="pv-home">
     <h1 className="pv-sr-only">{dictionary.home.title}</h1>
     {auth.status === "error" && <SessionNotice />}

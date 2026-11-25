@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useAuth } from "../../auth/context";
 import { useLocale } from "../../i18n/LocaleProvider";
 import type { SpeciesRow } from "../../services/pokemon";
 import { TEAM_MAX, type Profile, type ProfileUpdate } from "../../services/profile";
@@ -14,6 +15,7 @@ export function TrainerBand({ name, profile, failed, retry, rows, save }: {
 }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.profilePage;
+  const blocked = Boolean(useAuth().validating);   // nothing is saved while the session is being confirmed
   const [dialog, setDialog] = useState<"trainer" | "team" | null>(null);
   const trainerButton = useRef<HTMLButtonElement>(null);
   const team = profile?.team ?? [];
@@ -43,11 +45,11 @@ export function TrainerBand({ name, profile, failed, retry, rows, save }: {
       </div>
     </div>
     <div className="pv-band__actions">
-      <button ref={trainerButton} type="button" className="pv-pbtn" disabled={!profile} onClick={() => setDialog("trainer")}>{text.changeTrainer}</button>
-      <button type="button" className="pv-pbtn pv-pbtn--primary" disabled={!profile || !rows} onClick={() => setDialog("team")}>{text.editTeam.replace("{count}", String(team.length))}</button>
+      <button ref={trainerButton} type="button" className="pv-pbtn" disabled={!profile || blocked} onClick={() => setDialog("trainer")}>{text.changeTrainer}</button>
+      <button type="button" className="pv-pbtn pv-pbtn--primary" disabled={!profile || !rows || blocked} onClick={() => setDialog("team")}>{text.editTeam.replace("{count}", String(team.length))}</button>
     </div>
-    {dialog === "trainer" && profile && <TrainerPicker current={profile.trainer_id} onClose={() => setDialog(null)} onSave={(id) => save({ trainer_id: id, team: profile.team })} />}
-    {dialog === "team" && profile && rows && <TeamPicker rows={rows} team={profile.team} onClose={() => setDialog(null)} onSave={(next) => save({ trainer_id: profile.trainer_id, team: next })} />}
+    {dialog === "trainer" && profile && <TrainerPicker blocked={blocked} current={profile.trainer_id} onClose={() => setDialog(null)} onSave={(id) => save({ trainer_id: id, team: profile.team })} />}
+    {dialog === "team" && profile && rows && <TeamPicker blocked={blocked} rows={rows} team={profile.team} onClose={() => setDialog(null)} onSave={(next) => save({ trainer_id: profile.trainer_id, team: next })} />}
     <span className="pv-band__rule" aria-hidden="true" />
   </section>;
 }

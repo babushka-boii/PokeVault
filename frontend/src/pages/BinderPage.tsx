@@ -376,6 +376,6 @@ export function BinderPage() {
   return <section className="pv-binder" aria-labelledby="pv-binder-title">
     <SessionNotice />
     {auth.status === "unauthenticated" && <><h1 id="pv-binder-title">{dictionary.binders.title}</h1><p>{dictionary.binders.signIn}</p><Link to="/login">{dictionary.auth.signIn}</Link></>}
-    {auth.status === "authenticated" && !auth.loggingOut && !auth.validating && <BinderWorkspace key={`${auth.user.id}:${binderId}`} binderId={binderId} />}
+    {auth.status === "authenticated" && !auth.loggingOut && <BinderWorkspace key={`${auth.user.id}:${binderId}`} binderId={binderId} />}
   </section>;
 }

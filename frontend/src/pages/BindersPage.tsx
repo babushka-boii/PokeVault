@@ -144,6 +144,6 @@ export function BindersPage() {
     <p className="pv-binder__hint">{text.description}</p>
     <SessionNotice />
     {auth.status === "unauthenticated" && <><p>{text.signIn}</p><Link to="/login">{dictionary.auth.signIn}</Link></>}
-    {auth.status === "authenticated" && !auth.loggingOut && !auth.validating && <Shelf key={auth.user.id} />}
+    {auth.status === "authenticated" && !auth.loggingOut && <Shelf key={auth.user.id} />}
   </section>;
 }

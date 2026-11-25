@@ -16,7 +16,7 @@ import "./home.css";
 export function HomeGuide({ onFavorite }: { onFavorite: () => void }) {
   const { dictionary } = useLocale();
   const text = dictionary.home;
-  const { retrySession, getCsrfToken } = useAuth();
+  const { retrySession, getCsrfToken, validating } = useAuth();
   const request = useCallback((signal: AbortSignal) => fetchGuide(signal).catch((error: unknown) => {
     if (!signal.aborted && error instanceof HomeError && error.status === 401) retrySession();
     throw error;
@@ -46,7 +46,7 @@ export function HomeGuide({ onFavorite }: { onFavorite: () => void }) {
   return <CutPanel className="pv-home__guide pv-home__wide" aria-labelledby="home-guide-title">
     <div className="pv-home__section-head">
       <h2 id="home-guide-title">{text.guideTitle}</h2>
-      <button type="button" className="pv-button pv-button--secondary" disabled={busy} onClick={() => void close()}>{text.guideClose}</button>
+      <button type="button" className="pv-button pv-button--secondary" disabled={busy || Boolean(validating)} onClick={() => void close()}>{text.guideClose}</button>
     </div>
     {problem && <p role="alert" className="pv-home__meta">{text.guideCloseError}</p>}
     <ol className="pv-home__steps" aria-label={text.guideTitle}>

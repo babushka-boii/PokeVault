@@ -170,8 +170,8 @@ function Dex({ signedIn, resolving, userId }: { signedIn: boolean; resolving: bo
 
 export function PokedexPage() {
   const auth = useAuth();
-  const resolving = auth.status === "loading" || Boolean(auth.validating);
-  const signedIn = auth.status === "authenticated" && !auth.loggingOut && !auth.validating;
+  const resolving = auth.status === "loading";
+  const signedIn = auth.status === "authenticated" && !auth.loggingOut;
   // One component for guests and users: the public index is requested once; ownership is keyed by user.
   return <Dex signedIn={signedIn} resolving={resolving} userId={signedIn ? auth.user.id : ""} />;
 }
