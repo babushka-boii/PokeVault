@@ -235,3 +235,9 @@ def test_a_clean_normal_card_never_runs_the_dedicated_passes(tmp_path, monkeypat
         result.clues.printed_total,
     ) == ("Dragonite", "149", 165)
     assert not any(size in dedicated for size, _ in calls)
+
+
+def test_with_many_readings_a_word_seen_twice_is_noise():
+    readings = ["Heat Rotom@x", "HeatiRotom", "Neat Roton", "Heat Rotom ex"] * 2
+    readings += ["Heat ASIAN Rotom", "ASIAN x", "q1", "q2", "q3", "q4", "q5", "q6"]
+    assert vote_name(readings) == "Heat Rotom"

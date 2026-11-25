@@ -185,9 +185,10 @@ def vote_name(readings: list[str]) -> str:
     """The title words most readings agree on, in the order they were first seen.
 
     Foil titles come out as "Heat Rotom@x", "HeatiRotom" or "Neat Roton": no single
-    reading is trusted. Words of 3+ letters are grouped when they are nearly equal and a
-    group needs two different readings to count. A partial name ("Rotom") is a fine
-    result: the matching step combines it with the number and the printed total.
+    reading is trusted. Words of 3+ letters are grouped when they are nearly equal, and
+    a group needs two different readings (a quarter of them when there are many). A
+    partial name ("Rotom") is a fine result: the matching step combines it with the
+    number and the printed total.
     """
     groups: list[dict] = []
     # The same text read twice (two page modes) is one reading, not two votes.
@@ -195,8 +196,8 @@ def vote_name(readings: list[str]) -> str:
         split = _CAMEL.sub(" ", text)
         for match in _WORD.finditer(split):
             word, where = match.group(), match.start() / max(1, len(split))
-            if word.isupper() and len(word) < 4:
-                continue  # short capitals are artwork and shadow noise, not name words
+            if word.isupper():
+                continue  # all capitals are artwork and shadow noise, not name words
             for group in groups:
                 if SequenceMatcher(None, word.lower(), group["key"]).ratio() >= 0.75:
                     group["spellings"][word] += 1
@@ -212,7 +213,9 @@ def vote_name(readings: list[str]) -> str:
                         "where": [where],
                     }
                 )
-    kept = [group for group in groups if len(group["readings"]) >= 2]
+    distinct = len(dict.fromkeys(readings))
+    needed = max(2, round(distinct / 4))  # with many readings a word needs a quarter
+    kept = [group for group in groups if len(group["readings"]) >= needed]
     kept.sort(key=lambda group: sum(group["where"]) / len(group["where"]))
     return " ".join(group["spellings"].most_common(1)[0][0] for group in kept)
 
