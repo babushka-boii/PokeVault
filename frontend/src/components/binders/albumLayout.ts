@@ -11,3 +11,14 @@ export function fitAlbum(input: AlbumDimensions) {
   const sleeveWidth = Math.max(minSleeveWidth, available);
   return { sleeveWidth, sleeveHeight: sleeveWidth * 88 / 63, overflow: available < minSleeveWidth };
 }
+
+const GAP = 8;
+const MARGIN = 8;
+
+/** Where the popover goes: right of the anchor if it fits, else left, clamped inside the viewport. */
+export function placePopover(anchor: DOMRect, size: { width: number; height: number }, viewport: { width: number; height: number }) {
+  const right = anchor.right + GAP + size.width + MARGIN <= viewport.width;
+  const left = right ? anchor.right + GAP : Math.max(MARGIN, anchor.left - GAP - size.width);
+  const top = Math.min(Math.max(MARGIN, anchor.top), Math.max(MARGIN, viewport.height - size.height - MARGIN));
+  return { left, top, side: right ? "right" : "left" } as const;
+}

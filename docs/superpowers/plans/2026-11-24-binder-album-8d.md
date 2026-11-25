@@ -135,19 +135,19 @@ route-scoped shell.css/AppShell.tsx only if required to reserve existing shell s
 **Modify:** BinderPage.tsx, PageGrid.tsx, BinderTray.tsx, binders.css, dictionaries.ts.
 **Tests:** BinderView.test.tsx, PocketActions.test.tsx.
 
-- [ ] Add tests: occupied click opens named facts/actions, empty click offers tray;
+- [x] Add tests: occupied click opens named facts/actions, empty click offers tray;
   desktop flips/clamps at each edge; mobile modal traps focus; Escape/outside restores
   focus; outside pointer does not activate underlying pocket; no UUID in names/text.
-- [ ] Add a failing regression: in move mode ArrowRight/Down and Home/End cause zero
+- [x] Add a failing regression: in move mode ArrowRight/Down and Home/End cause zero
   placement requests; Enter on an empty destination causes exactly one. Occupied
   destination does not overwrite. Paging selects the new page without saving.
-- [ ] Separate onSelect/onActivate. Remove the aside; use one portal-based action surface.
+- [x] Separate onSelect/onActivate. Remove the aside; use one portal-based action surface.
   Implement idle/fill/move/other-binder states from spec §4.4 and explicit cancellation.
   Empty-pocket activation opens controls; only Choose from tray enters fill and moves
   focus to the tray. Test both steps separately.
-- [ ] Add multi-page move, target tray fill, cross-binder next-free, 409 refresh,
+- [x] Add multi-page move, target tray fill, cross-binder next-free, 409 refresh,
   failed-request retained identity and auth-unmount tests using existing API fixtures.
-- [ ] Run `npm test --prefix frontend -- --run src/pages/BinderView.test.tsx
+- [x] Run `npm test --prefix frontend -- --run src/pages/BinderView.test.tsx
   src/components/binders/PocketActions.test.tsx src/services/binders.test.ts`, then
   frontend lint/typecheck. Commit: `feat(binders): place pocket actions in context`.
 
@@ -348,3 +348,11 @@ Planning checks: source audit, main fast-forward pull, spec/plan cross-check and
   541 frontend tests, lint and typecheck green. The tray keeps its 30-item paging, retry,
   fill cue and consumed-item tests in BinderView.test.tsx. Real viewport fit is still a
   Safari check (jsdom proves no layout).
+- Task 2 complete (2026-11-24): `PocketActions` (portal popover / modal phone sheet) replaces
+  the side panel; `PageGrid` now has `onSelect` (arrows, focus only) and `onActivate`
+  (click/Enter/Space). Move mode has an explicit banner with Cancel and Escape, never
+  overwrites an occupied pocket, and navigation causes zero placement requests (checked by
+  planting a bug that made arrows activate). 552 frontend tests, lint and typecheck green.
+  Cross-binder move uses the inline chooser and `storeNext`; 409/401/outage cases keep their
+  existing tests. Real anchoring and the sheet are Safari checks.
+

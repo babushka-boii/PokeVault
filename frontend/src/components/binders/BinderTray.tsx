@@ -1,5 +1,4 @@
-import { useCallback, useState } from "react";
-import { useAuth } from "../../auth/context";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useCardMetadata } from "../cards/cardMetadata";
@@ -8,17 +7,11 @@ import { Button } from "../ui/Button";
 import { InlineError } from "../ui/InlineError";
 import { LoadingStatus, Skeleton } from "../ui/Skeleton";
 import { cardIdentity, fill } from "./labels";
+import { useGuard } from "./useGuard";
 import { captureOrigin, type FlightOrigin } from "./flight";
-import { BindersError, fetchCopyView, type CopyViewPage } from "../../services/binders";
+import { fetchCopyView, type CopyViewPage } from "../../services/binders";
 import type { InventoryCopy } from "../../services/inventory";
 import type { Mode } from "../../pages/BinderPage";
-function useGuard() {
-  const { retrySession } = useAuth();
-  return useCallback((error: unknown, signal: AbortSignal): never => {
-    if (!signal.aborted && error instanceof BindersError && error.status === 401) retrySession();
-    throw error;
-  }, [retrySession]);
-}
 export function BinderTray({ mode, binderId, busy, onStore, version, onCancel, consumed }: {
   mode: Mode; binderId: string; busy: boolean; version: number; consumed: ReadonlySet<string>;
   onStore: (copy: InventoryCopy, origin: FlightOrigin | null) => void; onCancel: () => void;
@@ -34,7 +27,17 @@ export function BinderTray({ mode, binderId, busy, onStore, version, onCancel, c
   const page = loaded && { ...loaded, results: loaded.results.filter((copy) => !consumed.has(copy.id)) };
   const metadata = useCardMetadata(page?.results.map((copy) => copy.card_id) ?? [], locale);
   const fillTarget = mode.kind === "fill" ? mode.target : null;
-  return <section className="pv-tray" aria-labelledby="pv-tray-title">
+  const fillKey = fillTarget ? `${fillTarget.page}:${fillTarget.pocket}` : null;
+  const list = useRef<HTMLUListElement>(null);
+  const focused = useRef<string | null>(null);
+  // Choosing from the tray for a pocket moves focus to its first card (the heading when it is empty).
+  useEffect(() => {
+    if (!fillKey) { focused.current = null; return; }
+    if (focused.current === fillKey || !loaded) return;
+    focused.current = fillKey;
+    (list.current?.querySelector<HTMLElement>("button:not(:disabled)") ?? document.getElementById("pv-tray-title"))?.focus();
+  }, [fillKey, loaded]);
+  return <section className="pv-tray" aria-labelledby="pv-tray-title" data-filling={fillKey ? "true" : undefined}>
     <div className="pv-tray__head">
       <h2 id="pv-tray-title" tabIndex={-1}>{text.tray}</h2>
       {page && <span className="pv-tray__count">{fill(text.trayTotal, { count: page.total })}</span>}
@@ -44,7 +47,7 @@ export function BinderTray({ mode, binderId, busy, onStore, version, onCancel, c
     {tray.state.kind === "loading" && <LoadingStatus label={text.trayLoading}><Skeleton shape="text" lines={3} /></LoadingStatus>}
     {tray.state.kind === "error" && <InlineError message={text.trayError} retryLabel={text.retry} onRetry={tray.retry} />}
     {page && page.results.length === 0 && <p className="pv-binder__hint">{text.trayEmpty}</p>}
-    {page && page.results.length > 0 && <ul className="pv-tray__list">
+    {page && page.results.length > 0 && <ul className="pv-tray__list" ref={list}>
       {page.results.map((copy) => {
         const card = metadata.cards[copy.card_id];
         const identity = cardIdentity(copy, card);

@@ -57,14 +57,21 @@ describe("spread and pockets", () => {
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     const first = await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ });
     await user.click(first);
-    const panel = screen.getByRole("complementary", { name: "Bolsillo seleccionado" });
-    expect(within(panel).getByRole("heading", { name: "Pág. 1 · bolsillo 1" })).toBeVisible();
+    const dialog = await screen.findByRole("dialog", { name: "Card 1 · Expansion 1" });
+    expect(within(dialog).getByText(/Pág\. 1 · bolsillo 1/)).toBeVisible();
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(first).toHaveFocus();
+    // Arrows only move focus and selection: no dialog opens.
     await user.keyboard("{ArrowRight}");
     expect(within(grid(1)).getAllByRole("button")[1]).toHaveFocus();
-    expect(await within(panel).findByText("Card 2 · Expansion 2")).toBeVisible();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.keyboard("{ArrowDown}");
-    expect(within(panel).getByRole("heading", { name: "Pág. 1 · bolsillo 5" })).toBeVisible();
-    expect(within(panel).getByRole("button", { name: "Elegir de la bandeja" })).toBeVisible();
+    expect(within(grid(1)).getAllByRole("button")[4]).toHaveFocus();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await user.keyboard("{Enter}");
+    const empty = await screen.findByRole("dialog", { name: "Pág. 1 · bolsillo 5" });
+    expect(within(empty).getByRole("button", { name: "Elegir de la bandeja" })).toBeVisible();
   });
 
   test("a deep link opens the spread of the page and focuses the pocket", async () => {
@@ -99,8 +106,8 @@ describe("tray and actions", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(2)}`]} />);
     await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 4:/ }));
-    await user.click(screen.getByRole("button", { name: "Mover" }));
-    const panel = screen.getByRole("complementary", { name: "Bolsillo seleccionado" });
+    const panel = await screen.findByRole("dialog");
+    await user.click(within(panel).getByRole("button", { name: "Mover a otra carpeta" }));
     const select = await within(panel).findByLabelText("Carpeta de destino");
     await waitFor(() => expect(within(select).getAllByRole("option")).toHaveLength(2));
     await user.selectOptions(select, binderId(1));
@@ -114,7 +121,8 @@ describe("tray and actions", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ }));
-    await user.click(screen.getByRole("button", { name: "Mover" }));
+    await user.click(await screen.findByRole("button", { name: "Mover a otro bolsillo" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.click(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 9: vacío" }));
     await waitFor(() => expect(live()).toHaveTextContent("Movida a pág. 2 · bolsillo 9"));
     expect(world.mutations()).toEqual([{ method: "PUT", path: `/api/v1/binders/${binderId(1)}/pockets/2/9`, body: { copy_id: physical(0).id } }]);
@@ -125,12 +133,15 @@ describe("tray and actions", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     await user.click(await within(await findGrid(2)).findByRole("button", { name: "Página 2, bolsillo 5: vacío" }));
-    await user.click(screen.getByRole("button", { name: "Elegir de la bandeja" }));
+    await user.click(await screen.findByRole("button", { name: "Elegir de la bandeja" }));
     const tray = screen.getByRole("region", { name: "Sin carpeta" });
     expect(within(tray).getByText("Toca una carta para guardarla en la página 2, bolsillo 5.")).toBeVisible();
-    await user.click(await within(tray).findByRole("button", { name: "Guardar Card 1 · Expansion 1 en página 2, bolsillo 5" }));
+    const card = await within(tray).findByRole("button", { name: "Guardar Card 1 · Expansion 1 en página 2, bolsillo 5" });
+    await waitFor(() => expect(card).toHaveFocus());   // focus moves to the first tray card
+    await user.click(card);
     await waitFor(() => expect(live()).toHaveTextContent("Guardada en Tesoros · pág. 2 · bolsillo 5"));
-    await user.click(screen.getByRole("button", { name: "Sacar de la carpeta" }));
+    await user.click(within(grid(2)).getByRole("button", { name: /^Página 2, bolsillo 5: Card 1/ }));
+    await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
     await waitFor(() => expect(live()).toHaveTextContent("Devuelta a la bandeja"));
     expect(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 5: vacío" })).toBeInTheDocument();
     expect(world.mutations().map((c) => `${c.method} ${c.path}`)).toEqual([
@@ -251,7 +262,7 @@ describe("FLIP flight", () => {
       expect(original.style.visibility).toBe("");                 // visible again
       expect(pocket).not.toHaveAttribute("data-incoming");
       expect(pocket).not.toHaveAttribute("data-arrived");         // the cancelled entry never plays
-      expect(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 5: vacío" })).toHaveFocus();
+      expect(await screen.findByRole("dialog", { name: "Pág. 1 · bolsillo 5" })).toBeVisible();
     } finally { motion.restore(); }
   });
 
@@ -281,7 +292,7 @@ describe("FLIP flight", () => {
       const source = within(await findGrid(1)).getByRole("button", { name: /^Página 1, bolsillo 1:/ });
       const held = source.querySelector(".pv-pocket__card") as HTMLElement;
       await user.click(source);
-      await user.click(screen.getByRole("button", { name: "Mover" }));
+      await user.click(await screen.findByRole("button", { name: "Mover a otro bolsillo" }));
       await user.click(within(grid(2)).getByRole("button", { name: "Página 2, bolsillo 9: vacío" }));
       await waitFor(() => expect(motion.flights).toHaveLength(1));
       // The card itself flies (not the sleeve and its plastic).

@@ -10,7 +10,7 @@ import { copyLabel, fill } from "./labels";
 export type PocketRef = { page: number; pocket: number };
 const same = (a: PocketRef | null, b: PocketRef) => !!a && a.page === b.page && a.pocket === b.pocket;
 
-function PocketPrice({ price }: { price?: CopyPrice }) {
+export function PocketPrice({ price }: { price?: CopyPrice }) {
   const { locale } = useLocale();
   const quote = price?.price;
   if (!quote) return null;
@@ -19,14 +19,14 @@ function PocketPrice({ price }: { price?: CopyPrice }) {
 }
 
 /**
- * One 3×3 page. Pockets are buttons in a roving-tabindex grid: arrows move within the
- * page, Page Up / Page Down ask the binder view to turn the page. Names carry card,
+ * One 3×3 page. Pockets are buttons in a roving-tabindex grid: arrows move focus and the
+ * selection within the page (onSelect); a click, Enter or Space activates (onActivate); Page Up / Page Down ask the binder view to turn the page. Names carry card,
  * expansion, page and pocket, never a UUID. Card images are decorative.
  */
-export function PageGrid({ page, pockets, cards, prices, selected, arrived, incoming, targetable, select, onTurn, register }: {
+export function PageGrid({ page, pockets, cards, prices, selected, arrived, incoming, targetable, onSelect, onActivate, onTurn, register }: {
   page: number; pockets: BinderPocket[]; cards: Record<string, TcgCard>; prices: Record<string, CopyPrice>;
   selected: PocketRef | null; arrived: PocketRef | null; incoming: PocketRef | null; targetable: boolean;
-  select: (target: PocketRef) => void; onTurn: (direction: 1 | -1) => void;
+  onSelect: (target: PocketRef) => void; onActivate: (target: PocketRef) => void; onTurn: (direction: 1 | -1) => void;
   register: (target: PocketRef) => RefCallback<HTMLButtonElement>;
 }) {
   const { dictionary } = useLocale();
@@ -41,7 +41,7 @@ export function PageGrid({ page, pockets, cards, prices, selected, arrived, inco
     if (next === undefined) return;
     event.preventDefault();
     if (next < 1 || next > 9) return;
-    select({ page, pocket: next });
+    onSelect({ page, pocket: next });  // arrows only move focus: never a placement
   }
 
   return <section className="pv-page" aria-label={fill(text.page, { page })}>
@@ -58,7 +58,7 @@ export function PageGrid({ page, pockets, cards, prices, selected, arrived, inco
               aria-label={label} tabIndex={focusPocket === pocket ? 0 : -1}
               data-arrived={same(arrived, target) ? "true" : undefined}
               data-incoming={same(incoming, target) ? "true" : undefined}
-              onClick={() => select(target)} onKeyDown={(event) => keyDown(event, pocket)}>
+              onClick={() => onActivate(target)} onKeyDown={(event) => keyDown(event, pocket)}>
               {/* A real sleeve: the card sits behind a front plastic (with its top edge) that shines. */}
               <span className="pv-pocket__sleeve" aria-hidden="true">
                 {held ? <span className="pv-pocket__card">
