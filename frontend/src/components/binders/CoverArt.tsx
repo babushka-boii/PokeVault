@@ -1,18 +1,18 @@
 import { useState } from "react";
 import type { Cover, Sticker } from "../../services/binders";
-import { PIXELS, stickerImage } from "./stickers";
+import { PIXELS, stickerImage, stickerStyle } from "./stickers";
 
-/** One sticker: its centre is x/y percent of the 3:4 cover and its box is 20% x scale of the cover's width. */
-export function StickerLayer({ sticker, index }: { sticker: Sticker; index: number }) {
+/** The picture of a sticker: a pixel design, or the species artwork (a placeholder if it fails to load). */
+export function StickerArt({ sticker }: { sticker: Sticker }) {
   const [failed, setFailed] = useState(false);
   const image = stickerImage(sticker);
-  const style = { left: `${sticker.x}%`, top: `${sticker.y}%`, width: `${20 * sticker.scale}%`, transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`, zIndex: index };
-  return <span className="pv-sticker" data-kind={sticker.kind} aria-hidden="true" style={style}>
-    {sticker.kind === "pixel" && sticker.pixel_key
-      ? <svg viewBox="0 0 10 10" shapeRendering="crispEdges" className={`pv-sticker__pixel pv-sticker__pixel--${sticker.pixel_key}`}><path d={PIXELS[sticker.pixel_key].path} /></svg>
-      : image && !failed ? <img src={image} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" draggable={false} onError={() => setFailed(true)} />
-        : <span className="pv-sticker__missing">◇</span>}
-  </span>;
+  if (sticker.kind === "pixel" && sticker.pixel_key) return <svg viewBox="0 0 10 10" shapeRendering="crispEdges" className={`pv-sticker__pixel pv-sticker__pixel--${sticker.pixel_key}`} aria-hidden="true"><path d={PIXELS[sticker.pixel_key].path} /></svg>;
+  return image && !failed ? <img src={image} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" draggable={false} onError={() => setFailed(true)} />
+    : <span className="pv-sticker__missing" aria-hidden="true">◇</span>;
+}
+
+export function StickerLayer({ sticker, index }: { sticker: Sticker; index: number }) {
+  return <span className="pv-sticker" data-kind={sticker.kind} aria-hidden="true" style={stickerStyle(sticker, index)}><StickerArt sticker={sticker} /></span>;
 }
 
 /** The cover itself: material, stitching and stickers, with no link. The same drawing everywhere (shelf, Home, editor). */

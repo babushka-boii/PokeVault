@@ -12,3 +12,6 @@ export const PIXELS: Record<PixelKey, { path: string }> = {
 
 /** A Pokémon sticker's image comes only from its validated species number. */
 export const stickerImage = (sticker: Sticker): string | null => sticker.kind === "pokemon" && sticker.species_id !== null ? artworkUrl(sticker.species_id) : null;
+
+/** Where a sticker sits: its centre is x/y percent of the 3:4 cover and its box is 20% x scale of the cover's width. */
+export const stickerStyle = (sticker: Sticker, index: number) => ({ left: `${sticker.x}%`, top: `${sticker.y}%`, width: `${20 * sticker.scale}%`, transform: `translate(-50%, -50%) rotate(${sticker.rotation}deg)`, zIndex: index });

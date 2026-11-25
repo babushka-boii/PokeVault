@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../auth/context";
 import { BindersError } from "../services/binders";
 
-export type BinderErrorKey = "pocket_occupied" | "binder_full" | "pocket_changed" | "binder_limit_reached" | "missing" | "expired" | "error";
+export type BinderErrorKey = "pocket_occupied" | "binder_full" | "pocket_changed" | "binder_limit_reached" | "binder_max_pages" | "missing" | "expired" | "error";
 export type MutationOutcome<T> = { ok: true; value: T } | { ok: false; error: BinderErrorKey };
-const CONFLICTS: BinderErrorKey[] = ["pocket_occupied", "binder_full", "pocket_changed", "binder_limit_reached"];
+const CONFLICTS: BinderErrorKey[] = ["pocket_occupied", "binder_full", "pocket_changed", "binder_limit_reached", "binder_max_pages"];
 
 /**
  * One binder write at a time, with the session's CSRF token. Pending writes abort on

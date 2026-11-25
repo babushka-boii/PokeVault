@@ -12,6 +12,7 @@ import { PocketActions } from "../components/binders/PocketActions";
 import { useGuard } from "../components/binders/useGuard";
 import { BinderValue } from "../components/prices/BinderValue";
 import { useCurrency } from "../components/prices/currency";
+import { CoverEditor } from "../components/binders/CoverEditor";
 import { Button } from "../components/ui/Button";
 import { InlineError } from "../components/ui/InlineError";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
@@ -21,8 +22,8 @@ import { captureOrigin, exitCard, flyCard, inViewport, PAGE_TURN_WAIT_MS, settle
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import {
-  copyDetailPath, fetchBinder, MAX_PAGES, placeInPocket, removeFromPocket, spreadStart, storeNext,
-  type Binder, type StoreResult,
+  addPages, copyDetailPath, fetchBinder, MAX_PAGES, placeInPocket, removeFromPocket, renameBinder, saveAppearance, spreadStart, storeNext,
+  type Appearance, type Binder, type StoreResult,
 } from "../services/binders";
 import type { InventoryCopy } from "../services/inventory";
 import { fetchCopyPrices } from "../services/prices";
@@ -36,6 +37,8 @@ const clampPage = (value: number, pages: number) => Number.isInteger(value) ? Ma
 
 function BinderWorkspace({ binderId }: { binderId: string }) {
   const { dictionary, locale } = useLocale();
+  const auth = useAuth();
+  const owner = auth.status === "authenticated" ? auth.user.display_name : "";
   const text = dictionary.binders;
   const { currency, ready } = useCurrency();
   const [params, setParams] = useSearchParams();
@@ -63,6 +66,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   const menu = menuState?.target ?? null;
   const [arrived, setArrived] = useState<PocketRef | null>(null);
   const [incoming, setIncoming] = useState<PocketRef | null>(null);
+  const [customizing, setCustomizing] = useState(false);
   const alive = useRef(true);
   // Each new action bumps this, so a late arrival never steals focus or state.
   const arrival = useRef(0);
@@ -248,6 +252,32 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     }
     setTrayVersion((v) => v + 1);
   }
+  /** Name first, then the look; the page shows what the server answered. */
+  async function saveLook(look: Appearance, nextName: string): Promise<boolean> {
+    if (!binder || !loaded) return false;
+    let current = binder;
+    if (nextName !== binder.name) {
+      const renamed = await run((csrf, signal) => renameBinder(binderId, nextName, csrf, signal));
+      if (!renamed) return false;
+      if (!renamed.ok) { failed(renamed.error); return false; }
+      current = { ...current, name: renamed.value.name, updated_at: renamed.value.updated_at };
+    }
+    const saved = await run((csrf, signal) => saveAppearance(binderId, look, csrf, signal));
+    if (!saved) return false;
+    if (!saved.ok) { setLocal({ base: loaded, value: current }); failed(saved.error); return false; }
+    setProblem(null);
+    setLocal({ base: loaded, value: { ...current, cover: saved.value.cover, stickers: saved.value.stickers, updated_at: saved.value.updated_at } });
+    return true;
+  }
+  /** "+ Agregar hojas": two more sheets, kept even when empty. */
+  async function moreSheets() {
+    if (!binder || !loaded) return;
+    const outcome = await run((csrf, signal) => addPages(binderId, csrf, signal));
+    if (!outcome) return;
+    if (!outcome.ok) { failed(outcome.error); return; }
+    setProblem(null); setStatus(text.pagesAdded);
+    setLocal({ base: loaded, value: { ...binder, page_count: outcome.value.page_count, updated_at: outcome.value.updated_at } });
+  }
   function failed(error: BinderErrorKey) {
     setProblem(error); setStatus("");
     if (error !== "expired" && error !== "error") detail.retry();
@@ -329,6 +359,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
       <Link className="pv-binder__back" to="/binders">‹ {text.back}</Link>
       <h1 id="pv-binder-title">{binder.name}</h1>
       <span className="pv-binder__pages">{label}</span>
+      <Button disabled={busy} onClick={() => setCustomizing(true)}>{text.editCover}</Button>
       <span className="pv-binder__count">· {plural(text.cards, binder.copy_count)} ·</span>
       <BinderValue binderId={binder.id} version={binder.pockets.map((p) => `${key(p)}:${p.copy.id}`).join(",")} />
     </header>
@@ -347,6 +378,8 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
       onTakeOut={() => { if (menuHeld) void takeOut(menu, menuHeld.copy); }}
       onChooseFromTray={() => { setMode({ kind: "fill", target: menu }); setMenu(null); }} />}
     {problem && <p className="pv-binder__problem" role="alert">{text.errors[problem]}</p>}
+    {customizing && <CoverEditor name={binder.name} owner={owner} year={new Date(binder.created_at).getFullYear()} initial={{ cover: binder.cover, stickers: binder.stickers }}
+      onSave={saveLook} onClose={() => setCustomizing(false)} />}
     {mode.kind === "move" && <div className="pv-binder__moving" role="group" aria-label={text.moveTitle}>
       <p>{fill(text.moveModeHint, { card: cardIdentity(mode.copy, metadata.cards[mode.copy.card_id]) })}</p>
       <Button onClick={cancelMode}>{text.moveCancel}</Button>
@@ -362,6 +395,10 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
         </AlbumFrame>
         <Button className="pv-binder__arrow pv-binder__arrow--next" aria-label={text.next} disabled={first + (mobile ? 1 : 2) > pageCount} onClick={() => turnPage(1)}><span aria-hidden="true">›</span></Button>
         </div>
+        {visible.includes(pageCount) && <div className="pv-binder__sheets">
+          <Button disabled={busy || pageCount >= MAX_PAGES} onClick={() => void moreSheets()}>{text.addPages}</Button>
+          {pageCount >= MAX_PAGES && <span className="pv-binder__hint">{text.pagesAtMax}</span>}
+        </div>}
         <p className="pv-sr-only">{text.keyboard}</p>
       </div>
       <BinderTray mode={mode} binderId={binderId} busy={busy} version={trayVersion} consumed={consumed} onStore={(copy, origin) => void store(copy, origin)} onCancel={cancelMode} />

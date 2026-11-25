@@ -4,6 +4,7 @@ import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
 import { binderAmount } from "../components/binders/amount";
 import { Cover } from "../components/binders/Cover";
+import { CoverEditor } from "../components/binders/CoverEditor";
 import { fill, plural } from "../components/binders/labels";
 import { useCurrency } from "../components/prices/currency";
 import { RatesAttribution } from "../components/prices/PriceDisplay";
@@ -15,13 +16,13 @@ import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useBinderMutations, type BinderErrorKey } from "../hooks/useBinderMutations";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
-import { BindersError, createBinder, deleteBinder, fetchBinders, fetchCopyView, renameBinder, reorderBinders, type BinderSummary } from "../services/binders";
+import { BindersError, createBinder, deleteBinder, fetchBinders, fetchCopyView, renameBinder, reorderBinders, saveAppearance, type BinderSummary } from "../services/binders";
 import { fetchBinderValues, PricesError, type BinderValue } from "../services/prices";
 import "../components/binders/binders.css";
 
-function BinderCard({ binder, value, valuesLoading, index, total, busy, onRename, onMove, onDelete }: {
+function BinderCard({ binder, value, valuesLoading, index, total, busy, onRename, onCustomize, onMove, onDelete }: {
   binder: BinderSummary; value?: BinderValue; valuesLoading: boolean; index: number; total: number; busy: boolean;
-  onRename: (name: string) => Promise<boolean>; onMove: (delta: number) => void; onDelete: () => void;
+  onRename: (name: string) => Promise<boolean>; onCustomize: () => void; onMove: (delta: number) => void; onDelete: () => void;
 }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.binders;
@@ -46,6 +47,7 @@ function BinderCard({ binder, value, valuesLoading, index, total, busy, onRename
       <details className="pv-shelf__manage">
         <summary>{fill(text.manage, { name: binder.name })}</summary>
         {!editing && <Button disabled={busy} onClick={() => setEditing(true)}>{text.rename}</Button>}
+        <Button disabled={busy} onClick={onCustomize}>{text.editCover}</Button>
         {editing && <form onSubmit={(event) => void save(event)} className="pv-shelf__form">
           <label className="pv-field">{text.nameLabel}<input value={name} maxLength={80} required onChange={(event) => setName(event.target.value)} /></label>
           <Button type="submit" variant="primary" disabled={busy || !name.trim()}>{text.saveName}</Button>
@@ -75,6 +77,10 @@ function Shelf() {
   const [newName, setNewName] = useState("");
   const [status, setStatus] = useState("");
   const [problem, setProblem] = useState<BinderErrorKey | null>(null);
+  // The editor lives here, not in a card: reloading the list after a save must not take a draft away.
+  const [customizing, setCustomizing] = useState<BinderSummary | null>(null);
+  const auth = useAuth();
+  const owner = auth.status === "authenticated" ? auth.user.display_name : "";
   const guard = useCallback((error: unknown, signal: AbortSignal): never => {
     const code = error instanceof BindersError || error instanceof PricesError ? error.status : 0;
     if (!signal.aborted && code === 401) retrySession();
@@ -113,6 +119,9 @@ function Shelf() {
   </form>;
 
   return <>
+    {customizing && <CoverEditor name={customizing.name} owner={owner} year={new Date(customizing.created_at).getFullYear()} initial={{ cover: customizing.cover, stickers: customizing.stickers }}
+      onSave={async (look, name) => (name === customizing.name || await mutate((csrf, signal) => renameBinder(customizing.id, name, csrf, signal))) && mutate((csrf, signal) => saveAppearance(customizing.id, look, csrf, signal))}
+      onClose={() => setCustomizing(null)} />}
     <p className="pv-binder__status" role="status" aria-live="polite">{status}</p>
     {problem && <p className="pv-binder__problem" role="alert">{text.errors[problem]}</p>}
     {loose > 0 && binders.length > 0 && <Chip to={`/binders/${encodeURIComponent(binders[0].id)}`}>{plural(text.unassigned, loose)}</Chip>}
@@ -128,6 +137,7 @@ function Shelf() {
       <ul className="pv-shelf">{binders.map((binder, index) => <BinderCard key={binder.id} binder={binder} value={byId[binder.id]}
         valuesLoading={values.state.kind === "loading"} index={index} total={binders.length} busy={busy}
         onRename={(name) => mutate((csrf, signal) => renameBinder(binder.id, name, csrf, signal))}
+        onCustomize={() => setCustomizing(binder)}
         onMove={(delta) => move(index, delta)} onDelete={() => void mutate((csrf, signal) => deleteBinder(binder.id, csrf, signal))} />)}</ul>
       {values.state.kind === "loaded" && values.state.data.results.some((v) => v.total !== null && v.priced_count > 0) && <RatesAttribution rates={values.state.data.rates} />}
       <details className="pv-shelf__create"><summary>{text.create}</summary>{form}</details>
