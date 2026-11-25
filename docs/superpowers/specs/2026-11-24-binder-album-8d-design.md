@@ -355,6 +355,27 @@ Document this loss before providing downgrade commands. No automatic development
 migration during agent tasks. Student takes a verified backup before applying/reverting
 schema; disposable-schema migration tests are separate. Never read backend/.env.
 
+### 7.4 Added by the student after the Part 1 Safari review: pages are stored
+
+Today `page_count` is derived (the last used page plus one, rounded up to an even number),
+so an empty page cannot be kept. Part 2 stores it:
+
+- `binders.page_count` integer, even, 2–40, added by migration 0009. Existing binders get
+  their *used pages plus one spare, rounded up to an even number* (minimum 2, maximum 40);
+  the downgrade drops the column and the derived rule applies again.
+- **"+ Agregar hojas"** at the end of the binder adds 2 pages (up to 40) and saves them even
+  when they are empty. It is a server write (owner-scoped, CSRF, no-store) that returns the
+  binder; the button is disabled at 40 pages and while a write is pending.
+- **"Quitar páginas vacías"** removes only trailing empty pages (two at a time, keeping the
+  count even and at least 2), after an explicit confirmation that says how many pages go.
+  It never touches a page that holds a card: the server recomputes the last used page under
+  the owner lock and refuses with 409 if the request would remove a used page.
+- Placing a card in a pocket beyond the stored pages (next free pocket on a full binder)
+  grows `page_count` by 2 in the same transaction, up to 40.
+- Tests: two users never see or change each other's `page_count`; cards are never lost
+  (adding, removing, concurrent placement and the 409 path leave every copy and pocket
+  intact); migration up/down preserves pockets and inventory.
+
 ## 8. Security, failure handling and performance
 
 - No auth/CSRF changes. Two-user isolation at API and SQL layers; all private views

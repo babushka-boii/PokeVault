@@ -215,6 +215,19 @@ backend/tests/integration/test_binder_appearance_migration_postgres.py.
 - [ ] Commit `feat(binders): persist cover materials and sticker layers`. Do not migrate
   the development database; supply student commands at final handoff.
 
+### Task 5b: Stored page count (added after the Part 1 Safari review; spec §7.4)
+
+**Create:** a section in migration 0009 (same file as Task 5); backend/tests for the page
+count; frontend "+ Agregar hojas" and "Quitar páginas vacías" with confirmation.
+
+- [ ] Migration 0009 adds `binders.page_count` (even, 2–40); backfill = used pages plus one
+  spare, rounded up to even; downgrade drops it. Test up/down on PostgreSQL and SQLite.
+- [ ] API: add pages (+2, max 40) and remove trailing empty pages (409 if a used page
+  would go, recomputed under the owner lock); placement grows the count when it must.
+- [ ] Tests: two-user isolation, no card is ever lost, limits 2 and 40, concurrent edits.
+- [ ] UI: "+ Agregar hojas" at the end of the binder; "Quitar páginas vacías" with a
+  confirmation naming how many pages go; ES/EN; announced results; no UUID.
+
 ### Task 6: Atomic appearance API and bounded summary data
 
 **Create:** backend/app/binders/appearance.py; backend/tests/test_binder_appearance.py;
