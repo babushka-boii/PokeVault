@@ -27,6 +27,9 @@
 .pv-tile[data-state="missing"] img { filter: grayscale(1); }
 .pv-sprite { align-items: center; display: inline-flex; height: 96px; justify-content: center; width: 96px; }
 .pv-sprite img { image-rendering: pixelated; }
+/* Standing on its feet in a box set by the parent (the profile team). */
+.pv-sprite--fit { align-items: flex-end; height: 100%; width: 100%; }
+.pv-sprite--fit img { max-height: 100%; max-width: 100%; object-fit: contain; }
 .pv-sprite__missing { color: var(--pv-text-3); font-size: 2rem; }
 .pv-dex__skeleton { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); }
 .pv-dex__skeleton > * { min-height: 11rem; }

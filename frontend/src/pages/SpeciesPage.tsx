@@ -4,7 +4,7 @@ import { useAuth } from "../auth/context";
 import { CardPreview } from "../components/cards/CardPreview";
 import { ExpansionSelector } from "../components/cards/ExpansionSelector";
 import { plural } from "../components/home/plural";
-import { SpeciesSprite } from "../components/pokedex/SpeciesTile";
+import { SpeciesSprite } from "../components/pokedex/SpeciesSprite";
 import { formatMoney } from "../components/prices/format";
 import { useCurrency } from "../components/prices/currency";
 import { RatesAttribution } from "../components/prices/PriceDisplay";

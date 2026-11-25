@@ -1,36 +1,11 @@
-import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { REDUCED_MOTION_QUERY, useMediaQuery } from "../../hooks/useMediaQuery";
 import { useLocale } from "../../i18n/LocaleProvider";
-import { animatedSpriteUrl, spriteUrl, type SpeciesRow } from "../../services/pokemon";
+import type { SpeciesRow } from "../../services/pokemon";
+import { SpeciesSprite } from "./SpeciesSprite";
 import "../typeBadge.css";
 import "./pokedex.css";
 
 const pad = (n: number) => `#${String(n).padStart(3, "0")}`;
-
-/** Static sprite; the animated one only while the tile is on screen, owned, and motion is welcome. */
-export function SpeciesSprite({ number, name, animate }: { number: number; name: string; animate: boolean }) {
-  const { dictionary } = useLocale();
-  const reduced = useMediaQuery(REDUCED_MOTION_QUERY);
-  const frame = useRef<HTMLSpanElement>(null);
-  const [visible, setVisible] = useState(false);
-  const [failed, setFailed] = useState<"gif" | "png" | null>(null);
-  const wantsGif = animate && !reduced && animatedSpriteUrl(number) !== null && failed === null;
-  useEffect(() => {
-    const element = frame.current;
-    if (!wantsGif || !element || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver((entries) => setVisible(entries.some((entry) => entry.isIntersecting)));
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [wantsGif]);
-  const src = wantsGif && visible ? animatedSpriteUrl(number)! : spriteUrl(number);
-  return <span ref={frame} className="pv-sprite">
-    {failed === "png" ? <span className="pv-sprite__missing" title={dictionary.pokedex.noSprite} aria-hidden="true">◇</span>
-      : <img src={src} alt="" width={96} height={96} loading="lazy" decoding="async" referrerPolicy="no-referrer" draggable={false}
-        data-animated={src !== spriteUrl(number) || undefined} onError={() => setFailed(src === spriteUrl(number) ? "png" : "gif")} />}
-    <span className="pv-sr-only">{name}</span>
-  </span>;
-}
 
 /** One species: a single link. Owned = colour, animated, gold label; not owned = dimmed (a living dex). */
 export function SpeciesTile({ row, cards, ownership, returnTo, onOpen }: {
