@@ -89,7 +89,7 @@ test("keeps copy management available when the public provider fails and clears 
   const user = userEvent.setup();
   render(<App initialEntries={["/collection"]} />);
   expect(await screen.findByText("My first copy")).toBeVisible();
-  expect(await screen.findByText("El catálogo no está disponible. Puedes gestionar tus copias por su ID.")).toBeVisible();
+  expect(await screen.findByText("Los datos de esta carta aún no están disponibles.")).toBeVisible();
   expect(screen.getByRole("button", { name: "Editar copia" })).toBeEnabled();
   await user.click(screen.getByRole("link", { name: "Perfil" }));
   await user.click(screen.getByRole("button", { name: "Cerrar sesión" }));
@@ -152,12 +152,12 @@ test("coordinates copy editing so saving one row cannot discard another draft", 
   await user.click(within(screen.getByText("My first copy").closest("li")!).getByRole("button", { name: "Editar copia" }));
   expect(within(screen.getByText("Second copy").closest("li")!).getByRole("button", { name: "Editar copia" })).toBeDisabled();
   expect(within(screen.getByText("Second copy").closest("li")!).getByRole("button", { name: "Eliminar copia" })).toBeDisabled();
-  expect(screen.getByRole("button", { name: "Aplicar filtros" })).toBeDisabled();
+  expect(screen.getByRole("searchbox", { name: "Buscar por nombre de carta" })).toBeDisabled();
   await user.click(screen.getByRole("button", { name: "Cancelar" }));
   expect(within(screen.getByText("Second copy").closest("li")!).getByRole("button", { name: "Editar copia" })).toBeEnabled();
 });
 
-test("uses server pagination and quantities, and resets the page when applying filters", async () => {
+test("loads the bounded collection and resets the local page when a filter changes", async () => {
   const records = Array.from({ length: 25 }, (_, i) => ({ ...copy,
     id: `00000000-0000-4000-8000-${String(i + 1).padStart(12, "0")}`, notes: `Copy ${i + 1}` }));
   vi.stubGlobal("fetch", vi.fn(async (input: string) => {
@@ -177,8 +177,7 @@ test("uses server pagination and quantities, and resets the page when applying f
   expect(await screen.findByText("Copy 25")).toBeVisible();
   expect(screen.queryByText("Copy 1")).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Página siguiente" })).toBeDisabled();
-  await user.selectOptions(screen.getByLabelText("Idioma de la copia"), "es");
-  await user.click(screen.getByRole("button", { name: "Aplicar filtros" }));
+  await user.click(within(screen.getByRole("group", { name: "Idioma de la copia" })).getByRole("button", { name: "Español" }));
   expect(await screen.findByText("No hay copias para estos filtros.")).toBeVisible();
   expect(screen.getByRole("button", { name: "Página anterior" })).toBeDisabled();
   await user.click(screen.getByRole("button", { name: "Limpiar filtros" }));
@@ -212,4 +211,48 @@ test("retains input after a save failure and prevents repeated submissions while
   expect(writes).toBe(2);
   await act(async () => { complete(json(copy, 201)); });
   expect(await screen.findByRole("status")).toHaveTextContent("Copia añadida");
+});
+
+test("searches loaded names immediately and shares metadata with displayed groups", async () => {
+  const calls = vi.fn(async (input: string) => {
+    if (input.includes("/auth/me")) return json(session);
+    if (input.includes("/cards/")) return json(pikachuCard);
+    return json(page([copy, { ...copy, id: "00000000-0000-4000-8000-000000000002" }]));
+  });
+  vi.stubGlobal("fetch", calls);
+  const user = userEvent.setup();
+  render(<App initialEntries={["/collection"]} />);
+  await screen.findByRole("heading", { name: pikachuCard.name });
+  const search = screen.getByRole("searchbox", { name: "Buscar por nombre de carta" });
+  expect(screen.queryByLabelText("ID de carta")).not.toBeInTheDocument();
+  await user.type(search, "not a card");
+  expect(screen.getByText("No hay copias para estos filtros.")).toBeVisible();
+  await user.clear(search);
+  await user.type(search, "PIKACHU");
+  expect(screen.getAllByRole("button", { name: "Editar copia" })).toHaveLength(2);
+  expect(calls.mock.calls.filter(([url]) => url.includes("/cards/"))).toHaveLength(1);
+});
+
+test("orders the full loaded set by name or expansion and defaults to recent copies", async () => {
+  const older = { ...copy, card_id: "sv1-1", created_at: "2026-01-01T00:00:00Z" };
+  const newer = { ...copy, id: "00000000-0000-4000-8000-000000000002", card_id: "sv1-2", created_at: "2026-11-01T00:00:00Z" };
+  vi.stubGlobal("fetch", vi.fn(async (input: string) => {
+    if (input.includes("/auth/me")) return json(session);
+    if (input.includes("/cards/sv1-1")) return json({ ...pikachuCard, id: "sv1-1", name: "Abra", set: { ...pikachuCard.set, name: "Zeta" } });
+    if (input.includes("/cards/sv1-2")) return json({ ...pikachuCard, id: "sv1-2", name: "Zubat", set: { ...pikachuCard.set, name: "Alfa" } });
+    return json({ results: [newer, older], total: 2, quantities: { "sv1-1": 1, "sv1-2": 1 }, offset: 0, limit: 24 });
+  }));
+  const user = userEvent.setup();
+  render(<App initialEntries={["/collection"]} />);
+  await screen.findByRole("heading", { name: "Abra" });
+  const titles = () => screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
+  expect(titles()).toEqual(["Zubat", "Abra"]);
+  await user.selectOptions(screen.getByLabelText("Ordenar por"), "name");
+  expect(titles()).toEqual(["Abra", "Zubat"]);
+  await user.selectOptions(screen.getByLabelText("Ordenar por"), "set");
+  expect(titles()).toEqual(["Zubat", "Abra"]);
+  await user.click(screen.getAllByRole("button", { name: "Editar copia" })[0]);
+  expect(screen.getByLabelText("Ordenar por")).toBeDisabled();
+  await user.click(screen.getByRole("button", { name: "Cancelar" }));
+  expect(screen.getByLabelText("Ordenar por")).toBeEnabled();
 });

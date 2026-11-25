@@ -1,0 +1,52 @@
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { afterEach, expect, test, vi } from "vitest";
+import { pikachuCard } from "../../test/tcgFixtures";
+import { useCollectionMetadata } from "./useCollectionMetadata";
+import { fetchCollectionCopies } from "../../services/collectionCopies";
+import * as cards from "../../services/cards";
+import * as inventory from "../../services/inventory";
+afterEach(() => vi.restoreAllMocks());
+test("loads at most 500 copies and preserves the server total", async () => {
+  const request = vi.spyOn(inventory, "fetchInventory").mockImplementation(async ({ offset }) => ({ results: Array.from({ length: 24 }, (_, i) => ({ id: String(offset + i), card_id: "sm9-33" } as inventory.InventoryCopy)), total: 700, quantities: { "sm9-33": 700 }, offset, limit: 24 }));
+  const result = await fetchCollectionCopies(new AbortController().signal);
+  expect(result.results).toHaveLength(500);
+  expect(result.total).toBe(700);
+  expect(request).toHaveBeenCalledTimes(21);
+});
+test("progressively publishes names, limits concurrency and distinct cards, and aborts on exit", async () => {
+  const pending: Array<{ resolve: (card: cards.TcgCard) => void; signal?: AbortSignal }> = [];
+  const request = vi.spyOn(cards, "fetchTcgCard").mockImplementation((_id, _locale, signal) => new Promise((resolve) => pending.push({ resolve, signal })));
+  const ids = Array.from({ length: 110 }, (_, i) => `sv1-${i}`);
+  const { result, rerender, unmount } = renderHook(({ ids }) => useCollectionMetadata(ids, "es"), { initialProps: { ids: [...ids, ids[0]] } });
+  await waitFor(() => expect(request).toHaveBeenCalledTimes(4));
+  await act(async () => pending[0].resolve({ ...pikachuCard, id: ids[0] }));
+  expect(result.current.cards[ids[0]].name).toBe(pikachuCard.name);
+  expect(result.current.completed).toBe(1);
+  expect(result.current.total).toBe(100);
+  expect(request).toHaveBeenCalledTimes(5);
+  rerender({ ids: [...ids] });
+  expect(request).toHaveBeenCalledTimes(5);
+  unmount();
+  expect(pending.every((p) => p.signal?.aborted)).toBe(true);
+});
+test("a failed name finishes without hiding successful cards or refetching them", async () => {
+  const request = vi.spyOn(cards, "fetchTcgCard").mockImplementation(async (id) => { if (id === "bad-1") throw Error("offline"); return pikachuCard; });
+  const { result, rerender } = renderHook(({ ids }) => useCollectionMetadata(ids, "es"), { initialProps: { ids: [pikachuCard.id, "bad-1"] } });
+  await waitFor(() => expect(result.current.completed).toBe(2));
+  expect(result.current.failed).toBe(1);
+  expect(result.current.cards[pikachuCard.id]).toEqual(pikachuCard);
+  rerender({ ids: [pikachuCard.id] });
+  await waitFor(() => expect(result.current.completed).toBe(1));
+  expect(request).toHaveBeenCalledTimes(2);
+});
+
+test("never fetches a 101st distinct name", async () => {
+  const request = vi.spyOn(cards, "fetchTcgCard").mockImplementation(async (id) => ({ ...pikachuCard, id }));
+  const ids = Array.from({ length: 120 }, (_, i) => `sv1-${i}`);
+  const { result, unmount } = renderHook(() => useCollectionMetadata(ids, "es"));
+  await waitFor(() => expect(result.current.completed).toBe(100));
+  expect(request).toHaveBeenCalledTimes(100);
+  expect(Object.keys(result.current.cards)).toHaveLength(100);
+  expect(result.current.cards[ids[100]]).toBeUndefined();
+  unmount();
+});
