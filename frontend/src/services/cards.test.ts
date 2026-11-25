@@ -29,7 +29,7 @@ test.each([
   expect(safeReturnTo(destination)).toBe(destination);
 });
 
-test.each([null, "/boxes", "/boxes?box=19&pokemon=559&wallpaper=ocean", "https://evil.example", "//evil.example", "/\\evil.example", "/profile", "/pokemon/0/cards", "/pokemon/1026/cards", "/pokemon/25/cards/extra", "/sets/invalid_id", "/sets/sm9/cards", "/sets//evil", "/boxes#oops", "/?x=1", "/#top", "//", "/boxes?x=\n", `/boxes?x=${"a".repeat(2048)}`])("rejects unsafe or unsupported return destination: %s", (destination) => {
+test.each([null, "/boxes", "/boxes?box=19&pokemon=559&wallpaper=ocean", "https://evil.example", "//evil.example", "/\\evil.example", "/profile/x", "/pokemon/0/cards", "/pokemon/1026/cards", "/pokemon/25/cards/extra", "/sets/invalid_id", "/sets/sm9/cards", "/sets//evil", "/boxes#oops", "/?x=1", "/#top", "//", "/boxes?x=\n", `/boxes?x=${"a".repeat(2048)}`])("rejects unsafe or unsupported return destination: %s", (destination) => {
   expect(safeReturnTo(destination)).toBe("/pokedex");
 });
 

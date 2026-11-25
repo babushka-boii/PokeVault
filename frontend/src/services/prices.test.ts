@@ -77,3 +77,15 @@ test("the collection value asks for more top copies only when told to, and check
   vi.stubGlobal("fetch", vi.fn(async () => json(valuation({ prices_updated_at: null, top: [], priced_count: 0, unpriced_count: 5, unpriced_by_reason: { variant_unknown: 5 }, sources: {} }))));
   expect((await fetchCollectionValue("CLP", signal())).prices_updated_at).toBeNull();
 });
+
+test("fetchSetValues validates the per-expansion value rows", async () => {
+  const { fetchSetValues } = await import("./prices");
+  const row = { set_id: "me02.5", total: "1038", original_totals: { EUR: "0.83" }, copy_count: 2, priced_count: 1, pending_count: 0, stale_count: 0 };
+  const reply = (results: unknown[]) => vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ currency: "CLP", results, rates })));
+  reply([row]);
+  expect((await fetchSetValues("CLP", new AbortController().signal)).results).toHaveLength(1);
+  reply([row, row]);
+  await expect(fetchSetValues("CLP", new AbortController().signal)).rejects.toThrow();
+  reply([{ ...row, set_id: "bad id!" }]);
+  await expect(fetchSetValues("CLP", new AbortController().signal)).rejects.toThrow();
+});

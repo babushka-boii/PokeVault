@@ -669,3 +669,17 @@ only loses the `card_species` cache (it is rebuilt on demand). The species list 
 - [ ] "Tu colección": copies, distinct cards and value (CLP/USD); "Ver solo las que me faltan" filters exactly, and pages stay full.
 - [ ] Cards: "TENGO" label and gold border on owned ones; ★ flips at once; the card detail returns to the sheet with the same filters; `/pokemon/25/cards` redirects to the sheet.
 - [ ] As a guest: public cards, owned filters disabled and a sign-in link; with the network cut, calm errors with "Reintentar".
+
+## Iteration 10 — Trainer profile (Safari checklist)
+
+Back up and apply migration 0011 first: `pg_dump -Fc pokevault -f ~/pokevault-before-0011.dump`, then
+`cd backend && .venv/bin/alembic upgrade head` (`alembic current` → 0011). `alembic downgrade 0010` only
+loses the chosen trainer and team. Design source: `docs/design/Profile.dc.html` (and `trainers-preview.png`).
+Known gaps against the design: no city (the account has none), "Ver todas →" opens Home (there is no favourites page yet),
+and the price note, rates attribution, currency switch and sign-out sit in a footer the design does not show.
+
+- [ ] `/profile` beside the design capture: band with name, "Entrenador desde …", team (empty slots dotted, sprites with shadow), big trainer, the two buttons; same spacing, type and colours.
+- [ ] "Cambiar entrenador" (4 sprites) and "Editar equipo" (search, up to 5, Guardar) persist after reloading; buttons are 44 px and the dialogs close with Escape.
+- [ ] Value card: amount, 7 d / 30 d / 1 año; with fewer than 2 recorded days the message shows and no chart is invented.
+- [ ] 2×2 counts (the gold one opens copies without variant), favourites row opens the card and returns to Perfil.
+- [ ] "Valor por carpeta" and "Valor por expansión" bars; iPhone-size mode stacks the band and cards, and with Reduce Motion the sprites stand still.

@@ -1,4 +1,4 @@
-import { isCardId } from "./cards";
+import { isCardId, isSetId } from "./cards";
 
 export const currencies = ["CLP", "USD"] as const;
 export type Currency = typeof currencies[number];
@@ -128,6 +128,18 @@ export async function fetchBinderValues(currency: Currency, signal: AbortSignal)
     throw new PricesError(0);
   }
   return v as BinderValues;
+}
+
+export type SetValue = Omit<BinderValue, "binder_id"> & { set_id: string };
+export type SetValues = { currency: Currency; results: SetValue[]; rates: RatesInfo };
+/** The owner's value per expansion, largest first, from one request. */
+export async function fetchSetValues(currency: Currency, signal: AbortSignal): Promise<SetValues> {
+  const v = await request(`/prices/sets?${query(currency)}`, signal);
+  const ok = (row: unknown) => record(row) && typeof row.set_id === "string" && isSetId(row.set_id) && (row.total === null || decimal(row.total))
+    && amounts(row.original_totals) && count(row.copy_count) && count(row.priced_count) && row.priced_count <= row.copy_count && count(row.pending_count) && count(row.stale_count);
+  if (!record(v) || v.currency !== currency || !isRates(v.rates) || !Array.isArray(v.results) || v.results.length > 2000 || !v.results.every(ok)
+    || new Set(v.results.map((row) => (row as SetValue).set_id)).size !== v.results.length) throw new PricesError(0);
+  return v as SetValues;
 }
 
 export { isCurrency };

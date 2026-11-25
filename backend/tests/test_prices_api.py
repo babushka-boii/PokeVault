@@ -434,6 +434,30 @@ def test_shelf_values_every_owned_binder_in_one_request(prices):
     assert [item["binder_id"] for item in misty] == [ids["misty_binder"]]
 
 
+def test_value_per_expansion_groups_the_owners_copies(prices):
+    client, factory, _, users, _, _ = prices
+    seed(factory, users)
+    identity(client, "ash")
+    response = client.get("/api/v1/prices/sets")
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"
+    body = response.json()
+    by_set = {row["set_id"]: row for row in body["results"]}
+    assert set(by_set) == {"me05", "me02.5"}  # dots in set ids survive
+    assert by_set["me05"]["copy_count"] == 2
+    assert by_set["me02.5"]["copy_count"] == 3
+    totals = [float(row["total"]) for row in body["results"]]
+    assert totals == sorted(totals, reverse=True)  # largest first
+    whole = float(client.get("/api/v1/prices/collection").json()["total"])
+    assert abs(sum(totals) - whole) <= len(totals)  # each group rounds on its own
+    identity(client, "misty")
+    assert [
+        r["set_id"] for r in client.get("/api/v1/prices/sets").json()["results"]
+    ] == ["me02.5"]
+    identity(client, None)
+    assert client.get("/api/v1/prices/sets").status_code == 401
+
+
 # --- Public card prices ---
 
 

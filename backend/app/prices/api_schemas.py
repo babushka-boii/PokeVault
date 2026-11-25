@@ -102,3 +102,19 @@ class BinderValues(BaseModel):
     currency: TargetCurrency
     results: list[BinderValue]
     rates: RatesInfo
+
+
+class SetValue(BaseModel):
+    set_id: str
+    total: str | None
+    original_totals: dict[str, str]
+    copy_count: int
+    priced_count: int
+    pending_count: int
+    stale_count: int
+
+
+class SetValues(BaseModel):
+    currency: TargetCurrency
+    results: list[SetValue]
+    rates: RatesInfo

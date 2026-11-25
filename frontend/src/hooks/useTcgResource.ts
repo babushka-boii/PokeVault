@@ -29,3 +29,6 @@ export function useTcgResource<T>(key: string | undefined, request: (signal: Abo
   const state: ResourceState<T> = result && result.key === key && result.attempt === attempt ? result.state : { kind: "loading" };
   return { state, retry: () => setAttempt((current) => current + 1) };
 }
+
+/** What `useTcgResource` returns, for components that receive a resource from their parent. */
+export type Resource<T> = ReturnType<typeof useTcgResource<T>>;

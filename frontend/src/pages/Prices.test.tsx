@@ -146,39 +146,43 @@ function profileServer(value: () => Response | Promise<Response>, extra: Route =
   return serve((url, options) => {
     if (url.pathname === "/api/v1/me/settings") return json({ preferred_currency: "CLP" });
     if (url.pathname === "/api/v1/prices/collection") return value();
+    if (url.pathname === "/api/v1/collection/history") return json({ currency: "CLP", range: url.searchParams.get("range"), started_on: null, points: [], baseline: null });
     return extra(url, options);
   }, true);
 }
 
-test("profile shows the collection value, copies without variant and the top copies", async () => {
-  let pending = 1;
-  const calls = profileServer(() => json(valuation({ pending_count: pending, unpriced_by_reason: { variant_unknown: 2, ...(pending ? { pending: 1 } : {}) }, copy_count: 5 + pending, unpriced_count: 2 + pending })));
-  const user = userEvent.setup();
+const valueLabel = () => screen.findByText("VALOR DE TU COLECCIÓN");
+
+test("profile shows the collection value, the copy count and the way to set missing variants", async () => {
+  const calls = profileServer(() => json(valuation({ copy_count: 6, unpriced_by_reason: { variant_unknown: 2 }, unpriced_count: 3 })));
   render(<App initialEntries={["/profile"]} />);
-  const card = (await screen.findByRole("heading", { name: "Valor de la colección" })).closest("section")!;
+  const card = (await valueLabel()).closest("section")!;
   expect(await within(card).findByText("$1.112")).toBeVisible();
-  expect(within(card).getByText("3 de 6 copias con precio")).toBeVisible();
-  expect(within(card).getByRole("link", { name: "Indicar variantes" })).toHaveAttribute("href", "/collection?variant=unknown");
-  expect(within(card).getByText(/2 copias sin variante no tienen precio/)).toBeVisible();
-  const top = within(card).getByRole("list");
-  expect(await within(top).findByText(/Pikachu & Zekrom-GX · Holográfica/)).toBeVisible();
-  expect(within(top).getByText("$1.038")).toBeVisible();
-  expect(within(top).getByRole("link", { name: "Ver copia" })).toHaveAttribute("href", `/collection/${copyId(1)}`);
-  expect(within(card).getByRole("link", { name: "Rates By Exchange Rate API" })).toBeVisible();
-  expect(within(card).getByText("1 precios aún se están actualizando.")).toBeVisible();
-  pending = 0;
-  await user.click(within(card).getByRole("button", { name: "Reintentar precios" }));
-  await waitFor(() => expect(within(card).queryByText(/aún se están actualizando/)).not.toBeInTheDocument());
-  expect(priceCalls(calls, "/api/v1/prices/collection")).toHaveLength(2);
+  expect(within(card).getByText("CLP")).toBeVisible();
+  const stats = screen.getByRole("list", { name: "Resumen de tu colección" });
+  expect(await within(stats).findByText("6")).toBeVisible();
+  expect(within(stats).getByRole("link", { name: /sin variante · indicar/ })).toHaveAttribute("href", "/collection?variant=unknown");
+  expect(within(stats).getByRole("link", { name: /^2/ })).toBeVisible();
+  expect(screen.getByRole("link", { name: "Rates By Exchange Rate API" })).toBeVisible();
+  expect(priceCalls(calls, "/api/v1/prices/collection")).toHaveLength(1);
 });
 
 test("without exchange rates the profile shows original totals and no attribution", async () => {
   profileServer(() => json(valuation({ total: null, original_totals: { EUR: "0.89", USD: "0.66" }, top: [], rates: noRates })));
   render(<App initialEntries={["/profile"]} />);
-  const card = (await screen.findByRole("heading", { name: "Valor de la colección" })).closest("section")!;
+  const card = (await valueLabel()).closest("section")!;
   expect(await within(card).findByText(/EUR\s0,89 \+ US\$0,66/)).toBeVisible();
-  expect(within(card).getByText("Conversión no disponible: se muestra el precio original.")).toBeVisible();
-  expect(within(card).queryByRole("link", { name: "Rates By Exchange Rate API" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Rates By Exchange Rate API" })).not.toBeInTheDocument();
+});
+
+test("a failing valuation is a calm error with its own retry", async () => {
+  let attempt = 0;
+  profileServer(() => ++attempt === 1 ? json({}, 500) : json(valuation()));
+  const user = userEvent.setup();
+  render(<App initialEntries={["/profile"]} />);
+  const card = (await valueLabel()).closest("section")!;
+  await user.click(await within(card).findByRole("button", { name: "Reintentar" }));
+  expect(await within(card).findByText("$1.112")).toBeVisible();
 });
 
 test("logging out discards a pending collection value", async () => {
@@ -186,12 +190,12 @@ test("logging out discards a pending collection value", async () => {
   profileServer(() => new Promise<Response>((resolve) => { finish = resolve; }), (url) => url.pathname === "/api/v1/auth/logout" ? new Response(null, { status: 204 }) : undefined);
   const user = userEvent.setup();
   render(<App initialEntries={["/profile"]} />);
-  await screen.findByRole("heading", { name: "Valor de la colección" });
+  await valueLabel();
   await user.click(screen.getByRole("button", { name: "Cerrar sesión" }));
   expect(await screen.findByRole("link", { name: "Iniciar sesión" })).toBeVisible();
   await act(async () => { finish(json(valuation())); });
   expect(screen.queryByText("$1.112")).not.toBeInTheDocument();
-  expect(screen.queryByRole("heading", { name: "Valor de la colección" })).not.toBeInTheDocument();
+  expect(screen.queryByText("VALOR DE TU COLECCIÓN")).not.toBeInTheDocument();
 });
 
 test("price texts and amounts follow the English locale", async () => {
@@ -200,11 +204,10 @@ test("price texts and amounts follow the English locale", async () => {
   render(<App initialEntries={["/profile"]} />);
   await screen.findByText("$1.112");
   await user.click(screen.getByRole("button", { name: "English" }));
-  const card = screen.getByRole("heading", { name: "Collection value" }).closest("section")!;
+  const card = screen.getByText("YOUR COLLECTION VALUE").closest("section")!;
   expect(within(card).getByText(/^CLP\s1,112$/)).toBeVisible();
-  expect(within(card).getByText("3 of 5 copies priced")).toBeVisible();
-  expect(within(card).getByRole("link", { name: "Set variants" })).toBeVisible();
-  expect(within(card).getByText(/Market reference price, the same for Spanish and English cards/)).toBeVisible();
+  expect(screen.getByText(/Market reference price, the same for Spanish and English cards/)).toBeVisible();
+  expect(screen.getByRole("link", { name: /no variant · set it/ })).toBeVisible();
 });
 
 // --- Binder value ---

@@ -100,9 +100,15 @@ describe("stylesheets", () => {
     expect(offenders).toEqual([]);
   });
 
+  // The Profile design mandates a two-step idle bob on the trainer and the team; it stays off under reduced motion.
+  const IDLE_MOTION = new Set(["/src/components/profile/profile.css"]);
+  test("the idle bob is stopped for reduced-motion users", () => {
+    for (const file of IDLE_MOTION) expect(stripComments(sheets[file])).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{[^}]*animation:\s*none/);
+  });
+
   test("migrated stylesheets never animate forever", () => {
     const offenders = Object.entries(sheets)
-      .filter(([file]) => !LEGACY_FILES.has(file))
+      .filter(([file]) => !LEGACY_FILES.has(file) && !IDLE_MOTION.has(file))
       .filter(([, css]) => /\binfinite\b/.test(stripComments(css)))
       .map(([file]) => file);
     expect(offenders).toEqual([]);

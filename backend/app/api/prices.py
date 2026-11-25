@@ -20,6 +20,8 @@ from app.prices.api_schemas import (
     BinderValues,
     CardPrices,
     CopyPrices,
+    SetValue,
+    SetValues,
     TargetCurrency,
     Valuation,
 )
@@ -223,3 +225,49 @@ async def binder_values(
         ],
         rates=rates.info(),
     )
+
+
+def set_of(card_id: str) -> str:
+    """TCGdex card ids are ``<set id>-<local number>``; set ids may contain dots."""
+    return card_id.rsplit("-", 1)[0]
+
+
+@router.get("/prices/sets", response_model=SetValues)
+async def set_values(
+    request: Request,
+    currency: CurrencyParam = None,
+    user: User = Depends(require_current_user),
+    service: PriceService = Depends(get_price_service),
+) -> SetValues:
+    """The owner's value per expansion (largest first) from one evaluation."""
+
+    def load(session):
+        rows = session.execute(
+            select(*_COPY_COLUMNS)
+            .where(InventoryCopy.user_id == user.id)
+            .order_by(InventoryCopy.created_at, InventoryCopy.id)
+        ).all()
+        groups: dict[str, list[CopyRef]] = {}
+        for ref in _refs(rows):
+            groups.setdefault(set_of(ref.card_id), []).append(ref)
+        return groups, currency or user_currency(session, user)
+
+    groups, chosen = _read(request, load)
+    values, rates = await _priced(
+        service.values_by_group(_factory(request), groups, chosen)
+    )
+    _still_signed_in(request, user)
+    keep = {
+        "total",
+        "original_totals",
+        "copy_count",
+        "priced_count",
+        "pending_count",
+        "stale_count",
+    }
+    results = [
+        SetValue(set_id=set_id, **value.model_dump(include=keep))
+        for set_id, value in values.items()
+    ]
+    results.sort(key=lambda row: (-float(row.total or 0), -row.copy_count, row.set_id))
+    return SetValues(currency=chosen, results=results, rates=rates.info())
