@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Perfil de entrenador</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=Silkscreen&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3FD0E0}a:hover{color:#8BE6F0}
+@keyframes pv-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.pv-bob{animation:pv-bob 900ms steps(2) infinite}
+.pv-bob2{animation:pv-bob 900ms steps(2) 450ms infinite}
+@media (prefers-reduced-motion: reduce){.pv-bob,.pv-bob2{animation:none}}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1220px; box-sizing: border-box; background: #0B0D10; color: #F2F5F7; font-family: Inter, system-ui, sans-serif; padding: 28px; display: flex; flex-direction: column; gap: 24px">
+
+  <section style="position: relative; height: 270px; flex: 0 0 270px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 0 8px 8px; background: radial-gradient(ellipse 50% 70% at 50% 90%, rgba(63,208,224,0.10), transparent 70%)">
+    <div style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 18px">
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700">Naim Salas</h1>
+      <div style="font-size: 13px; color: #9AA6B2">Entrenador desde nov 2026 · Santiago</div>
+    </div>
+
+    <div style="position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 18px">
+      <sc-for list="{{ team }}" as="m" hint-placeholder-count="5">
+        <div style="display: flex; flex-direction: column; align-items: center">
+          <div class="{{ m.cls }}" style="width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; border: {{ m.border }}">
+            <sc-if value="{{ m.filled }}" hint-placeholder-val="{{ true }}">
+              <svg width="64" height="64" viewBox="0 0 10 10" role="img" aria-label="{{ m.name }}" shape-rendering="crispEdges" fill="{{ m.color }}"><rect x="3" y="1" width="4" height="1"></rect><rect x="2" y="2" width="6" height="1"></rect><rect x="1" y="3" width="8" height="3"></rect><rect x="2" y="6" width="6" height="1"></rect><rect x="2" y="7" width="2" height="2"></rect><rect x="6" y="7" width="2" height="2"></rect><rect x="3" y="3" width="1" height="1" fill="#0B0D10"></rect><rect x="6" y="3" width="1" height="1" fill="#0B0D10"></rect></svg>
+            </sc-if>
+            <sc-if value="{{ m.empty }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 20px; color: #4A5563" aria-label="Espacio libre en el equipo">+</span>
+            </sc-if>
+          </div>
+          <div aria-hidden="true" style="width: 52px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.55); margin-top: 2px"></div>
+        </div>
+      </sc-for>
+      <div style="display: flex; flex-direction: column; align-items: center; margin-left: 10px">
+        <div class="pv-bob" style="width: 104px; height: 140px; display: flex; align-items: center; justify-content: center">
+          <svg width="96" height="132" viewBox="0 0 8 11" role="img" aria-label="Tu entrenador" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="2" fill="#2A323C"></rect><rect x="2" y="2" width="4" height="2" fill="#E8C3A0"></rect><rect x="1" y="4" width="6" height="3" fill="#F2F5F7"></rect><rect x="1" y="7" width="6" height="2" fill="#2A323C"></rect><rect x="1" y="9" width="2" height="2" fill="#3FD0E0"></rect><rect x="5" y="9" width="2" height="2" fill="#3FD0E0"></rect></svg>
+        </div>
+        <div aria-hidden="true" style="width: 80px; height: 10px; border-radius: 50%; background: rgba(0,0,0,0.6); margin-top: 2px"></div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; padding-bottom: 18px">
+      <button type="button" style="min-height: 44px; padding: 0 14px; border: 1px solid #2A323C; background: #14181D; color: #F2F5F7; font: 600 13px Inter, sans-serif">Cambiar entrenador</button>
+      <button type="button" style="min-height: 44px; padding: 0 14px; border: 0; background: #3FD0E0; color: #0B0D10; font: 600 13px Inter, sans-serif">Editar equipo (3/5)</button>
+    </div>
+    <div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, #2A323C 20%, #2A323C 80%, transparent)"></div>
+  </section>
+
+  <section style="display: flex; gap: 20px">
+    <div style="flex: 2 1 0; min-width: 0; background: #14181D; border: 1px solid #222A33; padding: 22px; clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%); display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-family: Silkscreen, monospace; font-size: 11px; color: #F2C94C; letter-spacing: 0.1em">VALOR DE TU COLECCIÓN</span>
+        <div role="group" aria-label="Rango" style="display: flex; gap: 6px">
+          <button type="button" style="min-height: 32px; padding: 0 10px; border: 1px solid #2A323C; background: transparent; color: #9AA6B2; font: 600 12px Inter, sans-serif">7 d</button>
+          <button type="button" style="min-height: 32px; padding: 0 10px; border: 0; background: #2A323C; color: #F2F5F7; font: 600 12px Inter, sans-serif">30 d</button>
+          <button type="button" style="min-height: 32px; padding: 0 10px; border: 1px solid #2A323C; background: transparent; color: #9AA6B2; font: 600 12px Inter, sans-serif">1 año</button>
+        </div>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 10px">
+        <span style="font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 700; line-height: 1">$1.116</span>
+        <span style="font-size: 14px; color: #9AA6B2">CLP</span>
+        <span style="font-size: 11px; color: #8592A0; margin-left: auto">gráfico con datos de ejemplo</span>
+      </div>
+      <svg viewBox="0 0 600 120" width="100%" height="120" role="img" aria-label="Gráfico de ejemplo del valor de la colección en 30 días" preserveAspectRatio="none">
+        <path d="M0 104 L60 102 L120 94 L180 96 L240 80 L300 78 L360 60 L420 62 L480 42 L540 40 L600 34 L600 120 L0 120 Z" fill="rgba(242,201,76,0.12)"></path>
+        <path d="M0 104 L60 102 L120 94 L180 96 L240 80 L300 78 L360 60 L420 62 L480 42 L540 40 L600 34" fill="none" stroke="#F2C94C" stroke-width="2"></path>
+      </svg>
+    </div>
+    <div style="flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <div style="background: #14181D; border: 1px solid #222A33; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700">7</span><span style="font-size: 12px; color: #9AA6B2">copias</span></div>
+      <div style="background: #14181D; border: 1px solid #222A33; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700">2</span><span style="font-size: 12px; color: #9AA6B2">expansiones</span></div>
+      <div style="background: #14181D; border: 1px solid #222A33; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: #F2C94C">7</span><span style="font-size: 12px; color: #9AA6B2">favoritas</span></div>
+      <a href="#" style="background: #14181D; border: 1px solid #5A4A1E; padding: 16px; display: flex; flex-direction: column; gap: 4px; text-decoration: none"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: #F2C94C">2</span><span style="font-size: 12px; color: #9AA6B2">sin variante · indicar</span></a>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600">Tus favoritas</h2>
+      <a href="#" style="font-size: 13px; text-decoration: none">Ver todas →</a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 14px">
+      <sc-for list="{{ favs }}" as="c" hint-placeholder-count="7">
+        <a href="#" style="text-decoration: none; color: #F2F5F7; display: flex; flex-direction: column; gap: 8px">
+          <div style="aspect-ratio: 63 / 88; border-radius: 8px; background: {{ c.bg }}; border: 1px solid #2A323C; position: relative; overflow: hidden; display: flex; justify-content: flex-end; padding: 8px; box-sizing: border-box">
+            <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.14) 48%, transparent 62%)"></div>
+            <span style="position: relative; color: #F2C94C; font-size: 14px" aria-label="Favorita">★</span>
+          </div>
+          <div style="font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ c.name }}</div>
+          <div style="font-size: 12px; color: {{ c.priceColor }}; font-family: 'Space Grotesk', sans-serif; font-weight: 600">{{ c.price }}</div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display: flex; gap: 20px">
+    <sc-for list="{{ breakdowns }}" as="b" hint-placeholder-count="2">
+      <div style="flex: 1 1 0; min-width: 0; background: #14181D; border: 1px solid #222A33; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-family: Silkscreen, monospace; font-size: 11px; color: #9AA6B2; letter-spacing: 0.1em">{{ b.title }}</div>
+        <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="2">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between; font-size: 14px">
+              <span>{{ r.label }}</span>
+              <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: #F2C94C">{{ r.value }}</span>
+            </div>
+            <div style="height: 6px; background: #222A33"><div style="height: 6px; width: {{ r.pct }}; background: #F2C94C"></div></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1220}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const team = [
+      { name: 'Scraggy', color: '#E8C35A' },
+      { name: 'Oshawott', color: '#6FB7E8' },
+      { name: 'Reuniclus', color: '#7FC98A' },
+      { name: 'Libre', empty: true },
+      { name: 'Libre', empty: true }
+    ].reverse();
+    const fav = (name, price, bg) => ({ name, price, bg, priceColor: price === 'sin precio' ? '#8592A0' : '#F2F5F7' });
+    return {
+      team: team.map((m, i) => ({
+        ...m,
+        filled: !m.empty,
+        empty: !!m.empty,
+        color: m.color || 'transparent',
+        cls: m.empty ? '' : (i % 2 ? 'pv-bob' : 'pv-bob2'),
+        border: m.empty ? '1px dashed #4A5563' : '0'
+      })),
+      favs: [
+        fav('Torre de Interferencia', '$927', 'linear-gradient(160deg,#2E5F4F,#1B2F3A)'),
+        fav('Cranidos', '$78', 'linear-gradient(160deg,#7A5A26,#3A2A18)'),
+        fav('Misdreavus', '$45', 'linear-gradient(160deg,#6A3F78,#2E2140)'),
+        fav('Zigzagoon de Galar', '$33', 'linear-gradient(160deg,#28485A,#18242E)'),
+        fav('Scorbunny', '$33', 'linear-gradient(160deg,#8A4A22,#3A2216)'),
+        fav('Palafin', 'sin precio', 'linear-gradient(160deg,#245A8A,#16283E)'),
+        fav('Armarouge', 'sin precio', 'linear-gradient(160deg,#8A3A2A,#3A1A1A)')
+      ],
+      breakdowns: [
+        { title: 'VALOR POR CAJA', rows: [
+          { label: 'Caja 1 · Tesoros', value: '$1.116', pct: '100%' },
+          { label: 'Caja 2 · Repetidas', value: '$0', pct: '0%' }
+        ] },
+        { title: 'VALOR POR EXPANSIÓN', rows: [
+          { label: 'ASC', value: '$1.038', pct: '93%' },
+          { label: 'PBL', value: '$78', pct: '7%' }
+        ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
