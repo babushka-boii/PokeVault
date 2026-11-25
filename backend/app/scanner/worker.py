@@ -359,7 +359,12 @@ def recognize_file(
     if best_angle:
         warnings.append("image_rotated")
     return OCRResult(
-        clues=best, engine_languages=languages.split("+"), warnings=warnings
+        clues=best,
+        engine_languages=languages.split("+"),
+        warnings=warnings,
+        corners=[list(corner) for corner in prepared.corners]
+        if prepared.rectified and prepared.corners
+        else None,
     )
 
 
