@@ -4,6 +4,7 @@ import csv
 import io
 import json
 import os
+import re
 import select
 import subprocess
 import sys
@@ -16,6 +17,14 @@ from PIL import Image, ImageFilter, ImageOps
 
 from app.scanner.errors import ScanError
 from app.scanner.extraction import OCRLine, extract_clues
+from app.scanner.foil import (
+    FooterReading,
+    footer_variants,
+    settled,
+    title_variants,
+    vote_footer,
+    vote_name,
+)
 from app.scanner.geometry import prepare_card
 from app.scanner.images import decode_image, normalize_pixels
 from app.scanner.normalization import name_key, number_key
@@ -185,6 +194,7 @@ def recognize_file(
         )
 
     best = None
+    trusted = False
     best_score = -1
     best_lines = []
     best_angle = 0
@@ -210,7 +220,61 @@ def recognize_file(
                 for line in lines
             )
         ):
+            trusted = bool(re.fullmatch(r"[A-Za-zÀ-ÿ' .&:-]+", clues.name))
             break
+
+    # Foil and full art cards print the collector number in white with a dark outline
+    # and keep the title on a metallic gradient, so the general pass reads neither (and
+    # can pick an upside-down reading from noise). A dedicated, voted footer pass runs
+    # unless the general pass gave a letters-only title and a fraction; it also settles
+    # the orientation.
+    foil = FooterReading()
+    foil_texts: list[str] = []
+    if prepared.rectified and not (trusted and best.printed_total):
+        for angle in dict.fromkeys((best_angle, 0, 180)):
+            card = (
+                prepared.image
+                if angle == 0
+                else prepared.image.rotate(angle, expand=True)
+            )
+            texts = []
+            for variant in footer_variants(card):
+                for psm in (7, 6):
+                    texts.append(
+                        " ".join(
+                            line.text
+                            for line in read(variant, psm=psm, minimum_confidence=0)
+                        )
+                    )
+                if settled(texts):
+                    break
+            reading = vote_footer(texts)
+            if reading.number or reading.total:
+                foil = reading
+                if angle != best_angle:
+                    best_angle = angle
+                    best = extract_clues(
+                        read(normalize_pixels(card)),
+                    )
+                # A total the general pass also saw settles a close vote.
+                foil = vote_footer(texts, best.printed_total)
+                foil_texts = texts
+                break
+
+    if foil.number or foil.total:
+        card = (
+            prepared.image
+            if best_angle == 0
+            else prepared.image.rotate(best_angle, expand=True)
+        )
+        readings = [
+            " ".join(line.text for line in read(variant, psm=psm, minimum_confidence=0))
+            for variant in title_variants(card)
+            for psm in (7, 6)
+        ]
+        voted = vote_name(readings)
+        if voted and (not best.name or len(voted) > len(best.name)):
+            best.name = voted
 
     # Most clear scans need only the full-card pass. The narrow title recovery
     # excludes evolution text and HP symbols; it is supplementary because other
@@ -293,8 +357,20 @@ def recognize_file(
             best_lines += lines
         best.local_number = footer_clues.local_number
         best.printed_total = footer_clues.printed_total
+        # The general footer read can confirm the printed total the dedicated pass saw.
+        if foil_texts and footer_clues.printed_total:
+            settled_vote = vote_footer(foil_texts, footer_clues.printed_total)
+            if settled_vote.number:
+                foil = settled_vote
+                best.local_number, best.printed_total = foil.number, foil.total
+    # The dedicated reading wins over a general one only where the general pass read
+    # nothing or something else; an ambiguous number leaves at least the total.
+    if foil.number:
+        best.local_number, best.printed_total = foil.number, foil.total
+    elif foil.total and not best.printed_total:
+        best.printed_total = foil.total
     warnings = list(prepared.warnings)
-    if prepared.rectified:
+    if prepared.rectified and not foil.number:
         # Retain a coherent reading from one path: never splice a crop's title
         # onto an unrelated number found elsewhere in the photograph.
         original = normalize_pixels(source)

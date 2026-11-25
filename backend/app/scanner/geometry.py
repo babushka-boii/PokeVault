@@ -118,6 +118,44 @@ def prepare_card(image: Image.Image) -> PreparedCard:
             if candidate is not None:
                 candidates.append(candidate)
     if not candidates:
+        # Full art and foil cards have a silver rounded border that Canny breaks into
+        # pieces. Closing the edge map joins them into one outer outline; only a large,
+        # card-shaped result passes (the same aspect, clipping and angle checks apply).
+        # (blur, low threshold, high threshold, closing window), widest first
+        passes = [
+            (5, 25, 75, 15),
+            (5, 25, 75, 21),
+            (9, 25, 75, 9),
+            (9, 25, 75, 15),
+            (9, 25, 75, 21),
+            (5, 40, 120, 3),
+            (9, 40, 120, 21),
+        ]
+        for blur, low, high, window in passes:
+            edges = cv2.Canny(cv2.GaussianBlur(pixels, (blur, blur), 0), low, high)
+            edges = cv2.morphologyEx(
+                edges,
+                cv2.MORPH_CLOSE,
+                cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (window, window)),
+            )
+            contours, _ = cv2.findContours(
+                edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
+            )
+            for contour in sorted(contours, key=cv2.contourArea, reverse=True)[:20]:
+                hull = cv2.convexHull(contour)
+                perimeter = cv2.arcLength(hull, True)
+                for epsilon in (0.02, 0.03, 0.04, 0.05):
+                    polygon = cv2.approxPolyDP(hull, epsilon * perimeter, True)
+                    candidate = _quad(polygon, small.size)
+                    if (
+                        candidate is not None
+                        and candidate[0] > 0.30 * small.width * small.height
+                    ):
+                        candidates.append(candidate)
+                        break
+            if candidates:
+                break
+    if not candidates:
         return PreparedCard(_bounded(image), False, ["card_boundary_uncertain"])
     candidates.sort(key=lambda candidate: candidate[0], reverse=True)
     area, points, _ = candidates[0]
