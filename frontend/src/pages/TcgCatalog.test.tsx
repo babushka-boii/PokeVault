@@ -4,13 +4,14 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 
 import { App } from "../app/App";
+import { indexResponse } from "../test/dexFixtures";
 import { bulbasaurCard, jsonResponse, pikachuCard, scraggyCard, speciesDetails, tcgPage } from "../test/tcgFixtures";
 
 afterEach(() => vi.unstubAllGlobals());
 
 function serveGallery(results: unknown[] = [pikachuCard], options: Record<string, unknown> = {}) {
   const request = vi.fn((input: string) => Promise.resolve(
-    input.includes("/cards?") ? jsonResponse(tcgPage(results, { ...options, page: Number(new URL(input).searchParams.get("page")) })) : jsonResponse(speciesDetails()),
+    input.includes("/pokemon/index") ? indexResponse() : input.includes("/cards?") ? jsonResponse(tcgPage(results, { ...options, page: Number(new URL(input).searchParams.get("page")) })) : jsonResponse(speciesDetails()),
   ));
   vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   return request;
@@ -27,18 +28,18 @@ test("loads real card-shaped JSON with species context, full card preview, and c
   expect(artwork).toHaveAttribute("src", "https://assets.tcgdex.net/en/sm/sm9/33/low.webp");
   expect(artwork).toHaveAttribute("loading", "lazy");
   expect(screen.getByText("Contenido de la carta disponible en inglés.")).toBeVisible();
-  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/pokedex?page=19");
-  expect(screen.getByText(/Catálogo inglés de TCGdex/)).toBeVisible();
+  expect(screen.getByRole("link", { name: /Volver a la Pokédex/ })).toHaveAttribute("href", "/pokedex?page=19");
+  expect(screen.getByText(/TCGdex/)).toBeVisible();
   expect(request).toHaveBeenCalledWith("http://localhost:8000/api/v1/pokemon/25/cards?language=es&page=1&page_size=12&sort=name", expect.objectContaining({ signal: expect.any(AbortSignal) }));
 });
 
 test("keeps gallery available when independent species details fail", async () => {
   vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn((input: string) => Promise.resolve(
-    input.includes("/cards?") ? jsonResponse(tcgPage()) : jsonResponse({ secret: "private" }, 503),
+    input.includes("/pokemon/index") ? indexResponse() : input.includes("/cards?") ? jsonResponse(tcgPage()) : jsonResponse({ secret: "private" }, 503),
   ))));
   render(<App initialEntries={["/pokemon/25/cards"]} />);
   expect(await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" })).toBeVisible();
-  expect(screen.getByRole("alert")).toHaveTextContent("No se pudieron cargar los detalles.");
+  expect(await screen.findByText("No pudimos cargar la descripción de Pikachu por ahora.")).toBeVisible();
   expect(screen.getByRole("button", { name: "Reintentar detalles" })).toBeEnabled();
 });
 
@@ -67,19 +68,20 @@ test("applies expansion and sort, resets pagination, and preserves the full gall
 test("renders empty cards, retryable sanitized failures, and successful retry", async () => {
   let attempt = 0;
   vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn((input: string) => Promise.resolve(
-    input.includes("/cards?") ? ++attempt === 1 ? jsonResponse({ secret: "internal exception" }, 503) : jsonResponse(tcgPage([])) : jsonResponse(speciesDetails()),
+    input.includes("/pokemon/index") ? indexResponse() : input.includes("/cards?") ? ++attempt === 1 ? jsonResponse({ secret: "internal exception" }, 503) : jsonResponse(tcgPage([])) : jsonResponse(speciesDetails()),
   ))));
   const user = userEvent.setup();
   render(<App initialEntries={["/pokemon/25/cards"]} />);
-  expect(await screen.findByRole("alert")).toHaveTextContent("No se pudieron cargar las cartas.");
+  expect(await screen.findByText("No pudimos cargar las cartas de Pikachu por ahora.")).toBeVisible();
   expect(screen.queryByText(/internal exception/)).not.toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Reintentar cartas" }));
-  expect(await screen.findByText("No hay cartas para estos filtros.")).toBeVisible();
+  expect(await screen.findByText("El catálogo aún no tiene cartas de Pikachu.")).toBeVisible();
 });
 
 test("provides missing artwork fallback and fetches new language without stale Spanish results", async () => {
   let finishSpanish: ((response: Response) => void) | undefined;
   vi.stubGlobal("fetch", withUnauthenticatedSession(vi.fn((input: string) => {
+    if (input.includes("/pokemon/index")) return Promise.resolve(indexResponse());
     if (!input.includes("/cards?")) return Promise.resolve(jsonResponse(speciesDetails(559)));
     if (input.includes("language=es")) return new Promise<Response>((resolve) => { finishSpanish = resolve; });
     return Promise.resolve(jsonResponse(tcgPage([scraggyCard])));
@@ -87,7 +89,7 @@ test("provides missing artwork fallback and fetches new language without stale S
   const user = userEvent.setup();
   render(<App initialEntries={["/pokemon/559/cards"]} />);
   await user.click(screen.getByRole("button", { name: "English" }));
-  expect(await screen.findByRole("heading", { name: "Scraggy", level: 2 })).toBeVisible();
+  expect(await screen.findByRole("heading", { name: "Scraggy", level: 3 })).toBeVisible();
   expect(screen.getByText("Card image unavailable")).toBeVisible();
   await act(async () => { finishSpanish?.(jsonResponse(tcgPage([{ ...scraggyCard, name: "Viejo" }]))); });
   expect(screen.queryByText("Viejo")).not.toBeInTheDocument();
@@ -118,7 +120,7 @@ test("renders detailed card fields from TCG content and full resolution artwork"
 test.each(["0", "1026", "-1", "abc", "1.5"])("rejects invalid species route %s without fetch", (number) => {
   const request = vi.fn(); vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   render(<App initialEntries={[`/pokemon/${number}/cards`]} />);
-  expect(screen.getByRole("alert")).toHaveTextContent("El número de Pokémon no es válido.");
+  expect(screen.getByRole("alert")).toHaveTextContent("Ese número no está en la Pokédex Nacional.");
   expect(request).not.toHaveBeenCalled();
 });
 
@@ -144,7 +146,7 @@ test.each([
 ])("rejects malformed card responses", async (card) => {
   serveGallery([card]);
   render(<App initialEntries={["/pokemon/25/cards"]} />);
-  expect(await screen.findByRole("alert")).toHaveTextContent("No se pudieron cargar las cartas.");
+  expect(await screen.findByText(/No pudimos cargar las cartas de/)).toBeVisible();
 });
 
 test("bounds direct gallery pagination to the API limit and hides the next-page link", async () => {

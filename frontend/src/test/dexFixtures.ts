@@ -37,3 +37,6 @@ export function stubDex(data: DexData = {}) {
   return request;
 }
 export const callsTo = (request: ReturnType<typeof stubDex>, path: string) => request.mock.calls.filter(([input]) => new URL(input as string).pathname === path);
+
+/** The index response, for older gallery tests that serve their own stub. */
+export const indexResponse = () => json({ results: speciesRows() });

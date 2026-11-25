@@ -42,7 +42,7 @@ test('an old box link → species gallery → card → gallery → back to the P
   expect(await screen.findByText('bw1-68')).toBeVisible();
   await user.click(screen.getByRole('link', { name: 'Volver a la galería' }));
   await screen.findByRole('link', { name: /Scraggy/ });
-  await user.click(screen.getByRole('link', { name: 'Volver' }));
+  await user.click(screen.getByRole('link', { name: /Volver a la Pokédex/ }));
   expect(await screen.findByRole('heading', { name: 'Tu Pokédex' })).toBeVisible();
   expect(request.mock.calls.every(([url]) => url.startsWith('http://localhost:8000/api/v1/'))).toBe(true);
 });
@@ -53,6 +53,6 @@ test('Pokédex exposes a separate card action and returns to Pokédex', async ()
   render(<App initialEntries={['/pokedex']} />);
   await user.click(await screen.findByRole('link', { name: /^#001 bulbasaur/ }));
   await screen.findByRole('link', { name: /Bulbasaur/ });
-  await user.click(screen.getByRole('link', { name: 'Volver' }));
+  await user.click(screen.getByRole('link', { name: /Volver a la Pokédex/ }));
   expect(await screen.findByRole('heading', { name: 'Tu Pokédex' })).toBeVisible();
 });
