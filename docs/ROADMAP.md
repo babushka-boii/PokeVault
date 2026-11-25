@@ -594,7 +594,7 @@ was merged, but `origin/main` did not contain it when checked, so this iteration
 
 ## Iteration 8D Part 1 — Open album and contextual actions (Safari checklist)
 
-Open http://localhost:5173/binders. Part 2 (covers and stickers, migration 0010 after 9A's 0009) is blocked
+Open http://localhost:5173/binders. Part 2 (covers and stickers, migration 0011 after 9A's 0009 and 9B's 0010) is blocked
 until this is approved.
 
 - [ ] At 1280×720 and 1440×900 (100% zoom) the two pages, rings, arrows and the bottom tray

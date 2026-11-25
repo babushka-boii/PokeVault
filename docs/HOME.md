@@ -91,4 +91,4 @@ cd backend && .venv/bin/alembic upgrade head
 ```
 
 Going back (`.venv/bin/alembic downgrade 0008`) **drops favourites, the value history and the
-guide state**; inventory, binders, pockets and prices are untouched. 8D Part 2's migration is now `0010`.
+guide state**; inventory, binders, pockets and prices are untouched. 8D Part 2's migration is now `0011` (9B takes `0010`).
