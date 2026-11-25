@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { useAuth } from "../../auth/context";
+import type { BinderErrorKey } from "../../hooks/useBinderMutations";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { covers, MAX_STICKERS, pixelKeys, type Appearance, type Cover, type PixelKey, type Sticker } from "../../services/binders";
@@ -14,6 +15,9 @@ type Look = { cover: Cover; stickers: Sticker[] };
 const FOCUSABLE = "button:not([disabled]), input, [href], [tabindex]:not([tabindex='-1'])";
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 const step = (n: number, unit: number) => Math.round(n / unit) * unit;
+/** Rounds away float noise (1.2000000000000002), so only clean numbers are ever drafted or sent. */
+const round = (n: number, places: number) => Math.round(n * 10 ** places) / 10 ** places;
+const tidy = (s: Sticker): Sticker => ({ ...s, x: round(s.x, 2), y: round(s.y, 2), rotation: round(s.rotation, 1), scale: round(s.scale, 2) });
 const fresh = (partial: Pick<Sticker, "kind" | "species_id" | "pixel_key">): Sticker => ({ ...partial, x: 50, y: 50, rotation: 0, scale: 1 });
 const pad = (n: number) => `#${String(n).padStart(3, "0")}`;
 
@@ -23,7 +27,7 @@ const pad = (n: number) => `#${String(n).padStart(3, "0")}`;
  * moved with the arrow keys or the number fields, so dragging is never the only way.
  */
 export function CoverEditor({ name: initialName, owner, year, initial, onSave, onClose }: {
-  name: string; owner: string; year: number; initial: Appearance; onSave: (look: Appearance, name: string) => Promise<boolean>; onClose: () => void;
+  name: string; owner: string; year: number; initial: Appearance; onSave: (look: Appearance, name: string) => Promise<true | BinderErrorKey>; onClose: () => void;
 }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.binders.editor;
@@ -38,7 +42,7 @@ export function CoverEditor({ name: initialName, owner, year, initial, onSave, o
   const [plop, setPlop] = useState<number | null>(null);
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<BinderErrorKey | null>(null);
   const [asking, setAsking] = useState(false);
   const [note, setNote] = useState("");
   const index = useTcgResource("species-index", fetchSpeciesIndex);
@@ -56,7 +60,7 @@ export function CoverEditor({ name: initialName, owner, year, initial, onSave, o
   }, []);
 
   function close() { if (dirty && !busy) setAsking(true); else onClose(); }
-  function change(i: number, patch: Partial<Sticker>) { setLook((l) => ({ ...l, stickers: l.stickers.map((s, k) => (k === i ? { ...s, ...patch } : s)) })); }
+  function change(i: number, patch: Partial<Sticker>) { setLook((l) => ({ ...l, stickers: l.stickers.map((s, k) => (k === i ? tidy({ ...s, ...patch }) : s)) })); }
   function add(partial: Pick<Sticker, "kind" | "species_id" | "pixel_key">) {
     if (full || busy) return;
     setLook((l) => ({ ...l, stickers: [...l.stickers, fresh(partial)] }));
@@ -104,10 +108,10 @@ export function CoverEditor({ name: initialName, owner, year, initial, onSave, o
   }
 
   async function save() {
-    setBusy(true); setFailed(false);
-    const ok = await onSave({ cover: look.cover, stickers: look.stickers }, name.trim());
+    setBusy(true); setFailed(null);
+    const result = await onSave({ cover: look.cover, stickers: look.stickers.map(tidy) }, name.trim());
     setBusy(false);
-    if (ok) onClose(); else setFailed(true);   // the draft stays for another try
+    if (result === true) onClose(); else setFailed(result);   // the draft stays for another try
   }
   const current = selected !== null ? look.stickers[selected] : null;
 
@@ -191,7 +195,7 @@ export function CoverEditor({ name: initialName, owner, year, initial, onSave, o
         </div>
 
         <p className="pv-sr-only" role="status" aria-live="polite">{note}</p>
-        {failed && <p role="alert" className="pv-editor__error">{text.saveError}</p>}
+        {failed && <p role="alert" className="pv-editor__error">{failed === "invalid" ? text.saveInvalid : failed === "expired" || failed === "missing" ? `${dictionary.binders.errors[failed]} ${text.saveKept}` : text.saveError}</p>}
         {asking && <div role="alertdialog" aria-label={text.discardAsk} className="pv-editor__ask">
           <p>{text.discardAsk}</p>
           <button type="button" className="pv-editor__quiet" onClick={onClose}>{text.discard}</button>

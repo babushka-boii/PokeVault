@@ -156,3 +156,43 @@ test("+ Agregar hojas adds two sheets, keeps them when empty and stops at 40", a
   expect(await screen.findByRole("group", { name: /de 4/ })).toBeVisible();
   expect(w.calls.filter((c) => c.method === "POST" && c.path.endsWith("/pages"))).toHaveLength(1);
 });
+
+test("regression: resizing and turning stickers sends clean numbers the server accepts (7 mixed stickers)", async () => {
+  const w = world(); const user = userEvent.setup();
+  const dialog = await openEditor(user);
+  const stick = async (label: string) => { await user.click(within(dialog).getByRole("button", { name: label })); };
+  await stick("Pegar Rayo"); await stick("Pegar Corazón"); await stick("Pegar Estrella");
+  for (const name of ["Pikachu", "Bulbasaur", "Charmander", "Chikorita"]) {
+    await user.clear(within(dialog).getByLabelText("Buscar Pokémon para pegar")); await user.type(within(dialog).getByLabelText("Buscar Pokémon para pegar"), name);
+    await stick(`Pegar ${name}`);
+  }
+  expect(within(dialog).getByText("7 de 24 stickers")).toBeVisible();
+  // Each +/- step used to leave float noise such as 1.2000000000000002 or 0.15000000000000002.
+  for (let i = 1; i <= 7; i += 1) {
+    await user.click(within(dialog).getByRole("button", { name: `Capa ${i}: ${["Rayo", "Corazón", "Estrella", "Pikachu", "Bulbasaur", "Charmander", "Chikorita"][i - 1]}` }));
+    for (let k = 0; k < i; k += 1) await user.click(within(dialog).getByRole("button", { name: "Más grande" }));
+    await user.click(within(dialog).getByRole("button", { name: "Más chico" }));
+    await user.click(within(dialog).getByRole("button", { name: "Girar 5° a la derecha" }));
+  }
+  await user.click(within(dialog).getByRole("button", { name: "Guardar portada" }));
+  await waitFor(() => expect(puts(w)).toHaveLength(1));
+  const text = JSON.stringify(puts(w)[0].body);
+  expect(text).not.toMatch(/\d\.\d{3,}/);                       // no float noise anywhere
+  const sent = (puts(w)[0].body as { stickers: { x: number; y: number; scale: number; rotation: number }[] }).stickers;
+  expect(sent).toHaveLength(7);
+  for (const s of sent) { expect(Math.round(s.scale * 100) / 100).toBe(s.scale); expect(Math.round(s.rotation * 10) / 10).toBe(s.rotation); }
+  await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+});
+
+test("when the server says 422 the editor explains it in words, not codes, and keeps the draft", async () => {
+  const w = world(); const user = userEvent.setup();
+  const dialog = await openEditor(user);
+  await user.click(within(dialog).getByRole("button", { name: "Pegar Estrella" }));
+  w.fail("PUT", `/api/v1/binders/${binderId(1)}/appearance`, () => new Response(JSON.stringify({ detail: [{ type: "value_error", loc: ["body", "stickers", 0, "scale"], msg: "At most 2 decimal places" }] }), { status: 422 }));
+  await user.click(within(dialog).getByRole("button", { name: "Guardar portada" }));
+  const alert = await within(dialog).findByRole("alert");
+  expect(alert).toHaveTextContent("Algún sticker tiene una posición, giro o tamaño que no se puede guardar");
+  expect(alert.textContent).not.toMatch(/422|value_error|decimal|body|scale|invalid/i);
+  expect(within(dialog).getByRole("button", { name: "Capa 1: Estrella" })).toBeVisible();   // the draft is still there
+  expect(within(dialog).getByRole("button", { name: "Guardar portada" })).toBeEnabled();
+});

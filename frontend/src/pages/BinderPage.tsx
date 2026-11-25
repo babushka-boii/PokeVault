@@ -253,18 +253,18 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     setTrayVersion((v) => v + 1);
   }
   /** Name first, then the look; the page shows what the server answered. */
-  async function saveLook(look: Appearance, nextName: string): Promise<boolean> {
-    if (!binder || !loaded) return false;
+  async function saveLook(look: Appearance, nextName: string): Promise<true | BinderErrorKey> {
+    if (!binder || !loaded) return "error";
     let current = binder;
     if (nextName !== binder.name) {
       const renamed = await run((csrf, signal) => renameBinder(binderId, nextName, csrf, signal));
-      if (!renamed) return false;
-      if (!renamed.ok) { failed(renamed.error); return false; }
+      if (!renamed) return "error";
+      if (!renamed.ok) { failed(renamed.error); return renamed.error; }
       current = { ...current, name: renamed.value.name, updated_at: renamed.value.updated_at };
     }
     const saved = await run((csrf, signal) => saveAppearance(binderId, look, csrf, signal));
-    if (!saved) return false;
-    if (!saved.ok) { setLocal({ base: loaded, value: current }); failed(saved.error); return false; }
+    if (!saved) return "error";
+    if (!saved.ok) { setLocal({ base: loaded, value: current }); failed(saved.error); return saved.error; }
     setProblem(null);
     setLocal({ base: loaded, value: { ...current, cover: saved.value.cover, stickers: saved.value.stickers, updated_at: saved.value.updated_at } });
     return true;

@@ -96,12 +96,14 @@ function Shelf() {
   const byId = values.state.kind === "loaded" ? Object.fromEntries(values.state.data.results.map((v) => [v.binder_id, v])) : {};
   const loose = tray.state.kind === "loaded" ? tray.state.data.total : 0;
 
-  async function mutate<T>(action: (csrf: string, signal: AbortSignal) => Promise<T>) {
+  /** Runs one write; the answer is `true` or the reason it failed (so the editor can say why). */
+  async function attempt<T>(action: (csrf: string, signal: AbortSignal) => Promise<T>): Promise<true | BinderErrorKey> {
     const outcome = await run(action);
-    if (!outcome) return false;
+    if (!outcome) return "error";
     if (outcome.ok) { setProblem(null); setVersion((v) => v + 1); return true; }
-    setProblem(outcome.error); setStatus(""); setVersion((v) => v + 1); return false;
+    setProblem(outcome.error); setStatus(""); setVersion((v) => v + 1); return outcome.error;
   }
+  const mutate = async <T,>(action: (csrf: string, signal: AbortSignal) => Promise<T>) => (await attempt(action)) === true;
   async function create(event: FormEvent) {
     event.preventDefault();
     const name = newName.trim();
@@ -120,7 +122,10 @@ function Shelf() {
 
   return <>
     {customizing && <CoverEditor name={customizing.name} owner={owner} year={new Date(customizing.created_at).getFullYear()} initial={{ cover: customizing.cover, stickers: customizing.stickers }}
-      onSave={async (look, name) => (name === customizing.name || await mutate((csrf, signal) => renameBinder(customizing.id, name, csrf, signal))) && mutate((csrf, signal) => saveAppearance(customizing.id, look, csrf, signal))}
+      onSave={async (look, name) => {
+        const renamed = name === customizing.name ? true : await attempt((csrf, signal) => renameBinder(customizing.id, name, csrf, signal));
+        return renamed === true ? attempt((csrf, signal) => saveAppearance(customizing.id, look, csrf, signal)) : renamed;
+      }}
       onClose={() => setCustomizing(null)} />}
     <p className="pv-binder__status" role="status" aria-live="polite">{status}</p>
     {problem && <p className="pv-binder__problem" role="alert">{text.errors[problem]}</p>}
