@@ -166,3 +166,11 @@ prices.
   - Home shows "Mis carpetas": a mini shelf of the first six covers (name, card count,
     gold value), each linked to its binder, plus "N cartas sin carpeta · guardar".
   - The scanner success screen links to binders.
+
+## Customization (8D Part 2, migration `0012`)
+
+- **Covers:** `cover` is one of `noir`, `brown_leather`, `metallic`, `holographic`, `white` (closed list, check constraint). The materials are CSS tokens in `styles/tokens.css`; `CoverArt` draws the same cover on the shelf, Home, the editor and (as the outer cover) the open album.
+- **Stickers:** table `binder_stickers`, at most 24 per binder, owner-scoped (composite FK, cascade). A sticker is `pokemon` (only the species number 1–1025; the image URL is built client-side from it, PokéAPI official artwork) or `pixel` (`star`, `bolt`, `heart`, `creature`, `circle`: original SVG paths, no files). `x`/`y` are percent of the 3:4 cover, rotation −180..180, scale 0.5–2; list order is the layer order. No URLs are ever stored or accepted.
+- **API:** `PUT /binders/{id}/appearance` replaces cover and stickers in one transaction under `lock_owner` (404 for another owner's binder, 422 for anything outside the catalogues, last save wins, no revision). `BinderSummary` now carries `stickers`, fetched in one query for the whole list.
+- **Pages:** `binders.page_count` is stored (even, 2–40). `POST /binders/{id}/pages` adds two ("+ Agregar hojas"; 409 `binder_max_pages` at 40); placing a card beyond the stored pages grows them; nothing ever shrinks them, so a page with a card can never be removed.
+- **Downgrade `0012`** drops the stickers, sets every cover to `noir` and removes `page_count` (the derived rule applies again); pockets, copies, names and prices are untouched. Back up first: `pg_dump -Fc pokevault -f ~/pokevault-before-0012.dump`.

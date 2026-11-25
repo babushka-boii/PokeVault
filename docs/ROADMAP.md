@@ -693,6 +693,19 @@ and the price note, rates attribution, currency switch and sign-out sit in a foo
 - [ ] A photo with no card visible (or a HEIC with no preview): the original photo stays, uncropped (HEIC shows only "Analizando carta…"), and nothing breaks.
 - [ ] With Reduce Motion: no sweep and no transition, a static frame with the same text, and the crop appears at once.
 
+## Iteration 8D Part 2 — Binder customization (Safari checklist)
+
+Back up and apply migration 0012 first: `pg_dump -Fc pokevault -f ~/pokevault-before-0012.dump`, then
+`cd backend && .venv/bin/alembic upgrade head` (`alembic current` → 0012). `alembic downgrade 0011` drops
+stickers, resets covers to noir and the stored page count. Design source: `docs/design/BinderCustomize.dc.html`.
+Known deviations: stickers also have rotation and size controls (the design shows none), the heart and creature
+pixel colours are decorative tokens, and last save wins (no edit-conflict revision).
+
+- [ ] Shelf → Gestionar → "Personalizar portada": the editor matches the design (preview with name plate, 5 covers, sticker grid, "Quitar todos", "Guardar portada") and each material looks right.
+- [ ] Tap pixel stickers to stick them (with the short pop) and drag them on the cover; with the arrow keys / number fields too; a Pokémon sprite from the search also works, and a broken image shows a placeholder.
+- [ ] Save, reload: shelf, Home and the open album show the same cover and stickers; closing with changes asks "¿Descartar…?".
+- [ ] "+ Agregar hojas" at the end of the album adds 2 empty sheets that stay after reloading; at 40 it is disabled.
+- [ ] iPhone-size mode: the editor is full screen, buttons are 44 px, and with Reduce Motion there is no pop.
 ## Collection polish — 2026-11-25
 - [x] Point 1: whole-collection copy/distinct-card counts and reference value in the selected currency.
 - Existing inventory/valuation endpoints; no migration or new backend endpoint.

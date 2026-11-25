@@ -1,11 +1,11 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { BindersError, fetchBinder, fetchBinders, fetchCopyView, fetchLocations, placeInPocket, removeFromPocket, reorderBinders, spreadStart, storeNext } from "./binders";
+import { addPages, BindersError, isSticker, saveAppearance, fetchBinder, fetchBinders, fetchCopyView, fetchLocations, placeInPocket, removeFromPocket, reorderBinders, spreadStart, storeNext } from "./binders";
 
 const id = "00000000-0000-4000-8000-000000000001";
 const other = "00000000-0000-4000-8000-000000000002";
 const copyId = "00000000-0000-4000-8000-000000000003";
 const stamp = "2026-11-24T12:00:00Z";
-const summary = { id, name: "Kanto", display_order: 0, cover: "noir", copy_count: 1, page_count: 2, last_placed_at: stamp, created_at: stamp, updated_at: stamp };
+const summary = { id, name: "Kanto", display_order: 0, cover: "noir", stickers: [], copy_count: 1, page_count: 2, last_placed_at: stamp, created_at: stamp, updated_at: stamp };
 const copy = { id: copyId, card_id: "base1-44", condition: "mint", language: "en", variant: "normal", acquired_on: null, notes: "", created_at: stamp, updated_at: stamp };
 const binder = (pockets = [{ page: 1, pocket: 5, copy, placed_at: stamp }], extra = {}) => ({ ...summary, copy_count: pockets.length, pockets, ...extra });
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
@@ -85,4 +85,46 @@ test("only an exact binder address (with an optional valid page and pocket) is a
   const path = copyDetailPath(copyId, id, { page: 2, pocket: 5 });
   expect(path).toBe(`/collection/${copyId}?returnTo=${encodeURIComponent(`/binders/${id}?page=2&pocket=5`)}`);
   expect(safeBinderReturn(new URL(path, "http://x").searchParams.get("returnTo"))).toBe(`/binders/${id}?page=2&pocket=5`);
+});
+
+const pixel = { kind: "pixel", species_id: null, pixel_key: "star", x: 50, y: 50, rotation: 0, scale: 1 };
+const species = { kind: "pokemon", species_id: 25, pixel_key: null, x: 20.5, y: 70.25, rotation: -12.5, scale: 1.25 };
+
+test.each([
+  [pixel, true], [species, true],
+  [{ ...pixel, pixel_key: "dragon" }, false], [{ ...pixel, species_id: 25 }, false], [{ ...species, species_id: 0 }, false], [{ ...species, species_id: 1026 }, false],
+  [{ ...species, pixel_key: "star" }, false], [{ ...pixel, kind: "image" }, false], [{ ...pixel, url: "https://evil.example/a.png" }, false],
+  [{ ...pixel, x: -1 }, false], [{ ...pixel, y: 100.5 }, false], [{ ...pixel, x: 12.345 }, false], [{ ...pixel, rotation: 181 }, false],
+  [{ ...pixel, scale: 0.4 }, false], [{ ...pixel, scale: Number.NaN }, false], [{ ...pixel, x: "50" }, false],
+])("sticker %# is %s", (candidate, valid) => { expect(isSticker(candidate)).toBe(valid); });
+
+test("binders carry their cover and at most 24 valid stickers", async () => {
+  const reply = (extra: object) => vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ results: [{ ...summary, ...extra }], total: 1 })));
+  reply({ cover: "metallic", stickers: [pixel, species] });
+  expect((await fetchBinders(signal)).results[0].stickers).toHaveLength(2);
+  for (const bad of [{ cover: "gold" }, { stickers: Array(25).fill(pixel) }, { stickers: [{ ...pixel, pixel_key: "dragon" }] }, { stickers: undefined }]) {
+    reply(bad);
+    await expect(fetchBinders(signal)).rejects.toBeInstanceOf(BindersError);
+  }
+});
+
+test("saves the look as one PUT and only accepts exactly what was asked", async () => {
+  const look = { cover: "brown_leather" as const, stickers: [pixel, species] as never };
+  const fetcher = vi.fn().mockResolvedValueOnce(json({ ...summary, ...look })).mockResolvedValueOnce(json({ ...summary, cover: "white", stickers: [] }));
+  vi.stubGlobal("fetch", fetcher);
+  expect((await saveAppearance(id, look, "csrf", signal)).cover).toBe("brown_leather");
+  expect(fetcher.mock.calls[0][0]).toContain(`/binders/${id}/appearance`);
+  expect(fetcher.mock.calls[0][1]).toMatchObject({ method: "PUT", credentials: "include", cache: "no-store", headers: expect.objectContaining({ "X-CSRF-Token": "csrf" }), body: JSON.stringify(look) });
+  await expect(saveAppearance(id, look, "csrf", signal)).rejects.toBeInstanceOf(BindersError);   // the answer is not what was saved
+  await expect(saveAppearance(id, { cover: "gold" as never, stickers: [] }, "csrf", signal)).rejects.toMatchObject({ status: 422 });
+  await expect(saveAppearance(id, { cover: "noir", stickers: Array(25).fill(pixel) }, "csrf", signal)).rejects.toMatchObject({ status: 422 });
+  expect(fetcher).toHaveBeenCalledTimes(2);
+});
+
+test("adds pages with a POST and reports the limit as a status", async () => {
+  const fetcher = vi.fn().mockResolvedValueOnce(json({ ...summary, page_count: 4 })).mockResolvedValueOnce(json({ detail: "binder_max_pages" }, 409));
+  vi.stubGlobal("fetch", fetcher);
+  expect((await addPages(id, "csrf", signal)).page_count).toBe(4);
+  expect(fetcher.mock.calls[0][0]).toContain(`/binders/${id}/pages`); expect(fetcher.mock.calls[0][1]).toMatchObject({ method: "POST" });
+  await expect(addPages(id, "csrf", signal)).rejects.toMatchObject({ status: 409, detail: "binder_max_pages" });
 });

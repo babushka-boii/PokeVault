@@ -87,6 +87,34 @@
   --pv-tabbar-h: 64px;
   --pv-touch: 44px;
 
+  /* Binder cover materials (8D Part 2): decorative surfaces, never actions or status. */
+  --pv-mat-leather-a: #3A2418;
+  --pv-mat-leather-b: #21140D;
+  --pv-mat-metal-a: #5A626B;
+  --pv-mat-metal-b: #2A3036;
+  --pv-mat-metal-c: #4A525B;
+  --pv-mat-holo-a: #2B3E52;
+  --pv-mat-holo-b: #4A3C6A;
+  --pv-mat-holo-c: #2E5F4F;
+  --pv-mat-holo-d: #3A4A2A;
+  --pv-mat-white-a: #D9DEE3;
+  --pv-mat-white-b: #AEB6BE;
+  --pv-mat-noir-a: #1B2E3A;
+  --pv-mat-noir-b: #0F1A22;
+  --pv-cover-leather: linear-gradient(150deg, var(--pv-mat-leather-a), var(--pv-mat-leather-b));
+  --pv-cover-metal: linear-gradient(160deg, var(--pv-mat-metal-a), var(--pv-mat-metal-b) 45%, var(--pv-mat-metal-c));
+  --pv-cover-holo: conic-gradient(from 210deg at 70% 30%, var(--pv-mat-holo-a), var(--pv-mat-holo-b), var(--pv-mat-holo-c), var(--pv-mat-holo-d), var(--pv-mat-holo-a));
+  --pv-cover-white: linear-gradient(150deg, var(--pv-mat-white-a), var(--pv-mat-white-b));
+  --pv-cover-noir: linear-gradient(150deg, var(--pv-mat-noir-a), var(--pv-mat-noir-b));
+  --pv-stitch-noir: color-mix(in srgb, var(--pv-cyan) 45%, transparent);
+  --pv-stitch-leather: color-mix(in srgb, var(--pv-gold) 40%, transparent);
+  --pv-stitch-metal: color-mix(in srgb, var(--pv-text) 20%, transparent);
+  --pv-stitch-white: color-mix(in srgb, var(--pv-bg) 35%, transparent);
+  --pv-sticker-heart: #E05C9E;
+  --pv-sticker-creature: #E8C35A;
+  --pv-sticker-shadow: color-mix(in srgb, var(--pv-shadow-color) 50%, transparent);
+  --pv-sticker-cut: var(--pv-text);
+
   /* Motion */
   --pv-dur-fast: 150ms;
   --pv-dur: 200ms;

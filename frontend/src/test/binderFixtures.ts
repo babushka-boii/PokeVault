@@ -19,7 +19,7 @@ export type Pocket = { page: number; pocket: number; copy: ReturnType<typeof phy
 export const pocketOf = (page: number, pocket: number, copy: ReturnType<typeof physical>): Pocket => ({ page, pocket, copy, placed_at: stamp });
 const visible = (pockets: Pocket[]) => Math.min(40, Math.max(2, Math.ceil((Math.max(0, ...pockets.map((p) => p.page)) + 1) / 2) * 2));
 export function binderSummary(n: number, name: string, pockets: Pocket[] = [], order = n - 1) {
-  return { id: binderId(n), name, display_order: order, cover: "noir", copy_count: pockets.length, page_count: visible(pockets),
+  return { id: binderId(n), name, display_order: order, cover: "noir", stickers: [], copy_count: pockets.length, page_count: visible(pockets),
     last_placed_at: pockets.length ? stamp : null, created_at: stamp, updated_at: stamp };
 }
 const sorted = (pockets: Pocket[]) => [...pockets].sort((a, b) => (a.page - b.page) * 9 + (a.pocket - b.pocket));
@@ -29,12 +29,14 @@ const sorted = (pockets: Pocket[]) => [...pockets].sort((a, b) => (a.page - b.pa
  * values and copy prices. Unknown requests fail loudly.
  */
 export function binderWorld(initial: { binders: { name: string; pockets: Pocket[] }[]; tray?: ReturnType<typeof physical>[] }) {
-  const state = initial.binders.map((binder, index) => ({ id: binderId(index + 1), name: binder.name, order: index, pockets: sorted(binder.pockets) }));
+  const state = initial.binders.map((binder, index) => ({ id: binderId(index + 1), name: binder.name, order: index, pockets: sorted(binder.pockets), cover: "noir", stickers: [] as unknown[], pages: 0 }));
   let tray = [...(initial.tray ?? [])];
   const favorites = new Set<string>();
   const calls: { method: string; path: string; body: unknown }[] = [];
   const failures: Record<string, () => Response> = {};
-  const detail = (b: typeof state[number]) => ({ ...binderSummary(Number(b.id.slice(-12)), b.name, b.pockets, b.order), pockets: b.pockets });
+  /** The summary with the look and stored pages the shelf and the binder show. */
+  const view = (b: typeof state[number]) => { const base = binderSummary(Number(b.id.slice(-12)), b.name, b.pockets, b.order); return { ...base, cover: b.cover, stickers: b.stickers, page_count: Math.max(base.page_count, b.pages) }; };
+  const detail = (b: typeof state[number]) => ({ ...view(b), pockets: b.pockets });
   const find = (id: string) => state.find((b) => b.id === id);
   function take(copyIdValue: string) {
     for (const binder of state) {
@@ -71,14 +73,24 @@ export function binderWorld(initial: { binders: { name: string; pockets: Pocket[
     if (path === "/api/v1/prices/binders") return json({ currency: "CLP", rates, results: state.map((b) => ({ binder_id: b.id, total: String(b.pockets.length * 1500), original_totals: { EUR: "1.2" }, copy_count: b.pockets.length, priced_count: b.pockets.length, pending_count: 0, stale_count: 0 })) });
     if (/\/api\/v1\/binders\/[^/]+\/value$/.test(path)) return json({ currency: "CLP", total: "1500", original_totals: { EUR: "1.2" }, copy_count: 1, priced_count: 1, unpriced_count: 0, unpriced_by_reason: {}, pending_count: 0, stale_count: 0, prices_updated_at: "2026-11-25T09:00:00Z", sources: { cardmarket: 1 }, top: [], rates });
     if (path === "/api/v1/binders/views/unassigned") return json({ results: tray.slice(0, 30), total: tray.length, offset: 0, limit: 30 });
-    if (path === "/api/v1/binders" && method === "GET") return json({ results: state.map((b) => binderSummary(Number(b.id.slice(-12)), b.name, b.pockets, b.order)), total: state.length });
-    if (path === "/api/v1/binders" && method === "POST") { const created = { id: binderId(state.length + 1), name: body.name, order: state.length, pockets: [] }; state.push(created); return json(binderSummary(state.length, created.name, [], created.order), 201); }
+    if (path === "/api/v1/binders" && method === "GET") return json({ results: state.map(view), total: state.length });
+    if (path === "/api/v1/binders" && method === "POST") { const created = { id: binderId(state.length + 1), name: body.name, order: state.length, pockets: [], cover: "noir", stickers: [] as unknown[], pages: 0 }; state.push(created); return json(binderSummary(state.length, created.name, [], created.order), 201); }
+    const look = /^\/api\/v1\/binders\/([^/]+)\/(appearance|pages)$/.exec(path);
+    if (look) {
+      const target = find(look[1]); if (!target) return json({ detail: "Binder not found" }, 404);
+      if (look[2] === "appearance" && method === "PUT") { target.cover = body.cover; target.stickers = body.stickers; return json(view(target)); }
+      if (look[2] === "pages" && method === "POST") {
+        const now = view(target).page_count;
+        if (now >= 40) return json({ detail: "binder_max_pages" }, 409);
+        target.pages = now + 2; return json(view(target));
+      }
+    }
     const match = /^\/api\/v1\/binders\/([^/]+)(?:\/pockets(?:\/(\d+)\/(\d+))?)?$/.exec(path);
     const binder = match && find(match[1]);
     if (!binder) return json({ detail: "Binder not found" }, 404);
     if (method === "GET") return json(detail(binder));
     if (method === "DELETE" && !match![2]) { state.splice(state.indexOf(binder), 1); return new Response(null, { status: 204 }); }
-    if (method === "PUT" && !match![2]) { binder.name = body.name; return json(binderSummary(Number(binder.id.slice(-12)), binder.name, binder.pockets, binder.order)); }
+    if (method === "PUT" && !match![2]) { binder.name = body.name; return json(view(binder)); }
     if (method === "POST") {
       const used = new Set(binder.pockets.map((p) => `${p.page}:${p.pocket}`));
       for (let page = 1; page <= 40; page++) for (let pocket = 1; pocket <= 9; pocket++) if (!used.has(`${page}:${pocket}`)) return put(binder, page, pocket, body.copy_id);

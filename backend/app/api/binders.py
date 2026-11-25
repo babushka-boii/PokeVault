@@ -1,10 +1,11 @@
 """Owner-scoped binders of existing copies; no catalog requests or copy writes."""
 
+from decimal import Decimal
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Response
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.api.inventory import owned_copy
@@ -17,6 +18,7 @@ from app.binders.placement import (
     visible_pages,
 )
 from app.binders.schemas import (
+    Appearance,
     BinderDetail,
     BindersPage,
     BinderSummary,
@@ -28,11 +30,12 @@ from app.binders.schemas import (
     OrderBinders,
     PlaceCopy,
     Pocket,
+    Sticker,
     StoreResult,
     UpdateBinder,
     View,
 )
-from app.db.models import Binder, BinderPocket, InventoryCopy, User
+from app.db.models import Binder, BinderPocket, BinderSticker, InventoryCopy, User
 from app.inventory.schemas import InventoryCopy as PublicCopy
 
 router = APIRouter(prefix="/api/v1/binders", tags=["binders"])
@@ -92,15 +95,46 @@ def _stats(session, user: User, binder_ids=None):
     return {row[0]: row[1:] for row in session.execute(query).all()}
 
 
-def _summary(binder: Binder, stats) -> BinderSummary:
-    count, max_page, last = stats or (0, None, None)
+def _stickers(session, user: User, binder_ids) -> dict[UUID, list[Sticker]]:
+    """Every sticker of the owner's returned binders in one query, back to front."""
+    rows = session.scalars(
+        select(BinderSticker)
+        .where(
+            BinderSticker.user_id == user.id, BinderSticker.binder_id.in_(binder_ids)
+        )
+        .order_by(BinderSticker.binder_id, BinderSticker.display_order)
+    ).all()
+    grouped: dict[UUID, list[Sticker]] = {}
+    for row in rows:
+        grouped.setdefault(row.binder_id, []).append(
+            Sticker.model_construct(
+                kind=row.kind,
+                species_id=row.species_id,
+                pixel_key=row.pixel_key,
+                x=float(row.x),
+                y=float(row.y),
+                rotation=float(row.rotation),
+                scale=float(row.scale),
+            )
+        )
+    return grouped
+
+
+def _summary(binder: Binder, stats, stickers=None) -> BinderSummary:
+    count, _, last = stats or (0, None, None)
     return BinderSummary.model_validate(binder).model_copy(
         update={
             "copy_count": count,
-            "page_count": visible_pages(max_page),
+            "stickers": stickers or [],
             "last_placed_at": last,
         }
     )
+
+
+def grow_pages(session, binder: Binder, max_page: int | None) -> None:
+    """Placing a card never leaves it beyond the stored pages; they never shrink."""
+    binder.page_count = max(binder.page_count, visible_pages(max_page))
+    session.flush()
 
 
 def listing(session, user: User) -> BindersPage:
@@ -110,8 +144,12 @@ def listing(session, user: User) -> BindersPage:
         .order_by(Binder.display_order, Binder.id)
     ).all()
     stats = _stats(session, user)
+    stickers = _stickers(session, user, [binder.id for binder in binders])
     return BindersPage(
-        results=[_summary(binder, stats.get(binder.id)) for binder in binders],
+        results=[
+            _summary(binder, stats.get(binder.id), stickers.get(binder.id))
+            for binder in binders
+        ],
         total=len(binders),
     )
 
@@ -127,7 +165,11 @@ def detail(session, user: User, binder: Binder) -> BinderDetail:
         )
         .order_by(BinderPocket.page, BinderPocket.pocket)
     ).all()
-    summary = _summary(binder, _stats(session, user, [binder.id]).get(binder.id))
+    summary = _summary(
+        binder,
+        _stats(session, user, [binder.id]).get(binder.id),
+        _stickers(session, user, [binder.id]).get(binder.id),
+    )
     return BinderDetail(
         **summary.model_dump(),
         pockets=[
@@ -361,7 +403,78 @@ def update_binder(
         setattr(binder, key, value)
     session.flush()
     session.refresh(binder)
-    result = _summary(binder, _stats(session, user, [binder.id]).get(binder.id))
+    result = _summary(
+        binder,
+        _stats(session, user, [binder.id]).get(binder.id),
+        _stickers(session, user, [binder.id]).get(binder.id),
+    )
+    session.commit()
+    return result
+
+
+@router.put("/{binder_id}/appearance", response_model=BinderSummary)
+def save_appearance(
+    binder_id: UUID,
+    payload: Appearance,
+    user: User = Depends(require_csrf),
+    session=Depends(database),
+):
+    """Replace the cover and every sticker in one transaction (owner lock)."""
+    lock_owner(session, user)
+    binder = owned_binder(session, user, binder_id)
+    binder.cover = payload.cover
+    session.execute(
+        delete(BinderSticker).where(
+            BinderSticker.binder_id == binder.id, BinderSticker.user_id == user.id
+        )
+    )
+    session.flush()
+    for order, sticker in enumerate(payload.stickers):
+        session.add(
+            BinderSticker(
+                user_id=user.id,
+                binder_id=binder.id,
+                display_order=order,
+                kind=sticker.kind,
+                species_id=sticker.species_id,
+                pixel_key=sticker.pixel_key,
+                x=Decimal(str(sticker.x)),
+                y=Decimal(str(sticker.y)),
+                rotation=Decimal(str(sticker.rotation)),
+                scale=Decimal(str(sticker.scale)),
+            )
+        )
+    binder.updated_at = func.now()
+    session.flush()
+    session.refresh(binder)
+    result = _summary(
+        binder,
+        _stats(session, user, [binder.id]).get(binder.id),
+        _stickers(session, user, [binder.id]).get(binder.id),
+    )
+    session.commit()
+    return result
+
+
+@router.post("/{binder_id}/pages", response_model=BinderSummary)
+def add_pages(
+    binder_id: UUID,
+    user: User = Depends(require_csrf),
+    session=Depends(database),
+):
+    """Add two pages ("+ Agregar hojas"): even, saved when empty, never fewer."""
+    lock_owner(session, user)
+    binder = owned_binder(session, user, binder_id)
+    if binder.page_count >= MAX_PAGES:
+        raise HTTPException(409, detail="binder_max_pages")
+    binder.page_count = min(MAX_PAGES, binder.page_count + 2)
+    session.flush()
+    session.refresh(binder)
+    result = _summary(
+        binder,
+        _stats(session, user, [binder.id]).get(binder.id),
+        _stickers(session, user, [binder.id]).get(binder.id),
+    )
     session.commit()
     return result
 
@@ -405,6 +518,7 @@ def store_copy(
     if target is None:
         raise HTTPException(409, detail="binder_full")
     moved_from = put_copy(session, user, binder, *target, payload.copy_id)
+    grow_pages(session, binder, target[0])
     result = stored(session, user, binder, *target, moved_from)
     session.commit()
     return result
@@ -427,6 +541,7 @@ def place_copy(
     if occupant is not None and occupant.copy_id != payload.copy_id:
         raise HTTPException(409, detail="pocket_occupied")
     moved_from = put_copy(session, user, binder, page, pocket, payload.copy_id)
+    grow_pages(session, binder, page)
     result = stored(session, user, binder, page, pocket, moved_from)
     session.commit()
     return result

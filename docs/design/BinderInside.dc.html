@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Dentro de la carpeta</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=Silkscreen&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3FD0E0}a:hover{color:#8BE6F0}
+@keyframes pv-insert{0%{transform:translateY(-105%) rotate(-2deg)}80%{transform:translateY(1%) rotate(0)}100%{transform:none}}
+@keyframes pv-pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.pv-insert{animation:pv-insert 520ms cubic-bezier(.22,.61,.36,1) both}
+.pv-pop{animation:pv-pop 140ms ease-out both}
+.pv-slot{transition:transform 160ms ease-out}
+.pv-slot:hover{transform:translateY(-2px)}
+@media (prefers-reduced-motion: reduce){.pv-insert,.pv-pop{animation:none}.pv-slot{transition:none}.pv-slot:hover{transform:none}}
+</style>
+</helmet>
+<div style="width: 1280px; height: 820px; box-sizing: border-box; background: #0B0D10; color: #F2F5F7; font-family: Inter, system-ui, sans-serif; padding: 18px 32px 16px; display: flex; flex-direction: column; gap: 12px">
+
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <a href="#" aria-label="Volver a mis carpetas" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #F2F5F7; border: 1px solid #2A323C">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+      </a>
+      <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700">Tesoros</h1>
+      <span style="font-size: 13px; color: #9AA6B2">{{ count }} cartas · <span style="color: #F2C94C">$18.022 CLP</span></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <span style="font-family: Silkscreen, monospace; font-size: 11px; color: #9AA6B2; letter-spacing: 0.08em">PÁGS. 1–2 DE 4</span>
+      <button type="button" style="min-height: 40px; padding: 0 14px; border: 1px solid #2A323C; background: #14181D; color: #F2F5F7; font: 600 13px Inter, sans-serif">Portada</button>
+    </div>
+  </div>
+
+  <div style="flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 18px">
+    <button type="button" aria-label="Página anterior" style="width: 44px; height: 88px; border: 1px solid #2A323C; background: #14181D; color: #9AA6B2; font-size: 18px">◀</button>
+
+    <div style="display: flex; align-items: stretch; padding: 14px; background: linear-gradient(150deg,#1B2E3A,#0F1A22); border-radius: 10px; box-shadow: 0 30px 70px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(63,208,224,0.15)">
+      <sc-for list="{{ pages }}" as="p" hint-placeholder-count="2">
+        <div style="display: flex; align-items: stretch">
+          <sc-if value="{{ p.isRight }}" hint-placeholder-val="{{ false }}">
+            <div aria-hidden="true" style="width: 46px; background: linear-gradient(90deg,#0A1117,#16222C 50%,#0A1117); display: flex; flex-direction: column; justify-content: space-evenly; align-items: center">
+              <span style="width: 26px; height: 26px; border-radius: 50%; border: 4px solid #8592A0; box-shadow: inset 0 0 0 2px #0A1117"></span>
+              <span style="width: 26px; height: 26px; border-radius: 50%; border: 4px solid #8592A0; box-shadow: inset 0 0 0 2px #0A1117"></span>
+              <span style="width: 26px; height: 26px; border-radius: 50%; border: 4px solid #8592A0; box-shadow: inset 0 0 0 2px #0A1117"></span>
+            </div>
+          </sc-if>
+          <div style="background: #161A1F; padding: 14px; display: grid; grid-template-columns: repeat(3, 118px); grid-auto-rows: 165px; gap: 9px; border-radius: {{ p.radius }}; background-image: {{ p.shade }}; position: relative">
+            <sc-for list="{{ p.slots }}" as="s" hint-placeholder-count="9">
+              <div style="position: relative">
+                <button type="button" class="pv-slot" onClick="{{ s.select }}" aria-label="{{ s.label }}" aria-pressed="{{ s.pressed }}" style="width: 118px; height: 165px; padding: 0; border-radius: 5px; border: {{ s.border }}; background: rgba(255,255,255,0.03); position: relative; overflow: visible; cursor: pointer; display: block">
+                  <sc-if value="{{ s.filled }}" hint-placeholder-val="{{ false }}">
+                    <div class="{{ s.cls }}" style="position: absolute; inset: 4px; border-radius: 4px; background: {{ s.bg }}; display: flex; flex-direction: column; justify-content: flex-end; padding: 6px; box-sizing: border-box; text-align: left">
+                      <span style="font-size: 10px; color: #F2F5F7; background: rgba(11,13,16,0.7); padding: 2px 4px">{{ s.name }}</span>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ s.empty }}" hint-placeholder-val="{{ true }}">
+                    <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: Silkscreen, monospace; font-size: 11px; color: #4A5563">{{ s.n }}</span>
+                  </sc-if>
+                  <span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 8%; bottom: 0; border-top: 1px solid rgba(255,255,255,0.2); background: linear-gradient(170deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 45%, rgba(255,255,255,0.06)); border-radius: 0 0 5px 5px; pointer-events: none"></span>
+                </button>
+
+                <sc-if value="{{ s.menu }}" hint-placeholder-val="{{ false }}">
+                  <div class="pv-pop" role="menu" aria-label="{{ s.menuLabel }}" style="position: absolute; top: 8px; {{ s.side }}; z-index: 20; width: 190px; background: #F2F5F7; color: #0B0D10; box-shadow: 0 16px 40px rgba(0,0,0,0.55); padding: 6px; display: flex; flex-direction: column">
+                    <div style="padding: 8px 10px 6px; display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #D5DAE0">
+                      <span style="font-weight: 700; font-size: 13px">{{ s.menuTitle }}</span>
+                      <span style="font-size: 11px; color: #4A5563">{{ s.menuSub }}</span>
+                    </div>
+                    <sc-for list="{{ s.actions }}" as="a" hint-placeholder-count="4">
+                      <button type="button" role="menuitem" onClick="{{ a.run }}" style="min-height: 38px; text-align: left; padding: 0 10px; border: 0; background: transparent; color: {{ a.color }}; font: 600 13px Inter, sans-serif; cursor: pointer">{{ a.label }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <button type="button" aria-label="Página siguiente" style="width: 44px; height: 88px; border: 1px solid #2A323C; background: #14181D; color: #9AA6B2; font-size: 18px">▶</button>
+  </div>
+
+  <div style="background: #14181D; border-top: 1px solid #5A4A1E; padding: 10px 14px; display: flex; align-items: center; gap: 14px">
+    <div style="display: flex; flex-direction: column; gap: 2px; flex: 0 0 auto">
+      <span style="color: #F2C94C; font-weight: 600; font-size: 13px">Sin carpeta ({{ trayCount }})</span>
+      <span style="color: #9AA6B2; font-size: 12px">{{ trayHint }}</span>
+    </div>
+    <div style="display: flex; gap: 10px; overflow: hidden">
+      <sc-for list="{{ tray }}" as="t" hint-placeholder-count="3">
+        <button type="button" onClick="{{ t.place }}" aria-label="{{ t.label }}" style="width: 44px; height: 62px; padding: 0; border: {{ t.border }}; border-radius: 3px; background: {{ t.bg }}; cursor: pointer; flex: 0 0 auto"></button>
+      </sc-for>
+      <sc-if value="{{ trayEmpty }}" hint-placeholder-val="{{ false }}">
+        <span style="font-size: 13px; color: #9AA6B2; align-self: center">Todo guardado ✓</span>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const cards = st.cards || [
+      { name: 'Armarouge', bg: 'linear-gradient(160deg,#8A3A2A,#3A1A1A)', price: '—' },
+      { name: 'Cranidos', bg: 'linear-gradient(160deg,#7A5A26,#3A2A18)', price: '—' },
+      { name: 'Toxtricity', bg: 'linear-gradient(160deg,#4A3A7A,#22183A)', price: '$1.755' },
+      { name: 'Eevee', bg: 'linear-gradient(160deg,#6A8A5A,#2A3A22)', price: '$34' },
+      { name: 'Scraggy', bg: 'linear-gradient(160deg,#8A7A3A,#3A3218)', price: '$13.584' },
+      { name: 'Serperior ex', bg: 'linear-gradient(160deg,#2E6A4A,#16301F)', price: '—' },
+      { name: 'Armarouge', bg: 'linear-gradient(160deg,#8A3A2A,#3A1A1A)', price: '$2.627' },
+      { name: 'Scraggy', bg: 'linear-gradient(160deg,#6A6A2A,#2E2E14)', price: '$22' },
+      { name: 'Shaymin', bg: 'linear-gradient(160deg,#5A8A3A,#24381A)', price: '—' },
+      { name: 'Mega-Golisopod ex', bg: 'linear-gradient(160deg,#3A5A4A,#1A2A22)', price: '—' }
+    ];
+    const pending = st.pending || [
+      { name: 'Zigzagoon de Galar', bg: 'linear-gradient(160deg,#28485A,#18242E)' },
+      { name: 'Misdreavus', bg: 'linear-gradient(160deg,#6A3F78,#2E2140)' },
+      { name: 'Palafin', bg: 'linear-gradient(160deg,#245A8A,#16283E)' }
+    ];
+    const sel = st.sel ?? null;
+    const lastPlaced = st.last ?? -1;
+    const close = () => this.setState({ sel: null });
+    const page = (n, isRight) => {
+      const slots = [];
+      for (let k = 0; k < 9; k++) {
+        const i = (n - 1) * 9 + k;
+        const c = cards[i];
+        const isSel = sel === i;
+        const actions = c ? [
+          { label: 'Ver carta', color: '#0B0D10', run: close },
+          { label: 'Mover a otro bolsillo', color: '#0B0D10', run: close },
+          { label: 'Mover a otra carpeta', color: '#0B0D10', run: close },
+          { label: 'Sacar de la carpeta', color: '#B3261E', run: () => {
+            const next = cards.slice(); next[i] = undefined;
+            this.setState({ cards: next, pending: pending.concat({ name: c.name, bg: c.bg }), sel: null });
+          } }
+        ] : [
+          { label: 'Elegir de la bandeja ↓', color: '#0B0D10', run: () => this.setState({ sel: i, picking: true }) },
+          { label: 'Cancelar', color: '#4A5563', run: close }
+        ];
+        slots.push({
+          n: k + 1,
+          filled: !!c, empty: !c,
+          name: c ? c.name : '', bg: c ? c.bg : 'transparent',
+          cls: i === lastPlaced ? 'pv-insert' : '',
+          border: isSel ? '2px solid #3FD0E0' : '1px solid #262D35',
+          pressed: isSel ? 'true' : 'false',
+          label: 'Página ' + n + ', bolsillo ' + (k + 1) + (c ? ': ' + c.name : ': vacío'),
+          select: () => this.setState({ sel: isSel ? null : i, picking: false }),
+          menu: isSel,
+          side: isRight || k % 3 === 2 ? 'right: calc(100% + 8px)' : 'left: calc(100% + 8px)',
+          menuLabel: 'Acciones del bolsillo',
+          menuTitle: c ? c.name : 'Bolsillo ' + (k + 1) + ' vacío',
+          menuSub: c ? 'Pág. ' + n + ' · bolsillo ' + (k + 1) + ' · ' + c.price : 'Pág. ' + n,
+          actions
+        });
+      }
+      return {
+        isRight, slots,
+        radius: isRight ? '0 6px 6px 0' : '6px 0 0 6px',
+        shade: isRight ? 'linear-gradient(90deg, rgba(0,0,0,0.35), transparent 7%)' : 'linear-gradient(270deg, rgba(0,0,0,0.35), transparent 7%)'
+      };
+    };
+    const firstFree = () => { for (let i = 0; i < 18; i++) if (!cards[i]) return i; return -1; };
+    const target = st.picking && sel !== null && !cards[sel] ? sel : firstFree();
+    const tray = pending.map((t, j) => ({
+      ...t,
+      label: 'Guardar ' + t.name,
+      border: st.picking ? '2px solid #3FD0E0' : '1px solid #2A323C',
+      place: () => {
+        if (target < 0) return;
+        const next = cards.slice(); next[target] = { name: t.name, bg: t.bg, price: '—' };
+        this.setState({ cards: next, pending: pending.filter((_, x) => x !== j), sel: null, picking: false, last: target });
+      }
+    }));
+    return {
+      pages: [page(1, false), page(2, true)],
+      count: cards.filter(Boolean).length,
+      tray,
+      trayCount: tray.length,
+      trayEmpty: tray.length === 0,
+      trayHint: st.picking ? 'Elige la carta para el bolsillo seleccionado' : 'Toca una para guardarla en el siguiente bolsillo libre'
+    };
+  }
+}
+</script>
+</body>
+</html>

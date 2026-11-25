@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../auth/context";
 import { BindersError } from "../services/binders";
 
-export type BinderErrorKey = "pocket_occupied" | "binder_full" | "pocket_changed" | "binder_limit_reached" | "missing" | "expired" | "error";
+export type BinderErrorKey = "pocket_occupied" | "binder_full" | "pocket_changed" | "binder_limit_reached" | "binder_max_pages" | "invalid" | "missing" | "expired" | "error";
 export type MutationOutcome<T> = { ok: true; value: T } | { ok: false; error: BinderErrorKey };
-const CONFLICTS: BinderErrorKey[] = ["pocket_occupied", "binder_full", "pocket_changed", "binder_limit_reached"];
+const CONFLICTS: BinderErrorKey[] = ["pocket_occupied", "binder_full", "pocket_changed", "binder_limit_reached", "binder_max_pages"];
 
 /**
  * One binder write at a time, with the session's CSRF token. Pending writes abort on
@@ -34,7 +34,7 @@ export function useBinderMutations() {
       const status = error instanceof BindersError ? error.status : 0;
       const detail = error instanceof BindersError ? error.detail : null;
       if (status === 401) retrySession();
-      const key: BinderErrorKey = status === 409 ? (CONFLICTS.find((code) => code === detail) ?? "pocket_changed")
+      const key: BinderErrorKey = status === 422 ? "invalid" : status === 409 ? (CONFLICTS.find((code) => code === detail) ?? "pocket_changed")
         : status === 404 ? "missing" : status === 401 || status === 403 ? "expired" : "error";
       return { ok: false, error: key };
     } finally {

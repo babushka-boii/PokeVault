@@ -185,7 +185,14 @@ class Binder(Base):
             name="ck_binders_name",
         ),
         CheckConstraint("display_order >= 0", name="ck_binders_order"),
-        CheckConstraint("cover IN ('noir')", name="ck_binders_cover"),
+        CheckConstraint(
+            "cover IN ('noir', 'brown_leather', 'metallic', 'holographic', 'white')",
+            name="ck_binders_cover",
+        ),
+        CheckConstraint(
+            "page_count BETWEEN 2 AND 40 AND page_count % 2 = 0",
+            name="ck_binders_page_count",
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
@@ -197,6 +204,10 @@ class Binder(Base):
     cover: Mapped[str] = mapped_column(
         String(16), nullable=False, default="noir", server_default="noir"
     )
+    # Stored (even, 2-40): pages added with "+ Agregar hojas" stay even when empty.
+    page_count: Mapped[int] = mapped_column(
+        SmallInteger, nullable=False, default=2, server_default="2"
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
@@ -205,6 +216,53 @@ class Binder(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    )
+
+
+class BinderSticker(Base):
+    """A sticker on a binder's cover: a Pokémon species or a fixed pixel design."""
+
+    __tablename__ = "binder_stickers"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "binder_id"],
+            ["binders.user_id", "binders.id"],
+            ondelete="CASCADE",
+            name="fk_binder_sticker_owned_binder",
+        ),
+        UniqueConstraint("binder_id", "display_order", name="uq_binder_stickers_order"),
+        CheckConstraint("kind IN ('pokemon', 'pixel')", name="ck_binder_stickers_kind"),
+        CheckConstraint(
+            "(kind = 'pokemon' AND species_id BETWEEN 1 AND 1025 AND pixel_key IS NULL)"
+            " OR (kind = 'pixel' AND species_id IS NULL AND pixel_key IN "
+            "('star', 'bolt', 'heart', 'creature', 'circle'))",
+            name="ck_binder_stickers_reference",
+        ),
+        CheckConstraint("x BETWEEN 0 AND 100", name="ck_binder_stickers_x"),
+        CheckConstraint("y BETWEEN 0 AND 100", name="ck_binder_stickers_y"),
+        CheckConstraint(
+            "rotation BETWEEN -180 AND 180", name="ck_binder_stickers_rotation"
+        ),
+        CheckConstraint("scale BETWEEN 0.5 AND 2", name="ck_binder_stickers_scale"),
+        CheckConstraint(
+            "display_order BETWEEN 0 AND 23", name="ck_binder_stickers_display_order"
+        ),
+        Index("ix_binder_stickers_owner_binder", "user_id", "binder_id"),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    binder_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    kind: Mapped[str] = mapped_column(String(8), nullable=False)
+    species_id: Mapped[int | None] = mapped_column(SmallInteger)
+    pixel_key: Mapped[str | None] = mapped_column(String(16))
+    x: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
+    y: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
+    rotation: Mapped[Decimal] = mapped_column(Numeric(5, 1), nullable=False)
+    scale: Mapped[Decimal] = mapped_column(Numeric(3, 2), nullable=False)
+    display_order: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
 

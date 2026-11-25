@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Personalizar portada</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=Silkscreen&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3FD0E0}a:hover{color:#8BE6F0}
+@keyframes pv-stick{0%{transform:scale(1.6) rotate(var(--r));opacity:0}60%{transform:scale(.92) rotate(var(--r));opacity:1}100%{transform:scale(1) rotate(var(--r))}}
+.pv-stick{animation:pv-stick 320ms cubic-bezier(.2,.8,.2,1) both}
+@media (prefers-reduced-motion: reduce){.pv-stick{animation:none}}
+</style>
+</helmet>
+<div style="width: 1280px; height: 820px; box-sizing: border-box; background: #0B0D10; color: #F2F5F7; font-family: Inter, system-ui, sans-serif; padding: 32px 40px; display: flex; gap: 48px">
+
+  <div style="flex: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 55%, #161C22, #0B0D10 70%)">
+    <div style="position: relative; width: 380px; height: 500px; border-radius: 8px 16px 16px 8px; background: {{ cover }}; box-shadow: inset 20px 0 0 rgba(0,0,0,0.35), 0 30px 60px rgba(0,0,0,0.6); border: 1px solid #2A323C; overflow: hidden">
+      <div aria-hidden="true" style="position: absolute; inset: 16px 16px 16px 36px; border: {{ stitch }}; border-radius: 6px"></div>
+      <sc-for list="{{ placed }}" as="s" hint-placeholder-count="2">
+        <div class="pv-stick" aria-hidden="true" style="position: absolute; left: {{ s.x }}; top: {{ s.y }}; width: {{ s.size }}; height: {{ s.size }}; --r: {{ s.r }}; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5))">
+          <svg width="100%" height="100%" viewBox="0 0 10 10" shape-rendering="crispEdges" fill="{{ s.color }}"><path d="{{ s.path }}"></path></svg>
+        </div>
+      </sc-for>
+      <div style="position: absolute; left: 44px; right: 24px; bottom: 28px; background: rgba(11,13,16,0.8); padding: 12px 14px">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px">Tesoros</div>
+        <div style="font-size: 12px; color: #9AA6B2">Naim Salas · desde 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <aside style="flex: 0 0 400px; display: flex; flex-direction: column; gap: 24px; justify-content: center">
+    <h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700">Personalizar portada</h1>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="binder-name" style="font-size: 13px; font-weight: 600">Nombre</label>
+      <input id="binder-name" value="Tesoros" style="min-height: 44px; padding: 0 12px; background: #0E1115; border: 1px solid #64717F; color: #F2F5F7; font: 15px Inter, sans-serif">
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="font-size: 13px; font-weight: 600">Portada</div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{ covers }}" as="c" hint-placeholder-count="5">
+          <button type="button" onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" aria-label="{{ c.label }}" style="aspect-ratio: 3 / 4; border-radius: 4px; background: {{ c.bg }}; border: {{ c.border }}; cursor: pointer"></button>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: #9AA6B2">{{ coverName }}</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-size: 13px; font-weight: 600">Stickers</span>
+        <button type="button" onClick="{{ clear }}" style="min-height: 32px; border: 0; background: transparent; color: #9AA6B2; font: 600 12px Inter, sans-serif">Quitar todos</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 12px; background: #14181D; border: 1px solid #222A33">
+        <sc-for list="{{ sheet }}" as="k" hint-placeholder-count="5">
+          <button type="button" onClick="{{ k.add }}" aria-label="{{ k.label }}" style="aspect-ratio: 1; background: #0E1115; border: 1px solid #2A323C; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="60%" height="60%" viewBox="0 0 10 10" aria-hidden="true" shape-rendering="crispEdges" fill="{{ k.color }}"><path d="{{ k.path }}"></path></svg>
+          </button>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: #8592A0">Toca para pegar; en la app los arrastras donde quieras. También podrás usar sprites de tus Pokémon.</div>
+    </div>
+
+    <button type="button" style="min-height: 50px; border: 0; background: #3FD0E0; color: #0B0D10; font: 600 15px Inter, sans-serif; clip-path: polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)">Guardar portada</button>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const SH = {
+      star: { label: 'Estrella', color: '#F2C94C', path: 'M4 0h2v3h4v2l-3 2 1 3-3-2-3 2 1-3-3-2V3h4z' },
+      bolt: { label: 'Rayo', color: '#3FD0E0', path: 'M5 0h3L6 4h3L3 10l1-5H1z' },
+      heart: { label: 'Corazón', color: '#E05C9E', path: 'M1 1h3v1h2V1h3v4L5 9 1 5z' },
+      blob: { label: 'Criatura pixel', color: '#E8C35A', path: 'M3 1h4v1h1v1h1v3H8v1H7v2H6V7H4v2H3V7H2V6H1V3h1V2h1z' },
+      ball: { label: 'Círculo', color: '#F2F5F7', path: 'M3 0h4v1h2v2h1v4H9v2H7v1H3V9H1V7H0V3h1V1h2z' }
+    };
+    const spots = [
+      { x: '56%', y: '8%', r: '12deg', size: '70px' }, { x: '16%', y: '22%', r: '-10deg', size: '86px' },
+      { x: '62%', y: '36%', r: '-6deg', size: '58px' }, { x: '24%', y: '50%', r: '8deg', size: '52px' },
+      { x: '58%', y: '58%', r: '16deg', size: '48px' }, { x: '40%', y: '6%', r: '-18deg', size: '40px' }
+    ];
+    const placedIds = st.stickers || ['star', 'blob'];
+    const covers = [
+      { id: 'noir', label: 'Unova Noir', bg: 'linear-gradient(150deg,#1B2E3A,#0F1A22)', stitch: '1px dashed rgba(63,208,224,0.45)' },
+      { id: 'leather', label: 'Cuero café', bg: 'linear-gradient(150deg,#3A2418,#21140D)', stitch: '1px dashed rgba(242,201,76,0.4)' },
+      { id: 'metal', label: 'Metálico', bg: 'linear-gradient(160deg,#5A626B,#2A3036 45%,#4A525B)', stitch: '1px solid rgba(255,255,255,0.2)' },
+      { id: 'holo', label: 'Holográfico', bg: 'conic-gradient(from 210deg at 70% 30%, #2B3E52, #4A3C6A, #2E5F4F, #3A4A2A, #2B3E52)', stitch: '1px solid rgba(255,255,255,0.18)' },
+      { id: 'blanco', label: 'Blanco', bg: 'linear-gradient(150deg,#D9DEE3,#AEB6BE)', stitch: '1px dashed rgba(11,13,16,0.35)' }
+    ];
+    const coverId = st.cover || 'noir';
+    const cover = covers.find((c) => c.id === coverId);
+    return {
+      cover: cover.bg,
+      stitch: cover.stitch,
+      coverName: cover.label,
+      covers: covers.map((c) => ({ ...c, pressed: c.id === coverId ? 'true' : 'false', border: c.id === coverId ? '2px solid #3FD0E0' : '1px solid #2A323C', pick: () => this.setState({ cover: c.id }) })),
+      placed: placedIds.slice(0, spots.length).map((id, i) => ({ ...SH[id], ...spots[i] })),
+      sheet: Object.keys(SH).map((id) => ({ ...SH[id], add: () => this.setState({ stickers: placedIds.concat(id).slice(-spots.length) }) })),
+      clear: () => this.setState({ stickers: [] })
+    };
+  }
+}
+</script>
+</body>
+</html>

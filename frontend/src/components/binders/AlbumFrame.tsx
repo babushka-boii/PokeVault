@@ -1,9 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import type { Cover } from "../../services/binders";
 import { fitAlbum, swipeDirection } from "./albumLayout";
 
 /** Measures the available workspace; small windows retain readable pockets and scroll. */
-export function AlbumFrame({ mobile, turn, swipeEnabled, onSwipe, children }: {
-  mobile: boolean; turn: "next" | "prev" | null; children: ReactNode;
+export function AlbumFrame({ mobile, turn, swipeEnabled, onSwipe, cover = "noir", children }: {
+  mobile: boolean; cover?: Cover; turn: "next" | "prev" | null; children: ReactNode;
   /** Off while a sheet is open or a copy is being written. */
   swipeEnabled: boolean; onSwipe: (direction: 1 | -1) => void;
 }) {
@@ -66,7 +67,7 @@ export function AlbumFrame({ mobile, turn, swipeEnabled, onSwipe, children }: {
     return () => { observer?.disconnect(); window.removeEventListener("resize", measure); };
   }, [mobile]);
   const fit = fitAlbum({ width: dimensions.width, height: dimensions.height, pages: mobile ? 1 : 2, gap: 8, pagePadding: 12, spineWidth: 28, framePadding: 12, captionHeight: 24, minSleeveWidth: 140 });
-  return <div ref={host} className="pv-album" data-overflow={fit.overflow || undefined}
+  return <div ref={host} className="pv-album" data-cover={cover} data-overflow={fit.overflow || undefined}
     onPointerDown={down} onPointerUp={up} onPointerCancel={cancel}
     style={{ "--pv-album-sleeve": `${fit.sleeveWidth}px` } as CSSProperties}>
     <div className="pv-spread" data-turn={turn ?? undefined}>
