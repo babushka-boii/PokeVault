@@ -20,14 +20,16 @@ from app.api.prices import (
     user_currency,
 )
 from app.auth.sessions import require_csrf, require_current_user
-from app.cards.schemas import IDENTIFIER_PATTERN
+from app.cards.schemas import IDENTIFIER_PATTERN, Identifier
 from app.db.models import CardFavorite, InventoryCopy, User
 from app.favorites.schemas import (
     MAX_FAVORITES,
     MAX_LISTED,
+    MAX_STATUS,
     FavoriteCard,
     FavoriteCards,
     FavoriteState,
+    FavoriteStatus,
 )
 from app.prices.service import CopyRef, PriceService
 
@@ -134,6 +136,24 @@ async def favorite_cards(
     return FavoriteCards(
         currency=chosen, total=total, results=cards, rates=result.rates
     )
+
+
+@router.get("/status", response_model=FavoriteStatus)
+def favorite_status(
+    card_id: Annotated[list[Identifier], Query(min_length=1, max_length=MAX_STATUS)],
+    user: User = Depends(require_current_user),
+    session=Depends(database),
+) -> FavoriteStatus:
+    """Which of these catalog cards the user starred: one request for a row of cards."""
+    asked = list(dict.fromkeys(card_id))
+    starred = set(
+        session.scalars(
+            select(CardFavorite.card_id).where(
+                CardFavorite.user_id == user.id, CardFavorite.card_id.in_(asked)
+            )
+        )
+    )
+    return FavoriteStatus(card_ids=[item for item in asked if item in starred])
 
 
 @router.get("/{card_id}", response_model=FavoriteState)

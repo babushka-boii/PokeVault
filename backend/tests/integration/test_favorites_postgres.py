@@ -94,3 +94,28 @@ def test_the_limit_holds_under_parallel_writes(favorites_database):
         app.state.session_factory.kw["bind"].dispose()
     assert statuses == [200, 409, 409]
     assert len(stored(factory, ash)) == 500
+
+
+def test_the_batch_status_only_sees_the_callers_stars(favorites_database):
+    factory, _ = favorites_database
+    ash = seed_owner(factory, copies=1, binders=0)
+    misty = seed_owner(factory, copies=1, binders=0)
+    with factory.begin() as session:
+        for owner, card in ((ash, "base1-4"), (misty, "base1-5"), (misty, "base1-4")):
+            session.execute(
+                text("INSERT INTO card_favorites (user_id, card_id) VALUES (:u, :c)"),
+                {"u": owner["user_id"], "c": card},
+            )
+    app = application(factory)
+    asked = {"card_id": ["base1-5", "base1-4", "base1-6"]}
+    try:
+        with client_for(app, ash) as client:
+            assert client.get(f"{PATH}/status", params=asked).json() == {
+                "card_ids": ["base1-4"]
+            }
+        with client_for(app, misty) as client:
+            assert client.get(f"{PATH}/status", params=asked).json() == {
+                "card_ids": ["base1-5", "base1-4"]
+            }
+    finally:
+        app.state.session_factory.kw["bind"].dispose()

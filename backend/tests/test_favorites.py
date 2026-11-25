@@ -219,3 +219,50 @@ def test_favourite_cards_can_be_priced_in_usd(home):
     assert usd["currency"] == "USD"
     assert usd["results"][0]["price"]["amount"] == "1.04"  # 0.83 EUR / 0.8
     assert client.get(f"{PATH}/cards?currency=EUR").status_code == 422
+
+
+def test_the_status_of_many_cards_comes_in_one_request(home):
+    client, factory, _, users, _, _ = home
+    headers = identity(client, "ash")
+    for card_id in ("base1-4", "me02.5-261"):
+        client.put(f"{PATH}/{card_id}", headers=headers)
+    misty = identity(client, "misty")
+    client.put(f"{PATH}/base1-5", headers=misty)
+    identity(client, "ash")
+    asked = ["base1-4", "base1-5", "me02.5-261", "zz9-9", "base1-4"]
+    response = client.get(f"{PATH}/status", params={"card_id": asked})
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"
+    # Only this user's stars, each id once, in the order asked.
+    assert response.json() == {"card_ids": ["base1-4", "me02.5-261"]}
+    assert client.get(f"{PATH}/status", params={"card_id": ["zz9-9"]}).json() == {
+        "card_ids": []
+    }
+
+
+def test_the_status_batch_is_validated_and_private(home):
+    client, _, _, _, provider, _ = home
+    identity(client, "ash")
+    assert client.get(f"{PATH}/status").status_code == 422
+    assert (
+        client.get(f"{PATH}/status", params={"card_id": ["bad id"]}).status_code == 422
+    )
+    assert (
+        client.get(
+            f"{PATH}/status", params={"card_id": [f"c-{n}" for n in range(51)]}
+        ).status_code
+        == 422
+    )
+    assert (
+        client.get(
+            f"{PATH}/status", params={"card_id": [f"c-{n}" for n in range(50)]}
+        ).status_code
+        == 200
+    )
+    assert provider.calls == []
+    for name in (None, "expired", "forged"):
+        identity(client, name)
+        assert (
+            client.get(f"{PATH}/status", params={"card_id": ["base1-4"]}).status_code
+            == 401
+        )

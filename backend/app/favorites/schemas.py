@@ -8,6 +8,7 @@ from app.prices.schemas import NoPriceReason
 
 MAX_FAVORITES = 500
 MAX_LISTED = 12
+MAX_STATUS = 50
 
 
 class FavoriteState(BaseModel):
@@ -27,3 +28,8 @@ class FavoriteCards(BaseModel):
     total: int
     results: list[FavoriteCard]
     rates: RatesInfo
+
+
+class FavoriteStatus(BaseModel):
+    # The asked-for cards that are starred, once each, in the order they were asked.
+    card_ids: list[Identifier]
