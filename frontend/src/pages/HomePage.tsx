@@ -5,6 +5,7 @@ import { useHistory } from "../components/prices/useHistory";
 import { GuestHome } from "../components/home/GuestHome";
 import { HomeGuide } from "../components/home/HomeGuide";
 import { CardCarousel, CAROUSEL_SIZE } from "../components/home/CardCarousel";
+import { ValueChart } from "../components/charts/ValueChart";
 import { BinderShelf } from "../components/home/BinderShelf";
 import { ScannerCard } from "../components/home/ScannerCard";
 import { SetsProgress } from "../components/home/SetsProgress";
@@ -28,6 +29,7 @@ function SignedInHome() {
       <CardCarousel valuation={valuation} />
       <BinderShelf />
       <SetsProgress />
+      <ValueChart shared={history} />
     </div>
     <SystemStatusFooter />
   </>;

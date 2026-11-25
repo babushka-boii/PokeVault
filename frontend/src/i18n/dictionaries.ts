@@ -134,6 +134,12 @@ export const spanish = {
     loadError: "No se pudo cargar tu favorita.", saveError: "No se pudo guardar tu favorita. Inténtalo de nuevo.",
     full: "Llegaste al máximo de 500 cartas favoritas.", signIn: "Inicia sesión para marcar favoritas",
   },
+  chart: {
+    title: "Valor de tu colección", rangeLabel: "Período", range7: "7 d", range30: "30 d", range365: "1 año", loading: "Cargando el historial…",
+    error: "No se pudo cargar el historial de valor.", noRecords: "Aún no hay registros. Empezamos a registrar tu colección apenas tengas cartas con precio.",
+    noPeriodRecords: "No hay registros con valor en {currency} para este período.", startedOn: "Empezamos a registrar tu colección el {day}. Vuelve mañana para ver el gráfico.",
+    summary: "Del {from} al {to}: de {start} a {end}.", summaryOne: "{day}: {value}.", tableCaption: "Valor registrado de tu colección", day: "Día", value: "Valor",
+  },
   pokedex: {
     title: "Pokédex",
     description: "Explora los 1025 Pokémon de la Pokédex Nacional, 30 por página, o búscalos por nombre o número.",
@@ -485,6 +491,12 @@ export const english: Dictionary = {
     label: "Favourite", added: "Added to your favourites.", removed: "Removed from your favourites.",
     loadError: "Your favourite could not be loaded.", saveError: "Your favourite could not be saved. Try again.",
     full: "You reached the limit of 500 favourite cards.", signIn: "Sign in to star favourites",
+  },
+  chart: {
+    title: "Your collection value", rangeLabel: "Period", range7: "7 d", range30: "30 d", range365: "1 year", loading: "Loading the history…",
+    error: "The value history could not be loaded.", noRecords: "No records yet. We start recording your collection as soon as you have cards with a price.",
+    noPeriodRecords: "No records with a value in {currency} for this period.", startedOn: "We started recording your collection on {day}. Come back tomorrow to see the chart.",
+    summary: "From {from} to {to}: from {start} to {end}.", summaryOne: "{day}: {value}.", tableCaption: "Recorded value of your collection", day: "Day", value: "Value",
   },
   pokedex: {
     title: "Pokédex",
