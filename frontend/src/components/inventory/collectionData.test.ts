@@ -39,3 +39,14 @@ test("a failed name finishes without hiding successful cards or refetching them"
   await waitFor(() => expect(result.current.completed).toBe(1));
   expect(request).toHaveBeenCalledTimes(2);
 });
+
+test("never fetches a 101st distinct name", async () => {
+  const request = vi.spyOn(cards, "fetchTcgCard").mockImplementation(async (id) => ({ ...pikachuCard, id }));
+  const ids = Array.from({ length: 120 }, (_, i) => `sv1-${i}`);
+  const { result, unmount } = renderHook(() => useCollectionMetadata(ids, "es"));
+  await waitFor(() => expect(result.current.completed).toBe(100));
+  expect(request).toHaveBeenCalledTimes(100);
+  expect(Object.keys(result.current.cards)).toHaveLength(100);
+  expect(result.current.cards[ids[100]]).toBeUndefined();
+  unmount();
+});

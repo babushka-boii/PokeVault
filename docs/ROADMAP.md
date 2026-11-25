@@ -697,5 +697,6 @@ and the price note, rates attribution, currency switch and sign-out sit in a foo
 - [x] Point 1: whole-collection copy/distinct-card counts and reference value in the selected currency.
 - Existing inventory/valuation endpoints; no migration or new backend endpoint.
 - [x] Point 2: instant attribute chips and progressive name search over up to 500 copies / 100 distinct cards, four concurrent metadata reads shared with rendering.
-- Pending: point 3 ordering; points 4–7 presentation/pagination/states; backend metadata batch endpoint and highest-value ordering are deferred (no backend changes).
+- [x] Point 3: client ordering by most recent (default), localized name or expansion; unresolved names sort last and active edits keep their visible page stable.
+- Pending: points 4–7 (album/list view, richer pagination/scroll restoration, premium states); metadata batch endpoint and highest-value ordering remain deferred. No backend changes.
 - Safari acceptance pending: filtered totals, currency switching, price outage and 390 px layout.

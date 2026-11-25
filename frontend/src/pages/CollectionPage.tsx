@@ -12,6 +12,7 @@ import { useLocale } from "../i18n/LocaleProvider";
 import { type TcgCard } from "../services/cards";
 import { conditions, InventoryError, physicalLanguages, variants, type InventoryCopy } from "../services/inventory";
 import { fetchCopyPrices, PricesError, type CopyPrice } from "../services/prices";
+import { orderCopies, type CollectionOrder } from "../components/inventory/collectionOrder";
 import { fetchCollectionCopies, COLLECTION_COPY_LIMIT } from "../services/collectionCopies";
 import { useCollectionMetadata, COLLECTION_NAME_LIMIT } from "../components/inventory/useCollectionMetadata";
 import "../components/inventory/inventory.css";
@@ -54,6 +55,7 @@ function PersonalCollection() {
   const [params, setParams] = useSearchParams();
   const filters = { variant: params.get("variant") ?? "", condition: params.get("condition") ?? "", language: params.get("language") ?? "" };
   const query = params.get("q") ?? "";
+  const order: CollectionOrder = params.get("order") === "name" ? "name" : params.get("order") === "set" ? "set" : "recent";
   const [offset, setOffset] = useState(0);
   function updateFilter(key: string, value: string) {
     const next = new URLSearchParams(params);
@@ -61,6 +63,7 @@ function PersonalCollection() {
     setParams(next, { replace: true }); setOffset(0); setMessage(null);
   }
   const [summaryVersion, setSummaryVersion] = useState(0);
+  const [editingPage, setEditingPage] = useState<InventoryCopy[] | null>(null);
   const [activeCopy, setActiveCopy] = useState<string | null>(null);
   const [message, setMessage] = useState<"updated" | "removed" | null>(null);
   const request = useCallback((signal: AbortSignal) => fetchCollectionCopies(signal).catch((error: unknown) => {
@@ -70,6 +73,7 @@ function PersonalCollection() {
   const { state, retry } = useTcgResource("collection-copies", request);
   const changed = (next: "updated" | "removed") => {
     setSummaryVersion((version) => version + 1);
+    setEditingPage(null);
     setActiveCopy(null);
     setMessage(next);
     setOffset(0); retry();
@@ -82,7 +86,11 @@ function PersonalCollection() {
     && (!filters.language || copy.language === filters.language)
     && (!query.trim() || (metadata.cards[copy.card_id] && normalize(metadata.cards[copy.card_id].name).includes(normalize(query.trim())))));
   const pageOffset = Math.min(offset, Math.max(0, Math.ceil(matching.length / 24) - 1) * 24);
-  const visible = matching.slice(pageOffset, pageOffset + 24);
+  const ordered = orderCopies(matching, metadata.cards, order, locale);
+  const visible = editingPage ?? ordered.slice(pageOffset, pageOffset + 24);
+  function activateCopy(id: string | null) {
+    setEditingPage(id ? visible : null); setActiveCopy(id);
+  }
   const idKey = visible.map((copy) => copy.id).join(",");
   const priceState = usePagePrices(idKey);
   const priceData = priceState.state.kind === "loaded" ? priceState.state.data : null;
@@ -100,6 +108,9 @@ function PersonalCollection() {
             <button type="button" aria-pressed={!filters[key]} onClick={() => updateFilter(key, "")}>{text.all}</button>
             {options.map((value) => <button key={value} type="button" aria-pressed={filters[key] === value} onClick={() => updateFilter(key, filters[key] === value ? "" : value)}>{key === "variant" && value === "unknown" ? text.unknownChip : (labels as Record<string, string>)[value]}</button>)}
           </div></fieldset>)}
+        <label>{text.orderLabel}<select value={order} onChange={(e) => updateFilter("order", e.target.value)}>
+          <option value="recent">{text.orderRecent}</option><option value="name">{text.orderName}</option><option value="set">{text.orderSet}</option>
+        </select></label>
         <button type="button" onClick={() => { const next = new URLSearchParams(params); ["q", "variant", "condition", "language"].forEach((key) => next.delete(key)); setParams(next, { replace: true }); setOffset(0); setMessage(null); }}>{text.clear}</button>
       </fieldset>
       {metadata.completed < metadata.total && <p role="status">{text.namesLoading.replace("{done}", String(metadata.completed)).replace("{total}", String(metadata.total))}</p>}
@@ -116,7 +127,7 @@ function PersonalCollection() {
       {priceState.state.kind === "error" && <p className="price-meta">{dictionary.prices.error} <button type="button" onClick={priceState.retry}>{dictionary.prices.retry}</button></p>}
       {matching.length === 0 ? <p>{filtered ? text.noMatches : text.empty}</p> : <>
         <p className="inventory-hint">{text.physicalNote}</p>
-        {[...groups].map(([id, copies]) => <CardGroup key={id} id={id} card={metadata.cards[id]} copies={copies} quantity={matching.filter((copy) => copy.card_id === id).length} onChanged={changed} activeCopy={activeCopy} onActiveChange={setActiveCopy} prices={prices} pricesLoading={priceState.state.kind === "loading" && !!idKey} />)}
+        {[...groups].map(([id, copies]) => <CardGroup key={id} id={id} card={metadata.cards[id]} copies={copies} quantity={matching.filter((copy) => copy.card_id === id).length} onChanged={changed} activeCopy={activeCopy} onActiveChange={activateCopy} prices={prices} pricesLoading={priceState.state.kind === "loading" && !!idKey} />)}
         {priceData && priceData.results.some((row) => row.price?.amount != null) && <RatesAttribution rates={priceData.rates} />}
       </>}
       <div className="inventory-actions">

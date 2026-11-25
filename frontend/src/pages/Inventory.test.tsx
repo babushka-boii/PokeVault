@@ -232,3 +232,27 @@ test("searches loaded names immediately and shares metadata with displayed group
   expect(screen.getAllByRole("button", { name: "Editar copia" })).toHaveLength(2);
   expect(calls.mock.calls.filter(([url]) => url.includes("/cards/"))).toHaveLength(1);
 });
+
+test("orders the full loaded set by name or expansion and defaults to recent copies", async () => {
+  const older = { ...copy, card_id: "sv1-1", created_at: "2026-01-01T00:00:00Z" };
+  const newer = { ...copy, id: "00000000-0000-4000-8000-000000000002", card_id: "sv1-2", created_at: "2026-11-01T00:00:00Z" };
+  vi.stubGlobal("fetch", vi.fn(async (input: string) => {
+    if (input.includes("/auth/me")) return json(session);
+    if (input.includes("/cards/sv1-1")) return json({ ...pikachuCard, id: "sv1-1", name: "Abra", set: { ...pikachuCard.set, name: "Zeta" } });
+    if (input.includes("/cards/sv1-2")) return json({ ...pikachuCard, id: "sv1-2", name: "Zubat", set: { ...pikachuCard.set, name: "Alfa" } });
+    return json({ results: [newer, older], total: 2, quantities: { "sv1-1": 1, "sv1-2": 1 }, offset: 0, limit: 24 });
+  }));
+  const user = userEvent.setup();
+  render(<App initialEntries={["/collection"]} />);
+  await screen.findByRole("heading", { name: "Abra" });
+  const titles = () => screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
+  expect(titles()).toEqual(["Zubat", "Abra"]);
+  await user.selectOptions(screen.getByLabelText("Ordenar por"), "name");
+  expect(titles()).toEqual(["Abra", "Zubat"]);
+  await user.selectOptions(screen.getByLabelText("Ordenar por"), "set");
+  expect(titles()).toEqual(["Zubat", "Abra"]);
+  await user.click(screen.getAllByRole("button", { name: "Editar copia" })[0]);
+  expect(screen.getByLabelText("Ordenar por")).toBeDisabled();
+  await user.click(screen.getByRole("button", { name: "Cancelar" }));
+  expect(screen.getByLabelText("Ordenar por")).toBeEnabled();
+});

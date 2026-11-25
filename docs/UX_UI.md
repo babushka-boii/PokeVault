@@ -484,3 +484,4 @@ respects reduced motion (no drift, no hover growth, no chart fade). See `docs/HO
 - Reserved value space and static loading skeletons support mobile layouts and reduced motion; Safari review pending.
 
 Collection filters apply immediately; cyan chips include unknown variant. Search covers loaded names from the first 100 distinct cards among the first 500 copies, with progress, failure and limit notices. Metadata is shared with displayed cards, owner-scoped and aborted on exit.
+Ordering is applied before pagination across the bounded snapshot: recent by default, name or expansion as metadata arrives; unnamed cards remain last. Editing pins the current page to preserve the draft and focus.
