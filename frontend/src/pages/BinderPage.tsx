@@ -288,6 +288,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     <header className="pv-binder__head">
       <Link className="pv-binder__back" to="/binders">‹ {text.back}</Link>
       <h1 id="pv-binder-title">{binder.name}</h1>
+      <span className="pv-binder__pages">{label}</span>
       <span className="pv-binder__count">· {plural(text.cards, binder.copy_count)} ·</span>
       <BinderValue binderId={binder.id} version={binder.pockets.map((p) => `${key(p)}:${p.copy.id}`).join(",")} />
     </header>
@@ -311,16 +312,15 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     </div>}
     <div className="pv-binder__layout">
       <div className="pv-binder__main">
-        <nav className="pv-binder__pager" aria-label={label}>
-          <Button disabled={first <= 1} onClick={() => turnPage(-1)}>‹ {text.previous}</Button>
-          <span className="pv-binder__pages">{label}</span>
-          <Button disabled={first + (mobile ? 1 : 2) > pageCount} onClick={() => turnPage(1)}>{text.next} ›</Button>
-        </nav>
+        <div className="pv-binder__stage" role="group" aria-label={label}>
+        <Button className="pv-binder__arrow pv-binder__arrow--prev" aria-label={text.previous} disabled={first <= 1} onClick={() => turnPage(-1)}><span aria-hidden="true">‹</span></Button>
         <AlbumFrame mobile={mobile} turn={turn} swipeEnabled={!busy && !menu && !incoming} onSwipe={(direction) => { if (mobile) turnPage(direction); }}>
           {visible.map((page) => <PageGrid key={page} page={page} pockets={binder.pockets} cards={metadata.cards} prices={priceById}
             selected={selected} arrived={arrived} incoming={incoming} targetable={mode.kind === "move" && mode.binderId === binderId}
             onSelect={select} onActivate={activate} onTurn={turnPage} register={register} />)}
         </AlbumFrame>
+        <Button className="pv-binder__arrow pv-binder__arrow--next" aria-label={text.next} disabled={first + (mobile ? 1 : 2) > pageCount} onClick={() => turnPage(1)}><span aria-hidden="true">›</span></Button>
+        </div>
         <p className="pv-sr-only">{text.keyboard}</p>
       </div>
       <BinderTray mode={mode} binderId={binderId} busy={busy} version={trayVersion} consumed={consumed} onStore={(copy, origin) => void store(copy, origin)} onCancel={cancelMode} />

@@ -40,7 +40,7 @@ describe("spread and pockets", () => {
     await screen.findByRole("heading", { level: 1, name: "Kanto" });
     expect(screen.getAllByRole("grid")).toHaveLength(1);
     expect(screen.getByText("pág. 1 de 4")).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "Página siguiente ›" }));
+    await user.click(screen.getByRole("button", { name: "Página siguiente" }));
     expect(screen.getByRole("grid", { name: "Página 2" })).toBeInTheDocument();
     const spread = document.querySelector(".pv-spread")!;
     expect(spread).toHaveAttribute("data-turn", "next");
@@ -137,6 +137,27 @@ describe("compact header and folding tray", () => {
     expect(tray).toHaveAttribute("data-open", "true");
     expect(within(tray).getByRole("button", { name: "Plegar la bandeja" })).toBeDisabled();
     expect(await within(tray).findByRole("button", { name: /^Guardar Card 1/ })).toBeVisible();
+  });
+});
+
+describe("page arrows", () => {
+  test("are icon buttons named for screen readers, flank the album and disable at the bounds", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [pocketOf(1, 1, physical(0)), pocketOf(3, 1, physical(1))] }] });
+    const user = userEvent.setup();
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    await screen.findByRole("grid", { name: "Página 1" });
+    const previous = screen.getByRole("button", { name: "Página anterior" });
+    const next = screen.getByRole("button", { name: "Página siguiente" });
+    expect(previous).toHaveTextContent(/^‹$/);                      // the letters never run vertically: one glyph
+    expect(next).toHaveTextContent(/^›$/);
+    const stage = screen.getByRole("group", { name: "pág. 1–2 de 4" });
+    expect([...stage.children].map((child) => child.classList.contains("pv-album") ? "album" : child.classList.contains("pv-binder__arrow") ? "arrow" : "?")).toEqual(["arrow", "album", "arrow"]);
+    expect(previous).toBeDisabled();
+    await user.click(next);
+    expect(await screen.findByRole("grid", { name: "Página 3" })).toBeVisible();
+    expect(screen.getByRole("group", { name: "pág. 3–4 de 4" })).toBeVisible();
+    expect(next).toBeDisabled();
+    expect(previous).toBeEnabled();
   });
 });
 

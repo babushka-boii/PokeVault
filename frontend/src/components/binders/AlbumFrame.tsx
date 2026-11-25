@@ -45,7 +45,7 @@ export function AlbumFrame({ mobile, turn, swipeEnabled, onSwipe, children }: {
     touches.current.delete(event.pointerId);
     gesture.current = null;
   }
-  const [dimensions, setDimensions] = useState({ width: 900, height: 460, reserved: 0 });
+  const [dimensions, setDimensions] = useState({ width: 900, height: 460 });
   useLayoutEffect(() => {
     const element = host.current;
     if (!element) return;
@@ -54,7 +54,8 @@ export function AlbumFrame({ mobile, turn, swipeEnabled, onSwipe, children }: {
       const tray = document.querySelector(".pv-tray")?.getBoundingClientRect().height ?? 160;
       const bar = document.querySelector(".pv-tabbar")?.getBoundingClientRect().height ?? 0;
       // The page's own top (not the viewport's): scrolling must not change the size.
-      setDimensions({ width: rect.width, height: window.innerHeight - (rect.top + window.scrollY) - tray - bar - 24, reserved: tray });
+      element.parentElement?.style.setProperty("--pv-reserve", `${tray}px`);   // room under the stage for the fixed tray
+      setDimensions({ width: rect.width, height: window.innerHeight - (rect.top + window.scrollY) - tray - bar - 24 });
     };
     measure();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
@@ -67,7 +68,7 @@ export function AlbumFrame({ mobile, turn, swipeEnabled, onSwipe, children }: {
   const fit = fitAlbum({ width: dimensions.width, height: dimensions.height, pages: mobile ? 1 : 2, gap: 8, pagePadding: 12, spineWidth: 28, framePadding: 12, captionHeight: 24, minSleeveWidth: 140 });
   return <div ref={host} className="pv-album" data-overflow={fit.overflow || undefined}
     onPointerDown={down} onPointerUp={up} onPointerCancel={cancel}
-    style={{ "--pv-album-sleeve": `${fit.sleeveWidth}px`, marginBottom: dimensions.reserved } as CSSProperties}>
+    style={{ "--pv-album-sleeve": `${fit.sleeveWidth}px` } as CSSProperties}>
     <div className="pv-spread" data-turn={turn ?? undefined}>
       {children}
       <div className="pv-album__rings" aria-hidden="true"><i /><i /><i /></div>

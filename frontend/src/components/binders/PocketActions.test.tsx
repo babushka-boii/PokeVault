@@ -102,8 +102,8 @@ describe("move mode never mutates by navigation", () => {
     const first = within(grid(1)).getAllByRole("button")[0];
     first.focus();
     await user.keyboard("{ArrowRight}{ArrowDown}{ArrowLeft}{ArrowUp}{End}{Home}");
-    await user.click(screen.getByRole("button", { name: "Página siguiente ›" }));
-    await user.click(screen.getByRole("button", { name: "‹ Página anterior" }));
+    await user.click(screen.getByRole("button", { name: "Página siguiente" }));
+    await user.click(screen.getByRole("button", { name: "Página anterior" }));
     expect(world.mutations()).toEqual([]);
     within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 2: vacío" }).focus();
     await user.keyboard("{Enter}");

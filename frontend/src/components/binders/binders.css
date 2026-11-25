@@ -45,7 +45,6 @@
 .pv-binder__back { align-items: center; display: inline-flex; min-height: var(--pv-touch); }
 .pv-binder__layout { align-items: start; display: grid; gap: var(--pv-space-4); grid-template-columns: minmax(0, 1fr); }
 .pv-binder__main { display: grid; gap: var(--pv-space-3); min-width: 0; }
-.pv-binder__pager { align-items: center; display: flex; flex-wrap: wrap; gap: var(--pv-space-2); justify-content: space-between; }
 .pv-binder__pages { color: var(--pv-text-2); font-family: var(--pv-font-display); font-variant-numeric: tabular-nums; }
 
 .pv-spread { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); perspective: 1600px; }
@@ -205,15 +204,14 @@
   .pv-album__rings { left: 4px; width: 28px; }
   .pv-tray { bottom: calc(var(--pv-tabbar-h) + env(safe-area-inset-bottom, 0px)); }
 }
-.pv-binder__main { position: relative; padding-inline: 52px; }
-.pv-binder__pager { justify-content: center; }
-.pv-binder__pager > button { position: absolute; top: 45%; width: 48px; min-height: 64px; overflow-wrap: anywhere; z-index: 3; }
-.pv-binder__pager > button:first-child { left: 0; }
-.pv-binder__pager > button:last-child { right: 0; }
+/* Page arrows: icon buttons as tall as the open album, one on each side (below it on phones). */
+.pv-binder__stage { align-items: stretch; display: grid; gap: var(--pv-space-2); grid-template-columns: var(--pv-touch) minmax(0, 1fr) var(--pv-touch); margin-bottom: var(--pv-reserve, 0px); }
+.pv-binder__arrow { align-self: stretch; font-size: 2rem; line-height: 1; min-height: var(--pv-touch); min-width: var(--pv-touch); padding: 0; }
 @media (max-width: 767px) {
-  .pv-binder__main { padding-inline: 0; }
-  .pv-binder__pager { justify-content: space-between; }
-  .pv-binder__pager > button { position: static; width: auto; min-height: 44px; }
+  .pv-binder__stage { grid-template-areas: "album album" "prev next"; grid-template-columns: 1fr 1fr; }
+  .pv-album { grid-area: album; }
+  .pv-binder__arrow--prev { grid-area: prev; }
+  .pv-binder__arrow--next { grid-area: next; }
 }
 
 /* Contextual pocket controls: a popover anchored to the pocket, a bottom sheet on phones. */
@@ -255,3 +253,5 @@
 .pv-tray__fold { background: transparent; border: 1px solid var(--pv-border-strong); color: var(--pv-text); cursor: pointer; margin-left: auto; min-height: var(--pv-touch); min-width: var(--pv-touch); }
 .pv-tray[data-open="false"] { max-height: none; padding-block: 2px; }
 .pv-tray__body { display: grid; gap: var(--pv-space-2); }
+
+.pv-binder__pages { margin-left: auto; order: 9; }

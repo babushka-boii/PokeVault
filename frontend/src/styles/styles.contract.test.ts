@@ -186,6 +186,15 @@ describe("stylesheets", () => {
     expect(rules(css).find((rule) => rule.selector === ".pv-actions-layer")?.body).toMatch(/position:\s*fixed/);
   });
 
+  test("the page arrows are as tall as the album and never wrap their label", () => {
+    const css = stripComments(sheets["/src/components/binders/binders.css"]);
+    const stage = rules(css).find((rule) => rule.selector === ".pv-binder__stage")?.body ?? "";
+    expect(stage).toMatch(/align-items:\s*stretch/);
+    const arrow = rules(css).find((rule) => rule.selector === ".pv-binder__arrow")?.body ?? "";
+    expect(arrow).toMatch(/align-self:\s*stretch/);
+    expect(arrow).toMatch(/min-width:\s*var\(--pv-touch\)/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);
