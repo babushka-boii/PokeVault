@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { fetchBinders } from "../../services/binders";
+import { FavoriteStar } from "../cards/FavoriteStar";
 import { Button, ButtonLink } from "../ui/Button";
 import { fill } from "./labels";
 import { useGuard } from "./useGuard";
@@ -11,7 +12,7 @@ import type { PocketRef } from "./PageGrid";
 
 const WIDTH = 288;
 
-export type PocketFacts = { identity: string; details: string; price: ReactNode; copyHref: string };
+export type PocketFacts = { identity: string; details: string; price: ReactNode; copyHref: string; cardId: string };
 
 type Props = {
   anchor: HTMLElement; target: PocketRef; binderId: string; mobile: boolean; busy: boolean;
@@ -115,6 +116,7 @@ export function PocketActions({ anchor, target, binderId, mobile, busy, facts, o
       {facts ? <>
         <p className="pv-actions__facts">{title}<br />{facts.details}</p>
         <p className="pv-actions__price">{facts.price}</p>
+        <FavoriteStar cardId={facts.cardId} />
         <div className="pv-actions__list">
           <ButtonLink variant="secondary" to={facts.copyHref}>{text.viewCopy}</ButtonLink>
           <Button disabled={busy} onClick={onMovePocket}>{text.move}</Button>

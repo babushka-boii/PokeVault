@@ -31,6 +31,7 @@ const sorted = (pockets: Pocket[]) => [...pockets].sort((a, b) => (a.page - b.pa
 export function binderWorld(initial: { binders: { name: string; pockets: Pocket[] }[]; tray?: ReturnType<typeof physical>[] }) {
   const state = initial.binders.map((binder, index) => ({ id: binderId(index + 1), name: binder.name, order: index, pockets: sorted(binder.pockets) }));
   let tray = [...(initial.tray ?? [])];
+  const favorites = new Set<string>();
   const calls: { method: string; path: string; body: unknown }[] = [];
   const failures: Record<string, () => Response> = {};
   const detail = (b: typeof state[number]) => ({ ...binderSummary(Number(b.id.slice(-12)), b.name, b.pockets, b.order), pockets: b.pockets });
@@ -57,6 +58,11 @@ export function binderWorld(initial: { binders: { name: string; pockets: Pocket[
     calls.push({ method, path, body });
     const failure = failures[`${method} ${path}`]; if (failure) { delete failures[`${method} ${path}`]; return failure(); }
     if (path === "/api/v1/auth/me") return json(binderSession);
+    if (path.startsWith("/api/v1/favorites/")) {
+      const card = decodeURIComponent(path.split("/").pop()!);
+      if (method === "PUT") favorites.add(card); if (method === "DELETE") favorites.delete(card);
+      return json({ card_id: card, favorite: favorites.has(card) });
+    }
     if (path === "/api/v1/me/settings") return json({ preferred_currency: "CLP" });
     if (path.startsWith("/api/v1/cards/")) { const card = binderCards.find((c) => c.id === decodeURIComponent(path.split("/").pop()!)); return card ? json(card) : json({}, 404); }
     if (path === "/api/v1/prices/copies") {
@@ -92,6 +98,6 @@ export function binderWorld(initial: { binders: { name: string; pockets: Pocket[
     throw new Error(`Unexpected ${method} ${path}`);
   });
   vi.stubGlobal("fetch", request);
-  return { request, calls, state, fail: (method: string, path: string, response: () => Response) => { failures[`${method} ${path}`] = response; },
+  return { request, calls, state, favorites, fail: (method: string, path: string, response: () => Response) => { failures[`${method} ${path}`] = response; },
     mutations: () => calls.filter((c) => c.method !== "GET") };
 }

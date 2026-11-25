@@ -129,6 +129,11 @@ export const spanish = {
     favoritesEmpty: "Marca cartas con ★ para verlas aquí", addedEmpty: "Agrega tu primera carta", favoritesError: "No se pudieron cargar tus favoritas.", addedError: "No se pudieron cargar tus cartas recientes.",
     carouselPause: "Pausar", carouselResume: "Reanudar", carouselPrevious: "Cartas anteriores", carouselNext: "Cartas siguientes", noPrice: "Sin precio",
   },
+  favorites: {
+    label: "Favorita", added: "Agregada a tus favoritas.", removed: "Quitada de tus favoritas.",
+    loadError: "No se pudo cargar tu favorita.", saveError: "No se pudo guardar tu favorita. Inténtalo de nuevo.",
+    full: "Llegaste al máximo de 500 cartas favoritas.", signIn: "Inicia sesión para marcar favoritas",
+  },
   pokedex: {
     title: "Pokédex",
     description: "Explora los 1025 Pokémon de la Pokédex Nacional, 30 por página, o búscalos por nombre o número.",
@@ -475,6 +480,11 @@ export const english: Dictionary = {
     cardsTitle: "Your cards", tabValuable: "Most valuable", tabFavorites: "Favourites", tabAdded: "Recent", cardsLoading: "Loading your cards…",
     favoritesEmpty: "Star cards with ★ to see them here", addedEmpty: "Add your first card", favoritesError: "Your favourites could not be loaded.", addedError: "Your recent cards could not be loaded.",
     carouselPause: "Pause", carouselResume: "Resume", carouselPrevious: "Previous cards", carouselNext: "Next cards", noPrice: "No price",
+  },
+  favorites: {
+    label: "Favourite", added: "Added to your favourites.", removed: "Removed from your favourites.",
+    loadError: "Your favourite could not be loaded.", saveError: "Your favourite could not be saved. Try again.",
+    full: "You reached the limit of 500 favourite cards.", signIn: "Sign in to star favourites",
   },
   pokedex: {
     title: "Pokédex",
