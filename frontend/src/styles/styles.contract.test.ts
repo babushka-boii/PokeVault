@@ -207,6 +207,28 @@ describe("stylesheets", () => {
     expect(caption).toMatch(/min-height:\s*20px/);
   });
 
+  test("the Home bookcase uses decorative wood tokens, keeps text off the wood and shows one scrolling shelf on phones", () => {
+    const css = stripComments(sheets["/src/components/home/home.css"]);
+    const values = tokens();
+    for (const name of ["--pv-wood-dark", "--pv-wood-mid", "--pv-wood-light"]) expect(resolve(values, name), name).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    // Wood colours only paint the frame and the planks, never a `color:` (text).
+    const woodRules = rules(css).filter((rule) => rule.body.includes("--pv-wood-"));
+    expect(woodRules.length).toBeGreaterThan(0);
+    for (const rule of woodRules) expect(rule.body, rule.selector).not.toMatch(/(^|;)\s*color:/);
+    // Planks are decoration: they take no pointer events and carry no content.
+    const plank = rules(css).find((rule) => rule.selector === ".pv-bookcase__item::after")?.body ?? "";
+    expect(plank).toMatch(/pointer-events:\s*none/);
+    expect(plank).toMatch(/content:\s*""/);
+    // Wood is used nowhere else in the app's styles.
+    const elsewhere = Object.entries(sheets).filter(([file, text]) => file !== "/src/components/home/home.css" && file !== TOKENS && text.includes("--pv-wood-"));
+    expect(elsewhere.map(([file]) => file)).toEqual([]);
+    // Phones: a single row that scrolls sideways.
+    const phone = rules(css).filter((rule) => rule.selector === ".pv-bookcase").map((rule) => rule.body).find((body) => body.includes("grid-auto-flow")) ?? "";
+    expect(css).toMatch(/@media \(max-width: 767px\)\s*\{[^@]*\.pv-bookcase \{[^}]*grid-auto-flow/);
+    expect(phone).toMatch(/grid-auto-flow:\s*column/);
+    expect(phone).toMatch(/overflow-x:\s*auto/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);

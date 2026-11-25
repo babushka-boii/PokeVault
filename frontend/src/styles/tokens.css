@@ -31,6 +31,11 @@
   --pv-warn-border: #5A4A1E;
   --pv-danger: #FF7A7A;
   --pv-success: #5BD69A;
+  /* Decorative wood for the Home bookcase (never used for text or interaction). */
+  --pv-wood-dark: #2A1C13;
+  --pv-wood-mid: #4A3222;
+  --pv-wood-light: #6E4C33;
+
   /* Value change: soft green and red, always paired with an arrow and a word. */
   --pv-up: var(--pv-success);
   --pv-down: var(--pv-danger);
