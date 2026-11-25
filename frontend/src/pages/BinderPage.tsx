@@ -17,7 +17,7 @@ import { InlineError } from "../components/ui/InlineError";
 import { LoadingStatus, Skeleton } from "../components/ui/Skeleton";
 import { useBinderMutations, type BinderErrorKey } from "../hooks/useBinderMutations";
 import { MOBILE_QUERY, REDUCED_MOTION_QUERY, useMediaQuery } from "../hooks/useMediaQuery";
-import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, settled, wait, type FlightOrigin, type FlightResult } from "../components/binders/flight";
+import { captureOrigin, exitCard, flyCard, inViewport, PAGE_TURN_WAIT_MS, settled, wait, type FlightOrigin, type FlightResult } from "../components/binders/flight";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import {
@@ -81,6 +81,8 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   const [status, setStatus] = useState("");
   const [problem, setProblem] = useState<BinderErrorKey | null>(null);
   const [trayVersion, setTrayVersion] = useState(0);
+  // The freshest binder, for continuations that outlive a render (a take-out flight lasts about a second).
+  const latest = useRef<{ binder?: Binder; loaded?: Binder }>({});
   const [focusRequest, setFocusRequest] = useState<PocketRef | null>(() => selected);
   const buttons = useRef(new Map<string, HTMLButtonElement>());
   const register = useCallback((target: PocketRef) => (node: HTMLButtonElement | null) => {
@@ -104,6 +106,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     buttons.current.get(key(focusRequest))?.focus();
   }, [focusRequest, binder, first]);
 
+  useEffect(() => { latest.current = { binder, loaded }; });
   const visiblePockets = binder?.pockets.filter((p) => visible.includes(p.page)) ?? [];
   const metadata = useCardMetadata(visiblePockets.map((p) => p.copy.card_id), locale);
   const ids = visiblePockets.map((p) => p.copy.id).join(",");
@@ -263,17 +266,54 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
     if (!outcome) return;
     if (outcome.ok) landed(outcome.value, origin); else failed(outcome.error);
   }
+  /** Where a card taken out lands: the first slot of the open tray, or the bar of a folded one. */
+  function trayTarget(): { left: number; top: number; width: number; height: number } | null {
+    const element = document.querySelector<HTMLElement>("[data-tray-target]");
+    if (!element) return null;
+    const box = element.getBoundingClientRect();
+    if (element.dataset.trayTarget === "slot") return { left: box.left, top: box.top, width: 36, height: (36 * 88) / 63 };
+    return { left: box.left + 24, top: box.top + box.height / 2 - 14, width: 20, height: 28 };
+  }
+  /**
+   * Taking a card out plays the entry backwards: the card slides up out of its sleeve behind
+   * the plastic, then flies in an arc to the tray (its bar when folded). Nothing moves before
+   * the server confirms; the pocket is emptied at the hand-off, or at once if the animation is
+   * cancelled, skipped (reduced motion, nothing visible to fly) or cut by a new action.
+   */
   async function takeOut(target: PocketRef, copy: InventoryCopy) {
     cancelArrival();
     setMenu(null);
+    // Measured now, before the menu closes or anything re-renders (only when the card is on screen).
+    const card = buttons.current.get(key(target))?.querySelector(".pv-pocket__card");
+    const origin = !reduced && card && inViewport(card) ? captureOrigin(card) : null;
     const outcome = await run((csrf, signal) => removeFromPocket(binderId, target, copy.id, csrf, signal));
     if (!outcome) return;
     if (!outcome.ok) { failed(outcome.error); return; }
-    if (binder && loaded) setLocal({ base: loaded, value: { ...binder, copy_count: binder.copy_count - 1,
-      pockets: binder.pockets.filter((p) => !(p.page === target.page && p.pocket === target.pocket)) } });
-    setConsumed((ids) => { const next = new Set(ids); next.delete(copy.id); return next; });
-    setStatus(text.removed); setProblem(null); setArrived(null); setTrayVersion((v) => v + 1);
-    setMenu(null); setFocusRequest(null); document.getElementById("pv-tray-title")?.focus();
+    let applied = false; let landedInTray = false;
+    const apply = () => {
+      if (applied || !alive.current) return;
+      applied = true;
+      const empty = (value: Binder) => ({ ...value, copy_count: value.copy_count - 1,
+        pockets: value.pockets.filter((p) => !(p.page === target.page && p.pocket === target.pocket)) });
+      const { binder: current, loaded: base } = latest.current;
+      if (current && base) setLocal({ base, value: empty(current) });
+      setConsumed((ids) => { const next = new Set(ids); next.delete(copy.id); return next; });
+      setStatus(text.removed); setProblem(null); setArrived(null); setMenu(null); setFocusRequest(null);
+      document.getElementById("pv-tray-title")?.focus();
+    };
+    if (origin && origin.element.isConnected) {
+      const controller = new AbortController();
+      flight.current = controller;
+      await exitCard(origin, trayTarget, {
+        signal: controller.signal,
+        onLaunch: () => flushSync(apply),
+        // The tray reloads in the same commit that removes the clone.
+        onLand: () => { landedInTray = true; flushSync(() => setTrayVersion((v) => v + 1)); },
+      });
+      if (flight.current === controller) flight.current = null;
+    }
+    apply();   // no animation, or it was cancelled before the hand-off
+    if (alive.current && !landedInTray) setTrayVersion((v) => v + 1);
   }
 
   if (detail.state.kind === "loading") return <LoadingStatus label={text.loading}><Skeleton shape="block" /><Skeleton shape="block" /></LoadingStatus>;

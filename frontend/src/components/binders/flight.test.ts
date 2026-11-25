@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
-  buildFlightKeyframes, captureOrigin, cubicBezier, DESCENT_MS, ENTRY_TILT_DEG, entryStart, FLIGHT_EASING, FLIGHT_MS, flyCard, LIFT_MS, LIFT_SCALE,
-  settled, TOTAL_FLIGHT_MS, type Box,
+  buildFlightKeyframes, buildReturnKeyframes, captureOrigin, cubicBezier, DESCENT_MS, ENTRY_TILT_DEG, entryStart, EXIT_MS, exitCard, FLIGHT_EASING,
+  FLIGHT_MS, flyCard, LIFT_MS, LIFT_SCALE, RETURN_MS, settled, TOTAL_FLIGHT_MS, type Box,
 } from "./flight";
 
 afterEach(() => {
@@ -244,5 +244,156 @@ describe("flyCard", () => {
     await settled(element);
     expect(spy.mock.calls.length).toBeGreaterThanOrEqual(7);   // kept checking until three still reads
     expect(element.getBoundingClientRect().top).toBe(120);
+  });
+});
+
+describe("return keyframes (taking a card out)", () => {
+  const from = box(700, 300, 180, 248); const target = box(120, 640, 36, 50);
+  const { keyframes, duration } = buildReturnKeyframes(from, target);
+  const centre = (frame: Keyframe) => mapPoint(frame, from, from.width / 2, from.height / 2);
+
+  test("a 600 ms flight that starts exactly on the card's exit pose, the mirror of the entry's first frame", () => {
+    expect(duration).toBe(RETURN_MS);
+    expect(RETURN_MS).toBe(600);
+    expect(EXIT_MS).toBe(400);
+    const first = keyframes[0];
+    const pose = entryStart(from, from);
+    expect({ x: parse(first).x, y: parse(first).y }).toEqual(pose);
+    expect(parse(first)).toMatchObject({ sx: 1, sy: 1, rotate: ENTRY_TILT_DEG });
+    // One card above its place, its bottom centre on the sleeve's opening.
+    expect(mapPoint(first, from, from.width / 2, from.height).y).toBeCloseTo(from.top, 6);
+    expect(mapPoint(first, from, from.width / 2, from.height).x).toBeCloseTo(from.left + from.width / 2, 6);
+    const offsets = keyframes.map((frame) => frame.offset as number);
+    expect(offsets[0]).toBe(0); expect(offsets.at(-1)).toBe(1);
+    expect(offsets).toEqual([...offsets].sort((a, b) => a - b));
+  });
+
+  test("it ends on the target box, level, at the target size and without shadow", () => {
+    const last = keyframes.at(-1)!;
+    expect(parse(last).rotate).toBe(0);
+    expect(parse(last).sx).toBeCloseTo(target.width / from.width, 6);
+    expect(parse(last).sy).toBeCloseTo(target.height / from.height, 6);
+    expect(mapPoint(last, from, 0, 0).x).toBeCloseTo(target.left, 6);
+    expect(mapPoint(last, from, 0, 0).y).toBeCloseTo(target.top, 6);
+    expect(String(last.boxShadow)).toMatch(/^0 0 0 .* 0%/);
+  });
+
+  test("the path is an arc above the straight line, tilted toward the travel direction and decelerating", () => {
+    const a = centre(keyframes[0]); const b = centre(keyframes.at(-1)!);
+    const lift = Math.max(...keyframes.slice(1, -1).map((frame) => {
+      const p = centre(frame); const t = (p.x - a.x) / (b.x - a.x);
+      return (a.y + (b.y - a.y) * t) - p.y;
+    }));
+    expect(lift).toBeGreaterThan(20);
+    const tilts = keyframes.map((frame) => parse(frame).rotate);
+    expect(Math.min(...tilts)).toBeLessThan(ENTRY_TILT_DEG);     // travelling left leans further left
+    expect(tilts.at(-1)).toBe(0);
+    const steps = keyframes.map((frame) => centre(frame).x);
+    expect(Math.abs(steps[1] - steps[0])).toBeGreaterThan(Math.abs(steps.at(-1)! - steps.at(-2)!));
+  });
+
+  test("a farther tray arcs more than a near one", () => {
+    const nearTarget = box(690, 400, 36, 50);
+    const high = (frames: Keyframe[], frame0: Box) => {
+      const c = (frame: Keyframe) => mapPoint(frame, frame0, frame0.width / 2, frame0.height / 2);
+      const a = c(frames[0]); const b = c(frames.at(-1)!);
+      return Math.max(...frames.slice(1, -1).map((frame) => { const p = c(frame); return (a.y + (b.y - a.y) * ((p.x - a.x) / (b.x - a.x))) - p.y; }));
+    };
+    expect(high(keyframes, from)).toBeGreaterThan(high(buildReturnKeyframes(from, nearTarget).keyframes, from));
+  });
+});
+
+describe("exitCard", () => {
+  function setup() {
+    const element = document.createElement("div"); element.style.visibility = "visible";
+    document.body.appendChild(element);
+    const animations: { target: HTMLElement; keyframes: Keyframe[]; options: KeyframeAnimationOptions; finish: () => void; cancelled: boolean }[] = [];
+    Object.defineProperty(HTMLElement.prototype, "animate", { configurable: true, writable: true, value: vi.fn(function (this: HTMLElement, keyframes: Keyframe[], options: KeyframeAnimationOptions) {
+      let finish!: () => void; let reject!: (error: unknown) => void;
+      const finished = new Promise<void>((resolve, fail) => { finish = resolve; reject = fail; });
+      const record = { target: this, keyframes, options, finish, cancelled: false };
+      animations.push(record);
+      return { finished, cancel: () => { record.cancelled = true; reject(new DOMException("cancelled", "AbortError")); } };
+    }) });
+    const origin = captureOrigin(element)!;
+    const events: string[] = [];
+    const target = () => ({ left: 10, top: 600, width: 36, height: 50 });
+    return { element, origin, animations, events, target };
+  }
+  const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+  test("rises behind the plastic, then hands off to a clone that flies to the tray, in that order", async () => {
+    const { element, origin, animations, events, target } = setup();
+    const done = exitCard(origin, target, {
+      onLaunch: () => events.push(`launch:${element.style.visibility}:${document.body.querySelectorAll(".pv-flight").length}`),
+      onLand: () => events.push(`land:${document.body.querySelectorAll(".pv-flight").length}`),
+    });
+    // Beat 1: the real card itself rises (translateY(-100%), tilted), 400 ms, no clone yet.
+    expect(animations).toHaveLength(1);
+    expect(animations[0].target).toBe(element);
+    expect(animations[0].options.duration).toBe(EXIT_MS);
+    expect(JSON.stringify(animations[0].keyframes)).toContain("translateY(-100%) rotate(-2deg)");
+    expect(document.body.querySelector(".pv-flight")).toBeNull();
+    expect(element.style.visibility).toBe("visible");
+    animations[0].finish();
+    await settle();
+    // Beat 2: in one task the real card is hidden and the clone is there; beat 3: it flies 600 ms.
+    expect(animations).toHaveLength(2);
+    expect(animations[1].target).toBe(origin.ghost);
+    expect(animations[1].options.duration).toBe(RETURN_MS);
+    expect(events).toEqual(["launch:hidden:0"]);   // hidden first; the clone is added right after, in the same task
+    expect(element.style.visibility).toBe("hidden");
+    expect(document.body.querySelectorAll(".pv-flight")).toHaveLength(1);
+    animations[1].finish();
+    expect(await done).toBe("completed");
+    // Beat 4: onLand runs while the clone is still there; then it is removed and the real card restored.
+    expect(events.at(-1)).toBe("land:1");
+    expect(document.body.querySelector(".pv-flight")).toBeNull();
+    expect(element.style.visibility).toBe("visible");
+  });
+
+  test("cancelled while rising: no clone, the card is restored, nothing launches", async () => {
+    const { element, origin, animations, target } = setup();
+    const control = new AbortController(); const onLaunch = vi.fn();
+    const done = exitCard(origin, target, { signal: control.signal, onLaunch });
+    control.abort();
+    expect(await done).toBe("cancelled");
+    expect(onLaunch).not.toHaveBeenCalled();
+    expect(animations[0].cancelled).toBe(true);
+    expect(document.body.querySelector(".pv-flight")).toBeNull();
+    expect(element.style.visibility).toBe("visible");
+  });
+
+  test("cancelled mid-flight: the clone is removed, the card restored and onLand never runs", async () => {
+    const { element, origin, animations, target } = setup();
+    const control = new AbortController(); const onLand = vi.fn(); const onLaunch = vi.fn();
+    const done = exitCard(origin, target, { signal: control.signal, onLaunch, onLand });
+    animations[0].finish(); await settle();
+    expect(document.body.querySelectorAll(".pv-flight")).toHaveLength(1);
+    control.abort();
+    expect(await done).toBe("cancelled");
+    expect(onLaunch).toHaveBeenCalledTimes(1);
+    expect(onLand).not.toHaveBeenCalled();
+    expect(document.body.querySelector(".pv-flight")).toBeNull();
+    expect(element.style.visibility).toBe("visible");
+  });
+
+  test("without a place in the tray the card still leaves its pocket, with no clone", async () => {
+    const { origin, animations } = setup();
+    const onLaunch = vi.fn();
+    const done = exitCard(origin, () => null, { onLaunch });
+    animations[0].finish();
+    expect(await done).toBe("skipped");
+    expect(onLaunch).toHaveBeenCalledTimes(1);
+    expect(document.body.querySelector(".pv-flight")).toBeNull();
+  });
+
+  test("an already cancelled signal or no animation API does nothing", async () => {
+    const { origin, animations, target } = setup();
+    const control = new AbortController(); control.abort();
+    expect(await exitCard(origin, target, { signal: control.signal })).toBe("cancelled");
+    expect(animations).toHaveLength(0);
+    delete (HTMLElement.prototype as Partial<HTMLElement>).animate;
+    expect(await exitCard(origin, target)).toBe("skipped");
   });
 });

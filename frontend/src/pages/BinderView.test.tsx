@@ -421,6 +421,117 @@ describe("FLIP flight", () => {
     } finally { motion.restore(); }
   });
 
+  describe("taking a card out", () => {
+    async function openMenuOnFirstPocket(motion: ReturnType<typeof stubAnimate>, tray = [physical(5)]) {
+      const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [pocketOf(1, 1, physical(0))] }], tray });
+      const user = userEvent.setup();
+      render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+      const pocket = await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1: Card 1/ });
+      const card = pocket.querySelector(".pv-pocket__card") as HTMLElement;
+      await user.click(pocket);
+      await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
+      void motion;
+      return { world, user, pocket, card };
+    }
+
+    test("the card rises out of its sleeve, then flies to the tray: the entry in reverse, in order", async () => {
+      const motion = stubAnimate();
+      try {
+        const { world, pocket, card } = await openMenuOnFirstPocket(motion);
+        // Beat 1: only after the server confirms does the real card rise; the pocket still holds it.
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        expect(world.mutations().map((call) => call.method)).toEqual(["DELETE"]);
+        expect(motion.flights[0].element).toBe(card);
+        expect(motion.flights[0].options.duration).toBe(400);
+        expect(pocket).toHaveAccessibleName(/Card 1/);                       // not emptied yet
+        expect(clones()).toHaveLength(0);
+        // Beat 2: at the hand-off the pocket empties and the clone appears, in the same commit.
+        const seen: string[] = [];
+        await act(async () => {
+          motion.flights[0].finish();
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+        await waitFor(() => expect(motion.flights).toHaveLength(2));
+        seen.push(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 1: vacío" }) ? "pocket-empty" : "");
+        expect(seen).toEqual(["pocket-empty"]);
+        expect(clones()).toHaveLength(1);
+        expect(motion.flights[1].options.duration).toBe(600);
+        expect(live()).toHaveTextContent("Devuelta a la bandeja");
+        // Beat 3: it lands, the clone goes and the tray reloads with the card.
+        await act(async () => motion.flights[1].finish());
+        await waitFor(() => expect(clones()).toHaveLength(0));
+        expect(await screen.findByRole("button", { name: /^Guardar Card 1/ })).toBeVisible();
+      } finally { motion.restore(); }
+    });
+
+    test("it flies to the thin bar when the tray is folded, and to its first slot when open", async () => {
+      const motion = stubAnimate();
+      try {
+        await openMenuOnFirstPocket(motion, []);          // an empty tray is folded
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        const target = document.querySelector("[data-tray-target]") as HTMLElement;
+        expect(target).toHaveAttribute("data-tray-target", "bar");
+        expect(target).toHaveClass("pv-tray__head");
+      } finally { motion.restore(); }
+      const openMotion = stubAnimate();
+      try {
+        document.body.innerHTML = "";
+        await openMenuOnFirstPocket(openMotion, [physical(5)]);
+        await waitFor(() => expect(openMotion.flights).toHaveLength(1));
+        expect(document.querySelector("[data-tray-target]")).toHaveAttribute("data-tray-target", "slot");
+      } finally { openMotion.restore(); }
+    });
+
+    test("another action while the card rises cancels it: the pocket empties at once, no clone, the card is visible again", async () => {
+      const motion = stubAnimate();
+      try {
+        const { user, card } = await openMenuOnFirstPocket(motion);
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        await user.click(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 5: vacío" }));
+        await waitFor(() => expect(motion.flights[0].cancelled).toBe(true));
+        expect(await within(grid(1)).findByRole("button", { name: "Página 1, bolsillo 1: vacío" })).toBeVisible();
+        expect(clones()).toHaveLength(0);
+        expect(motion.flights).toHaveLength(1);              // it never reached the flight
+        expect(card.style.visibility).not.toBe("hidden");
+        expect(await screen.findByRole("button", { name: /^Guardar Card 1/ })).toBeVisible();
+      } finally { motion.restore(); }
+    });
+
+    test("leaving the page mid-flight removes the clone", async () => {
+      const motion = stubAnimate();
+      try {
+        const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [pocketOf(1, 1, physical(0))] }], tray: [] });
+        void world;
+        const user = userEvent.setup();
+        const view = render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+        await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ }));
+        await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
+        await waitFor(() => expect(motion.flights).toHaveLength(1));
+        await act(async () => { motion.flights[0].finish(); await new Promise((resolve) => setTimeout(resolve, 0)); });
+        await waitFor(() => expect(clones()).toHaveLength(1));
+        view.unmount();
+        await act(async () => undefined);
+        expect(clones()).toHaveLength(0);
+      } finally { motion.restore(); }
+    });
+
+    test("with reduced motion the card just leaves its pocket: no rise, no flight", async () => {
+      stubMedia({ reducedMotion: true });
+      const motion = stubAnimate();
+      try {
+        binderWorld({ binders: [{ name: "Tesoros", pockets: [pocketOf(1, 1, physical(0))] }], tray: [] });
+        const user = userEvent.setup();
+        render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+        await user.click(await within(await findGrid(1)).findByRole("button", { name: /^Página 1, bolsillo 1:/ }));
+        await user.click(await screen.findByRole("button", { name: "Sacar de la carpeta" }));
+        await waitFor(() => expect(live()).toHaveTextContent("Devuelta a la bandeja"));
+        expect(motion.animate).not.toHaveBeenCalled();
+        expect(clones()).toHaveLength(0);
+        expect(within(grid(1)).getByRole("button", { name: "Página 1, bolsillo 1: vacío" })).toBeInTheDocument();
+      } finally { motion.restore(); }
+    });
+  });
+
   test("with reduced motion there is no flight and the original is never hidden", async () => {
     stubMedia({ reducedMotion: true });
     const motion = stubAnimate();
