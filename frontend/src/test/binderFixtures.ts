@@ -19,7 +19,7 @@ export type Pocket = { page: number; pocket: number; copy: ReturnType<typeof phy
 export const pocketOf = (page: number, pocket: number, copy: ReturnType<typeof physical>): Pocket => ({ page, pocket, copy, placed_at: stamp });
 const visible = (pockets: Pocket[]) => Math.min(40, Math.max(2, Math.ceil((Math.max(0, ...pockets.map((p) => p.page)) + 1) / 2) * 2));
 export function binderSummary(n: number, name: string, pockets: Pocket[] = [], order = n - 1) {
-  return { id: binderId(n), name, display_order: order, cover: "noir", copy_count: pockets.length, page_count: visible(pockets),
+  return { id: binderId(n), name, display_order: order, cover: "noir", stickers: [], copy_count: pockets.length, page_count: visible(pockets),
     last_placed_at: pockets.length ? stamp : null, created_at: stamp, updated_at: stamp };
 }
 const sorted = (pockets: Pocket[]) => [...pockets].sort((a, b) => (a.page - b.page) * 9 + (a.pocket - b.pocket));

@@ -19,7 +19,7 @@ export const physicalCopy = (index: number, extra: Record<string, unknown> = {})
   notes: "", created_at: "2026-11-07T12:00:00Z", updated_at: "2026-11-07T12:00:00Z", ...extra,
 });
 const stamp = "2026-11-07T12:00:00Z";
-export const binder = (n: number, name: string, extra: Record<string, unknown> = {}) => ({ id: copyId(n), name, display_order: n - 1, cover: "noir", copy_count: 2, page_count: 4, last_placed_at: stamp, created_at: stamp, updated_at: stamp, ...extra });
+export const binder = (n: number, name: string, extra: Record<string, unknown> = {}) => ({ id: copyId(n), name, display_order: n - 1, cover: "noir", stickers: [], copy_count: 2, page_count: 4, last_placed_at: stamp, created_at: stamp, updated_at: stamp, ...extra });
 export type HomePocket = { page: number; pocket: number; copy: ReturnType<typeof physicalCopy>; placed_at: string };
 export const pocketAt = (page: number, pocket: number, copy: ReturnType<typeof physicalCopy>, placed_at = stamp): HomePocket => ({ page, pocket, copy, placed_at });
 

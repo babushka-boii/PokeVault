@@ -32,7 +32,7 @@ function profileApp(options: Options = {}) {
       { set_id: "me02.5", total: "1038", original_totals: { EUR: "0.83" }, copy_count: 5, priced_count: 5, pending_count: 0, stale_count: 0 },
       { set_id: "me05", total: "78", original_totals: { EUR: "0.06" }, copy_count: 2, priced_count: 2, pending_count: 0, stale_count: 0 }] });
     if (path === "/api/v1/prices/binders") return json({ currency: "CLP", rates, results: [{ binder_id: BINDER, total: "1116", original_totals: { EUR: "0.89" }, copy_count: 7, priced_count: 5, pending_count: 0, stale_count: 0 }] });
-    if (path === "/api/v1/binders") return json({ total: 1, results: [{ id: BINDER, name: "Tesoros", display_order: 0, cover: "noir", copy_count: 7, page_count: 2, last_placed_at: null, created_at: stamp, updated_at: stamp }] });
+    if (path === "/api/v1/binders") return json({ total: 1, results: [{ id: BINDER, name: "Tesoros", display_order: 0, cover: "noir", stickers: [], copy_count: 7, page_count: 2, last_placed_at: null, created_at: stamp, updated_at: stamp }] });
     if (path.startsWith("/api/v1/cards/")) return json(pikachuCard);
     return undefined;
   } });

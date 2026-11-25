@@ -100,7 +100,7 @@ test("says which binder, page and pocket hold the copy and links there", async (
 
 test("offers to store a copy that is in no binder in the first binder", async () => {
   const stamp = "2026-11-24T12:00:00Z";
-  const first = { id: "10000000-0000-4000-8000-000000000009", name: "Kanto", display_order: 0, cover: "noir", copy_count: 0, page_count: 2, last_placed_at: null, created_at: stamp, updated_at: stamp };
+  const first = { id: "10000000-0000-4000-8000-000000000009", name: "Kanto", display_order: 0, cover: "noir", stickers: [], copy_count: 0, page_count: 2, last_placed_at: null, created_at: stamp, updated_at: stamp };
   locationApi(() => json({ results: [] }), [first]);
   render(<App initialEntries={[`/collection/${copy.id}`]} />);
   const section = await screen.findByRole("region", { name: "¿Dónde está esta carta?" });

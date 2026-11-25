@@ -1,12 +1,20 @@
 import { isInventoryCopy, type InventoryCopy } from "./inventory";
+import { NATIONAL_DEX_TOTAL } from "./pokemon";
 
 /** Binders (Iteration 8C): albums of 9-pocket pages holding the user's physical copies. */
 export const MAX_PAGES = 40;
 export const POCKETS_PER_PAGE = 9;
-export const covers = ["noir"] as const;
+/** Closed catalogues: a cover or a sticker is one of these ids, never a URL. */
+export const covers = ["noir", "brown_leather", "metallic", "holographic", "white"] as const;
 export type Cover = typeof covers[number];
+export const pixelKeys = ["star", "bolt", "heart", "creature", "circle"] as const;
+export type PixelKey = typeof pixelKeys[number];
+export const MAX_STICKERS = 24;
+/** One layer on the cover, in the list's order (back to front). x and y are percentages of the 3:4 cover. */
+export type Sticker = { kind: "pokemon" | "pixel"; species_id: number | null; pixel_key: PixelKey | null; x: number; y: number; rotation: number; scale: number };
+export type Appearance = { cover: Cover; stickers: Sticker[] };
 export type BinderSummary = {
-  id: string; name: string; display_order: number; cover: Cover; copy_count: number; page_count: number;
+  id: string; name: string; display_order: number; cover: Cover; stickers: Sticker[]; copy_count: number; page_count: number;
   last_placed_at: string | null; created_at: string; updated_at: string;
 };
 export type BinderPocket = { page: number; pocket: number; copy: InventoryCopy; placed_at: string };
@@ -30,8 +38,18 @@ const name = (v: unknown): v is string => typeof v === "string" && v.trim() === 
 const page = (v: unknown): v is number => integer(v, 1, MAX_PAGES);
 const pocket = (v: unknown): v is number => integer(v, 1, POCKETS_PER_PAGE);
 
+const decimals = (n: number, places: number) => Math.abs(Math.round(n * 10 ** places) - n * 10 ** places) < 1e-6;
+const ranged = (v: unknown, min: number, max: number, places: number): v is number => typeof v === "number" && Number.isFinite(v) && v >= min && v <= max && decimals(v, places);
+/** A sticker names a species (1-1025) or a fixed pixel design, never both, and stays inside the cover. */
+export function isSticker(v: unknown): v is Sticker {
+  if (!record(v) || Object.keys(v).length !== 7) return false;
+  const pokemon = v.kind === "pokemon" && integer(v.species_id, 1, NATIONAL_DEX_TOTAL) && v.pixel_key === null;
+  const pixel = v.kind === "pixel" && v.species_id === null && pixelKeys.some((key) => key === v.pixel_key);
+  return (pokemon || pixel) && ranged(v.x, 0, 100, 2) && ranged(v.y, 0, 100, 2) && ranged(v.rotation, -180, 180, 1) && ranged(v.scale, 0.5, 2, 2);
+}
 function summary(v: unknown): v is BinderSummary {
   return record(v) && uuid(v.id) && name(v.name) && integer(v.display_order, 0, 2147483647) && covers.some((c) => c === v.cover)
+    && Array.isArray(v.stickers) && v.stickers.length <= MAX_STICKERS && v.stickers.every(isSticker)
     && integer(v.copy_count, 0, MAX_PAGES * POCKETS_PER_PAGE) && integer(v.page_count, 2, MAX_PAGES) && v.page_count % 2 === 0
     && (v.last_placed_at === null || timestamp(v.last_placed_at)) && timestamp(v.created_at) && timestamp(v.updated_at);
 }
@@ -83,6 +101,19 @@ export async function createBinder(binderName: string, csrf: string, signal: Abo
 }
 export async function renameBinder(id: string, binderName: string, csrf: string, signal: AbortSignal): Promise<BinderSummary> {
   const payload = await request(path(id), signal, "PUT", csrf, { name: binderName.trim() });
+  if (!summary(payload) || payload.id !== id) throw new BindersError(0); return payload;
+}
+/** Saves the cover and every sticker as one snapshot; the answer must be exactly what was asked. */
+export async function saveAppearance(id: string, appearance: Appearance, csrf: string, signal: AbortSignal): Promise<BinderSummary> {
+  if (!uuid(id) || !covers.some((c) => c === appearance.cover) || appearance.stickers.length > MAX_STICKERS || !appearance.stickers.every(isSticker)) throw new BindersError(422);
+  const payload = await request(`${path(id)}/appearance`, signal, "PUT", csrf, appearance);
+  if (!summary(payload) || payload.id !== id || payload.cover !== appearance.cover || JSON.stringify(payload.stickers) !== JSON.stringify(appearance.stickers)) throw new BindersError(0);
+  return payload;
+}
+/** "+ Agregar hojas": two more pages, saved even when empty; the server never removes any. */
+export async function addPages(id: string, csrf: string, signal: AbortSignal): Promise<BinderSummary> {
+  if (!uuid(id)) throw new BindersError(404);
+  const payload = await request(`${path(id)}/pages`, signal, "POST", csrf);
   if (!summary(payload) || payload.id !== id) throw new BindersError(0); return payload;
 }
 export async function reorderBinders(ids: string[], csrf: string, signal: AbortSignal): Promise<BinderList> {
