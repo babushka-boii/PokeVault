@@ -4,7 +4,8 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
 import { useCardMetadata } from "../components/cards/cardMetadata";
-import { CardArtwork } from "../components/cards/CardArtwork";
+import { AlbumFrame } from "../components/binders/AlbumFrame";
+import { BinderTray } from "../components/binders/BinderTray";
 import { cardIdentity, fill, plural } from "../components/binders/labels";
 import { PageGrid, type PocketRef } from "../components/binders/PageGrid";
 import { BinderValue } from "../components/prices/BinderValue";
@@ -18,14 +19,14 @@ import { captureOrigin, flyCard, inViewport, PAGE_TURN_WAIT_MS, settled, wait, t
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
 import {
-  BindersError, fetchBinder, fetchBinders, fetchCopyView, MAX_PAGES, placeInPocket, removeFromPocket, spreadStart, storeNext,
-  type Binder, type CopyViewPage, type StoreResult,
+  BindersError, fetchBinder, fetchBinders, MAX_PAGES, placeInPocket, removeFromPocket, spreadStart, storeNext,
+  type Binder, type StoreResult,
 } from "../services/binders";
 import type { InventoryCopy } from "../services/inventory";
 import { fetchCopyPrices, PricesError } from "../services/prices";
 import "../components/binders/binders.css";
 
-type Mode = { kind: "idle" } | { kind: "fill"; target: PocketRef } | { kind: "move"; copy: InventoryCopy; from: PocketRef; binderId: string };
+export type Mode = { kind: "idle" } | { kind: "fill"; target: PocketRef } | { kind: "move"; copy: InventoryCopy; from: PocketRef; binderId: string };
 const key = (target: PocketRef) => `${target.page}:${target.pocket}`;
 const clampPage = (value: number, pages: number) => Number.isInteger(value) ? Math.min(Math.max(value, 1), pages) : 1;
 
@@ -38,54 +39,6 @@ function useGuard() {
   }, [retrySession]);
 }
 
-function Tray({ mode, binderId, busy, onStore, version, onCancel, consumed }: {
-  mode: Mode; binderId: string; busy: boolean; version: number; consumed: ReadonlySet<string>;
-  onStore: (copy: InventoryCopy, origin: FlightOrigin | null) => void; onCancel: () => void;
-}) {
-  const { dictionary, locale } = useLocale();
-  const text = dictionary.binders;
-  const guard = useGuard();
-  const [offset, setOffset] = useState(0);
-  const request = useCallback((signal: AbortSignal) => fetchCopyView("unassigned", offset, signal).catch((e: unknown) => guard(e, signal)), [offset, guard]);
-  const tray = useTcgResource<CopyViewPage>(`${binderId}:${offset}:${version}`, request);
-  const loaded = tray.state.kind === "loaded" ? tray.state.data : undefined;
-  // Copies whose flight just landed are already in a pocket: never show them twice while the tray reloads.
-  const page = loaded && { ...loaded, results: loaded.results.filter((copy) => !consumed.has(copy.id)) };
-  const metadata = useCardMetadata(page?.results.map((copy) => copy.card_id) ?? [], locale);
-  const fillTarget = mode.kind === "fill" ? mode.target : null;
-  return <section className="pv-tray" aria-labelledby="pv-tray-title">
-    <div className="pv-tray__head">
-      <h2 id="pv-tray-title" tabIndex={-1}>{text.tray}</h2>
-      {page && <span className="pv-tray__count">{fill(text.trayTotal, { count: page.total })}</span>}
-    </div>
-    <p className="pv-binder__hint">{fillTarget ? fill(text.trayTargetHint, fillTarget) : text.trayHint}</p>
-    {fillTarget && <Button onClick={onCancel}>{text.trayCancel}</Button>}
-    {tray.state.kind === "loading" && <LoadingStatus label={text.trayLoading}><Skeleton shape="text" lines={3} /></LoadingStatus>}
-    {tray.state.kind === "error" && <InlineError message={text.trayError} retryLabel={text.retry} onRetry={tray.retry} />}
-    {page && page.results.length === 0 && <p className="pv-binder__hint">{text.trayEmpty}</p>}
-    {page && page.results.length > 0 && <ul className="pv-tray__list">
-      {page.results.map((copy) => {
-        const card = metadata.cards[copy.card_id];
-        const identity = cardIdentity(copy, card);
-        const label = fillTarget ? fill(text.storeHere, { card: identity, ...fillTarget }) : fill(text.storeNext, { card: identity });
-        return <li key={copy.id}>
-          <button type="button" className="pv-tray__item" disabled={busy} aria-label={label}
-            onClick={(event) => onStore(copy, captureOrigin(event.currentTarget.querySelector(".pv-tray__thumb")))}>
-            <span className="pv-tray__thumb" aria-hidden="true">{card ? <CardArtwork card={card} /> : <span className="pv-pocket__fallback">{copy.card_id}</span>}</span>
-            <span className="pv-tray__facts">
-              <strong>{identity}</strong>
-              <span>{dictionary.inventory.variants[copy.variant]} · {dictionary.inventory.languages[copy.language]} · {dictionary.inventory.conditions[copy.condition]}</span>
-            </span>
-          </button>
-        </li>;
-      })}
-    </ul>}
-    {page && page.total > 30 && <div className="pv-tray__pages">
-      <Button disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - 30))}>{text.trayPrevious}</Button>
-      <Button disabled={offset + 30 >= page.total} onClick={() => setOffset(offset + 30)}>{text.trayNext}</Button>
-    </div>}
-  </section>;
-}
 
 function MoveTargets({ current, value, onChange }: { current: string; value: string; onChange: (id: string) => void }) {
   const { dictionary } = useLocale();
@@ -325,11 +278,11 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           <span className="pv-binder__pages">{label}</span>
           <Button disabled={first + (mobile ? 1 : 2) > pageCount} onClick={() => turnPage(1)}>{text.next} ›</Button>
         </nav>
-        <div className="pv-spread" data-turn={turn ?? undefined}>
+        <AlbumFrame mobile={mobile} turn={turn}>
           {visible.map((page) => <PageGrid key={page} page={page} pockets={binder.pockets} cards={metadata.cards} prices={priceById}
             selected={selected} arrived={arrived} incoming={incoming} targetable={mode.kind === "move" && mode.binderId === binderId}
             select={select} onTurn={turnPage} register={register} />)}
-        </div>
+        </AlbumFrame>
         <p className="pv-binder__hint">{text.keyboard}</p>
       </div>
       <aside className="pv-selection" aria-label={text.selected}>
@@ -358,7 +311,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           <Button disabled={busy} onClick={() => setMode({ kind: "fill", target: selected })}>{text.fillFromTray}</Button>
         </>}
       </aside>
-      <Tray mode={mode} binderId={binderId} busy={busy} version={trayVersion} consumed={consumed} onStore={(copy, origin) => void store(copy, origin)} onCancel={() => setMode({ kind: "idle" })} />
+      <BinderTray mode={mode} binderId={binderId} busy={busy} version={trayVersion} consumed={consumed} onStore={(copy, origin) => void store(copy, origin)} onCancel={() => setMode({ kind: "idle" })} />
     </div>
   </>;
 }

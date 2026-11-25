@@ -101,11 +101,11 @@ Interfaces to settle exactly as the spec before implementation:
 
 **Files:** read CLAUDE.md, both 8D documents, previous 8C/8C.1 test evidence.
 
-- [ ] Record approval of D1–D7 and the separate Safari gate. Revise both documents first
+- [x] Record approval of D1–D7 and the separate Safari gate. Revise both documents first
   if an answer changes the contract; do not silently choose an unapproved alternative.
-- [ ] Verify branch/worktree, create `feat/iteration-8d-binder-album` from updated main
+- [x] Verify branch/worktree, create `feat/iteration-8d-binder-album` from updated main
   without resetting or staging unrelated files. Keep AGENTS.md unless separately included.
-- [ ] Inspect available Python/node tools and test configuration without opening secrets.
+- [x] Inspect available Python/node tools and test configuration without opening secrets.
   Record baseline failures/skips honestly; stop on a failure rather than building on it.
 
 ### Task 1: Album geometry and fixed tray
@@ -116,17 +116,17 @@ Interfaces to settle exactly as the spec before implementation:
 route-scoped shell.css/AppShell.tsx only if required to reserve existing shell space.
 **Tests:** BinderView.test.tsx, styles/styles.contract.test.ts.
 
-- [ ] Write fitAlbum cases for width/height-limited two-page fit, one page, 64 px minimum,
+- [x] Write fitAlbum cases for width/height-limited two-page fit, one page, 64 px minimum,
   63:88 ratio and explicit overflow fallback. Write tray tests proving 30-item paging,
   pending-disable, empty/retry, target highlight and consumed-item behavior survive.
-- [ ] Run `npm test --prefix frontend -- --run src/components/binders/albumLayout.test.ts
+- [x] Run `npm test --prefix frontend -- --run src/components/binders/albumLayout.test.ts
   src/pages/BinderView.test.tsx`; confirm new assertions fail for missing behavior.
-- [ ] Implement pure sizing and measured available space, desktop spine/three rings,
+- [x] Implement pure sizing and measured available space, desktop spine/three rings,
   lateral arrows and mobile rings; extract tray without changing request semantics.
   Keep original sleeve/card/front nodes and flight overflow clear. Add ES/EN strings.
-- [ ] Test shell height, status wrapping and tray-height changes; cleanup observers and
+- [x] Test shell height, status wrapping and tray-height changes; cleanup observers and
   resize handlers. Add skeletons with the same reserved space and reduced-motion styles.
-- [ ] Run task tests, `npm run lint --prefix frontend`, `npm run typecheck --prefix frontend`.
+- [x] Run task tests, `npm run lint --prefix frontend`, `npm run typecheck --prefix frontend`.
   Commit only the task's files on green: `feat(binders): fit the open album and bottom tray`.
 
 ### Task 2: Contextual controls and safe selection modes
@@ -325,3 +325,26 @@ D1–D7: approved by the student on 2026-11-24; Part 1 execution authorized.
 Part 1 Safari approval: **pending**.
 Implementation tests/full gate/migration/Safari: **not executed in this planning task**.
 Planning checks: source audit, main fast-forward pull, spec/plan cross-check and whitespace.
+
+### Execution checkpoint — 2026-11-24
+
+- Branch created from main: `feat/iteration-8d-binder-album`.
+- Approval/spec/plan/AGENTS commit: `75834d4`.
+- Baseline: backend pytest 839 passed; frontend 538 passed; ESLint and TypeScript passed.
+- Task 1 is in progress, not complete: AlbumFrame, fitAlbum and extracted BinderTray
+  are implemented locally. Geometry regression assertions were observed failing before
+  implementing the calculation, then passing.
+- Latest frontend suite: 541 passed in 38 files. Focused geometry/binder/style checks:
+  76 passed; lint/typecheck passed. Subsequent lateral-pager CSS passed lint but still
+  requires its final focused verification.
+- Pending before Task 1 commit: finish measured layout/overflow and tray-state coverage,
+  reconcile pocket box sizing with the fit calculation, and verify lateral controls.
+  The current action panel still consumes document height until Task 2 replaces it;
+  viewport-fit acceptance is not established yet.
+- Tasks 2–4 are not started; no application-code commit, full check.sh, migration,
+  Safari acceptance, or Part 2 work has been performed.
+- Task 0 and Task 1 complete (2026-11-24): branch, approval and baseline recorded; album
+  geometry (fitAlbum, three rings, lateral arrows, fixed bottom tray) committed with
+  541 frontend tests, lint and typecheck green. The tray keeps its 30-item paging, retry,
+  fill cue and consumed-item tests in BinderView.test.tsx. Real viewport fit is still a
+  Safari check (jsdom proves no layout).
