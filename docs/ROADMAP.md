@@ -655,3 +655,17 @@ Apply migration 0009 first (`docs/HOME.md`), then open http://localhost:5173/.
 - [ ] Starring changes the Favoritas tab without reloading; an offline server puts the star back with a quiet notice.
 - [ ] Turn the API off: each Home section says "No pudimos cargar … por ahora" with Reintentar, with no alarm.
 - [ ] The guide shows your two finished steps crossed out; "Marca tu favorita ★" scrolls to the carousel and focuses its title.
+
+## Iteration 9B — Collector's Pokédex (Safari checklist)
+
+Back up and apply migration 0010 first: `pg_dump -Fc pokevault -f ~/pokevault-before-0010.dump`, then
+`cd backend && .venv/bin/alembic upgrade head` (`alembic current` → 0010). `alembic downgrade 0009`
+only loses the `card_species` cache (it is rebuilt on demand). The species list is a fixed JSON
+(`backend/app/pokemon/data/species_index.json`); regenerate it with `backend/scripts/build_species_index.py`
+(see the script header) and the test `test_species_index.py` validates it.
+
+- [ ] `/pokedex`: 9 generation tabs, search by name (ES/EN) or number, type chips, owned/missing filter; owned species in colour with their card count, the rest dimmed; "Ver más" and going back restore the position.
+- [ ] A species sheet (`/pokemon/25`): hero with artwork, description and ability "(oculta)"; previous/next with names; back returns to the grid.
+- [ ] "Tu colección": copies, distinct cards and value (CLP/USD); "Ver solo las que me faltan" filters exactly, and pages stay full.
+- [ ] Cards: "TENGO" label and gold border on owned ones; ★ flips at once; the card detail returns to the sheet with the same filters; `/pokemon/25/cards` redirects to the sheet.
+- [ ] As a guest: public cards, owned filters disabled and a sign-in link; with the network cut, calm errors with "Reintentar".
