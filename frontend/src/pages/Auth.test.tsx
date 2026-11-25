@@ -156,11 +156,12 @@ test("replaces an expired session with the sign-in action on focus", async () =>
 });
 
 test("keeps the public Pokédex accessible while session restoration is pending", async () => {
-  vi.stubGlobal("fetch", vi.fn((input: string) => input.endsWith("/auth/me") ? new Promise<Response>(() => undefined) : Promise.resolve(json({ results: [{ national_dex_number: 1, name: "bulbasaur", types: ["grass"], sprite_url: null }] }))));
+  const rows = Array.from({ length: 1025 }, (_, n) => ({ national_dex_number: n + 1, name_en: n === 0 ? "Bulbasaur" : `Species ${n + 1}`, name_es: n === 0 ? "Bulbasaur" : `Especie ${n + 1}`, types: ["grass"] }));
+  vi.stubGlobal("fetch", vi.fn((input: string) => input.endsWith("/auth/me") ? new Promise<Response>(() => undefined) : Promise.resolve(json({ results: rows }))));
   render(<App initialEntries={["/pokedex"]} />);
-  expect(await screen.findByRole("heading", { name: "Bulbasaur" })).toBeVisible();
+  const tile = await screen.findByRole("link", { name: /^#001 Bulbasaur/ });
+  expect(tile.getAttribute("href")).toMatch(/^\/pokemon\/1\?returnTo=/);
   expect(screen.getByRole("link", { name: "Expansiones" })).toHaveAttribute("href", "/sets");
-  expect(screen.getByRole("link", { name: "Ver cartas TCG" })).toHaveAttribute("href", "/pokemon/1/cards?returnTo=%2Fpokedex");
 });
 
 function SessionProbe() { const auth = useAuth(); return <output>{auth.status}</output>; }

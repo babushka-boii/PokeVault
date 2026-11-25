@@ -136,7 +136,7 @@ describe("mobile shell", () => {
     await user.click(explore);
     await user.click(screen.getByRole("link", { name: "Pokédex" }));
     expect(explore).toHaveAttribute("aria-expanded", "false");
-    expect(await screen.findByRole("heading", { level: 1, name: "Pokédex" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Tu Pokédex" })).toBeInTheDocument();
   });
 
   test("swaps layouts live when the viewport crosses the breakpoint", () => {

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.binders import router as binders_router
 from app.api.cards import router as cards_router
+from app.api.collection import router as collection_router
 from app.api.favorites import router as favorites_router
 from app.api.health import router as health_router
 from app.api.history import router as history_router
@@ -18,6 +19,7 @@ from app.api.settings import router as settings_router
 from app.auth.google import GoogleOIDCClient
 from app.auth.middleware import AuthenticationPrivacyMiddleware
 from app.cards.provider import CardProvider
+from app.collection.species import CardSpeciesService
 from app.core.config import Settings, get_settings
 from app.db.base import create_session_factory
 from app.pokemon.provider import PokemonProvider
@@ -44,6 +46,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(AuthenticationPrivacyMiddleware)
     app.state.pokemon_provider = PokemonProvider()
     app.state.card_provider = CardProvider()
+    app.state.card_species = CardSpeciesService(app.state.card_provider)
     app.state.price_service = PriceService(app.state.card_provider, RatesClient())
     app.state.ocr_service = OCRService()
     app.state.scan_upload_slots = asyncio.Semaphore(2)
@@ -53,6 +56,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(binders_router)
     app.include_router(favorites_router)
     app.include_router(history_router)
+    app.include_router(collection_router)
     app.include_router(prices_router)
     app.include_router(settings_router)
     app.include_router(pokemon_router)

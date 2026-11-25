@@ -3,7 +3,7 @@
 **Date:** 2026-11-24
 
 **Status:** D1–D7 approved by the student on 2026-11-24. Implementation is
-currently authorized for Part 1 only. Part 2 and migration 0010 require separate
+currently authorized for Part 1 only. Part 2 and migration 0011 require separate
 approval after the Part 1 Safari checkpoint.
 
 **Iteration:** 8D, following merged 8C and 8C.1.
@@ -72,7 +72,7 @@ Alternatives considered:
 
 Included: approved album layout, contextual actions, touch paging, fixed tray,
 cover editor, five materials, original pixel stickers, Pokémon artwork, migration
-0010, anti-UUID cleanup, ES/EN, accessibility and regression evidence.
+0011, anti-UUID cleanup, ES/EN, accessibility and regression evidence.
 
 Excluded: inventory or scanner redesign, OCR changes, PC boxes, card drag-and-drop,
 page stickers, user uploads, arbitrary URLs/SVG, sharing, batch scanning, favourites,
@@ -213,7 +213,7 @@ never the copy UUID. Preserve edit/delete, copy prices, location and owner guard
 ## 5. Mandatory Safari checkpoint
 
 After Part 1 tests/lint pass and its commits are complete, stop. Give the student local
-URLs and the Part 1 checklist in §10. Do not create migration 0010 or implement Part 2
+URLs and the Part 1 checklist in §10. Do not create migration 0011 or implement Part 2
 until Safari feedback is resolved and the student explicitly approves continuing.
 There is no database migration in Part 1.
 
@@ -286,7 +286,7 @@ Save sends one atomic snapshot. Cancel/Escape/outside close with dirty draft ask
 of drafts. Session loss discards private drafts without a discard prompt. Disable Save
 and editing while pending; errors keep the draft for the same confirmed owner. No auto-save.
 
-## 7. Data and API (migration 0010, D7)
+## 7. Data and API (migration 0011, D7)
 
 ### 7.1 Schema
 
@@ -345,7 +345,7 @@ all numeric bounds, layer identifiers and order. Prices remain a separate groupe
 
 ### 7.3 Migration safety
 
-0010 follows 0009 (9A's favourites and value history). Upgrade changes only the cover check, adds revision=0 and the empty
+0011 follows 0010 (9B's card species; 0009 is 9A's favourites and value history). Upgrade changes only the cover check, adds revision=0 and the empty
 sticker table. Existing binder IDs, names, timestamps, positions, inventory and prices
 are unchanged. PostgreSQL and SQLite-compatible migration operations must preserve FKs.
 
@@ -360,7 +360,7 @@ schema; disposable-schema migration tests are separate. Never read backend/.env.
 Today `page_count` is derived (the last used page plus one, rounded up to an even number),
 so an empty page cannot be kept. Part 2 stores it:
 
-- `binders.page_count` integer, even, 2–40, added by migration 0010. Existing binders get
+- `binders.page_count` integer, even, 2–40, added by migration 0011. Existing binders get
   their *used pages plus one spare, rounded up to an even number* (minimum 2, maximum 40);
   the downgrade drops the column and the derived rule applies again.
 - **"+ Agregar hojas"** at the end of the binder adds 2 pages (up to 40) and saves them even

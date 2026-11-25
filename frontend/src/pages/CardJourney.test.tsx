@@ -25,9 +25,7 @@ function mockBackend() {
     else if (details) payload = { ...pokemon(Number(details[1])), name_language: 'en', height_m: .7, weight_kg: 6.9, abilities: [], description: null, description_language: null };
     else if (url.pathname.startsWith('/api/v1/cards/')) payload = printing(url.pathname.endsWith('base1-44') ? 1 : 559);
     else {
-      const offset = Number(url.searchParams.get('offset') ?? 0);
-      const count = Number(url.searchParams.get('limit') ?? 20);
-      payload = { results: Array.from({ length: count }, (_, index) => pokemon(offset + index + 1)) };
+      payload = { results: Array.from({ length: 1025 }, (_, index) => ({ national_dex_number: index + 1, name_en: pokemon(index + 1).name, name_es: pokemon(index + 1).name, types: pokemon(index + 1).types })) };
     }
     return Promise.resolve(new Response(JSON.stringify(payload), { status: 200 }));
   });
@@ -44,8 +42,8 @@ test('an old box link → species gallery → card → gallery → back to the P
   expect(await screen.findByText('bw1-68')).toBeVisible();
   await user.click(screen.getByRole('link', { name: 'Volver a la galería' }));
   await screen.findByRole('link', { name: /Scraggy/ });
-  await user.click(screen.getByRole('link', { name: 'Volver' }));
-  expect(await screen.findByRole('heading', { name: 'Pokédex' })).toBeVisible();
+  await user.click(screen.getByRole('link', { name: /Volver a la Pokédex/ }));
+  expect(await screen.findByRole('heading', { name: 'Tu Pokédex' })).toBeVisible();
   expect(request.mock.calls.every(([url]) => url.startsWith('http://localhost:8000/api/v1/'))).toBe(true);
 });
 
@@ -53,9 +51,8 @@ test('Pokédex exposes a separate card action and returns to Pokédex', async ()
   mockBackend();
   const user = userEvent.setup();
   render(<App initialEntries={['/pokedex']} />);
-  await screen.findByRole('heading', { name: 'Bulbasaur' });
-  await user.click(screen.getAllByRole('link', { name: 'Ver cartas TCG' })[0]);
+  await user.click(await screen.findByRole('link', { name: /^#001 bulbasaur/ }));
   await screen.findByRole('link', { name: /Bulbasaur/ });
-  await user.click(screen.getByRole('link', { name: 'Volver' }));
-  expect(await screen.findByRole('heading', { name: 'Pokédex' })).toBeVisible();
+  await user.click(screen.getByRole('link', { name: /Volver a la Pokédex/ }));
+  expect(await screen.findByRole('heading', { name: 'Tu Pokédex' })).toBeVisible();
 });

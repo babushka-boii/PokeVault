@@ -1,0 +1,57 @@
+/* Collector's Pokédex on "Unova Noir" tokens. Type colours only as small dots (from typeBadge.css). */
+.pv-dex { display: grid; gap: var(--pv-space-4); min-width: 0; }
+.pv-dex__head h1 { margin: 0 0 var(--pv-space-2); }
+.pv-dex__bar { background: var(--pv-panel-raised); border: 1px solid var(--pv-border); height: .75rem; margin: var(--pv-space-2) 0; overflow: hidden; }
+.pv-dex__bar > span { background: var(--pv-gold); display: block; height: 100%; }
+.pv-dex__tabs { display: flex; flex-wrap: wrap; gap: var(--pv-space-1); }
+.pv-dex__tabs button, .pv-chipbtn { background: var(--pv-panel); border: 1px solid var(--pv-border); color: var(--pv-text-2); cursor: pointer; font: inherit; min-height: var(--pv-touch); padding: 0 var(--pv-space-3); }
+.pv-dex__tabs button[aria-selected="true"], .pv-chipbtn[aria-pressed="true"], .pv-dex__show button[aria-checked="true"] { background: var(--pv-cyan-soft); border-color: var(--pv-cyan); color: var(--pv-text); }
+.pv-dex__tabs small { color: var(--pv-text-3); display: block; font-size: var(--pv-text-xs); }
+.pv-dex__filters { align-items: end; display: flex; flex-wrap: wrap; gap: var(--pv-space-3); }
+.pv-dex__filters label { color: var(--pv-text-2); display: grid; font-size: var(--pv-text-sm); gap: var(--pv-space-1); }
+.pv-dex__filters input[type="search"] { min-height: var(--pv-touch); min-width: 14rem; padding: 0 var(--pv-space-3); }
+.pv-dex__show { border: 1px solid var(--pv-border-strong); display: inline-flex; }
+.pv-dex__show button { background: transparent; border: 0; color: var(--pv-text-2); cursor: pointer; font: inherit; min-height: var(--pv-touch); padding: 0 var(--pv-space-3); }
+.pv-dex__show button:disabled { cursor: not-allowed; opacity: .5; }
+.pv-dex__types { display: flex; flex-wrap: wrap; gap: var(--pv-space-1); }
+.pv-chipbtn { align-items: center; display: inline-flex; gap: var(--pv-space-2); }
+.pv-typedot { background: var(--type-color, var(--pv-border-strong)); border-radius: 50%; display: inline-block; height: .6rem; width: .6rem; }
+.pv-dex__grid { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); list-style: none; margin: 0; padding: 0; }
+.pv-tile a { align-items: center; background: var(--pv-panel); border: 1px solid var(--pv-border); color: var(--pv-text); display: grid; gap: var(--pv-space-1); justify-items: center; min-height: 11rem; padding: var(--pv-space-3) var(--pv-space-2); position: relative; text-decoration: none; transition: transform var(--pv-dur-fast) var(--pv-ease), border-color var(--pv-dur-fast) var(--pv-ease); }
+.pv-tile a:hover, .pv-tile a:focus-visible { border-color: var(--pv-cyan); transform: translateY(-2px); }
+.pv-tile__number { color: var(--pv-text-2); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); }
+.pv-tile__name { font-weight: 600; overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+.pv-tile__types { display: flex; gap: var(--pv-space-1); min-height: .6rem; }
+.pv-tile__count { background: var(--pv-gold-soft); border: 1px solid var(--pv-gold); color: var(--pv-gold); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); padding: 0 var(--pv-space-2); }
+.pv-tile[data-state="missing"] a { opacity: .45; }
+.pv-tile[data-state="missing"] img { filter: grayscale(1); }
+.pv-sprite { align-items: center; display: inline-flex; height: 96px; justify-content: center; width: 96px; }
+.pv-sprite img { image-rendering: pixelated; }
+.pv-sprite__missing { color: var(--pv-text-3); font-size: 2rem; }
+.pv-dex__skeleton { display: grid; gap: var(--pv-space-3); grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); }
+.pv-dex__skeleton > * { min-height: 11rem; }
+@media (prefers-reduced-motion: reduce) { .pv-tile a { transition: none; } .pv-tile a:hover, .pv-tile a:focus-visible { transform: none; } }
+
+/* Species sheet */
+.pv-species__bar { align-items: center; display: flex; flex-wrap: wrap; gap: var(--pv-space-3); justify-content: space-between; }
+.pv-species__siblings { display: flex; flex-wrap: wrap; gap: var(--pv-space-4); }
+.pv-species__siblings a, .pv-species .tcg-back { align-items: center; display: inline-flex; min-height: var(--pv-touch); }
+.pv-species__hero { display: grid; gap: var(--pv-space-5); grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); }
+.pv-species__art { background: var(--pv-panel); border: 1px solid var(--pv-border); position: relative; }
+.pv-species__art > img { display: block; height: auto; width: 100%; }
+.pv-species__corner { background: var(--pv-bar); border: 1px solid var(--pv-border-strong); bottom: var(--pv-space-2); position: absolute; right: var(--pv-space-2); }
+.pv-species__hero h1 { margin: var(--pv-space-1) 0 var(--pv-space-2); }
+.pv-species__facts { display: grid; gap: var(--pv-space-2); margin: var(--pv-space-3) 0 0; }
+.pv-species__facts div { display: flex; flex-wrap: wrap; gap: var(--pv-space-2); }
+.pv-species__facts dt { color: var(--pv-text-2); min-width: 6rem; }
+.pv-species__facts dd { margin: 0; }
+.pv-species__mine { background: var(--pv-panel); border: 1px solid var(--pv-border); display: grid; gap: var(--pv-space-2); padding: var(--pv-space-4); }
+.pv-species__value .price-amount { font-size: var(--pv-text-lg); }
+.tcg-preview { position: relative; }
+.tcg-preview[data-owned="true"] .tcg-artwork { box-shadow: 0 0 0 2px var(--pv-gold); }
+.tcg-preview[data-owned="false"] > :not(.tcg-preview__star) { opacity: .5; }
+.tcg-preview__owned { background: var(--pv-bg); border: 1px solid var(--pv-gold); color: var(--pv-gold); font-family: var(--pv-font-pixel); font-size: var(--pv-text-pixel); left: var(--pv-space-2); padding: 0 var(--pv-space-2); position: absolute; top: var(--pv-space-2); z-index: 2; }
+.tcg-preview__star { background: color-mix(in srgb, var(--pv-bg) 78%, transparent); border: 1px solid var(--pv-border-strong); color: var(--pv-text); cursor: pointer; font-size: 1.25rem; height: var(--pv-touch); position: absolute; right: var(--pv-space-2); top: var(--pv-space-2); width: var(--pv-touch); z-index: 2; }
+.tcg-preview__star[aria-pressed="true"] { border-color: var(--pv-gold); color: var(--pv-gold); }
+.tcg-preview__star:disabled { opacity: .55; }
+@media (max-width: 767px) { .pv-species__hero { grid-template-columns: minmax(0, 1fr); } }

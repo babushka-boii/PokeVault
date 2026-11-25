@@ -92,7 +92,7 @@ export async function fetchCopyPrices(copyIds: string[], currency: Currency, sig
 
 export const DEFAULT_TOP = 5;
 export const MAX_TOP = 20;
-function isValuation(v: unknown, currency: Currency): v is Valuation {
+export function isValuation(v: unknown, currency: Currency): v is Valuation {
   return record(v) && v.currency === currency && (v.total === null || decimal(v.total)) && amounts(v.original_totals)
     && count(v.copy_count) && count(v.priced_count) && count(v.unpriced_count) && v.priced_count + v.unpriced_count === v.copy_count
     && counts(v.unpriced_by_reason, reasons) && count(v.pending_count) && count(v.stale_count) && counts(v.sources, ["cardmarket", "tcgplayer"] as const)

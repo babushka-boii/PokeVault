@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vitest";
 import { App } from "../app/App";
+import { indexResponse } from "../test/dexFixtures";
 import { jsonResponse, pikachuCard, speciesDetails, tcgPage } from "../test/tcgFixtures";
 
 const teamUp = { id: "sm9", name: "Unión de Aliados", name_language: "es", logo_url: "https://assets.tcgdex.net/es/sm/sm9/logo.png", symbol_url: null,
@@ -15,6 +16,7 @@ afterEach(() => vi.unstubAllGlobals());
 function gallery() {
   const request = vi.fn((value: string) => {
     const url = new URL(value);
+    if (url.pathname.endsWith("/pokemon/index")) return Promise.resolve(indexResponse());
     const selected = sets.find((set) => set.id === url.searchParams.get("set_id")) ?? teamUp;
     return Promise.resolve(jsonResponse(value.includes("/cards?") ? tcgPage([{ ...pikachuCard, id: `${selected.id}-33`, set: selected }], {
       sets, sets_complete: true, page: Number(url.searchParams.get("page")),
@@ -90,7 +92,7 @@ test("chronological controls request a new complete server order and retain navi
   await user.selectOptions(screen.getByRole("combobox", { name: "Ordenar por" }), "newest");
   await waitFor(() => expect(request).toHaveBeenCalledWith(expect.stringContaining("page=1&page_size=12&sort=newest"), expect.anything()));
   await screen.findByRole("heading", { name: "Pikachu & Zekrom-GX" });
-  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/pokedex?page=3");
+  expect(screen.getByRole("link", { name: /Volver a la Pokédex/ })).toHaveAttribute("href", "/pokedex?page=3");
   await user.selectOptions(screen.getByRole("combobox", { name: "Ordenar por" }), "oldest");
   await waitFor(() => expect(request).toHaveBeenCalledWith(expect.stringContaining("sort=oldest"), expect.anything()));
 });

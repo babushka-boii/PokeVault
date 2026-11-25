@@ -10,7 +10,7 @@ import { LoginPage } from "../pages/LoginPage";
 import { HomePage } from "../pages/HomePage";
 import { PokedexPage } from "../pages/PokedexPage";
 import { ProfilePage } from "../pages/ProfilePage";
-import { PokemonCardsPage } from "../pages/PokemonCardsPage";
+import { SpeciesGalleryRedirect, SpeciesPage } from "../pages/SpeciesPage";
 import { TcgCardPage } from "../pages/TcgCardPage";
 import { SetsPage } from "../pages/SetsPage";
 import { SetPage } from "../pages/SetPage";
@@ -30,7 +30,8 @@ export function AppRoutes() {
         <Route path="collection" element={<CollectionPage />} />
         <Route path="collection/:copyId" element={<InventoryCopyPage />} />
         <Route path="profile" element={<ProfilePage />} />
-        <Route path="pokemon/:number/cards" element={<PokemonCardsPage />} />
+        <Route path="pokemon/:number" element={<SpeciesPage />} />
+        <Route path="pokemon/:number/cards" element={<SpeciesGalleryRedirect />} />
         <Route path="cards/:id" element={<TcgCardPage />} />
         <Route path="sets" element={<SetsPage />} />
         <Route path="sets/:setId" element={<SetPage />} />

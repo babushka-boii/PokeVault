@@ -3,6 +3,7 @@ from decimal import Decimal
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     CheckConstraint,
     Date,
@@ -371,4 +372,27 @@ class CollectionValueDay(Base):
     priced_count: Mapped[int] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class CardSpecies(Base):
+    """The national numbers a catalog card shows (shared catalog data: no user in it).
+
+    ``status`` is "ok" when TCGdex answered (``dex_ids`` is empty for trainers and
+    energies) and "unknown" when it does not know the card (retried after a day).
+    """
+
+    __tablename__ = "card_species"
+    __table_args__ = (
+        CheckConstraint(
+            "length(card_id) BETWEEN 1 AND 100", name="ck_card_species_card"
+        ),
+        CheckConstraint("status IN ('ok', 'unknown')", name="ck_card_species_status"),
+    )
+
+    card_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    dex_ids: Mapped[list[int]] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(String(8), nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
     )

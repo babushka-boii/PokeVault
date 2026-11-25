@@ -25,7 +25,7 @@ export function TcgCardPage() {
   const card = state.kind === "loaded" ? state.data : undefined;
   useEffect(() => { heading.current?.focus(); }, [location.pathname, card?.id]);
   const returnTo = safeReturnTo(searchParams.get("returnTo"));
-  const fromGallery = /^\/pokemon\/\d+\/cards(?:\?|$)/.test(returnTo);
+  const fromGallery = /^\/pokemon\/\d+(?:\/cards)?(?:\?|$)/.test(returnTo);
   const fromSet = /^\/sets\/[^/?]+(?:\?|$)/.test(returnTo);
   const fromScanner = /^\/scanner(?:\?|$)/.test(returnTo);
   const fromHome = returnTo === "/";
