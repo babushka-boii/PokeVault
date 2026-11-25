@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { fetchPokemonCards, fetchTcgCard, isCardId, isSetId, safeReturnTo } from "./cards";
+import { fetchPokemonCards, fetchTcgCard, cardPath, isCardId, isSetId, safeReturnTo } from "./cards";
 import { jsonResponse, pikachuCard, tcgPage } from "../test/tcgFixtures";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -24,11 +24,12 @@ test.each([
   "/sets?q=base&sort=oldest&page=2",
   "/sets/sv03.5?ownership=missing&page=3",
   "/scanner",
+  "/",
 ])("preserves allowed return destinations: %s", (destination) => {
   expect(safeReturnTo(destination)).toBe(destination);
 });
 
-test.each([null, "/boxes", "/boxes?box=19&pokemon=559&wallpaper=ocean", "https://evil.example", "//evil.example", "/\\evil.example", "/profile", "/pokemon/0/cards", "/pokemon/1026/cards", "/pokemon/25/cards/extra", "/sets/invalid_id", "/sets/sm9/cards", "/sets//evil", "/boxes#oops", "/boxes?x=\n", `/boxes?x=${"a".repeat(2048)}`])("rejects unsafe or unsupported return destination: %s", (destination) => {
+test.each([null, "/boxes", "/boxes?box=19&pokemon=559&wallpaper=ocean", "https://evil.example", "//evil.example", "/\\evil.example", "/profile", "/pokemon/0/cards", "/pokemon/1026/cards", "/pokemon/25/cards/extra", "/sets/invalid_id", "/sets/sm9/cards", "/sets//evil", "/boxes#oops", "/?x=1", "/#top", "//", "/boxes?x=\n", `/boxes?x=${"a".repeat(2048)}`])("rejects unsafe or unsupported return destination: %s", (destination) => {
   expect(safeReturnTo(destination)).toBe("/pokedex");
 });
 
@@ -95,4 +96,10 @@ test.each([
 ])("rejects malformed new artwork, expansion or battle metadata", async (changes) => {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ ...pikachuCard, ...changes })));
   await expect(fetchTcgCard("sm9-33", "es")).rejects.toThrow();
+});
+
+test("cardPath builds the catalog card address and keeps a safe way back", () => {
+  expect(cardPath("sv1-1")).toBe("/cards/sv1-1");
+  expect(cardPath("me02.5-261", "/")).toBe("/cards/me02.5-261?returnTo=%2F");
+  expect(safeReturnTo(new URLSearchParams("returnTo=%2F").get("returnTo"))).toBe("/");
 });

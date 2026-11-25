@@ -40,7 +40,7 @@ describe("tabs and sources", () => {
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     await waitFor(() => expect(names(cards)).toEqual(["Card 1", "Card 2", "Card 3", "Card 4", "Card 5"]));
     const first = cards.getAllByRole("listitem")[0];
-    expect(within(first).getByRole("link", { name: "Card 1" })).toHaveAttribute("href", `/collection/${copyId(100)}`);
+    expect(within(first).getByRole("link", { name: "Card 1" })).toHaveAttribute("href", "/cards/sv1-1?returnTo=%2F");   // the catalog card, coming back to Home
     expect(first.querySelector(".price-amount")).toHaveTextContent("$5.000");
     // Sober cards: no original currency, no source, no variant, no date.
     const text = cards.getByRole("tabpanel").textContent!;
@@ -62,13 +62,13 @@ describe("tabs and sources", () => {
     await user.click(cards.getByRole("tab", { name: "Favoritas" }));
     await waitFor(() => expect(names(cards)).toEqual(["Card 2", "Card 1"]));
     const items = cards.getAllByRole("listitem");
-    expect(within(items[0]).getByRole("link", { name: "Card 2" })).toHaveAttribute("href", "/cards/sv2-2");   // to the card, not a copy
+    expect(within(items[0]).getByRole("link", { name: "Card 2" })).toHaveAttribute("href", "/cards/sv2-2?returnTo=%2F");
     expect(items[0].querySelector(".price-amount")).toHaveTextContent("$9.000");
     expect(within(items[1]).getByText("Sin precio")).toBeVisible();
     await user.click(cards.getByRole("tab", { name: "Recientes" }));
     await waitFor(() => expect(names(cards)).toEqual(["Card 1", "Card 2"]));
     expect(cards.getAllByRole("listitem")[0].querySelector(".price-amount")).toHaveTextContent("$2.500");
-    expect(within(cards.getAllByRole("listitem")[0]).getByRole("link", { name: "Card 1" })).toHaveAttribute("href", `/collection/${copyId(100)}`);
+    expect(within(cards.getAllByRole("listitem")[0]).getByRole("link", { name: "Card 1" })).toHaveAttribute("href", "/cards/sv1-1?returnTo=%2F");
     // Back and forth: nothing is requested twice.
     await user.click(cards.getByRole("tab", { name: "Favoritas" }));
     await user.click(cards.getByRole("tab", { name: "Más valiosas" }));
@@ -408,5 +408,25 @@ describe("guests and recent copies", () => {
     await screen.findByText("TU BÓVEDA TCG");
     expect(callsTo(request, "/api/v1/favorites/cards")).toHaveLength(0);
     expect(callsTo(request, "/api/v1/binders/views/added")).toHaveLength(0);
+  });
+});
+
+describe("opening a card", () => {
+  test("every view leads to the catalog card page, and its back link returns to Home", async () => {
+    stubHome({ favorites: { results: [star("sv2-2", "9000")] } });
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    for (const [tab, card, href] of [["Más valiosas", "Card 1", "/cards/sv1-1?returnTo=%2F"], ["Favoritas", "Card 2", "/cards/sv2-2?returnTo=%2F"], ["Recientes", "Card 1", "/cards/sv1-1?returnTo=%2F"]]) {
+      await user.click(cards.getByRole("tab", { name: tab }));
+      expect(await cards.findByRole("link", { name: card })).toHaveAttribute("href", href);
+    }
+    await user.click(cards.getByRole("tab", { name: "Más valiosas" }));
+    await user.click(await cards.findByRole("link", { name: "Card 1" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Card 1" })).toBeVisible();     // the large catalog view
+    const back = screen.getByRole("link", { name: /Volver al Inicio/ });
+    expect(back).toHaveAttribute("href", "/");
+    await user.click(back);
+    expect(await screen.findByRole("region", { name: "Tus cartas" })).toBeVisible();
   });
 });

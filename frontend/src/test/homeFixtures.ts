@@ -47,6 +47,7 @@ export type HomeData = {
 
 /** Routes every request by path and fails loudly on anything unplanned. */
 export function stubHome(data: HomeData = {}) {
+  const starred = new Set<string>();
   const request = vi.fn((input: string, options?: RequestInit) => {
     const url = new URL(input); const path = url.pathname;
     const custom = data.override?.(url, options); if (custom) return Promise.resolve(custom);
@@ -65,6 +66,11 @@ export function stubHome(data: HomeData = {}) {
     if (path === "/api/v1/home/guide") {
       const guide = data.guide ?? {};
       return Promise.resolve(typeof guide === "function" ? guide() : json({ ...openGuide, ...guide }));
+    }
+    if (path.startsWith("/api/v1/favorites/") && path !== "/api/v1/favorites/cards") {
+      const card = decodeURIComponent(path.split("/").pop()!); const method = options?.method ?? "GET";
+      if (method === "PUT") starred.add(card); if (method === "DELETE") starred.delete(card);
+      return Promise.resolve(json({ card_id: card, favorite: starred.has(card) }));
     }
     if (path === "/api/v1/favorites/cards") {
       const favorites = data.favorites ?? noFavorites;
@@ -91,6 +97,7 @@ export function stubHome(data: HomeData = {}) {
       const pockets = data.pockets ?? [pocketAt(1, 3, physicalCopy(0)), pocketAt(1, 4, physicalCopy(1))];
       return Promise.resolve(json({ ...known, copy_count: pockets.length, pockets }));
     }
+    if (path.startsWith("/api/v1/prices/cards/")) return Promise.resolve(json({ card_id: path.split("/").pop(), currency: "CLP", language_independent: true, rates, variants: [{ variant: "normal", price: quote("38"), reason: null }, { variant: "reverse", price: null, reason: "no_market_data" }, { variant: "holo", price: null, reason: "no_market_data" }] }));
     if (path.startsWith("/api/v1/cards/")) { const card = cardById[decodeURIComponent(path.split("/").pop()!)]; return Promise.resolve(card ? json(card) : json({}, 404)); }
     if (path === "/api/v1/sets/progress") {
       const ids = url.searchParams.getAll("set_id");

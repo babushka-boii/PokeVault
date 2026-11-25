@@ -4,6 +4,7 @@ import { useAuth } from "../../auth/context";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { BindersError, fetchCopyView } from "../../services/binders";
+import { cardPath } from "../../services/cards";
 import { FavoritesError, fetchFavoriteCards } from "../../services/favorites";
 import { fetchCopyPrices, PricesError } from "../../services/prices";
 import { useCardMetadata } from "../cards/cardMetadata";
@@ -56,14 +57,14 @@ export function CardCarousel({ valuation }: { valuation: ValuationResource }) {
 
   const sources: Record<Tab, Source> = {
     valuable: valuation.state.kind === "loading" ? { state: "loading" } : valuation.state.kind === "error" ? { state: "error", retry: valuation.retry }
-      : { state: "ready", items: valuation.state.data.top.map((row) => ({ key: row.copy_id, cardId: row.card_id, to: `/collection/${encodeURIComponent(row.copy_id)}`, price: row.price })) },
+      : { state: "ready", items: valuation.state.data.top.map((row) => ({ key: row.copy_id, cardId: row.card_id, to: cardPath(row.card_id, "/"), price: row.price })) },
     favorites: !visited.has("favorites") || favorites.state.kind === "loading" ? { state: "loading" } : favorites.state.kind === "error" ? { state: "error", retry: favorites.retry }
-      : { state: "ready", items: favorites.state.data.results.map((row) => ({ key: row.card_id, cardId: row.card_id, to: `/cards/${encodeURIComponent(row.card_id)}`, price: row.price })) },
+      : { state: "ready", items: favorites.state.data.results.map((row) => ({ key: row.card_id, cardId: row.card_id, to: cardPath(row.card_id, "/"), price: row.price })) },
     added: !visited.has("added") || added.state.kind === "loading" ? { state: "loading" } : added.state.kind === "error" ? { state: "error", retry: added.retry }
       : added.state.kind === "loaded" && added.state.data.results.length === 0 ? { state: "ready", items: [] }
       : addedPrices.state.kind === "loading" ? { state: "loading" }
       // Prices failing never hides the cards: they just show without a price.
-      : { state: "ready", items: (added.state.kind === "loaded" ? added.state.data.results.slice(0, CAROUSEL_SIZE) : []).map((copy) => ({ key: copy.id, cardId: copy.card_id, to: `/collection/${encodeURIComponent(copy.id)}`,
+      : { state: "ready", items: (added.state.kind === "loaded" ? added.state.data.results.slice(0, CAROUSEL_SIZE) : []).map((copy) => ({ key: copy.id, cardId: copy.card_id, to: cardPath(copy.card_id, "/"),
         price: addedPrices.state.kind === "loaded" ? addedPrices.state.data.results.find((row) => row.copy_id === copy.id)?.price ?? null : null })) },
   };
   const source = sources[tab];
