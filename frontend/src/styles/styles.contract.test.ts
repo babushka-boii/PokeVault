@@ -253,6 +253,23 @@ describe("stylesheets", () => {
     expect(variants).toMatch(/text-decoration:\s*underline/);
   });
 
+  test("the quick star shows on hover or focus, always (smaller) without hover, and respects reduced motion", () => {
+    const css = stripComments(sheets["/src/components/home/home.css"]);
+    const star = rules(css).find((rule) => rule.selector === ".pv-reel__star")?.body ?? "";
+    expect(star).toMatch(/opacity:\s*0/);
+    expect(star).toMatch(/position:\s*absolute/);
+    expect(star).toMatch(/top:/); expect(star).toMatch(/right:/);
+    expect(star).toMatch(/height:\s*var\(--pv-touch\)/);
+    const shown = rules(css).find((rule) => /\.pv-reel__item:hover \.pv-reel__star/.test(rule.selector));
+    expect(shown?.selector).toMatch(/\.pv-reel__item:focus-within \.pv-reel__star/);
+    expect(shown?.selector).toMatch(/\.pv-reel__star:focus-visible/);
+    expect(shown?.body).toMatch(/opacity:\s*1/);
+    const touch = /@media \(hover: none\)\s*\{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    expect(touch).toMatch(/\.pv-reel__star \{[^}]*opacity:\s*1/);
+    expect(touch).toMatch(/\.pv-reel__star \{[^}]*height:\s*32px/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.pv-reel__star \{\s*transition:\s*none/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);

@@ -127,7 +127,7 @@ export const spanish = {
     guideDone: "(hecho)", guideClose: "Cerrar guía", guideCloseError: "No se pudo cerrar la guía.",
     cardsTitle: "Tus cartas", tabValuable: "Más valiosas", tabFavorites: "Favoritas", tabAdded: "Recientes", cardsLoading: "Cargando tus cartas…",
     favoritesEmpty: "Marca cartas con ★ para verlas aquí", addedEmpty: "Agrega tu primera carta", favoritesError: "No se pudieron cargar tus favoritas.", addedError: "No se pudieron cargar tus cartas recientes.",
-    carouselPause: "Pausar", carouselResume: "Reanudar", carouselPrevious: "Cartas anteriores", carouselNext: "Cartas siguientes", noPrice: "Sin precio",
+    quickStar: "Marcar {card} como favorita", quickUnstar: "Quitar {card} de favoritas", carouselPause: "Pausar", carouselResume: "Reanudar", carouselPrevious: "Cartas anteriores", carouselNext: "Cartas siguientes", noPrice: "Sin precio",
   },
   favorites: {
     label: "Favorita", added: "Agregada a tus favoritas.", removed: "Quitada de tus favoritas.",
@@ -485,7 +485,7 @@ export const english: Dictionary = {
     guideDone: "(done)", guideClose: "Close guide", guideCloseError: "The guide could not be closed.",
     cardsTitle: "Your cards", tabValuable: "Most valuable", tabFavorites: "Favourites", tabAdded: "Recent", cardsLoading: "Loading your cards…",
     favoritesEmpty: "Star cards with ★ to see them here", addedEmpty: "Add your first card", favoritesError: "Your favourites could not be loaded.", addedError: "Your recent cards could not be loaded.",
-    carouselPause: "Pause", carouselResume: "Resume", carouselPrevious: "Previous cards", carouselNext: "Next cards", noPrice: "No price",
+    quickStar: "Mark {card} as a favourite", quickUnstar: "Remove {card} from favourites", carouselPause: "Pause", carouselResume: "Resume", carouselPrevious: "Previous cards", carouselNext: "Next cards", noPrice: "No price",
   },
   favorites: {
     label: "Favourite", added: "Added to your favourites.", removed: "Removed from your favourites.",

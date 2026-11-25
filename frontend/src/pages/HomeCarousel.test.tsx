@@ -430,3 +430,128 @@ describe("opening a card", () => {
     expect(await screen.findByRole("region", { name: "Tus cartas" })).toBeVisible();
   });
 });
+
+describe("the quick star", () => {
+  const starFor = (cards: ReturnType<typeof within>, name: string) => cards.getByRole("button", { name });
+  const originalList = () => document.querySelector(".pv-reel__list:not(.pv-reel__loop)") as HTMLElement;
+
+  test("every card has a star button named for it, unpressed, and one request knows all their states", async () => {
+    const request = stubHome({ starred: ["sv2-2"] });
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    await waitFor(() => expect(names(cards)).toEqual(["Card 1", "Card 2", "Card 3", "Card 4", "Card 5"]));
+    const first = starFor(cards, "Marcar Card 1 como favorita");
+    expect(first.tagName).toBe("BUTTON");
+    expect(first).toHaveAttribute("aria-pressed", "false");
+    // A starred card says so, with the opposite action as its name.
+    await waitFor(() => expect(starFor(cards, "Quitar Card 2 de favoritas")).toHaveAttribute("aria-pressed", "true"));
+    const status = callsTo(request, "/api/v1/favorites/status");
+    expect(status).toHaveLength(1);
+    expect(new URL(status[0][0] as string).searchParams.getAll("card_id")).toEqual(["sv1-1", "sv2-2", "sv3-3", "sv4-4", "sv5-5"]);
+  });
+
+  test("the star is not inside the card's link, so using it never opens the card", async () => {
+    stubHome();
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    await waitFor(() => expect(names(cards)).toEqual(["Card 1", "Card 2", "Card 3", "Card 4", "Card 5"]));
+    const star = starFor(cards, "Marcar Card 1 como favorita");
+    expect(star.closest("a")).toBeNull();
+    expect(star.parentElement).toBe(cards.getAllByRole("listitem")[0]);
+  });
+
+  test("clicking changes it at once, keeps it when the server confirms, and neither navigates nor touches Pause", async () => {
+    stubGeometry(); stubFrames();
+    let release: () => void = () => undefined;
+    const request = stubHome({ override: (url, options) => (url.pathname === "/api/v1/favorites/sv1-1" && options?.method === "PUT"
+      ? new Promise<Response>((resolve) => { release = () => resolve(json({ card_id: "sv1-1", favorite: true })); }) : undefined) });
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    await waitFor(() => expect(document.querySelector(".pv-reel__loop")).not.toBeNull());
+    await waitFor(() => expect(starFor(cards, "Marcar Card 1 como favorita")).toBeEnabled());
+    const pause = screen.getByRole("button", { name: "Pausar" });
+    await user.click(starFor(cards, "Marcar Card 1 como favorita"));
+    // At once: pressed, renamed, and still the same page with the same Pause state.
+    const pressed = starFor(cards, "Quitar Card 1 de favoritas");
+    expect(pressed).toHaveAttribute("aria-pressed", "true");
+    expect(pressed).toBeDisabled();
+    expect(screen.getByRole("region", { name: "Tus cartas" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Pausar" })).toBe(pause);
+    expect(pause).toHaveAttribute("aria-pressed", "false");
+    release();
+    await waitFor(() => expect(pressed).toBeEnabled());
+    expect(pressed).toHaveAttribute("aria-pressed", "true");
+    expect(await cards.findByRole("status")).toHaveTextContent("Agregada a tus favoritas.");
+    const writes = callsTo(request, "/api/v1/favorites/sv1-1").filter(([, options]) => (options as RequestInit | undefined)?.method === "PUT");
+    expect(writes).toHaveLength(1);
+    expect((writes[0][1] as RequestInit).headers).toMatchObject({ "X-CSRF-Token": "csrf" });
+  });
+
+  test("the looping copy of a card shows the same star state", async () => {
+    stubGeometry(); stubFrames();
+    stubHome({ starred: ["sv1-1"] });
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    await section();
+    await waitFor(() => expect(document.querySelector(".pv-reel__loop")).not.toBeNull());
+    await waitFor(() => expect(document.querySelectorAll(".pv-reel__star[aria-pressed='true']").length).toBe(2));   // original and its twin
+    await user.click(within(originalList()).getByRole("button", { name: "Quitar Card 1 de favoritas" }));
+    await waitFor(() => expect(document.querySelectorAll(".pv-reel__star[aria-pressed='true']").length).toBe(0));
+  });
+
+  test("a refusal puts the star back with a quiet notice, never an alert", async () => {
+    stubHome({ override: (url, options) => (url.pathname === "/api/v1/favorites/sv1-1" && options?.method === "PUT" ? json({}, 500) : undefined) });
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    await waitFor(() => expect(starFor(cards, "Marcar Card 1 como favorita")).toBeEnabled());
+    await user.click(starFor(cards, "Marcar Card 1 como favorita"));
+    expect(await cards.findByRole("status")).toHaveTextContent("volvimos al estado anterior");
+    expect(starFor(cards, "Marcar Card 1 como favorita")).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  test("the limit of 500 is explained and the star goes back", async () => {
+    stubHome({ override: (url, options) => (url.pathname === "/api/v1/favorites/sv1-1" && options?.method === "PUT" ? json({ detail: "favorites_full" }, 409) : undefined) });
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    await waitFor(() => expect(starFor(cards, "Marcar Card 1 como favorita")).toBeEnabled());
+    await user.click(starFor(cards, "Marcar Card 1 como favorita"));
+    expect(await cards.findByRole("status")).toHaveTextContent("Llegaste al máximo de 500 cartas favoritas.");
+    expect(starFor(cards, "Marcar Card 1 como favorita")).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("starring from the carousel updates the Favoritas view without reloading the page", async () => {
+    const request = stubHome();
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    await user.click(cards.getByRole("tab", { name: "Favoritas" }));
+    expect(await cards.findByText("Marca cartas con ★ para verlas aquí")).toBeVisible();
+    await user.click(cards.getByRole("tab", { name: "Más valiosas" }));
+    await waitFor(() => expect(starFor(cards, "Marcar Card 3 como favorita")).toBeEnabled());
+    await user.click(starFor(cards, "Marcar Card 3 como favorita"));
+    await waitFor(() => expect(starFor(cards, "Quitar Card 3 de favoritas")).toBeEnabled());
+    await user.click(cards.getByRole("tab", { name: "Favoritas" }));
+    await waitFor(() => expect(names(cards)).toEqual(["Card 3"]));
+    expect(starFor(cards, "Quitar Card 3 de favoritas")).toHaveAttribute("aria-pressed", "true");   // no status request needed there
+    expect(callsTo(request, "/api/v1/favorites/status")).toHaveLength(1);
+    // And back: removing it empties the list again, with no flash of skeletons.
+    await user.click(starFor(cards, "Quitar Card 3 de favoritas"));
+    await waitFor(() => expect(cards.getByText("Marca cartas con ★ para verlas aquí")).toBeVisible());
+    expect(callsTo(request, "/api/v1/favorites/cards").length).toBeGreaterThanOrEqual(3);
+  });
+
+  test("keyboard: the star is a button in the tab order of its card", async () => {
+    stubHome();
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    const cards = await section();
+    await waitFor(() => expect(starFor(cards, "Marcar Card 1 como favorita")).toBeEnabled());
+    starFor(cards, "Marcar Card 1 como favorita").focus();
+    await user.keyboard("{Enter}");
+    await waitFor(() => expect(starFor(cards, "Quitar Card 1 de favoritas")).toHaveAttribute("aria-pressed", "true"));
+  });
+});

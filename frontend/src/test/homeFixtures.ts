@@ -79,7 +79,8 @@ export function stubHome(data: HomeData = {}) {
       return Promise.resolve(json({ card_id: card, favorite: starred.has(card) }));
     }
     if (path === "/api/v1/favorites/cards") {
-      const favorites = data.favorites ?? noFavorites;
+      // Unless the test fixes the list, the favourites are whatever is starred now (newest first).
+      const favorites = data.favorites ?? { results: [...starred].reverse().map((id) => ({ card_id: id, favorited_at: "2026-11-25T12:00:00Z", price: quote("2500", "CLP", "2.00"), reason: null })) };
       return Promise.resolve(typeof favorites === "function" ? favorites() : json({ currency: url.searchParams.get("currency") ?? "CLP", rates, total: favorites.results.length, ...favorites }));
     }
     if (path === "/api/v1/binders") { const binders = data.binders ?? [binder(1, "Favoritas")]; return Promise.resolve(json({ results: binders, total: binders.length })); }

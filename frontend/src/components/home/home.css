@@ -163,3 +163,36 @@
   white-space: nowrap;
 }
 .pv-home__chips .pv-chip--link:hover, .pv-home__chips .pv-chip--link:focus-visible { border-color: var(--pv-cyan); color: var(--pv-text); text-decoration: underline; }
+
+/* The quick star: appears on hover or keyboard focus (always, and smaller, without hover). */
+.pv-reel__item { position: relative; }
+.pv-reel__star {
+  align-items: center;
+  background: color-mix(in srgb, var(--pv-bg) 78%, transparent);
+  border: 1px solid var(--pv-border-strong);
+  color: var(--pv-text);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1.25rem;
+  height: var(--pv-touch);
+  justify-content: center;
+  line-height: 1;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  right: var(--pv-space-2);
+  top: var(--pv-space-2);
+  transition: opacity 150ms var(--pv-ease);
+  width: var(--pv-touch);
+  z-index: 3;
+}
+.pv-reel__item:hover .pv-reel__star, .pv-reel__item:focus-within .pv-reel__star, .pv-reel__star:focus-visible { opacity: 1; }
+.pv-reel__star[aria-pressed="true"] { border-color: var(--pv-gold); color: var(--pv-gold); }
+.pv-reel__star:disabled { cursor: default; opacity: .55; }
+@media (hover: none) {
+  .pv-reel__star { font-size: 1rem; height: 32px; opacity: 1; width: 32px; }
+  /* A 44 px target around the smaller button. */
+  .pv-reel__star::after { content: ""; inset: -6px; position: absolute; }
+}
+@media (prefers-reduced-motion: reduce) { .pv-reel__star { transition: none; } }
+.pv-reel__note { margin-top: var(--pv-space-2); }

@@ -12,19 +12,28 @@ import { advance, needsLoop, TOUCH_RESUME_MS } from "./drift";
 import "./home.css";
 
 export type ReelItem = { key: string; cardId: string; to: string; price: Quote | null };
+/** The quick star: one shared state for every copy of a card (the loop shows each card twice). */
+export type StarControls = { starred: (cardId: string) => boolean; ready: (cardId: string) => boolean; pending: (cardId: string) => boolean; toggle: (cardId: string) => void };
 
-function ReelCard({ item, card, loading }: { item: ReelItem; card?: TcgCard; loading: boolean }) {
+function ReelCard({ item, card, loading, stars }: { item: ReelItem; card?: TcgCard; loading: boolean; stars?: StarControls }) {
   const { dictionary, locale } = useLocale();
   const { price } = item;
   const gold = price === null ? null
     : price.amount !== null ? formatMoney(price.amount, price.currency, locale)
     : formatMoney(price.original_amount, price.original_currency, locale, true);
+  const name = card?.name ?? item.cardId;
+  const starred = stars?.starred(item.cardId) ?? false;
   return <li className="pv-reel__item">
     {card ? <InteractiveCard card={card} touchLabel={dictionary.cards.tiltStart} touchActiveLabel={dictionary.cards.tiltStop}>
       {/* The name link below is the accessible one; the artwork link is a pointer and touch shortcut. */}
       <Link to={item.to} aria-hidden="true" tabIndex={-1} className="pv-home__top-art"><CardArtwork card={card} /></Link>
     </InteractiveCard> : loading ? <Skeleton shape="card" /> : <div className="pv-home__top-missing" aria-hidden="true">◇</div>}
-    <h3 className="pv-reel__name"><Link to={item.to}>{card?.name ?? item.cardId}</Link></h3>
+    {stars && <button type="button" className="pv-reel__star" aria-pressed={starred} disabled={!stars.ready(item.cardId) || stars.pending(item.cardId)}
+      aria-label={(starred ? dictionary.home.quickUnstar : dictionary.home.quickStar).replace("{card}", name)}
+      onClick={(event) => { event.stopPropagation(); stars.toggle(item.cardId); }}>
+      <span aria-hidden="true">{starred ? "★" : "☆"}</span>
+    </button>}
+    <h3 className="pv-reel__name"><Link to={item.to}>{name}</Link></h3>
     {gold ? <p className="pv-reel__price price-amount">{gold}</p> : <p className="pv-reel__price pv-reel__price--none">{dictionary.home.noPrice}</p>}
   </li>;
 }
@@ -37,7 +46,7 @@ function ReelCard({ item, card, loading }: { item: ReelItem; card?: TcgCard; loa
  * are wider than their viewport. A single requestAnimationFrame loop moves one scroll
  * offset from elapsed time; no React state changes per frame.
  */
-export function Reel({ items, cards, loading, label }: { items: ReelItem[]; cards: Record<string, TcgCard>; loading: boolean; label: string }) {
+export function Reel({ items, cards, loading, label, stars }: { items: ReelItem[]; cards: Record<string, TcgCard>; loading: boolean; label: string; stars?: StarControls }) {
   const { dictionary } = useLocale();
   const text = dictionary.home;
   const reduced = useMediaQuery(REDUCED_MOTION_QUERY);
@@ -136,7 +145,7 @@ export function Reel({ items, cards, loading, label }: { items: ReelItem[]; card
     resume.current = window.setTimeout(() => setTouching(false), TOUCH_RESUME_MS);
   }
 
-  const cardsFor = (copy: "original" | "duplicate") => items.map((item) => <ReelCard key={`${copy}:${item.key}`} item={item} card={cards[item.cardId]} loading={loading} />);
+  const cardsFor = (copy: "original" | "duplicate") => items.map((item) => <ReelCard key={`${copy}:${item.key}`} item={item} card={cards[item.cardId]} loading={loading} stars={stars} />);
   return <div className="pv-reel">
     <div className="pv-reel__controls">
       {looping && <button type="button" className="pv-button pv-button--secondary pv-reel__pause" aria-pressed={userPaused} onClick={() => setUserPaused(!userPaused)}>
