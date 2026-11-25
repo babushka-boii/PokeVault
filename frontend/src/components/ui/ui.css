@@ -73,3 +73,5 @@
   padding: var(--pv-space-2) var(--pv-space-3);
 }
 .pv-inline-error p { color: var(--pv-danger); margin: 0; }
+.pv-inline-error--calm { border-left-color: var(--pv-border-strong); }
+.pv-inline-error--calm p { color: var(--pv-text-2); }

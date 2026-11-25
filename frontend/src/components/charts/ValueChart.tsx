@@ -71,7 +71,7 @@ export function ValueChart({ shared }: { shared?: Resource }) {
     </div>
     <div className="pv-chart__body">
       {state.kind === "loading" && <LoadingStatus label={text.loading}><Skeleton shape="block" /></LoadingStatus>}
-      {state.kind === "error" && <InlineError message={text.error} retryLabel={dictionary.home.retry} onRetry={resource.retry} />}
+      {state.kind === "error" && <InlineError calm message={text.error} retryLabel={dictionary.home.retry} onRetry={resource.retry} />}
       {history && history.points.length === 0 && <p className="pv-home__meta pv-chart__empty">
         {history.started_on === null ? text.noRecords : text.noPeriodRecords.replace("{currency}", history.currency)}</p>}
       {history && history.points.length >= 1 && <Plot history={history} currency={currency} />}

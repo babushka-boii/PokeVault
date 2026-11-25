@@ -120,7 +120,7 @@ describe("tabs and sources", () => {
     render(<App initialEntries={["/"]} />);
     const cards = await section();
     await user.click(cards.getByRole("tab", { name: "Favoritas" }));
-    expect(await cards.findByText("No se pudieron cargar tus favoritas.")).toBeVisible();
+    expect(await cards.findByText("No pudimos cargar tus favoritas por ahora.")).toBeVisible();
     await user.click(cards.getByRole("tab", { name: "Más valiosas" }));
     await waitFor(() => expect(names(cards)).toHaveLength(5));
     await user.click(cards.getByRole("tab", { name: "Favoritas" }));

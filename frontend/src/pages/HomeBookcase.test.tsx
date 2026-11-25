@@ -78,7 +78,7 @@ describe("the bookcase", () => {
     const user = userEvent.setup();
     render(<App initialEntries={["/"]} />);
     const section = await shelf();
-    expect(await section.findByText("No se pudieron cargar tus carpetas.")).toBeVisible();
+    expect(await section.findByText("No pudimos cargar tus carpetas por ahora.")).toBeVisible();
     expect(await screen.findByRole("region", { name: "Expansiones" })).toBeVisible();
     fail = false;
     await user.click(section.getByRole("button", { name: "Reintentar" }));

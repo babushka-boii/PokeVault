@@ -46,7 +46,7 @@ export function ValueHero({ resource, history }: { resource: ValuationResource; 
     <Greeting />
     <PixelLabel id="home-value-label" tone="gold">{text.valueLabel}</PixelLabel>
     {state.kind === "loading" && <LoadingStatus label={text.valueLoading}><Skeleton shape="number" /><Skeleton shape="text" lines={2} /></LoadingStatus>}
-    {state.kind === "error" && <InlineError message={text.valueError} retryLabel={text.retry} onRetry={retry} />}
+    {state.kind === "error" && <InlineError calm message={text.valueError} retryLabel={text.retry} onRetry={retry} />}
     {value && <>
       <p className="pv-home__total pv-tabular">{value.total !== null ? formatMoney(value.total, value.currency, locale) : originals || formatMoney("0", value.currency, locale)}</p>
       {value.total === null && <p className="pv-home__meta">{prices.conversionUnavailable}</p>}

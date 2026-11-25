@@ -177,13 +177,15 @@ describe("failures and sessions", () => {
     const request = stubHome({ valuation: () => fail ? json({}, 503) : json(homeValuation()) });
     const user = userEvent.setup();
     render(<App initialEntries={["/"]} />);
-    expect(await main().findByText("No se pudo cargar el valor de tu colección.")).toBeVisible();
+    expect(await main().findByText("No pudimos cargar el valor de tu colección por ahora. Tus cartas están a salvo.")).toBeVisible();
     expect(await screen.findByRole("link", { name: "Favoritas" })).toBeVisible();
     expect(await screen.findByRole("region", { name: "Expansiones" })).toBeVisible();
     expect(main().getByRole("region", { name: "Tus cartas" })).toBeVisible();
-    expect(main().getByText("No se pudieron cargar tus cartas más valiosas.")).toBeVisible();   // the carousel explains, the hero retries
+    expect(main().getByText("No pudimos cargar tus cartas más valiosas por ahora.")).toBeVisible();   // the carousel explains, the hero retries
     fail = false;
-    await user.click(main().getByRole("button", { name: "Reintentar" }));
+    // The hero and the "most valuable" view both offer a retry for the same request: either one works.
+    expect(main().getAllByRole("button", { name: "Reintentar" })).toHaveLength(2);
+    await user.click(main().getAllByRole("button", { name: "Reintentar" })[0]);
     expect(await main().findByText(/1\.112/)).toBeVisible();
     expect(callsTo(request, "/api/v1/prices/collection")).toHaveLength(2);
     expect(callsTo(request, "/api/v1/binders")).toHaveLength(1);
@@ -192,7 +194,7 @@ describe("failures and sessions", () => {
   test("a binders failure leaves the value and expansions working", async () => {
     stubHome({ override: (url) => url.pathname === "/api/v1/binders" ? json({}, 500) : undefined });
     render(<App initialEntries={["/"]} />);
-    expect(await main().findByText("No se pudieron cargar tus carpetas.")).toBeVisible();
+    expect(await main().findByText("No pudimos cargar tus carpetas por ahora.")).toBeVisible();
     expect(await main().findByText(/1\.112/)).toBeVisible();
     expect(await screen.findByRole("region", { name: "Expansiones" })).toBeVisible();
   });

@@ -55,7 +55,7 @@ export function SetsProgress() {
     </div>
     <p className="pv-home__meta">{text.setsSource}</p>
     {loading && <LoadingStatus label={text.setsLoading}><Skeleton shape="bar" lines={3} /></LoadingStatus>}
-    {failed && <InlineError message={text.setsError} retryLabel={text.retry} onRetry={retry} />}
+    {failed && <InlineError calm message={text.setsError} retryLabel={text.retry} onRetry={retry} />}
     {empty && <p className="pv-home__meta">{text.setsEmpty}</p>}
     {progress.state.kind === "loaded" && <ul className="pv-home__sets-list">
       {sets.map((set) => {

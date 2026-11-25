@@ -137,10 +137,8 @@ export function CardCarousel({ valuation }: { valuation: ValuationResource }) {
       {source.state === "loading" && <LoadingStatus label={text.cardsLoading}>
         <ul className="pv-reel__skeleton">{[0, 1, 2, 3, 4].map((index) => <li key={index}><Skeleton shape="card" /></li>)}</ul>
       </LoadingStatus>}
-      {/* The hero already shows the alert for the shared valuation; this view explains and retries only itself. */}
-      {source.state === "error" && (tab === "valuable"
-        ? <p className="pv-home__meta">{text.topError}</p>
-        : <InlineError message={tab === "favorites" ? text.favoritesError : text.addedError} retryLabel={text.retry} onRetry={source.retry} />)}
+      {/* Each view says what failed and retries only itself; the other views and sections keep working. */}
+      {source.state === "error" && <InlineError calm message={tab === "valuable" ? text.topError : tab === "favorites" ? text.favoritesError : text.addedError} retryLabel={text.retry} onRetry={source.retry} />}
       {source.state === "ready" && (source.items.length === 0
         ? <CutPanel as="div"><p className="pv-home__meta">{empty[tab].message}</p><Link to={empty[tab].to}>{empty[tab].link}</Link></CutPanel>
         : <Reel key={tab} items={source.items} cards={metadata.cards} loading={metadata.loading} label={labels[tab]} stars={stars} />)}

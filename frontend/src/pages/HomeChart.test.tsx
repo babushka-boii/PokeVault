@@ -110,7 +110,7 @@ describe("the chart on Home", () => {
     const user = userEvent.setup();
     render(<App initialEntries={["/"]} />);
     const section = await chart();
-    expect(await section.findByText("No se pudo cargar el historial de valor.")).toBeVisible();
+    expect(await section.findByText("No pudimos cargar el historial de valor por ahora.")).toBeVisible();
     fail = false;
     await user.click(section.getByRole("button", { name: "Reintentar" }));
     expect(await section.findByRole("img")).toBeVisible();

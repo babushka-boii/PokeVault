@@ -55,7 +55,7 @@ export function BinderShelf() {
       <Link to="/binders">{text.bindersAll}</Link>
     </div>
     {list.state.kind === "loading" && <LoadingStatus label={text.bindersLoading}><Skeleton shape="block" /></LoadingStatus>}
-    {list.state.kind === "error" && <InlineError message={text.bindersError} retryLabel={text.retry} onRetry={list.retry} />}
+    {list.state.kind === "error" && <InlineError calm message={text.bindersError} retryLabel={text.retry} onRetry={list.retry} />}
     {list.state.kind === "loading" && <div className="pv-bookcase pv-bookcase--skeleton" aria-hidden="true">{fillers(0)}</div>}
     {list.state.kind === "loaded" && !first && <>
       <div className="pv-bookcase pv-bookcase--empty" aria-hidden="true">{fillers(0)}</div>

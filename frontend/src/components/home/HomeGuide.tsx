@@ -5,6 +5,7 @@ import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { closeGuide, fetchGuide, HomeError, type Guide } from "../../services/home";
 import { CutPanel } from "../ui/CutPanel";
+import { InlineError } from "../ui/InlineError";
 import "./home.css";
 
 /**
@@ -20,10 +21,12 @@ export function HomeGuide() {
     if (!signal.aborted && error instanceof HomeError && error.status === 401) retrySession();
     throw error;
   }), [retrySession]);
-  const { state } = useTcgResource("home-guide", request);
+  const { state, retry } = useTcgResource("home-guide", request);
   const [closed, setClosed] = useState(false);
   const [problem, setProblem] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Optional: nothing while it loads, a quiet note with a retry if it fails (so it is never missing without a reason).
+  if (state.kind === "error") return <InlineError calm message={text.guideLoadError} retryLabel={text.retry} onRetry={retry} />;
   if (state.kind !== "loaded" || state.data.dismissed || closed) return null;
   const guide: Guide = state.data;
   const steps = [

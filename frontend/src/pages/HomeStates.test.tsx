@@ -66,8 +66,8 @@ describe("states", () => {
   test("prices down: the page stays usable, with retry where it helps and recorded history intact", async () => {
     stubHome({ valuation: () => json({}, 503), history: recorded, override: (url) => (url.pathname === "/api/v1/prices/binders" ? json({}, 503) : undefined) });
     render(<App initialEntries={["/"]} />);
-    expect(await main().findByText("No se pudo cargar el valor de tu colección.")).toBeVisible();
-    expect(main().getByText("No se pudieron cargar tus cartas más valiosas.")).toBeVisible();
+    expect(await main().findByText("No pudimos cargar el valor de tu colección por ahora. Tus cartas están a salvo.")).toBeVisible();
+    expect(main().getByText("No pudimos cargar tus cartas más valiosas por ahora.")).toBeVisible();
     expect(await main().findByRole("img")).toBeVisible();                         // the recorded history is still there
     expect(await main().findByRole("link", { name: "Favoritas" })).toBeVisible();   // binders without values
     expect(main().queryByText(/en 7 días/)).not.toBeInTheDocument();
@@ -96,8 +96,8 @@ describe("states", () => {
   test("one failing section never takes the others with it", async () => {
     stubHome({ history: () => json({}, 500), override: (url) => (url.pathname === "/api/v1/binders" ? json({}, 500) : undefined) });
     render(<App initialEntries={["/"]} />);
-    expect(await main().findByText("No se pudo cargar el historial de valor.")).toBeVisible();
-    expect(await main().findByText("No se pudieron cargar tus carpetas.")).toBeVisible();
+    expect(await main().findByText("No pudimos cargar el historial de valor por ahora.")).toBeVisible();
+    expect(await main().findByText("No pudimos cargar tus carpetas por ahora.")).toBeVisible();
     expect(await main().findByText(/1\.112/)).toBeVisible();
     expect(await main().findAllByRole("progressbar")).not.toHaveLength(0);
     expect(main().getAllByRole("link", { name: /^Card \d/ }).length).toBeGreaterThan(0);
@@ -123,5 +123,28 @@ describe("states", () => {
     render(<App initialEntries={["/"]} />);
     expect(await main().findByRole("heading", { level: 2, name: "Hola, Misty" })).toBeVisible();
     expect(main().queryByText("Hola, Ash")).not.toBeInTheDocument();
+  });
+
+  test("every section that fails explains itself kindly, offers Reintentar and never raises an alarm", async () => {
+    const down = () => json({}, 503);
+    stubHome({
+      valuation: down, history: down, guide: down, favorites: down,
+      override: (url) => (["/api/v1/binders", "/api/v1/binders/views/recent"].includes(url.pathname) ? json({}, 503) : undefined),
+    });
+    render(<App initialEntries={["/"]} />);
+    for (const message of [
+      "No pudimos cargar el valor de tu colección por ahora. Tus cartas están a salvo.",
+      "No pudimos cargar tus cartas más valiosas por ahora.",
+      "No pudimos cargar tus carpetas por ahora.",
+      "No pudimos cargar el avance de tus expansiones por ahora.",
+      "No pudimos cargar el historial de valor por ahora.",
+      "No pudimos cargar tus primeros pasos por ahora.",
+    ]) {
+      const note = (await main().findByText(message)).closest(".pv-inline-error")!;
+      expect(note, message).toHaveAttribute("role", "status");
+      expect(within(note as HTMLElement).getByRole("button", { name: "Reintentar" }), message).toBeVisible();
+    }
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(main().queryByText(/se pudo cargar|se pudieron cargar/)).not.toBeInTheDocument();    // no curt "could not" wording left
   });
 });

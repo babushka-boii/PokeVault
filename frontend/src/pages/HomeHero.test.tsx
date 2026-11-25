@@ -203,12 +203,20 @@ describe("new-user guide", () => {
     expect(main().queryByRole("list", { name: "Primeros pasos" })).not.toBeInTheDocument();
   });
 
-  test("a failed request hides it silently", async () => {
-    stubHome({ guide: () => json({}, 500) });
+  test("a failed request says so quietly and can be retried (it never just vanishes)", async () => {
+    let fail = true;
+    const request = stubHome({ guide: () => (fail ? json({}, 500) : json({ has_copy: true, has_stored: true, has_favorite: false, dismissed: false })) });
+    const user = userEvent.setup();
     render(<App initialEntries={["/"]} />);
     await (await hero()).findByText(/1\.112/);
-    expect(main().queryByRole("list", { name: "Primeros pasos" })).not.toBeInTheDocument();
+    const note = await main().findByText("No pudimos cargar tus primeros pasos por ahora.");
+    expect(note.closest(".pv-inline-error")).toHaveAttribute("role", "status");     // polite, not an alarm
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    fail = false;
+    await user.click(main().getByRole("button", { name: "Reintentar" }));
+    const items = within(await main().findByRole("list", { name: "Primeros pasos" })).getAllByRole("listitem");
+    expect(items.map((item) => item.getAttribute("data-done"))).toEqual(["true", "true", "false"]);   // the user's own two finished steps
+    expect(callsTo(request, "/api/v1/home/guide")).toHaveLength(2);
   });
 
   test("closing it asks the server and removes it for good", async () => {
