@@ -196,3 +196,8 @@
 }
 @media (prefers-reduced-motion: reduce) { .pv-reel__star { transition: none; } }
 .pv-reel__note { margin-top: var(--pv-space-2); }
+.pv-home__step-link { background: none; border: 0; color: var(--pv-cyan); cursor: pointer; font: inherit; min-height: var(--pv-touch); padding: 0; text-align: left; text-decoration: underline; }
+.pv-home__step-link:hover { color: var(--pv-text); }
+.pv-home__steps li[data-done="true"] .pv-home__step-link { color: var(--pv-text-2); }
+.pv-home__section-head h2:focus { outline: none; }
+.pv-home__section-head h2:focus-visible { outline: 3px solid var(--pv-focus); outline-offset: 4px; }

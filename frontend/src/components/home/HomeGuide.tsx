@@ -13,7 +13,7 @@ import "./home.css";
  * done (the server records that) or when closed. It is optional: while loading or on error
  * nothing is shown.
  */
-export function HomeGuide() {
+export function HomeGuide({ onFavorite }: { onFavorite: () => void }) {
   const { dictionary } = useLocale();
   const text = dictionary.home;
   const { retrySession, getCsrfToken } = useAuth();
@@ -32,7 +32,8 @@ export function HomeGuide() {
   const steps = [
     { done: guide.has_copy, label: text.guideScan, to: "/scanner" },
     { done: guide.has_stored, label: text.guideStore, to: "/binders" },
-    { done: guide.has_favorite, label: text.guideFavorite, to: "/collection" },
+    // Starring happens on the carousel right here on Home, so this step takes you to it.
+    { done: guide.has_favorite, label: text.guideFavorite, to: null },
   ];
   async function close() {
     const csrf = getCsrfToken();
@@ -49,9 +50,10 @@ export function HomeGuide() {
     </div>
     {problem && <p role="alert" className="pv-home__meta">{text.guideCloseError}</p>}
     <ol className="pv-home__steps" aria-label={text.guideTitle}>
-      {steps.map((step) => <li key={step.to} data-done={step.done}>
+      {steps.map((step) => <li key={step.label} data-done={step.done}>
         <span className="pv-home__step-mark" aria-hidden="true">{step.done ? "✓" : "○"}</span>
-        <Link to={step.to} style={step.done ? { textDecoration: "line-through" } : undefined}>{step.label}</Link>
+        {step.to ? <Link to={step.to} style={step.done ? { textDecoration: "line-through" } : undefined}>{step.label}</Link>
+          : <button type="button" className="pv-home__step-link" style={step.done ? { textDecoration: "line-through" } : undefined} onClick={onFavorite}>{step.label}</button>}
         {step.done && <span className="pv-sr-only">{text.guideDone}</span>}
       </li>)}
     </ol>

@@ -4,6 +4,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "../app/App";
 import { priceAge } from "../components/home/age";
 import { callsTo, homeValuation, ratesDown, stubHome, userA } from "../test/homeFixtures";
+import { stubMedia } from "../test/media";
 import { jsonResponse as json } from "../test/tcgFixtures";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -187,7 +188,9 @@ describe("new-user guide", () => {
     expect(items.map((item) => item.textContent)).toEqual([expect.stringContaining("Escanea tu primera carta"), expect.stringContaining("Guárdala en una carpeta"), expect.stringContaining("Marca tu favorita ★")]);
     expect(within(items[0]).getByText("Escanea tu primera carta").closest("a")).toHaveAttribute("href", "/scanner");
     expect(within(items[1]).getByRole("link")).toHaveAttribute("href", "/binders");
-    expect(within(items[2]).getByRole("link")).toHaveAttribute("href", "/collection");
+    // Starring happens on Home's own carousel, so the last step is an action, not a link away.
+    expect(within(items[2]).queryByRole("link")).not.toBeInTheDocument();
+    expect(within(items[2]).getByRole("button", { name: "Marca tu favorita ★" })).toBeVisible();
     // Done means crossed out *and* named as done: never colour or a line alone.
     expect(items[0]).toHaveAttribute("data-done", "true");
     expect(within(items[0]).getByText("(hecho)")).toHaveClass("pv-sr-only");
@@ -286,5 +289,48 @@ describe("chips", () => {
     expect(within(hero).getByRole("link", { name: "2 sin variante · indicar" })).toHaveAttribute("href", "/collection?variant=unknown");
     expect(within(hero).getByRole("button", { name: "2 precios pendientes · reintentar" })).toBeVisible();
     expect(new Set(chips.map((chip) => chip.className.replace(/pv-chip--(link|button)/g, "").trim().split(/\s+/).filter((name) => name === "pv-chip").join(" ")))).toEqual(new Set(["pv-chip"]));
+  });
+});
+
+describe("the favourite step", () => {
+  test("takes you to the 'most valuable' carousel: tab selected, section scrolled to and its title focused", async () => {
+    const scrolled = vi.fn();
+    Element.prototype.scrollIntoView = scrolled;
+    stubHome({ guide: { has_copy: true, has_stored: true, has_favorite: false, dismissed: false } });
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    const cards = within(await screen.findByRole("region", { name: "Tus cartas" }));
+    await user.click(cards.getByRole("tab", { name: "Recientes" }));         // away from "most valuable" on purpose
+    await user.click(await main().findByRole("button", { name: "Marca tu favorita ★" }));
+    expect(cards.getByRole("tab", { name: "Más valiosas" })).toHaveAttribute("aria-selected", "true");
+    const title = screen.getByRole("heading", { level: 2, name: "Tus cartas" });
+    expect(title).toHaveFocus();
+    expect(scrolled).toHaveBeenCalledTimes(1);
+    expect(scrolled.mock.instances[0]).toBe(title);
+    // Asking again does it again (even if you moved away meanwhile).
+    await user.click(cards.getByRole("tab", { name: "Favoritas" }));
+    await user.click(main().getByRole("button", { name: "Marca tu favorita ★" }));
+    expect(cards.getByRole("tab", { name: "Más valiosas" })).toHaveAttribute("aria-selected", "true");
+    expect(scrolled).toHaveBeenCalledTimes(2);
+  });
+
+  test("with reduced motion it scrolls without animation", async () => {
+    stubMedia({ reducedMotion: true });
+    const scrolled = vi.fn();
+    Element.prototype.scrollIntoView = scrolled;
+    stubHome({ guide: { has_copy: true, has_stored: true, has_favorite: false, dismissed: false } });
+    const user = userEvent.setup();
+    render(<App initialEntries={["/"]} />);
+    await user.click(await main().findByRole("button", { name: "Marca tu favorita ★" }));
+    expect(scrolled).toHaveBeenCalledWith({ behavior: "auto", block: "start" });
+  });
+
+  test("with the user's own data it opens with two steps crossed out and the third open", async () => {
+    stubHome({ guide: { has_copy: true, has_stored: true, has_favorite: false, dismissed: false } });
+    render(<App initialEntries={["/"]} />);
+    const items = within(await main().findByRole("list", { name: "Primeros pasos" })).getAllByRole("listitem");
+    expect(items.map((item) => item.getAttribute("data-done"))).toEqual(["true", "true", "false"]);
+    expect(within(items[1]).getByText("(hecho)")).toBeInTheDocument();
+    expect(within(items[2]).queryByText("(hecho)")).not.toBeInTheDocument();
   });
 });

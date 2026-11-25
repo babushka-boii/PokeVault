@@ -1,5 +1,6 @@
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
+import { useState } from "react";
 import { useCollectionValuation } from "../components/prices/useCollectionValuation";
 import { useHistory } from "../components/prices/useHistory";
 import { GuestHome } from "../components/home/GuestHome";
@@ -21,12 +22,14 @@ function SignedInHome() {
   const valuation = useCollectionValuation(CAROUSEL_SIZE);
   // One shared history request: the hero reads its 7-day baseline from it, and so will the chart.
   const history = useHistory("30d");
+  // The guide asks the carousel to come into view (a counter, so asking twice works twice).
+  const [showCards, setShowCards] = useState(0);
   return <>
     <div className="pv-home__grid">
       <ValueHero resource={valuation} history={history} />
       <div className="pv-home__side"><ScannerCard /></div>
-      <HomeGuide />
-      <CardCarousel valuation={valuation} />
+      <HomeGuide onFavorite={() => setShowCards((count) => count + 1)} />
+      <CardCarousel valuation={valuation} focusRequest={showCards} />
       <BinderShelf />
       <SetsProgress />
       <ValueChart shared={history} />

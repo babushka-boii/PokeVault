@@ -1,6 +1,7 @@
-import { useCallback, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/context";
+import { REDUCED_MOTION_QUERY, useMediaQuery } from "../../hooks/useMediaQuery";
 import { useFavoriteWrite } from "../../hooks/useFavoriteWrite";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
@@ -38,7 +39,7 @@ function useGuard() {
  * reuses the page's valuation request; the others are requested when first selected and kept
  * while the page is open.
  */
-export function CardCarousel({ valuation }: { valuation: ValuationResource }) {
+export function CardCarousel({ valuation, focusRequest = 0 }: { valuation: ValuationResource; focusRequest?: number }) {
   const { dictionary, locale } = useLocale();
   const text = dictionary.home;
   const { currency, ready } = useCurrency();
@@ -47,6 +48,16 @@ export function CardCarousel({ valuation }: { valuation: ValuationResource }) {
   const [tab, setTab] = useState<Tab>("valuable");
   const [visited, setVisited] = useState<Set<Tab>>(() => new Set<Tab>(["valuable"]));
   const buttons = useRef(new Map<Tab, HTMLButtonElement>());
+  const heading = useRef<HTMLHeadingElement>(null);
+  // When asked to show itself (the guide's last step), go to "most valuable", scroll here and focus the title.
+  const [handled, setHandled] = useState(focusRequest);
+  if (focusRequest !== handled) { setHandled(focusRequest); setTab("valuable"); }
+  const reducedMotion = useMediaQuery(REDUCED_MOTION_QUERY);
+  useEffect(() => {
+    if (focusRequest === 0) return;
+    heading.current?.scrollIntoView?.({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    heading.current?.focus({ preventScroll: true });
+  }, [focusRequest, reducedMotion]);
 
   // Starring from the carousel changes this counter, so the favourites view is read again.
   const [starsVersion, setStarsVersion] = useState(0);
@@ -126,7 +137,7 @@ export function CardCarousel({ valuation }: { valuation: ValuationResource }) {
 
   return <section className="pv-home__section pv-home__wide" aria-labelledby="home-top-title">
     <div className="pv-home__section-head">
-      <h2 id="home-top-title">{text.cardsTitle}</h2>
+      <h2 id="home-top-title" ref={heading} tabIndex={-1}>{text.cardsTitle}</h2>
       <div className="pv-segmented" role="tablist" aria-label={text.cardsTitle}>
         {TABS.map((name) => <button key={name} type="button" role="tab" id={`${id}-tab-${name}`} aria-selected={tab === name} aria-controls={`${id}-panel`}
           tabIndex={tab === name ? 0 : -1} ref={(node) => { if (node) buttons.current.set(name, node); else buttons.current.delete(name); }}
