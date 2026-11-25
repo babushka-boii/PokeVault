@@ -22,3 +22,13 @@ export function placePopover(anchor: DOMRect, size: { width: number; height: num
   const top = Math.min(Math.max(MARGIN, anchor.top), Math.max(MARGIN, viewport.height - size.height - MARGIN));
   return { left, top, side: right ? "right" : "left" } as const;
 }
+
+/** Swipe thresholds: at least 48 px, and horizontal motion at least 1.5× the vertical. */
+export const SWIPE_MIN_PX = 48;
+export const SWIPE_RATIO = 1.5;
+
+/** 1 = next page (swipe left), -1 = previous page (swipe right), 0 = not a page swipe. */
+export function swipeDirection(dx: number, dy: number): 1 | -1 | 0 {
+  if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < SWIPE_RATIO * Math.abs(dy)) return 0;
+  return dx < 0 ? 1 : -1;
+}

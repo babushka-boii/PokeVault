@@ -78,9 +78,15 @@ export function PocketActions({ anchor, target, binderId, mobile, busy, facts, o
   useEffect(() => {
     const down = (event: PointerEvent) => {
       if (panel.current?.contains(event.target as Node)) return;
-      const swallow = (click: Event) => { click.stopPropagation(); click.preventDefault(); };
-      document.addEventListener("click", swallow, { capture: true, once: true });
-      window.setTimeout(() => document.removeEventListener("click", swallow, true), 500);
+      // The click that ends this press must not reach the pocket underneath. The guard outlives
+      // the dialog, and goes away with the next press or after a moment.
+      const stop = () => {
+        document.removeEventListener("click", swallow, true); document.removeEventListener("pointerdown", stop, true); window.clearTimeout(timer);
+      };
+      const swallow = (click: Event) => { click.stopPropagation(); click.preventDefault(); stop(); };
+      const timer = window.setTimeout(stop, 500);
+      document.addEventListener("click", swallow, true);
+      document.addEventListener("pointerdown", stop, true);
       close.current();
     };
     document.addEventListener("pointerdown", down, true);

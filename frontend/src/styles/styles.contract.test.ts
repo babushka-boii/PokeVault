@@ -176,6 +176,16 @@ describe("stylesheets", () => {
     expect(reduced).toMatch(/\.pv-flight\s*\{\s*display:\s*none/);
   });
 
+  test("the album keeps vertical scroll and pinch zoom for the browser, and the tray scrolls sideways", () => {
+    const css = stripComments(sheets["/src/components/binders/binders.css"]);
+    expect(rules(css).filter((rule) => rule.selector === ".pv-album").map((rule) => rule.body).join(";")).toMatch(/touch-action:\s*pan-y pinch-zoom/);
+    const list = rules(css).filter((rule) => rule.selector === ".pv-tray__list").map((rule) => rule.body).join(";");
+    expect(list).toMatch(/display:\s*flex/);
+    expect(list).toMatch(/overflow-x:\s*auto/);
+    // The action sheet and popover live above the spread, never clipped by it.
+    expect(rules(css).find((rule) => rule.selector === ".pv-actions-layer")?.body).toMatch(/position:\s*fixed/);
+  });
+
   test("focus is drawn with the focus token in the base layer", () => {
     const focus = rules(sheets[BASE]).find((rule) => rule.selector === ":focus-visible");
     expect(focus?.body).toMatch(/outline:\s*3px solid var\(--pv-focus\)/);

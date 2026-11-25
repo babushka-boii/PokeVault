@@ -70,6 +70,13 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
   const [consumed, setConsumed] = useState<ReadonlySet<string>>(() => new Set());
   // Leaving the page cancels a flight in progress (the clone is removed, the original restored).
   useEffect(() => { alive.current = true; return () => { alive.current = false; flight.current?.abort(); }; }, []);
+  // A resize or rotation mid-flight invalidates the frozen destination: cancel the flight and
+  // show the confirmed state (the card enters its sleeve, the original is restored).
+  useEffect(() => {
+    const onResize = () => flight.current?.abort();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const [turn, setTurn] = useState<"next" | "prev" | null>(null);
   const [status, setStatus] = useState("");
   const [problem, setProblem] = useState<BinderErrorKey | null>(null);
@@ -311,7 +318,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
           <span className="pv-binder__pages">{label}</span>
           <Button disabled={first + (mobile ? 1 : 2) > pageCount} onClick={() => turnPage(1)}>{text.next} ›</Button>
         </nav>
-        <AlbumFrame mobile={mobile} turn={turn}>
+        <AlbumFrame mobile={mobile} turn={turn} swipeEnabled={!busy && !menu && !incoming} onSwipe={(direction) => { if (mobile) turnPage(direction); }}>
           {visible.map((page) => <PageGrid key={page} page={page} pockets={binder.pockets} cards={metadata.cards} prices={priceById}
             selected={selected} arrived={arrived} incoming={incoming} targetable={mode.kind === "move" && mode.binderId === binderId}
             onSelect={select} onActivate={activate} onTurn={turnPage} register={register} />)}

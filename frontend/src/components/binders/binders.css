@@ -233,3 +233,6 @@
 .pv-binder__moving { align-items: center; background: var(--pv-cyan-soft); border-left: 3px solid var(--pv-cyan); display: flex; flex-wrap: wrap; gap: var(--pv-space-3); justify-content: space-between; padding: var(--pv-space-2) var(--pv-space-3); }
 .pv-binder__moving p { margin: 0; }
 .pv-tray[data-filling="true"] { border-color: var(--pv-cyan); box-shadow: inset 0 0 0 2px var(--pv-cyan); }
+
+/* Page swipes on phones: vertical scrolling and pinch zoom stay with the browser; the tray scrolls sideways. */
+.pv-album { touch-action: pan-y pinch-zoom; }

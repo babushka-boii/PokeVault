@@ -156,18 +156,18 @@ route-scoped shell.css/AppShell.tsx only if required to reserve existing shell s
 **Modify:** AlbumFrame.tsx, BinderPage.tsx, BinderTray.tsx, PageGrid.tsx, binders.css.
 **Tests:** BinderView.test.tsx, components/binders/flight.test.ts, albumLayout.test.ts.
 
-- [ ] Add tests for 48 px/1.5× swipe criteria, vertical/multitouch/control/tray exclusion,
+- [x] Add tests for 48 px/1.5× swipe criteria, vertical/multitouch/control/tray exclusion,
   suppressed click after swipe, bounds and reduced motion. No gesture mutates inventory.
-- [ ] Add resize-during-flight, page-then-arrival, popover closure before source capture,
+- [x] Add resize-during-flight, page-then-arrival, popover closure before source capture,
   horizontal tray scroll, rapid second action, unmount/auth abort and missing animation
   API cases. Assert no stale focus, floating clone, duplicate card or hidden origin.
   Distinguish visible-source full flight from unmounted/offscreen-source sleeve entry:
   no stale origin is reused after paging and neither case animates before success.
-- [ ] Implement gesture handling and geometry cancellation around existing arrival tokens.
+- [x] Implement gesture handling and geometry cancellation around existing arrival tokens.
   Capture visible origins at destination activation; otherwise pass no origin to the
   existing sleeve-entry fallback. Keep current flight keyframes/timings and synchronous
   hand-off. Do not replace animation with a second mechanism.
-- [ ] Run the three test files plus frontend lint/typecheck. Commit:
+- [x] Run the three test files plus frontend lint/typecheck. Commit:
   `feat(binders): support touch paging without changing card flight`.
 
 ### Task 4: Copy identity, Part 1 evidence and mandatory pause
@@ -355,4 +355,11 @@ Planning checks: source audit, main fast-forward pull, spec/plan cross-check and
   planting a bug that made arrows activate). 552 frontend tests, lint and typecheck green.
   Cross-binder move uses the inline chooser and `storeNext`; 409/401/outage cases keep their
   existing tests. Real anchoring and the sheet are Safari checks.
-
+- Task 3 complete (2026-11-24): swipe paging (touch/pen only, 48 px and 1.5×, ignored with
+  multi-touch, an open sheet, a pending write or a flight; the click that ends a swipe is
+  swallowed and a new touch cancels that swallow), and a window resize or rotation during a
+  flight cancels it (clone removed, original restored, the card still enters its pocket).
+  The flight keyframes, timings and hand-off are untouched. Source geometry is measured at the
+  activating click and only when the source is mounted and in the viewport, else the sleeve
+  entry plays alone. Planted bugs (resize ignored, arrows activating, outside click not
+  swallowed) each failed tests. 560 frontend tests, lint and typecheck green.
