@@ -86,7 +86,8 @@ export function safeReturnTo(value: string | null | undefined): string {
   if (path === "/pokedex" || path === "/sets" || path === "/scanner") return value;
   const expansion = /^\/sets\/([^/]+)$/.exec(path);
   if (expansion && isSetId(expansion[1])) return value;
-  const match = /^\/pokemon\/([^/]+)\/cards$/.exec(path);
+  // A species: its sheet (/pokemon/25) and the old gallery address that redirects to it.
+  const match = /^\/pokemon\/([^/]+)(?:\/cards)?$/.exec(path);
   return match && parsePokemonNumber(match[1]) !== undefined ? value : fallback;
 }
 
@@ -172,7 +173,7 @@ function isTcgCard(value: unknown): value is TcgCard {
     isNullableText(value.regulation_mark);
 }
 
-function isCardPage(value: unknown): value is CardPage {
+export function isCardPage(value: unknown): value is CardPage {
   return isRecord(value) && isPositiveInteger(value.page) && value.page <= MAX_CARD_PAGE &&
     isPositiveInteger(value.page_size) && value.page_size <= 24 &&
     typeof value.has_more === "boolean" && value.coverage === "english_catalog" &&
