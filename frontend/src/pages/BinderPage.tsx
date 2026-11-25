@@ -286,11 +286,9 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
 
   return <>
     <header className="pv-binder__head">
-      <div>
-        <Link className="pv-binder__back" to="/binders">‹ {text.back}</Link>
-        <h1 id="pv-binder-title">{binder.name}</h1>
-        <p className="pv-binder__hint">{plural(text.cards, binder.copy_count)}</p>
-      </div>
+      <Link className="pv-binder__back" to="/binders">‹ {text.back}</Link>
+      <h1 id="pv-binder-title">{binder.name}</h1>
+      <span className="pv-binder__count">· {plural(text.cards, binder.copy_count)} ·</span>
       <BinderValue binderId={binder.id} version={binder.pockets.map((p) => `${key(p)}:${p.copy.id}`).join(",")} />
     </header>
     <p className="pv-binder__status" role="status" aria-live="polite">{status}</p>
@@ -323,7 +321,7 @@ function BinderWorkspace({ binderId }: { binderId: string }) {
             selected={selected} arrived={arrived} incoming={incoming} targetable={mode.kind === "move" && mode.binderId === binderId}
             onSelect={select} onActivate={activate} onTurn={turnPage} register={register} />)}
         </AlbumFrame>
-        <p className="pv-binder__hint">{text.keyboard}</p>
+        <p className="pv-sr-only">{text.keyboard}</p>
       </div>
       <BinderTray mode={mode} binderId={binderId} busy={busy} version={trayVersion} consumed={consumed} onStore={(copy, origin) => void store(copy, origin)} onCancel={cancelMode} />
     </div>

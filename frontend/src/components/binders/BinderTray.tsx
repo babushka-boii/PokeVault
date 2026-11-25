@@ -27,6 +27,9 @@ export function BinderTray({ mode, binderId, busy, onStore, version, onCancel, c
   const page = loaded && { ...loaded, results: loaded.results.filter((copy) => !consumed.has(copy.id)) };
   const metadata = useCardMetadata(page?.results.map((copy) => copy.card_id) ?? [], locale);
   const fillTarget = mode.kind === "fill" ? mode.target : null;
+  // Folded to a thin bar by default when empty; choosing for a pocket, or an error, opens it.
+  const [choice, setChoice] = useState<boolean | null>(null);
+  const open = fillTarget !== null || tray.state.kind === "error" || (choice ?? (loaded ? loaded.total > 0 : false));
   const fillKey = fillTarget ? `${fillTarget.page}:${fillTarget.pocket}` : null;
   const list = useRef<HTMLUListElement>(null);
   const focused = useRef<string | null>(null);
@@ -37,17 +40,21 @@ export function BinderTray({ mode, binderId, busy, onStore, version, onCancel, c
     focused.current = fillKey;
     (list.current?.querySelector<HTMLElement>("button:not(:disabled)") ?? document.getElementById("pv-tray-title"))?.focus();
   }, [fillKey, loaded]);
-  return <section className="pv-tray" aria-labelledby="pv-tray-title" data-filling={fillKey ? "true" : undefined}>
-    <div className="pv-tray__head">
+  const listId = "pv-tray-body";
+  return <section className="pv-tray" aria-labelledby="pv-tray-title" data-filling={fillKey ? "true" : undefined} data-open={open ? "true" : "false"}>
+    <div className="pv-tray__head" data-tray-target={open && page && page.results.length > 0 ? undefined : "bar"}>
       <h2 id="pv-tray-title" tabIndex={-1}>{text.tray}</h2>
-      {page && <span className="pv-tray__count">{fill(text.trayTotal, { count: page.total })}</span>}
+      {page && <span className="pv-tray__count">{fill(text.trayCount, { count: page.total })}</span>}
+      <button type="button" className="pv-tray__fold" aria-expanded={open} aria-controls={listId} disabled={fillTarget !== null}
+        aria-label={open ? text.trayFold : text.trayUnfold} onClick={() => setChoice(!open)}>{open ? "▾" : "▴"}</button>
     </div>
+    {open && <div id={listId} className="pv-tray__body">
     <p className="pv-binder__hint">{fillTarget ? fill(text.trayTargetHint, fillTarget) : text.trayHint}</p>
     {fillTarget && <Button onClick={onCancel}>{text.trayCancel}</Button>}
     {tray.state.kind === "loading" && <LoadingStatus label={text.trayLoading}><Skeleton shape="text" lines={3} /></LoadingStatus>}
     {tray.state.kind === "error" && <InlineError message={text.trayError} retryLabel={text.retry} onRetry={tray.retry} />}
     {page && page.results.length === 0 && <p className="pv-binder__hint">{text.trayEmpty}</p>}
-    {page && page.results.length > 0 && <ul className="pv-tray__list" ref={list}>
+    {page && page.results.length > 0 && <ul className="pv-tray__list" ref={list} data-tray-target="slot">
       {page.results.map((copy) => {
         const card = metadata.cards[copy.card_id];
         const identity = cardIdentity(copy, card);
@@ -67,6 +74,7 @@ export function BinderTray({ mode, binderId, busy, onStore, version, onCancel, c
     {page && page.total > 30 && <div className="pv-tray__pages">
       <Button disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - 30))}>{text.trayPrevious}</Button>
       <Button disabled={offset + 30 >= page.total} onClick={() => setOffset(offset + 30)}>{text.trayNext}</Button>
+    </div>}
     </div>}
   </section>;
 }

@@ -184,7 +184,7 @@
 }
 
 /* 8D album geometry; sleeve animation and stacking remain unchanged. */
-.pv-binder__layout { grid-template-columns: minmax(0, 1fr); padding-bottom: 200px; }
+.pv-binder__layout { grid-template-columns: minmax(0, 1fr); }
 .pv-album { min-width: 0; }
 .pv-album .pv-spread { position: relative; width: fit-content; margin-inline: auto; padding: 12px; gap: 28px; grid-template-columns: repeat(2, auto); background: var(--pv-bar); border: 1px solid var(--pv-border-strong); }
 .pv-album .pv-page { width: calc(3 * var(--pv-album-sleeve) + 40px); padding: 12px; box-shadow: inset -10px 0 16px var(--pv-shadow-color); }
@@ -236,3 +236,22 @@
 
 /* Page swipes on phones: vertical scrolling and pinch zoom stay with the browser; the tray scrolls sideways. */
 .pv-album { touch-action: pan-y pinch-zoom; }
+
+/* One-line header: back · name · count · gold value · details · attribution. */
+.pv-binder__head { align-items: baseline; display: flex; flex-wrap: wrap; gap: var(--pv-space-1) var(--pv-space-3); }
+.pv-binder__head h1 { font-size: var(--pv-text-lg); margin: 0; }
+.pv-binder__count { color: var(--pv-text-2); font-size: var(--pv-text-sm); }
+.pv-binder-value { align-items: baseline; display: inline-flex; flex-wrap: wrap; gap: var(--pv-space-1) var(--pv-space-3); position: relative; }
+.pv-binder-value .pv-binder__total, .pv-binder-value__total { font-size: var(--pv-text-lg); margin: 0; }
+.pv-binder-value__more summary { color: var(--pv-cyan); cursor: pointer; font-size: var(--pv-text-sm); }
+.pv-binder-value__panel { background: var(--pv-panel-raised); border: 1px solid var(--pv-border-strong); box-shadow: 0 12px 28px color-mix(in srgb, var(--pv-shadow-color) 60%, transparent); left: 0; min-width: 16rem; padding: var(--pv-space-3); position: absolute; top: 100%; z-index: 20; }
+.pv-binder-value .price-attribution { margin: 0; }
+.pv-binder__layout { gap: var(--pv-space-2); }
+.pv-binder { gap: var(--pv-space-2); }
+
+/* The tray folds to a thin bar. */
+.pv-tray__head { align-items: center; gap: var(--pv-space-2); justify-content: flex-start; }
+.pv-tray__head h2 { font-size: var(--pv-text-md); }
+.pv-tray__fold { background: transparent; border: 1px solid var(--pv-border-strong); color: var(--pv-text); cursor: pointer; margin-left: auto; min-height: var(--pv-touch); min-width: var(--pv-touch); }
+.pv-tray[data-open="false"] { max-height: none; padding-block: 2px; }
+.pv-tray__body { display: grid; gap: var(--pv-space-2); }

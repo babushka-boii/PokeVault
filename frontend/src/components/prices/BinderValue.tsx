@@ -3,11 +3,15 @@ import { useAuth } from "../../auth/context";
 import { useTcgResource } from "../../hooks/useTcgResource";
 import { useLocale } from "../../i18n/LocaleProvider";
 import { fetchBinderValue, PricesError } from "../../services/prices";
-import { ValueTotal } from "./CollectionValue";
+import { ValueAmount, ValueDetails } from "./CollectionValue";
 import { useCurrency } from "./currency";
 import { RatesAttribution } from "./PriceDisplay";
 
-/** ``version`` changes whenever the binder contents change, so the total is refetched. */
+/**
+ * A binder's total as one header line: the amount in gold, a foldable "Detalles" with the
+ * rest, and the rates attribution (always visible). ``version`` changes whenever the
+ * binder contents change, so the total is refetched.
+ */
 export function BinderValue({ binderId, version }: { binderId: string; version: string }) {
   const { dictionary } = useLocale();
   const text = dictionary.prices;
@@ -19,14 +23,20 @@ export function BinderValue({ binderId, version }: { binderId: string; version: 
   }), [binderId, currency, retrySession]);
   const { state, retry } = useTcgResource(ready ? `${binderId}:${version}:${currency}` : undefined, request);
   const value = state.kind === "loaded" ? state.data : null;
-  return <section className="price-value pv-binder-value" aria-labelledby="binder-value-title">
-    <h3 id="binder-value-title">{text.binderValue}</h3>
-    {state.kind === "loading" && <p className="price-meta" aria-live="polite">{text.loading}</p>}
-    {state.kind === "error" && <p className="price-meta">{text.error} <button type="button" onClick={retry}>{text.retry}</button></p>}
-    {value && (value.copy_count === 0 ? <p className="price-meta">{text.empty}</p> : <>
-      <ValueTotal value={value} />
-      {value.pending_count > 0 && <p className="price-meta">{text.pending.replace("{count}", String(value.pending_count))} <button type="button" onClick={retry}>{text.retry}</button></p>}
-      {value.total !== null && value.priced_count > 0 && <RatesAttribution rates={value.rates} />}
+  const attributed = value !== null && value.total !== null && value.priced_count > 0;
+  return <section className="pv-binder-value" aria-label={text.binderValue}>
+    {state.kind === "loading" && <span className="price-meta" aria-live="polite">{text.loading}</span>}
+    {state.kind === "error" && <span className="price-meta">{text.error} <button type="button" onClick={retry}>{text.retry}</button></span>}
+    {value && (value.copy_count === 0 ? <span className="price-meta">{text.empty}</span> : <>
+      <ValueAmount value={value} />
+      <details className="pv-binder-value__more">
+        <summary>{text.valueDetails}</summary>
+        <div className="pv-binder-value__panel">
+          <ValueDetails value={value} />
+          {value.pending_count > 0 && <p className="price-meta">{text.pending.replace("{count}", String(value.pending_count))} <button type="button" onClick={retry}>{text.retry}</button></p>}
+        </div>
+      </details>
+      {attributed && <RatesAttribution rates={value.rates} />}
     </>)}
   </section>;
 }

@@ -83,6 +83,63 @@ describe("spread and pockets", () => {
   });
 });
 
+describe("compact header and folding tray", () => {
+  test("the header is one line: name, count and gold value, with the attribution visible and the rest folded", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [pocketOf(1, 1, physical(0)), pocketOf(1, 2, physical(1))] }] });
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const header = (await screen.findByRole("heading", { level: 1, name: "Kanto" })).closest("header")!;
+    expect(within(header).getByText(/2 cartas/)).toBeVisible();
+    expect(await within(header).findByText("$1.500")).toBeVisible();
+    expect(within(header).getByRole("link", { name: "Rates By Exchange Rate API" })).toBeVisible();   // never hidden
+    const details = header.querySelector("details")!;
+    expect(details).not.toHaveAttribute("open");
+    expect(within(header).getByText("1 de 1 copias con precio")).not.toBeVisible();
+    expect(header.querySelectorAll("h1")).toHaveLength(1);
+  });
+
+  test("the keyboard help is for screen readers only", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [] }] });
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const help = await screen.findByText(/Flechas: moverse entre bolsillos/);
+    expect(help).toHaveClass("pv-sr-only");
+  });
+
+  test("an empty tray is folded to a thin bar by default and unfolds on request", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [] }], tray: [] });
+    const user = userEvent.setup();
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const tray = await screen.findByRole("region", { name: "Sin carpeta" });
+    const fold = await within(tray).findByRole("button", { name: "Desplegar la bandeja" });
+    await waitFor(() => expect(within(tray).getByText("(0)")).toBeVisible());
+    expect(fold).toHaveAttribute("aria-expanded", "false");
+    expect(tray).toHaveAttribute("data-open", "false");
+    expect(within(tray).queryByText(/Toca una carta/)).not.toBeInTheDocument();
+    await user.click(fold);
+    expect(tray).toHaveAttribute("data-open", "true");
+    expect(within(tray).getByText("Todas tus cartas están en carpetas.")).toBeVisible();
+    await user.click(within(tray).getByRole("button", { name: "Plegar la bandeja" }));
+    expect(tray).toHaveAttribute("data-open", "false");
+  });
+
+  test("a tray with cards is open by default, can be folded, and choosing for a pocket opens it", async () => {
+    binderWorld({ binders: [{ name: "Kanto", pockets: [] }], tray: [physical(0), physical(1)] });
+    const user = userEvent.setup();
+    render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
+    const tray = await screen.findByRole("region", { name: "Sin carpeta" });
+    expect(await within(tray).findByText("(2)")).toBeVisible();
+    expect(tray).toHaveAttribute("data-open", "true");
+    await user.click(within(tray).getByRole("button", { name: "Plegar la bandeja" }));
+    expect(tray).toHaveAttribute("data-open", "false");
+    expect(within(tray).queryByRole("button", { name: /^Guardar Card 1/ })).not.toBeInTheDocument();
+    // Choosing from the tray for a pocket opens it again, and the fold is disabled meanwhile.
+    await user.click(await within(await findGrid(1)).findByRole("button", { name: "Página 1, bolsillo 3: vacío" }));
+    await user.click(await screen.findByRole("button", { name: "Elegir de la bandeja" }));
+    expect(tray).toHaveAttribute("data-open", "true");
+    expect(within(tray).getByRole("button", { name: "Plegar la bandeja" })).toBeDisabled();
+    expect(await within(tray).findByRole("button", { name: /^Guardar Card 1/ })).toBeVisible();
+  });
+});
+
 describe("tray and actions", () => {
   test("tapping a tray card stores it in the next free pocket and announces where", async () => {
     const world = binderWorld({ binders: [{ name: "Tesoros", pockets: [pocketOf(1, 1, physical(0))] }], tray: [physical(1)] });
@@ -98,6 +155,10 @@ describe("tray and actions", () => {
     await waitFor(() => expect(stored).toHaveFocus());
     // The arrival mark clears just after its 600 ms animation.
     await waitFor(() => expect(stored).not.toHaveAttribute("data-arrived"), { timeout: 1500 });
+    // An empty tray folds to its bar: "Sin carpeta (0)".
+    await waitFor(() => expect(within(tray).getByText("(0)")).toBeVisible());
+    expect(within(tray).queryByText("Todas tus cartas están en carpetas.")).not.toBeInTheDocument();
+    await user.click(within(tray).getByRole("button", { name: "Desplegar la bandeja" }));
     expect(await within(tray).findByText("Todas tus cartas están en carpetas.")).toBeVisible();
   });
 
@@ -370,7 +431,7 @@ describe("tray paging", () => {
     const user = userEvent.setup();
     render(<App initialEntries={[`/binders/${binderId(1)}`]} />);
     const tray = await screen.findByRole("region", { name: "Sin carpeta" });
-    expect(await within(tray).findByText("31 sin carpeta")).toBeVisible();
+    expect(await within(tray).findByText("(31)")).toBeVisible();
     expect(within(tray).getAllByRole("listitem")).toHaveLength(30);
     expect(within(tray).getByRole("button", { name: "Cartas anteriores" })).toBeDisabled();
     await user.click(within(tray).getByRole("button", { name: "Más cartas" }));
