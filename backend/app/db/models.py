@@ -66,6 +66,10 @@ class UserSettings(Base):
         CheckConstraint(
             "preferred_currency IN ('CLP', 'USD')", name="ck_settings_currency"
         ),
+        CheckConstraint(
+            "trainer_id IN ('mateo', 'diego', 'valentina', 'camila')",
+            name="ck_settings_trainer",
+        ),
     )
 
     user_id: Mapped[UUID] = mapped_column(
@@ -83,6 +87,13 @@ class UserSettings(Base):
     # Set once the student closes the new-user guide, or when its three steps are done.
     home_guide_dismissed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True)
+    )
+    # Profile (Iteration 10): the chosen trainer sprite and the team of up to 5 species.
+    trainer_id: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="mateo", server_default="mateo"
+    )
+    team: Mapped[list[int]] = mapped_column(
+        JSON, nullable=False, default=list, server_default="[]"
     )
 
 
