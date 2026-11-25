@@ -24,7 +24,7 @@ class PokemonProvider:
         transport: httpx.AsyncBaseTransport | None = None,
         clock: Callable[[], float] = monotonic,
     ) -> None:
-        self.search_index = SpeciesIndex(transport)
+        self.search_index = SpeciesIndex()
         self.details = PokemonDetailsService(transport=transport, clock=clock)
         self._transport = transport
         self._clock = clock
