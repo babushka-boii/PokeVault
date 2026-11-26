@@ -53,6 +53,9 @@ test("shows the hero, neighbours with names and a single navigation landmark", a
   expect(screen.getByRole("link", { name: /siguiente.*#026/i })).toBeVisible();
   expect(screen.getByRole("link", { name: /Volver a la Pokédex/ })).toHaveAttribute("href", "/pokedex");
   await screen.findByText(/Cartas de Pikachu/);
+  const artwork = document.querySelector(".pv-species__art")!;
+  expect(artwork.querySelectorAll("img")).toHaveLength(1);
+  expect(artwork.querySelector("img")).toHaveAttribute("src", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png");
   expect(screen.getAllByRole("navigation")).toHaveLength(1);
   expect(screen.getByRole("group", { name: "Páginas de cartas" })).toBeVisible();
 });

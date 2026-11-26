@@ -40,9 +40,8 @@
 .pv-species__siblings { display: flex; flex-wrap: wrap; gap: var(--pv-space-4); }
 .pv-species__siblings a, .pv-species .tcg-back { align-items: center; display: inline-flex; min-height: var(--pv-touch); }
 .pv-species__hero { display: grid; gap: var(--pv-space-5); grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); }
-.pv-species__art { background: var(--pv-panel); border: 1px solid var(--pv-border); position: relative; }
-.pv-species__art > img { display: block; height: auto; width: 100%; }
-.pv-species__corner { background: var(--pv-bar); border: 1px solid var(--pv-border-strong); bottom: var(--pv-space-2); position: absolute; right: var(--pv-space-2); }
+.pv-species__art { display: grid; place-items: center; }
+.pv-species__art > img { display: block; height: auto; max-width: 20rem; width: 100%; }
 .pv-species__hero h1 { margin: var(--pv-space-1) 0 var(--pv-space-2); }
 .pv-species__facts { display: grid; gap: var(--pv-space-2); margin: var(--pv-space-3) 0 0; }
 .pv-species__facts div { display: flex; flex-wrap: wrap; gap: var(--pv-space-2); }
