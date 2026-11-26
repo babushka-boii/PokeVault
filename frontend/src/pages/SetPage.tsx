@@ -138,7 +138,7 @@ export function SetPage() {
   const valid = isSetId(setId);
   const request = useCallback((signal: AbortSignal) => fetchSet(setId, locale, signal), [setId, locale]);
   const { state, retry } = useTcgResource(valid ? `${setId}:${locale}` : undefined, request);
-  useEffect(() => { heading.current?.focus(); }, [location.pathname, state.kind]);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [location.pathname, state.kind]);
   const metadata = state.kind === "loaded" ? state.data : null;
   const personal = auth.status === "authenticated" && !auth.loggingOut;
   const canFilter = personal && metadata?.checklist_status === "verified" && metadata.checklist_size > 0;

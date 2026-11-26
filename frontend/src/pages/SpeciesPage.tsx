@@ -64,7 +64,7 @@ export function SpeciesPage() {
   const stars = useStarState(pageCards.map((card) => card.id), signedIn && cards.state.kind === "loaded");
 
   const heading = useRef<HTMLHeadingElement>(null);
-  useEffect(() => { heading.current?.focus(); }, [location.pathname]);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [location.pathname]);
   useEffect(() => {
     if (rawPage === String(page)) return;
     const next = new URLSearchParams(params); next.set("page", String(page)); setParams(next, { replace: true });

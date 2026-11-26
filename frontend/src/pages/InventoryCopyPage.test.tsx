@@ -29,7 +29,7 @@ test("opens the exact inventory UUID and edits it without requiring provider ava
   expect(await screen.findByText("Physical copy detail")).toBeVisible();
   // The copy UUID is never shown: only the card (here the catalog id, as no metadata is reachable).
   expect(screen.queryByText(copy.id)).not.toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "base1-4" })).toHaveAttribute("href", "/cards/base1-4");
+  expect(screen.getByRole("link", { name: "base1-4" })).toHaveAttribute("href", `/cards/base1-4?${new URLSearchParams({ returnTo: `/collection/${copy.id}` })}`);
   await user.click(screen.getByRole("button", { name: "Editar copia" }));
   await user.clear(screen.getByLabelText("Notas personales"));
   await user.type(screen.getByLabelText("Notas personales"), "Exact copy updated");
@@ -141,7 +141,7 @@ test("names the copy by card and expansion, never by its UUID", async () => {
   const user = userEvent.setup();
   render(<App initialEntries={[`/collection/${copy.id}`]} />);
   const link = await screen.findByRole("link", { name: "Charizard · Base Set" });
-  expect(link).toHaveAttribute("href", "/cards/base1-4");
+  expect(link).toHaveAttribute("href", `/cards/base1-4?${new URLSearchParams({ returnTo: `/collection/${copy.id}` })}`);
   noUuid(screen.getByRole("main"));
   await user.click(screen.getByRole("button", { name: "Editar copia" }));       // editing
   noUuid(screen.getByRole("main"));
@@ -187,4 +187,13 @@ test.each([
   render(<App initialEntries={[`/collection/${copy.id}?${new URLSearchParams({ returnTo })}`]} />);
   await screen.findByRole("link", { name: "Charizard · Base Set" });
   expect(screen.queryByRole("link", { name: "‹ Volver a la carpeta" })).not.toBeInTheDocument();
+});
+
+test("propagates the binder page and pocket through the copy's catalog link", async () => {
+  detailApi();
+  const origin = `/binders/${binderId(1)}?page=2&pocket=5`;
+  render(<App initialEntries={[`/collection/${copy.id}?${new URLSearchParams({ returnTo: origin })}`]} />);
+  expect(await screen.findByRole("link", { name: "Charizard · Base Set" })).toHaveAttribute("href", `/cards/base1-4?${new URLSearchParams({ returnTo: origin })}`);
+  await userEvent.click(screen.getByRole("link", { name: "Charizard · Base Set" }));
+  expect(await screen.findByRole("link", { name: "Volver a la carpeta" })).toHaveAttribute("href", origin);
 });

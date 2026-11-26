@@ -79,7 +79,7 @@ export function SetsPage() {
   const filters = useMemo<SetFilters>(() => ({ page, q, seriesId, sort }), [page, q, seriesId, sort]);
   const request = useCallback((signal: AbortSignal) => fetchSets(locale, filters, signal), [locale, filters]);
   const { state, retry } = useTcgResource(JSON.stringify([locale, page, q, seriesId, sort]), request);
-  useEffect(() => { heading.current?.focus(); }, [location.pathname]);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [location.pathname]);
   const apply = (next: SetFilters) => {
     const nextParams = new URLSearchParams();
     if (next.q) nextParams.set("q", next.q);

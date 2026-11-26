@@ -112,7 +112,7 @@ test("renders detailed card fields from TCG content and full resolution artwork"
   expect(screen.getByText("Only the card's own effect.")).toBeVisible();
   expect(screen.getByText(/Promo/)).toBeVisible();
   expect(screen.getByText(/Idiomas verificados en esta respuesta/)).toBeVisible();
-  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/pokedex");
+  expect(screen.getByRole("link", { name: "Volver a la Pokédex" })).toHaveAttribute("href", "/pokedex");
   for (let attempt = 0; attempt < 6; attempt += 1) fireEvent.error(screen.getByRole("img", { name: "Pikachu & Zekrom-GX" }));
   expect(screen.getByText("Imagen de carta no disponible")).toBeVisible();
 });
@@ -129,7 +129,7 @@ test("allows dot identifiers and ignores external return destinations", async ()
   vi.stubGlobal("fetch", withUnauthenticatedSession(request));
   render(<App initialEntries={["/cards/sv03.5-001?returnTo=https%3A%2F%2Fevil.example"]} />);
   expect(await screen.findByRole("heading", { level: 1, name: "Bulbasaur" })).toBeVisible();
-  expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute("href", "/pokedex");
+  expect(screen.getByRole("link", { name: "Volver a la Pokédex" })).toHaveAttribute("href", "/pokedex");
   expect(request).toHaveBeenCalledWith("http://localhost:8000/api/v1/cards/sv03.5-001?language=es", expect.anything());
 });
 

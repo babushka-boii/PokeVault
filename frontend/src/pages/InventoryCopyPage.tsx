@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
+import { cardPath } from "../services/cards";
 import { CopyLocation } from "../components/binders/CopyLocation";
 import { cardIdentity } from "../components/binders/labels";
 import { useCardMetadata } from "../components/cards/cardMetadata";
@@ -17,6 +18,7 @@ function PersonalCopy({ id }: { id: string }) {
   const text = dictionary.inventory;
   const { retrySession } = useAuth();
   const [params] = useSearchParams();
+  const location = useLocation();
   const backToBinder = safeBinderReturn(params.get("returnTo"));
   const [message, setMessage] = useState<"updated" | "removed" | null>(null);
   const request = useCallback(async (signal: AbortSignal) => {
@@ -40,7 +42,7 @@ function PersonalCopy({ id }: { id: string }) {
       <button type="button" onClick={retry}>{text.retry}</button></>}
     {state.kind === "loaded" && (state.data ? <>
       {backToBinder && <p><Link to={backToBinder}>{dictionary.binders.backToBinder}</Link></p>}
-      <h2><Link to={`/cards/${encodeURIComponent(state.data.card_id)}`}>{cardIdentity(state.data, printing)}</Link></h2>
+      <h2><Link to={cardPath(state.data.card_id, backToBinder ?? location.pathname + location.search)}>{cardIdentity(state.data, printing)}</Link></h2>
       <p>{text.physicalNote}</p>
       <CopyLocation copyId={state.data.id} />
       <ul className="inventory-copies"><OwnedCopy key={state.data.updated_at} copy={state.data} locked={false}
