@@ -485,3 +485,10 @@ respects reduced motion (no drift, no hover growth, no chart fade). See `docs/HO
 
 Collection filters apply immediately; cyan chips include unknown variant. Search covers loaded names from the first 100 distinct cards among the first 500 copies, with progress, failure and limit notices. Metadata is shared with displayed cards, owner-scoped and aborted on exit.
 Ordering is applied before pagination across the bounded snapshot: recent by default, name or expansion as metadata arrives; unnamed cards remain last. Editing pins the current page to preserve the draft and focus.
+
+## Card return navigation — 2026-11-25
+- Home carousel, Profile favorites, species previews, expansion cards and scanner already supplied `returnTo`; collection groups and physical-copy details now supply it too.
+- Pokédex and the expansion index enter through species/set details; binder shelves enter through albums and physical copies. Copies preserve their binder page/pocket context.
+- Return destinations are allowlisted, including collection filters/order/page and binder UUID routes; technical IDs remain URL-only. Back labels identify the destination in ES/EN.
+- A matching previous entry uses history back, preserving the browser stack. Missing/invalid destinations use observed in-app history, otherwise Pokédex; external history is never guessed.
+- Route scroll positions are kept in memory with bounded asynchronous restoration, cancelled by user scrolling; collection pagination is URL-backed. Safari acceptance remains manual.

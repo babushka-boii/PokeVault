@@ -76,14 +76,14 @@ export function cardPath(cardId: string, returnTo?: string): string {
   return `/cards/${encodeURIComponent(cardId)}${returnTo ? `?${new URLSearchParams({ returnTo })}` : ""}`;
 }
 
-/** Only local catalog destinations (and Home) may be used for a return link. */
-export function safeReturnTo(value: string | null | undefined): string {
-  const fallback = "/pokedex";
+/** Only allowlisted local destinations may be used for a return link. */
+export function safeReturnTo(value: string | null | undefined, fallback = "/pokedex"): string {
   if (!value || value.length > 2048 || /[\\#\s]/.test(value) ||
     Array.from(value).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return fallback;
   const path = value.split("?")[0];
   if (value === "/") return value;   // Home, with nothing after it
-  if (path === "/pokedex" || path === "/sets" || path === "/scanner" || path === "/profile") return value;
+  if (path === "/pokedex" || path === "/sets" || path === "/scanner" || path === "/profile" || path === "/collection" || path === "/binders") return value;
+  if (/^\/(?:collection|binders)\/[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(path)) return value;
   const expansion = /^\/sets\/([^/]+)$/.exec(path);
   if (expansion && isSetId(expansion[1])) return value;
   // A species: its sheet (/pokemon/25) and the old gallery address that redirects to it.

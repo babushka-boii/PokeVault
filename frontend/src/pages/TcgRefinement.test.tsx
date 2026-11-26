@@ -113,7 +113,7 @@ test("detail presents TCG defensive metadata and two independently validated ret
   expect(screen.getByText("Marca de regulación").nextElementSibling).toHaveTextContent("F");
   expect(screen.getByRole("heading", { name: "TCG Power" })).toBeVisible();
   expect(screen.getByRole("link", { name: "Volver a la galería" })).toHaveAttribute("href", returnTo);
-  expect(screen.getByRole("link", { name: "Volver a Pokédex" })).toHaveAttribute("href", origin);
+  expect(screen.getByRole("link", { name: "Volver a la Pokédex" })).toHaveAttribute("href", origin);
   await user.click(screen.getByRole("button", { name: "English" }));
   await screen.findByRole("link", { name: "Back to gallery" });
   expect(await screen.findByText("Weaknesses")).toBeVisible();
@@ -124,7 +124,7 @@ test("a nested external return destination never creates an external link", asyn
   const returnTo = `/pokemon/25/cards?${new URLSearchParams({ returnTo: "https://evil.example" })}`;
   render(<App initialEntries={[`/cards/sm9-33?${new URLSearchParams({ returnTo })}`]} />);
   await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" });
-  expect(screen.getByRole("link", { name: "Volver a Pokédex" })).toHaveAttribute("href", "/pokedex");
+  expect(screen.getByRole("link", { name: "Volver a la Pokédex" })).toHaveAttribute("href", "/pokedex");
 });
 
 test("a stale return destination that still points at the retired /boxes falls back to the Pokédex", async () => {
@@ -133,6 +133,6 @@ test("a stale return destination that still points at the retired /boxes falls b
   const returnTo = `/pokemon/25/cards?${new URLSearchParams({ returnTo: stale })}`;
   render(<App initialEntries={[`/cards/sm9-33?${new URLSearchParams({ returnTo })}`]} />);
   await screen.findByRole("heading", { level: 1, name: "Pikachu & Zekrom-GX" });
-  expect(screen.getByRole("link", { name: "Volver a Pokédex" })).toHaveAttribute("href", "/pokedex");
+  expect(screen.getByRole("link", { name: "Volver a la Pokédex" })).toHaveAttribute("href", "/pokedex");
   expect(screen.queryByRole("link", { name: /Cajas/ })).not.toBeInTheDocument();
 });

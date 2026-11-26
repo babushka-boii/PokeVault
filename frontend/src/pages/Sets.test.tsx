@@ -482,3 +482,13 @@ test("ignores stale public explorer responses after keyboard submission of new f
   await act(async () => finish(json(setPage())));
   expect(screen.queryByRole("link", { name: "Team Up" })).not.toBeInTheDocument();
 });
+
+test("loading the expansion focuses its heading without overriding restored scroll", async () => {
+  setup();
+  const focus = vi.spyOn(HTMLElement.prototype, "focus");
+  try {
+    render(<App initialEntries={["/sets/sm9"]} />);
+    await screen.findByRole("heading", { name: "Team Up", level: 1 });
+    await waitFor(() => expect(focus).toHaveBeenCalledWith({ preventScroll: true }));
+  } finally { focus.mockRestore(); }
+});

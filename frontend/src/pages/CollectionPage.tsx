@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/context";
 import { SessionNotice } from "../auth/SessionNotice";
 import { CardArtwork } from "../components/cards/CardArtwork";
@@ -9,7 +9,7 @@ import { useCurrency } from "../components/prices/currency";
 import { PriceOrReason, RatesAttribution } from "../components/prices/PriceDisplay";
 import { useTcgResource } from "../hooks/useTcgResource";
 import { useLocale } from "../i18n/LocaleProvider";
-import { type TcgCard } from "../services/cards";
+import { cardPath, type TcgCard } from "../services/cards";
 import { conditions, InventoryError, physicalLanguages, variants, type InventoryCopy } from "../services/inventory";
 import { fetchCopyPrices, PricesError, type CopyPrice } from "../services/prices";
 import { orderCopies, type CollectionOrder } from "../components/inventory/collectionOrder";
@@ -20,10 +20,11 @@ import "../components/inventory/inventory.css";
 function CardGroup({ card, id, copies, quantity, onChanged, activeCopy, onActiveChange, prices, pricesLoading }: { card?: TcgCard; id: string; copies: InventoryCopy[]; quantity: number; onChanged: (message: "updated" | "removed") => void; activeCopy: string | null; onActiveChange: (id: string | null) => void; prices: Map<string, CopyPrice>; pricesLoading: boolean }) {
   const { dictionary } = useLocale();
   const text = dictionary.inventory;
+  const location = useLocation();
   return <article className="inventory-group">
     <div className="inventory-card-summary">
       {card && <div className="inventory-art"><CardArtwork card={card} /></div>}
-      <div><h2><Link to={`/cards/${encodeURIComponent(id)}`}>{card?.name ?? text.unnamedCard}</Link></h2>
+      <div><h2><Link to={cardPath(id, location.pathname + location.search)}>{card?.name ?? text.unnamedCard}</Link></h2>
         <p>{text.copies.replace("{count}", String(quantity))}</p>
         {card && <p lang={card.set.name_language}>{card.set.name}</p>}
         {!card && <p className="inventory-hint">{text.nameUnavailable}</p>}
@@ -56,11 +57,15 @@ function PersonalCollection() {
   const filters = { variant: params.get("variant") ?? "", condition: params.get("condition") ?? "", language: params.get("language") ?? "" };
   const query = params.get("q") ?? "";
   const order: CollectionOrder = params.get("order") === "name" ? "name" : params.get("order") === "set" ? "set" : "recent";
-  const [offset, setOffset] = useState(0);
+  const rawPage = Number(params.get("page") ?? 1);
+  const offset = Number.isInteger(rawPage) && rawPage >= 1 && rawPage <= 21 ? (rawPage - 1) * 24 : 0;
+  function setOffset(value: number) {
+    const next = new URLSearchParams(params); next.set("page", String(Math.floor(value / 24) + 1)); setParams(next, { replace: true });
+  }
   function updateFilter(key: string, value: string) {
     const next = new URLSearchParams(params);
     if (value) next.set(key, value); else next.delete(key);
-    setParams(next, { replace: true }); setOffset(0); setMessage(null);
+    next.delete("page"); setParams(next, { replace: true }); setMessage(null);
   }
   const [summaryVersion, setSummaryVersion] = useState(0);
   const [editingPage, setEditingPage] = useState<InventoryCopy[] | null>(null);
@@ -111,7 +116,7 @@ function PersonalCollection() {
         <label>{text.orderLabel}<select value={order} onChange={(e) => updateFilter("order", e.target.value)}>
           <option value="recent">{text.orderRecent}</option><option value="name">{text.orderName}</option><option value="set">{text.orderSet}</option>
         </select></label>
-        <button type="button" onClick={() => { const next = new URLSearchParams(params); ["q", "variant", "condition", "language"].forEach((key) => next.delete(key)); setParams(next, { replace: true }); setOffset(0); setMessage(null); }}>{text.clear}</button>
+        <button type="button" onClick={() => { const next = new URLSearchParams(params); ["q", "variant", "condition", "language"].forEach((key) => next.delete(key)); next.delete("page"); setParams(next, { replace: true }); setMessage(null); }}>{text.clear}</button>
       </fieldset>
       {metadata.completed < metadata.total && <p role="status">{text.namesLoading.replace("{done}", String(metadata.completed)).replace("{total}", String(metadata.total))}</p>}
       {metadata.failed > 0 && <p className="inventory-hint">{text.namesFailed}</p>}

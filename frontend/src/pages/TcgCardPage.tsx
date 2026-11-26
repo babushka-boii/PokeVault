@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { usePreviousRoute } from "../app/routeHistory";
 import { AddToCollection } from "../components/inventory/AddToCollection";
 import { CardArtwork } from "../components/cards/CardArtwork";
 import { CardLanguageNote } from "../components/cards/CardLanguageNote";
@@ -23,8 +24,17 @@ export function TcgCardPage() {
   const location = useLocation();
   const heading = useRef<HTMLHeadingElement>(null);
   const card = state.kind === "loaded" ? state.data : undefined;
-  useEffect(() => { heading.current?.focus(); }, [location.pathname, card?.id]);
-  const returnTo = safeReturnTo(searchParams.get("returnTo"));
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, [location.pathname, card?.id]);
+  const previous = usePreviousRoute();
+  const navigate = useNavigate();
+  const explicit = safeReturnTo(searchParams.get("returnTo"), "");
+  const returnTo = explicit || previous || "/pokedex";
+  const backLabel = returnTo.startsWith("/profile") ? text.backProfile
+    : returnTo.startsWith("/collection") ? text.backCollection
+    : returnTo.startsWith("/binders/") ? text.backBinder
+    : returnTo === "/binders" ? dictionary.binders.back
+    : returnTo.startsWith("/pokedex") ? text.backPokedex
+    : returnTo.startsWith("/sets?") || returnTo === "/sets" ? dictionary.sets.back : null;
   const fromGallery = /^\/pokemon\/\d+(?:\/cards)?(?:\?|$)/.test(returnTo);
   const fromSet = /^\/sets\/[^/?]+(?:\?|$)/.test(returnTo);
   const fromScanner = /^\/scanner(?:\?|$)/.test(returnTo);
@@ -37,7 +47,7 @@ export function TcgCardPage() {
 
   return <section className="panel tcg-page tcg-card-page" aria-labelledby="tcg-card-title">
     <nav className="tcg-detail-navigation" aria-label={text.cardInformation}>
-      <Link className="tcg-back" to={returnTo}><span aria-hidden="true">← </span>{fromHome ? text.backHome : fromScanner ? dictionary.scanner.back : fromSet ? dictionary.sets.backSet : fromGallery ? text.backGallery : text.back}</Link>
+      <Link className="tcg-back" to={returnTo} onClick={(event) => { if (previous === returnTo && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); navigate(-1); } }}><span aria-hidden="true">← </span>{backLabel ?? (fromHome ? text.backHome : fromScanner ? dictionary.scanner.back : fromSet ? dictionary.sets.backSet : fromGallery ? text.backGallery : text.back)}</Link>
       {fromGallery && <Link className="tcg-origin" to={origin}>{text.backPokedex}<span aria-hidden="true"> ↗</span></Link>}
     </nav>
     {!card && <h1 id="tcg-card-title" tabIndex={-1} ref={heading}>{text.detailTitle}</h1>}

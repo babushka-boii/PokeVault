@@ -103,3 +103,7 @@ test("cardPath builds the catalog card address and keeps a safe way back", () =>
   expect(cardPath("me02.5-261", "/")).toBe("/cards/me02.5-261?returnTo=%2F");
   expect(safeReturnTo(new URLSearchParams("returnTo=%2F").get("returnTo"))).toBe("/");
 });
+
+test.each(["/collection?q=pika&variant=unknown&order=name&page=3", "/collection/00000000-0000-4000-8000-000000000001", "/binders/00000000-0000-4000-8000-000000000001?page=4&pocket=2", "/binders", "/profile"])("preserves card return context %s", (target) => {
+  expect(safeReturnTo(target)).toBe(target);
+});

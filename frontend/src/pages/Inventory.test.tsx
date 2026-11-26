@@ -256,3 +256,29 @@ test("orders the full loaded set by name or expansion and defaults to recent cop
   await user.click(screen.getByRole("button", { name: "Cancelar" }));
   expect(screen.getByLabelText("Ordenar por")).toBeEnabled();
 });
+
+test("card round trip preserves collection filters, order and page", async () => {
+  const records = Array.from({ length: 30 }, (_, i) => ({ ...copy, id: `00000000-0000-4000-8000-${String(i + 1).padStart(12, "0")}`, notes: `Copy ${i}` }));
+  vi.stubGlobal("fetch", vi.fn(async (input: string) => {
+    if (input.includes("/auth/me")) return json(session);
+    if (input.includes("/cards/")) return json(pikachuCard);
+    if (input.includes("/inventory?")) {
+      const offset = Number(new URL(input).searchParams.get("offset"));
+      return json({ ...page(records), results: records.slice(offset, offset + 24), offset });
+    }
+    return json({}, 503);
+  }));
+  const origin = "/collection?variant=holo&language=ja&order=name&page=2";
+  render(<App initialEntries={[origin]} />);
+  const user = userEvent.setup();
+  const link = await screen.findByRole("link", { name: pikachuCard.name });
+  expect(link).toHaveAttribute("href", `/cards/${pikachuCard.id}?${new URLSearchParams({ returnTo: origin })}`);
+  expect(screen.getAllByText(/^Copy \d+$/)).toHaveLength(6);
+  await user.click(link);
+  const back = await screen.findByRole("link", { name: "Volver a Mi colección" });
+  expect(back).toHaveAttribute("href", origin);
+  await user.click(back);
+  await screen.findByRole("link", { name: pikachuCard.name });
+  expect(screen.getAllByText(/^Copy \d+$/)).toHaveLength(6);
+  expect(screen.getByLabelText("Ordenar por")).toHaveValue("name");
+});
