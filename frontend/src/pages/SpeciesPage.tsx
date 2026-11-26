@@ -4,7 +4,6 @@ import { useAuth } from "../auth/context";
 import { CardPreview } from "../components/cards/CardPreview";
 import { ExpansionSelector } from "../components/cards/ExpansionSelector";
 import { plural } from "../components/home/plural";
-import { SpeciesSprite } from "../components/pokedex/SpeciesSprite";
 import { formatMoney } from "../components/prices/format";
 import { useCurrency } from "../components/prices/currency";
 import { RatesAttribution } from "../components/prices/PriceDisplay";
@@ -115,7 +114,6 @@ export function SpeciesPage() {
     <div className="pv-species__hero">
       <div className="pv-species__art">
         <img src={artworkUrl(number)} alt="" width={320} height={320} loading="lazy" referrerPolicy="no-referrer" />
-        <span className="pv-species__corner"><SpeciesSprite number={number} name={name} animate /></span>
       </div>
       <div>
         <p className="pv-tile__number">{pad(number)} · {text.heroGeneration.replace("{roman}", generation.roman).replace("{region}", generation.region[locale])}</p>
